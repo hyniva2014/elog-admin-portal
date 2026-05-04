@@ -1,0 +1,117 @@
+/*
+ * Copyright (c) 2023.
+ * File Name: index.tsx
+ * Author: Coderthemes
+ */
+
+import { Box, FilledInput, InputAdornment } from "@mui/material";
+import { LuSearch } from "react-icons/lu";
+import { styled } from "@mui/material";
+import { useLayoutContext } from "@src/states";
+import MenuToggler from "./MenuToggler";
+import MaximizeScreen from "./MaximizeScreen";
+import LayoutThemeToggler from "./LayoutThemeToggler";
+import ThemeCustomizerToggler from "./ThemeCustomizerToggler";
+import AppsDropdown from "./AppsDropdown";
+import NotificationsDropdown from "./NotificationsDropdown";
+import LanguageDropdown from "./LanguageDropdown";
+import { notifications } from "./data";
+import UserProfile from "./UserProfile";
+const TopBarWrapper = styled("div")(({ theme, settings }) => {
+  return {
+    backgroundColor: theme.palette.background.paper,
+    paddingInlineStart: "16px",
+    paddingInlineEnd: "16px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    height: "50px",
+    minHeight: "50px",
+    borderRadius: 0,
+    boxShadow: "0 1px 3px 0 rgb(0 0 0 / .1)",
+    zIndex: 2,
+    position: "sticky",
+    top: 0,
+    background: "#F8F9FA",
+  };
+});
+const Topbar = () => {
+  const { settings } = useLayoutContext();
+  return (
+    <TopBarWrapper settings={settings} className="topbar-header-do-not-remove">
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 2,
+        }}
+      >
+        <MenuToggler />
+      </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 1.5,
+        }}
+        alignItems={"center"}
+      >
+        <Box
+          sx={{
+            display: {
+              lg: "block",
+              xs: "none",
+            },
+          }}
+        >
+          {" "}
+          <FilledInput
+            placeholder="Search"
+            disableUnderline
+            startAdornment={
+              <InputAdornment position="end">
+                <InputAdornment position="start">
+                  <LuSearch size={14} />
+                </InputAdornment>
+              </InputAdornment>
+            }
+            // sx={{
+            //   pl: 0,
+            //   "&:hover": {
+            //     borderBottom: 0,
+            //   },
+            //   "&:before": {
+            //     borderBottom: 0,
+            //   },
+            //   "& > .MuiInputBase-input": {
+            //     py: "8px",
+            //   },
+            // }}
+            sx={{
+              width: "580px",
+              backgroundColor: "transparent",
+              border: "none",
+              boxShadow: "none",
+
+              "& .MuiInputBase-input": {
+                py: "6px",
+              },
+
+              "&:hover": {
+                backgroundColor: "transparent",
+              },
+
+              "&.Mui-focused": {
+                backgroundColor: "transparent",
+              },
+            }}
+          />
+        </Box>
+        <UserProfile />
+      </Box>
+    </TopBarWrapper>
+  );
+};
+export default Topbar;
