@@ -14,10 +14,10 @@ import { useViewPort } from "@src/hooks";
 import { useEffect } from "react";
 
 /* Sidemenu content */
-const SideBarContent = () => <AppMenu menuItems={getMenuItems()} />;
+const SideBarContent = () => <AppMenu menuItems={getMenuItems()} isColla />;
 const LeftSideBarWrapper = styled("div")(({ settings }) => {
   return {
-    backgroundColor: settings.sidenav.theme == "light" ? "#284394 " : "#212428",
+    backgroundColor:  "#284394",
     width: 240,
     minWidth: 240,
     height: "100vh",
