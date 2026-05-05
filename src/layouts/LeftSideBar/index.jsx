@@ -14,7 +14,7 @@ import { useViewPort } from "@src/hooks";
 import { useEffect } from "react";
 
 /* Sidemenu content */
-const SideBarContent = () => <AppMenu menuItems={getMenuItems()} isColla />;
+const SideBarContent = () => <AppMenu menuItems={getMenuItems()}  />;
 const LeftSideBarWrapper = styled("div")(({ settings }) => {
   return {
     backgroundColor:  "#284394",
