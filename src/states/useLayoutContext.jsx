@@ -24,7 +24,8 @@ const LayoutProvider = ({
     sidenav: {
       mode: params["sidenav_mode"] == "mobile" ? "mobile" : "default",
       theme: params["sidenav_theme"] == "light" ? "light" : "dark",
-      showMobileMenu: true
+      showMobileMenu: true,
+      isCollapsed: false
     },
     showRightsideBar: false
   };

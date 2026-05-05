@@ -12,13 +12,21 @@ const MenuToggler = () => {
     settings,
     updateSidenav
   } = useLayoutContext();
-  const showSideNavMobile = () => {
-    updateSidenav({
-      showMobileMenu: !settings.sidenav.showMobileMenu
-    });
+  const toggleSideNav = () => {
+    if (settings.sidenav.mode === "mobile") {
+      updateSidenav({
+        showMobileMenu: !settings.sidenav.showMobileMenu,
+      });
+    } else {
+      updateSidenav({
+        isCollapsed: !settings.sidenav.isCollapsed,
+      });
+    }
   };
-  return <IconButton color={"inherit"} onClick={showSideNavMobile}>
+  return (
+    <IconButton color={"inherit"} onClick={toggleSideNav}>
       <LuMenu />
-    </IconButton>;
+    </IconButton>
+  );
 };
 export default MenuToggler;

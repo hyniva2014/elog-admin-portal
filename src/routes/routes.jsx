@@ -753,6 +753,14 @@ const adminRoutes = [
       />
     ),
   },
+  {
+    path: "/fleet-dashboard",
+    element: (
+      <LoadComponent
+        component={lazy(() => import("../components/AdminComponents/Dummy"))}
+      />
+    ),
+  },
 ];
 export const defaultLayoutRoutes = [...otherRotes, ...authRoutes];
 export const verticalLayoutRoutes = [

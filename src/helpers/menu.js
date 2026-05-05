@@ -1,8 +1,13 @@
 import { MENU_ITEMS } from "@src/common/menu-items";
+import { FLEET_ITEMS } from "../common/fleet-items";
 
 const getMenuItems = () => {
   return MENU_ITEMS;
 };
+const getFleetMenuItems = () => {
+  return FLEET_ITEMS;
+};
+
 const findAllParent = (menuItems, menuItem) => {
   let parents = [];
   const parent = findMenuItem(menuItems, menuItem.parentKey);
@@ -56,5 +61,6 @@ export {
   findMenuItem,
   getMenuItemFromURL,
   getMenuItems,
+  getFleetMenuItems,
   changeHTMLAttribute,
 };
