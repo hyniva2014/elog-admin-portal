@@ -7,38 +7,49 @@
 import { Drawer, styled } from "@mui/material";
 import LogoBox from "./LogoBox";
 import SimpleBar from "simplebar-react";
-import AppMenu from "./AppMenu";
-import { changeHTMLAttribute, getMenuItems } from "@src/helpers/menu";
+import SideMenu from "./SideMenu";
+import { changeHTMLAttribute, getMenuItems, getFleetMenuItems } from "@src/helpers/menu";
 import { useLayoutContext } from "@src/states";
 import { useViewPort } from "@src/hooks";
 import { useEffect } from "react";
 
 /* Sidemenu content */
-const SideBarContent = () => <AppMenu menuItems={getMenuItems()}  />;
+const SideBarContent = ({ isCollapsed,isVisible }) => {
+  // <SideMenu menuItems={getMenuItems()} isCollapsed={isCollapsed} />
+    const allMenuItems = [
+    ...getMenuItems(),
+    ...getFleetMenuItems(),
+  ];
+  return isVisible ? (
+    <SideMenu menuItems={allMenuItems} isCollapsed={isCollapsed} />
+  ) : null;
+};
 const LeftSideBarWrapper = styled("div")(({ settings }) => {
+  const collapsed = settings?.sidenav?.isCollapsed;
+  const width = collapsed ? 80 : 240;
   return {
-    backgroundColor:  "#284394",
-    width: 240,
-    minWidth: 240,
+    backgroundColor: "#284394",
+    width,
+    minWidth: width,
     height: "100vh",
     position: "sticky",
     top: 0,
-    // transform: "translateX(-100%)"
-    marginInlineStart: !settings.sidenav.showMobileMenu ? -240 : 0,
-    transition: "0.3s margin",
+    marginInlineStart: !settings.sidenav.showMobileMenu ? -width : 0,
+    transition: "0.2s all",
+    overflow: "hidden",
   };
 });
 const LeftSideBarMenu = () => {
   const { settings } = useLayoutContext();
   return (
     <LeftSideBarWrapper settings={settings} className="app-menu-do-not-remove">
-      <LogoBox backgroundColor />
+      <LogoBox backgroundColor isCollapsed={settings.sidenav.isCollapsed} />
       <SimpleBar
         style={{
           height: "calc(100% - 70px)",
         }}
       >
-        <SideBarContent />
+        <SideBarContent isCollapsed={settings.sidenav.isCollapsed} isVisible={true}/>
       </SimpleBar>
     </LeftSideBarWrapper>
   );

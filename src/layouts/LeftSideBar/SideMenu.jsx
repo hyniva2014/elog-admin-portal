@@ -867,10 +867,10 @@ const SideMenu = ({ menuItems, isCollapsed }) => {
   const { settings } = useLayoutContext();
   const [activeMenuItems, setActiveMenuItems] = useState([]);
 
-  const permissions = useSelector((state) => state.loginSlice?.permissions);
-  console.log("permissions", permissions);
+  // const permissions = useSelector((state) => state.loginSlice?.permissions);
+  // console.log("permissions", permissions);
 
-  if (!permissions) return null;
+  // if (!permissions) return null;
 
   const theme = useMemo(
     () => getLeftbarTheme(settings.sidenav.theme),
@@ -883,37 +883,38 @@ const SideMenu = ({ menuItems, isCollapsed }) => {
   };
 
   const filteredMenuItems = useMemo(() => {
-    if (!permissions) return [];
+    // if (!permissions) return [];
 
-    const allPermissions = permissions["Menu Permissions"] || [];
+    // const allPermissions = permissions["Menu Permissions"] || [];
 
-    return menuItems
-      .map((menu) => {
-        const filteredChildren = (menu.children || []).filter((child) => {
-          const childLabel = child?.label?.toLowerCase?.() || "";
-          const normalizedLabel = childLabel.replace(/\s/g, "_");
+    // return menuItems
+    //   .map((menu) => {
+    //     const filteredChildren = (menu.children || []).filter((child) => {
+    //       const childLabel = child?.label?.toLowerCase?.() || "";
+    //       const normalizedLabel = childLabel.replace(/\s/g, "_");
 
-          const expectedDesc =
-            MENU_PERMISSION_MAP[childLabel] || normalizedLabel;
+    //       const expectedDesc =
+    //         MENU_PERMISSION_MAP[childLabel] || normalizedLabel;
 
-          return allPermissions.some((perm) => {
-            if (Number(perm?.granted) !== 1) return false;
+    //       return allPermissions.some((perm) => {
+    //         if (Number(perm?.granted) !== 1) return false;
 
-            const desc = perm?.description?.toLowerCase?.() || "";
+    //         const desc = perm?.description?.toLowerCase?.() || "";
 
-            return desc === expectedDesc;
-          });
-        });
+    //         return desc === expectedDesc;
+    //       });
+    //     });
 
-        if (!filteredChildren.length) return null;
+    //     if (!filteredChildren.length) return null;
 
-        return {
-          ...menu,
-          children: filteredChildren,
-        };
-      })
-      .filter(Boolean);
-  }, [menuItems, permissions]);
+    //     return {
+    //       ...menu,
+    //       children: filteredChildren,
+    //     };
+    //   })
+    //   .filter(Boolean);
+      return menuItems || [];
+  }, [menuItems]);
   const activateMenu = useCallback(() => {
     const match = getMenuItemFromURL(filteredMenuItems, location.pathname);
 
