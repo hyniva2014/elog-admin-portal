@@ -5,6 +5,7 @@
  */
 import { Suspense, lazy } from "react";
 import { Navigate } from "react-router-dom";
+import RequireAuthRedirect from "@src/components/LoginScreen/RequireAuthRedirect";
 const VerticalLayout = lazy(() => import("@src/layouts/VerticalLayout"));
 const GoogleMaps = lazy(() => import("@src/pages/maps/GoogleMaps"));
 const LoadComponent = ({ component: Component }) => {
@@ -490,7 +491,9 @@ const authRoutes = [
   {
     path: "/auth/login",
     element: (
-      <LoadComponent component={lazy(() => import("@src/pages/auth/Login"))} />
+      <LoadComponent
+        component={lazy(() => import("@src/components/LoginScreen/LoginScreen"))}
+      />
     ),
   },
   {
@@ -766,7 +769,7 @@ export const defaultLayoutRoutes = [...otherRotes, ...authRoutes];
 export const verticalLayoutRoutes = [
   {
     path: "/",
-    element: <Navigate to="/dashboard" />,
+    element: <RequireAuthRedirect />,
   },
   ...adminRoutes,
   ...appsRoutes,
