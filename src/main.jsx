@@ -5,6 +5,7 @@ import { SnackbarProvider } from "notistack";
 import { AuthProvider, LayoutProvider } from "./states";
 import { Provider } from "react-redux";
 import App from "@src/App";
+import { BrowserRouter } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
 import "@src/assets/css/app.css";
 import { persistor, store } from "./store/reduxSlice";
@@ -37,15 +38,17 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <StrictMode>
       <HelmetProvider>
-        <AuthProvider>
-          <LayoutProvider>
-            <SnackbarProvider>
-              <PersistGate loading={null} persistor={persistor}>
-                <App />
-              </PersistGate>
-            </SnackbarProvider>
-          </LayoutProvider>
-        </AuthProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <LayoutProvider>
+              <SnackbarProvider>
+                <PersistGate loading={null} persistor={persistor}>
+                  <App />
+                </PersistGate>
+              </SnackbarProvider>
+            </LayoutProvider>
+          </AuthProvider>
+        </BrowserRouter>
       </HelmetProvider>
     </StrictMode>
   </Provider>,

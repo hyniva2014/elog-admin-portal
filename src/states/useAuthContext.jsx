@@ -16,10 +16,12 @@ export function AuthProvider({
   const saveSession = user => {
     setCookie(authSessionKey, JSON.stringify(user));
     setUser(user);
+    localStorage.setItem("token", user?.token || "");
   };
   const removeSession = () => {
     deleteCookie(authSessionKey);
     setUser(undefined);
+    localStorage.removeItem("token");
   };
   return <AuthContext.Provider value={{
     user,
