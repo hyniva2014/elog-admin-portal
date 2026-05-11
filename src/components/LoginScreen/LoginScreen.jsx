@@ -98,8 +98,7 @@ const LoginScreen = () => {
     severity: "success",
   });
 
-  const isDisableSaveButton =
-    !touched.username || !touched.password ;
+  const isDisableSaveButton = !touched.username || !touched.password;
 
   const showSnackbar = (message, severity = "success") => {
     setSnackbar({ open: true, message, severity });
@@ -127,10 +126,7 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
     try {
-      await loginSchema.validate(
-        { username, password },
-        { abortEarly: false },
-      );
+      await loginSchema.validate({ username, password }, { abortEarly: false });
       setErrors({});
       setLoading(true);
 
@@ -164,11 +160,7 @@ const LoginScreen = () => {
             userdetails: response?.body?.data?.userdetails,
           });
         }
-
-        showSnackbar("Login Successful !", "success");
-        setTimeout(() => {
-          navigate(location.state?.from?.pathname || "/dashboard");
-        }, 900);
+        navigate(location.state?.from?.pathname || "/dashboard");
       } else if (response) {
         showSnackbar(
           response?.body?.message || "Invalid username or password",
@@ -205,10 +197,7 @@ const LoginScreen = () => {
 
   const handleSendOtp = async () => {
     try {
-      await forgotEmailSchema.validate(
-        { forgotEmail },
-        { abortEarly: false },
-      );
+      await forgotEmailSchema.validate({ forgotEmail }, { abortEarly: false });
       setErrors({});
       setLoading(true);
 
@@ -221,10 +210,7 @@ const LoginScreen = () => {
         showSnackbar("OTP Sent Successfully", "success");
         setForgotStep(2);
       } else {
-        showSnackbar(
-          response?.body?.message || "Unable to send OTP",
-          "error",
-        );
+        showSnackbar(response?.body?.message || "Unable to send OTP", "error");
       }
     } catch (err) {
       if (err.name === "ValidationError") {
@@ -316,10 +302,10 @@ const LoginScreen = () => {
       <LoginWrapper>
         <LoadingContainer />
         <LogoRow>
-          <img 
-          src={TruckLogo} 
-          alt="E-Log" 
-          style={{ width: 400, filter: "brightness(0) invert(1)" }}
+          <img
+            src={TruckLogo}
+            alt="E-Log"
+            style={{ width: 400, filter: "brightness(0) invert(1)" }}
           />
         </LogoRow>
 
