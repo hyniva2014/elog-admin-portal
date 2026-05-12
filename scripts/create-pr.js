@@ -251,7 +251,17 @@ async function main() {
     if (jiraTicket) {
         console.log(`\n⏳ Adding comment to Jira Ticket (${jiraTicket})...`);
         
-        const jiraComment = `${inputMsg || commitMsg}\n\nPR Link: ${prUrl}`;
+        let formattedMsg = inputMsg || commitMsg;
+        // Automatically format multi-line messages into bullet points if they aren't already
+        if (formattedMsg.includes('\n') && !formattedMsg.match(/^\s*[*#-]/m)) {
+            formattedMsg = formattedMsg.split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0)
+                .map(line => `* ${line}`)
+                .join('\n');
+        }
+
+        const jiraComment = `${formattedMsg}\n\n*PR Link:* ${prUrl}`;
         const encodedAuth = Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64');
 
         try {
