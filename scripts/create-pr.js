@@ -251,15 +251,7 @@ async function main() {
     if (jiraTicket) {
         console.log(`\n⏳ Adding comment to Jira Ticket (${jiraTicket})...`);
         
-        const jiraComment = `*Pull Request ${isNewPr ? 'Created' : 'Updated'}*
-
-The code for this ticket has been ${isNewPr ? 'submitted for review' : 'updated with new commits'}.
-
-{panel:title=Change Summary|borderStyle=solid|borderColor=#3e60d5|titleBGColor=#eef2f7}
-${readableSummary}
-{panel}
-
-*GitHub PR Link:* ${prUrl}`;
+        const jiraComment = `${inputMsg || commitMsg}\n\nPR Link: ${prUrl}`;
         const encodedAuth = Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64');
 
         try {
