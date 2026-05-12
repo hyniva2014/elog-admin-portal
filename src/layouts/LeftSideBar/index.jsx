@@ -11,14 +11,14 @@ import SideMenu from "./SideMenu";
 import { changeHTMLAttribute, getMenuItems, getFleetMenuItems } from "@src/helpers/menu";
 import { useLayoutContext } from "@src/states";
 import { useViewPort } from "@src/hooks";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 /* Sidemenu content */
 const SideBarContent = ({ isCollapsed,isVisible }) => {
   // <SideMenu menuItems={getMenuItems()} isCollapsed={isCollapsed} />
     const allMenuItems = [
     ...getMenuItems(),
-    ...getFleetMenuItems(),
+    // ...getFleetMenuItems(),
   ];
   return isVisible ? (
     <SideMenu menuItems={allMenuItems} isCollapsed={isCollapsed} />
@@ -40,9 +40,41 @@ const LeftSideBarWrapper = styled("div")(({ settings }) => {
   };
 });
 const LeftSideBarMenu = () => {
-  const { settings } = useLayoutContext();
+  const { settings, updateSidenav } = useLayoutContext();
+  const [isHoverExpanded, setIsHoverExpanded] = useState(false);
+
+  const handleMouseEnter = () => {
+    if (settings.sidenav.mode !== "default") {
+      return;
+    }
+
+    setIsHoverExpanded(true);
+
+    if (settings.sidenav.isCollapsed) {
+      updateSidenav({
+        isCollapsed: false,
+      });
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!isHoverExpanded || settings.sidenav.mode !== "default") {
+      return;
+    }
+
+    setIsHoverExpanded(false);
+    updateSidenav({
+      isCollapsed: true,
+    });
+  };
+
   return (
-    <LeftSideBarWrapper settings={settings} className="app-menu-do-not-remove">
+    <LeftSideBarWrapper
+      settings={settings}
+      className="app-menu-do-not-remove"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <LogoBox backgroundColor isCollapsed={settings.sidenav.isCollapsed} />
       <SimpleBar
         style={{
