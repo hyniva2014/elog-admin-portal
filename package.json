@@ -9,7 +9,8 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "latest": "yarn upgrade-interactive --latest",
     "format": "prettier --write src/**/*.{ts,tsx}",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "pr": "node scripts/create-pr.js"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",

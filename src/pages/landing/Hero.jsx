@@ -49,28 +49,37 @@ const Hero = () => {
                 justifyContent: "space-between"
               }} gap={6}>
                   <Typography variant="h1" sx={{
-                  fontSize: "38px",
-                  lineHeight: 1.4,
-                  color: "text.primary"
-                }}>
-                    Attex - React & Material UI (MUI) Admin & Dashboard Template
+                    fontSize: "38px",
+                    lineHeight: 1.4,
+                    color: "text.primary",
+                    fontFamily: "'Outfit', sans-serif",
+                    fontWeight: 700
+                  }}>
+                    ELog Admin Portal - Premium Fleet & Logistics Dashboard
                   </Typography>
                   <Typography variant="h5" sx={{
-                  color: "text.primary",
-                  fontWeight: 400,
-                  lineHeight: 1.5,
-                  "&>span": {
-                    color: "primary.main",
-                    fontWeight: 500
-                  }
-                }}>
-                    The Attex MUI is built on top of latest MUI, following best practices.
-                    <br />
-                    Provides you with ready to use Dashboards, Apps and <span>Many</span> UI Elements
+                    color: "text.primary",
+                    fontWeight: 400,
+                    lineHeight: 1.5,
+                    "&>span": {
+                      color: "primary.main",
+                      fontWeight: 600
+                    }
+                  }}>
+                    Empower your fleet operations with our <span>state-of-the-art</span> administration portal. 
+                    Built for performance, scalability, and seamless driver management.
                   </Typography>
-                  <Button variant="contained" color="primary" size="large" href="#dashboards" endIcon={<LuArrowDown size={16} />} sx={{
-                  width: "fit-content"
-                }}>
+                  <Button 
+                    id="hero-view-demos-btn"
+                    variant="contained" 
+                    color="primary" 
+                    size="large" 
+                    href="#dashboards" 
+                    endIcon={<LuArrowDown size={16} />} 
+                    sx={{
+                      width: "fit-content"
+                    }}
+                  >
                     View Demos
                   </Button>
                 </Stack>

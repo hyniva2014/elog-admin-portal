@@ -55,7 +55,7 @@ const Navbar = () => {
     width: "100%",
     alignItems: "center",
     backgroundColor: theme => alpha(theme.palette.background.paper, 0.95),
-    backdropFilter: "blur(2px)",
+    backdropFilter: "blur(10px)",
     transitionProperty: "all",
     transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
     transitionDuration: "300ms",
@@ -152,11 +152,20 @@ const Navbar = () => {
             alignItems: 'center',
             gap: 1
           }}>
-              <IconButton onClick={toggleLayoutTheme}>
+              <IconButton 
+                id="navbar-theme-toggle"
+                onClick={toggleLayoutTheme} 
+                sx={{ color: 'text.primary' }}
+              >
                 {themeLight ? <LuMoon /> : <LuSunMedium />}
               </IconButton>
-              <Button color="primary" variant="outlined" startIcon={<LuShoppingCart size={20} />}>
-                Buy Now
+              <Button 
+                id="navbar-dashboard-btn"
+                color="primary" 
+                variant="contained" 
+                sx={{ display: { xs: 'none', sm: 'block' } }}
+              >
+                Dashboard
               </Button>
             </Box>
 
