@@ -1,36 +1,11 @@
 /* Modern typography handled in index.html */
 
-/* Global Utilities & Design Tokens */
-:root {
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --glass-blur: blur(10px);
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --primary-gradient: linear-gradient(135deg, #3e60d5 0%, #6c757d 100%);
-}
-
-[data-theme='dark'] {
-  --glass-bg: rgba(30, 35, 40, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.05);
-}
-
-.glass-effect {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-}
-
-.smooth-transition {
-  transition: var(--transition-smooth);
-}
-
-.premium-shadow {
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
-}
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;600;700&display=swap");
 
 /* libraries */
 @import "simplebar-react/dist/simplebar.min.css";
+/*@import "react-quill/dist/quill.snow.css";*/
+/*@import "react-quill/dist/quill.bubble.css";*/
 
 /* custom */
 @import "setup.css";
