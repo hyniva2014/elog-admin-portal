@@ -162,7 +162,14 @@ async function main() {
         ? `*Latest Code Changes:*\n${commits}`
         : `*Developer Summary of Functionality:*\n${inputMsg}`;
 
-    const prTitle = isAutoMsg ? `Merge ${branch} into dev` : inputMsg;
+    let prTitle = isAutoMsg ? `Merge ${branch} into dev` : inputMsg;
+    
+    // 5. Ensure PR Title starts with Jira Ticket ID
+    if (jiraTicket) {
+        // Clean existing ticket prefix if it exists to ensure standard format "TICKET-ID: Message"
+        const cleanMsg = prTitle.replace(/^[A-Za-z]+-\d+\s*[:\-]?\s*/i, '').trim();
+        prTitle = `${jiraTicket}: ${cleanMsg}`;
+    }
     let prBody = `### Overview\n${readableSummary}\n\n### Changed Files\n\`\`\`text\n${fileStats}\n\`\`\`\n\n`;
     if (jiraTicket) prBody += `Jira Ticket: [${jiraTicket}](https://${JIRA_DOMAIN}/browse/${jiraTicket})`;
 
@@ -243,9 +250,16 @@ async function main() {
     // Step 3: Automatically comment on Jira Ticket using basic auth structure
     if (jiraTicket) {
         console.log(`\n⏳ Adding comment to Jira Ticket (${jiraTicket})...`);
-        const jiraComment = isNewPr
-            ? `A Pull Request has been created for this ticket.\n\n${readableSummary}\n\n*PR Link:* ${prUrl}`
-            : `The Pull Request for this branch has been updated with new code.\n\n${readableSummary}\n\n*PR Link:* ${prUrl}`;
+        
+        const jiraComment = `*Pull Request ${isNewPr ? 'Created' : 'Updated'}*
+
+The code for this ticket has been ${isNewPr ? 'submitted for review' : 'updated with new commits'}.
+
+{panel:title=Change Summary|borderStyle=solid|borderColor=#3e60d5|titleBGColor=#eef2f7}
+${readableSummary}
+{panel}
+
+*GitHub PR Link:* ${prUrl}`;
         const encodedAuth = Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64');
 
         try {
