@@ -764,6 +764,46 @@ const adminRoutes = [
       />
     ),
   },
+  {
+    path: "/device-asset-management",
+    element: (
+      <LoadComponent
+        component={lazy(() => import("../components/compliance/DeviceAssetManagement/DeviceAssetManagement"))}
+      />
+    ),
+  },
+  {
+    path: "/account-management",
+    element: (
+      <LoadComponent
+        component={lazy(() => import("../components/compliance/AccountManagement/AccountManagement"))}
+      />
+    ),
+  },
+  {
+    path: "/device-model-management",
+    element: (
+      <LoadComponent
+        component={lazy(() => import("../components/compliance/DeviceModelManagement/DeviceModelManagement"))}
+      />
+    ),
+  },
+  {
+    path: "/device-management",
+    element: (
+      <LoadComponent
+        component={lazy(() => import("../components/compliance/DeviceManagement/DeviceManagement"))}
+      />
+    ),
+  },
+  {
+    path: "/user-management",
+    element: (
+      <LoadComponent
+        component={lazy(() => import("../components/compliance/UserManagement/UserManagement"))}
+      />
+    ),
+  },
 ];
 export const defaultLayoutRoutes = [...otherRotes, ...authRoutes];
 export const verticalLayoutRoutes = [
