@@ -49,9 +49,33 @@ import { Link, useLocation } from "react-router-dom";
 import { useLayoutContext } from "@src/states";
 import { getLeftbarTheme } from "@src/layouts/LeftSideBar/helpers";
 // import { Link, useLocation } from "react-router-dom";
-import CollapsedMenuPopper from "../../common/CollapsedMenuPopper";
 import { useSelector } from "react-redux";
 // import { permissions } from "../../components/CommonRowColumnUtils";
+
+const MenuIcon = ({ icon, size }) => {
+  if (!icon) return null;
+
+  if (typeof icon === "string") {
+    return (
+      <Box
+        component="img"
+        src={icon}
+        alt=""
+        sx={{
+          width: size,
+          height: size,
+          objectFit: "contain",
+          flexShrink: 0,
+          display: "block",
+        }}
+      />
+    );
+  }
+
+  const Icon = icon;
+  return <Icon size={size} />;
+};
+
 const MenuItemWithChildren = ({
   item,
   activeMenuItems,
@@ -60,9 +84,6 @@ const MenuItemWithChildren = ({
   isCollapsed,
 }) => {
   const [open, setOpen] = useState(activeMenuItems.includes(item.key));
-  const Icon = item.icon;
-  const [anchorEl, setAnchorEl] = useState(null);
-  const closeTimer = useRef(null);
 
   useEffect(() => {
     setOpen(activeMenuItems.includes(item.key));
@@ -83,48 +104,27 @@ const MenuItemWithChildren = ({
   return (
     <li>
       {isCollapsed ? (
-        <>
-          <Box
-            onMouseEnter={(e) => {
-              if (closeTimer.current) {
-                clearTimeout(closeTimer.current);
-              }
-              setAnchorEl(e.currentTarget);
-            }}
-            onMouseLeave={() => {
-              closeTimer.current = setTimeout(() => {
-                setAnchorEl(null);
-              }, 150);
-            }}
-            sx={{
-              p: "12px",
-              display: "flex",
-              justifyContent: "center",
-              cursor: "pointer",
-              borderRadius: "20px 0px 0px 20px",
-              marginLeft: "5px",
-              color: isChildActive ? "#284495" : "#fff",
-              backgroundColor: isChildActive ? "#ffffff" : "transparent",
-              // width: "80%",
-              transition: "all 0.2s ease",
-              "&:hover": {
-                backgroundColor: isChildActive
-                  ? "#ffffff"
-                  : "rgba(255,255,255,0.12)",
-              },
-            }}
-          >
-            {Icon && <Icon size={30} />}
-          </Box>
-
-          <CollapsedMenuPopper
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            item={item}
-            onClose={() => setAnchorEl(null)}
-            closeTimer={closeTimer}
-          />
-        </>
+        <Box
+          sx={{
+            p: "12px",
+            display: "flex",
+            justifyContent: "center",
+            cursor: "pointer",
+            borderRadius: "20px 0px 0px 20px",
+            marginLeft: "5px",
+            color: isChildActive ? "#284495" : "#fff",
+            backgroundColor: isChildActive ? "#ffffff" : "transparent",
+            // width: "80%",
+            transition: "all 0.2s ease",
+            "&:hover": {
+              backgroundColor: isChildActive
+                ? "#ffffff"
+                : "rgba(255,255,255,0.12)",
+            },
+          }}
+        >
+          <MenuIcon icon={item.icon} size={30} />
+        </Box>
       ) : (
         <Box
           onClick={toggleMenuItem}
@@ -137,7 +137,7 @@ const MenuItemWithChildren = ({
             color: open ? theme.item.active : theme.item.color,
           }}
         >
-          {Icon && <Icon size={20} />}
+          <MenuIcon icon={item.icon} size={20} />
           <Typography>{item.label}</Typography>
           <Box sx={{ marginLeft: "auto" }}>
             <LuChevronRight
@@ -171,7 +171,6 @@ const MenuItemWithChildren = ({
 
 const MenuItem = ({ item, theme, activeMenuItems, isCollapsed }) => {
   const [open, setOpen] = useState(activeMenuItems.includes(item.key));
-  const Icon = item.icon;
   const location = useLocation();
 
   const isChildActive = (item.children || []).some((child) =>
@@ -198,23 +197,48 @@ const MenuItem = ({ item, theme, activeMenuItems, isCollapsed }) => {
   };
   return (
     <li>
-      <Box
-        component={Link}
-        to={item.url}
-        onClick={toggleSidebar}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          padding: "10px 16px",
-          color: active ? theme.item.active : theme.item.color,
-          textDecoration: "none",
-          borderRadius: "8px",
-          "&:hover": { backgroundColor: "rgba(255,255,255,0.1)" },
-        }}
-      >
-        {Icon && <Icon size={16} />}
-        <Typography ml={1}>{item.label}</Typography>
-      </Box>
+      {isCollapsed ? (
+        <Box
+          component={Link}
+          to={item.url}
+          onClick={toggleSidebar}
+          sx={{
+            p: "12px",
+            display: "flex",
+            justifyContent: "center",
+            cursor: "pointer",
+            borderRadius: "20px 0px 0px 20px",
+            marginLeft: "5px",
+            color: active ? "#284495" : "#fff",
+            backgroundColor: active ? "#ffffff" : "transparent",
+            textDecoration: "none",
+            transition: "all 0.2s ease",
+            "&:hover": {
+              backgroundColor: active ? "#ffffff" : "rgba(255,255,255,0.12)",
+            },
+          }}
+        >
+          <MenuIcon icon={item.icon} size={30} />
+        </Box>
+      ) : (
+        <Box
+          component={Link}
+          to={item.url}
+          onClick={toggleSidebar}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            padding: "10px 16px",
+            color: active ? theme.item.active : theme.item.color,
+            textDecoration: "none",
+            borderRadius: "8px",
+            "&:hover": { backgroundColor: "rgba(255,255,255,0.1)" },
+          }}
+        >
+          <MenuIcon icon={item.icon} size={16} />
+          <Typography ml={1}>{item.label}</Typography>
+        </Box>
+      )}
     </li>
   );
 };
@@ -347,6 +371,7 @@ const SideMenu = ({ menuItems, isCollapsed }) => {
               item={item}
               theme={theme}
               activeMenuItems={activeMenuItems}
+              isCollapsed={isCollapsed}
             />
           ),
         )}

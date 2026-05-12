@@ -5,6 +5,31 @@ import { LuChevronRight } from "react-icons/lu";
 import { Link, useLocation } from "react-router-dom";
 import { useLayoutContext } from "@src/states";
 import { getLeftbarTheme } from "@src/layouts/LeftSideBar/helpers";
+
+const MenuIcon = ({ icon, size = 16 }) => {
+  if (!icon) return null;
+
+  if (typeof icon === "string") {
+    return (
+      <Box
+        component="img"
+        src={icon}
+        alt=""
+        sx={{
+          width: size,
+          height: size,
+          objectFit: "contain",
+          flexShrink: 0,
+          display: "block",
+        }}
+      />
+    );
+  }
+
+  const Icon = icon;
+  return <Icon size={size} />;
+};
+
 const MenuItemWithChildren = ({
   item,
   activeMenuItems,
@@ -12,7 +37,6 @@ const MenuItemWithChildren = ({
   theme
 }) => {
   const [open, setOpen] = useState(activeMenuItems.includes(item.key));
-  const Icon = item.icon;
   useEffect(() => {
     setOpen(activeMenuItems.includes(item.key));
   }, [activeMenuItems, item]);
@@ -34,7 +58,7 @@ const MenuItemWithChildren = ({
         color: open ? theme.item.active : theme.item.hover
       }
     }} onClick={toggleMenuItem}>
-        {Icon && <Icon size={16} />}
+        <MenuIcon icon={item.icon} size={16} />
         <Typography variant="subtitle1" sx={{
         lineHeight: 1
       }}>
@@ -83,7 +107,6 @@ const MenuItem = ({
   activeMenuItems
 }) => {
   const [open, setOpen] = useState(activeMenuItems.includes(item.key));
-  const Icon = item.icon;
   useEffect(() => {
     setOpen(activeMenuItems.includes(item.key));
   }, [activeMenuItems, item]);
@@ -103,7 +126,7 @@ const MenuItem = ({
         textDecoration: "none",
         color: "inherit"
       }}>
-          {Icon && <Icon />}
+          <MenuIcon icon={item.icon} size={16} />
           <Typography variant="subtitle1" style={{
           lineHeight: 1
         }}>
