@@ -2,7 +2,7 @@ import { Box, Grid } from "@mui/material";
 import CommonSearch from "./CommonSearch";
 import CommonDateRangeSelector from "./CommonDateRangeSelector";
 import CommonAutocompleteDropdown from "./CommonAutocompleteDropdown";
-import ViolationTypeAutocomplete from "../components/HOSViolations/ViolationTypeAutocomplete";
+import ViolationTypeAutocomplete from "./ViolationTypeAutocomplete";
 
 const CommonFilters = ({
   data,
