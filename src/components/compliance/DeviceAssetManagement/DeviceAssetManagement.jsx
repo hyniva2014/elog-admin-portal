@@ -19,7 +19,14 @@ import CommonDataGrid from "@src/common/CommonDataGrid";
 import { PageContainer } from "../../../common/PageContainer";
 import eyeIcon from "../../../assets/images/svg/eyeicon.png";
 import CommonLoading from "../../../common/CommonLoading";
+import CommonDialogForm from "../../../common/CommonDialogForm";
 import DeviceAssetManagementHeader from "./DeviceAssetManagementHeader";
+import DeviceAssetManagementForm from "./DeviceAssetManagementForm";
+import {
+  StatusTypography,
+  EditButton,
+  CancelEditButton,
+} from "./DeviceAssetManagement.styles";
 
 const DeviceAssetManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,10 +38,51 @@ const DeviceAssetManagement = () => {
   });
   const [mode, setMode] = useState("");
   const [summaryCards, setSummaryCards] = useState([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [defaultValues, setDefaultValues] = useState({
+    modelName: "",
+    imeiNumber: "",
+  });
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleClick = () => {
-    // Handle add button click
-    console.log("Add device asset clicked");
+    setIsEditMode(false);
+    setDefaultValues({ modelName: "", imeiNumber: "" });
+    setIsAddModalOpen(true);
+  };
+
+  const handleViewClick = (row) => {
+    setIsEditMode(true);
+    setIsEditing(false);
+    setDefaultValues({
+      modelName: row.deviceModel,
+      imeiNumber: row.imei,
+    });
+    setIsAddModalOpen(true);
+  };
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+  };
+
+  const handleAddSubmit = (data) => {
+    console.log("Form submitted:", data);
+    setIsAddModalOpen(false);
+    setDefaultValues({ modelName: "", imeiNumber: "" });
+    setIsEditMode(false);
+    setIsEditing(false);
+  };
+
+  const handleAddCancel = () => {
+    setIsAddModalOpen(false);
+    setDefaultValues({ modelName: "", imeiNumber: "" });
+    setIsEditMode(false);
+    setIsEditing(false);
   };
 
   const mockData = [
@@ -100,14 +148,9 @@ const DeviceAssetManagement = () => {
       flex: 1,
       minWidth: 120,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{
-            color: params.value === "Active" ? "#2e7d32" : "#c62828",
-          }}
-        >
+        <StatusTypography variant="body2" value={params.value}>
           {params.value}
-        </Typography>
+        </StatusTypography>
       ),
     },
     {
@@ -115,8 +158,8 @@ const DeviceAssetManagement = () => {
       headerName: "Action",
       flex: 1,
       minWidth: 100,
-      renderCell: () => (
-        <IconButton size="small" color="primary">
+      renderCell: (params) => (
+        <IconButton size="small" color="primary" onClick={() => handleViewClick(params.row)}>
           <img src={eyeIcon} alt="view" width={16} height={16} />
         </IconButton>
       ),
@@ -149,6 +192,35 @@ const DeviceAssetManagement = () => {
         getRowHeight={() => "auto"}
       />
     </PageContainer>
+    <CommonDialogForm
+      open={isAddModalOpen}
+      title={isEditMode ? "View Asset" : "Add Asset"}
+      mode={isEditMode ? "edit" : "add"}
+      formId="addAssetForm"
+      onSubmit={handleAddSubmit}
+      onCancel={handleAddCancel}
+      submitButtonText={isEditMode ? (isEditing ? "Update" : "Save") : "Add Asset"}
+      headerActions={
+        isEditMode && !isEditing ? (
+          <EditButton variant="contained" onClick={handleEditClick}>
+            Edit
+          </EditButton>
+        ) : isEditMode && isEditing ? (
+          <CancelEditButton variant="outlined" onClick={handleCancelEdit}>
+            Cancel Edit
+          </CancelEditButton>
+        ) : null
+      }
+      content={
+        <DeviceAssetManagementForm
+          formId="addAssetForm"
+          defaultValues={defaultValues}
+          isEditing={isEditing}
+          isEditMode={isEditMode}
+          onSubmit={handleAddSubmit}
+        />
+      }
+    />
     </>
   );
 };
