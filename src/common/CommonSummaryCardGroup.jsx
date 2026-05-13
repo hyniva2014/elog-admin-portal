@@ -1,7 +1,11 @@
 import { Box } from "@mui/material";
 import CommonSummaryCard from "./CommonSummaryCard";
 
-const CommonSummaryCardGroup = ({ cards = [], showAccentBar = true }) => {
+const CommonSummaryCardGroup = ({
+  cards = [],
+  showAccentBar = true,
+  layout = "dashboard",
+}) => {
   if (!cards.length) return null;
 
   return (
@@ -27,6 +31,7 @@ const CommonSummaryCardGroup = ({ cards = [], showAccentBar = true }) => {
           accentcolor={card.accentcolor}
           icon={card.icon}
           showAccentBar={showAccentBar}
+          layout={layout}
         />
       ))}
     </Box>
