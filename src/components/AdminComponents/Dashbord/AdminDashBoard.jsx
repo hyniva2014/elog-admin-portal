@@ -2,16 +2,26 @@ import DevicesIcon from "@mui/icons-material/Devices";
 import WifiIcon from "@mui/icons-material/Wifi";
 import WifiOffIcon from "@mui/icons-material/WifiOff";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
-import { Grid } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { PageContainer } from "../component.styled";
 import CarrierGrowthTrend from "./CarrierGrowthTrend";
 import CommonAlertCenter from "./AlertCenter";
+import { HeaderContainer, HeaderSubtitle, HeaderTitle } from "./AlertCenter.styles";
+import ActiveDevicesIcon from "../../../assets/images/Active Devices.png";
+import FMCSA from "../../../assets/images/Avg FMCSA Score.png";
 
 const AdminDashboard = () => {
   return (
     <>
       <PageContainer>
+        <HeaderContainer>
+          <HeaderTitle variant="h4">Dashboard</HeaderTitle>
+
+          <HeaderSubtitle variant="h6">
+            Overview of platform operations and key metrics
+          </HeaderSubtitle>
+        </HeaderContainer>
         <CommonSummaryCardGroup
           cards={summaryCards}
           showAccentBar={false}
@@ -58,8 +68,8 @@ export default AdminDashboard;
 
 const summaryCards = [
   {
-    id: "total_devices",
-    title: "Total Devices",
+    id: "total_carriers",
+    title: "Total Carriers",
     value: "1,095",
     accentcolor: "#284495",
     icon: (
@@ -72,22 +82,26 @@ const summaryCards = [
     ),
   },
   {
-    id: "online_devices",
-    title: "Online Devices",
+    id: "active_devices",
+    title: "Active Devices",
     value: "1,077",
     accentcolor: "#008236",
     icon: (
-      <WifiIcon
+      <Box
+        component="img"
+        src={ActiveDevicesIcon}
+        alt="ActiveDevicesIcon"
         sx={{
-          //     fontSize: 18,
-          color: "#008236",
+          width: 24,
+          height: 24,
+          objectFit: "contain",
         }}
       />
     ),
   },
   {
-    id: "offline_devices",
-    title: "Offline Devices",
+    id: "open_incidents",
+    title: "Open Incidents",
     value: "18",
     accentcolor: "#FF0000",
     icon: (
@@ -100,15 +114,19 @@ const summaryCards = [
     ),
   },
   {
-    id: "unassigned_devices",
-    title: "Unassigned Devices",
-    value: "34",
+    id: "avg_fmcsa_score",
+    title: "Average FMCSA Score",
+    value: "85.5",
     accentcolor: "#E69500",
     icon: (
-      <Inventory2OutlinedIcon
+      <Box
+        component="img"
+        src={FMCSA}
+        alt="FMCSA"
         sx={{
-          //     fontSize: 18,
-          color: "#E69500",
+          width: 24,
+          height: 24,
+          objectFit: "contain",
         }}
       />
     ),

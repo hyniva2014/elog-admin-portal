@@ -8,7 +8,18 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import { Box, Typography, Paper, useTheme } from "@mui/material";
+import { useTheme } from "@mui/material";
+// import { TooltipContainer } from "./CarrierGrowthTrend.styled";
+
+import {
+  ChartContainer,
+  ChartTitle,
+  TooltipContainer,
+  TooltipLabel,
+  TooltipRow,
+  TooltipText,
+  TooltipValue,
+} from "./CarrierGrowthTrend.styled";
 
 const CarrierGrowthTrend = ({
   title = "Chart",
@@ -27,35 +38,19 @@ const CarrierGrowthTrend = ({
       const tooltipData = payload[0].payload;
 
       return (
-        <Paper
-          elevation={3}
-          sx={{
-            p: 2,
-            borderRadius: 2,
-            minWidth: 160,
-          }}
-        >
-          <Typography fontSize={16} fontWeight={700} mb={1}>
-            {label}
-          </Typography>
+        <TooltipContainer elevation={3}>
+          <TooltipLabel>{label}</TooltipLabel>
 
           {tooltipKeys.map((item) => (
-            <Box
-              key={item.key}
-              display="flex"
-              justifyContent="space-between"
-              mb={0.5}
-            >
-              <Typography fontSize={13} fontWeight={500}>
-                {item.label}
-              </Typography>
+            <TooltipRow key={item.key}>
+              <TooltipText>{item.label}</TooltipText>
 
-              <Typography fontSize={13} fontWeight={700} color={item.color}>
+              <TooltipValue textcolor={item.color}>
                 {tooltipData[item.key]}
-              </Typography>
-            </Box>
+              </TooltipValue>
+            </TooltipRow>
           ))}
-        </Paper>
+        </TooltipContainer>
       );
     }
 
@@ -63,25 +58,8 @@ const CarrierGrowthTrend = ({
   };
 
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        p: 2,
-        paddingTop: 1,
-        paddingBottom: 1,
-        border: "1px solid #E5E7EB",
-        borderRadius: 2,
-        height: 360,
-      }}
-    >
-      <Typography
-        fontSize={18}
-        fontWeight={700}
-        mb={3}
-        color={isDark ? "#FFFFFF" : "#111827"}
-      >
-        {title}
-      </Typography>
+    <ChartContainer elevation={0} chartheight={height}>
+      <ChartTitle isdark={isDark}>{title}</ChartTitle>
 
       <ResponsiveContainer width="100%" height="80%">
         <LineChart data={data}>
@@ -108,7 +86,7 @@ const CarrierGrowthTrend = ({
           />
         </LineChart>
       </ResponsiveContainer>
-    </Paper>
+    </ChartContainer>
   );
 };
 
