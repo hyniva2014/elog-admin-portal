@@ -752,7 +752,7 @@ const adminRoutes = [
     path: "/dashboard",
     element: (
       <LoadComponent
-        component={lazy(() => import("../components/AdminComponents/Test"))}
+        component={lazy(() => import("../components/AdminComponents/dashbord/AdminDashBoard"))}
       />
     ),
   },
@@ -760,7 +760,7 @@ const adminRoutes = [
     path: "/fleet-dashboard",
     element: (
       <LoadComponent
-        component={lazy(() => import("../components/AdminComponents/Dummy"))}
+        // component={lazy(() => import("../components/AdminComponents/Dummy"))}
       />
     ),
   },
