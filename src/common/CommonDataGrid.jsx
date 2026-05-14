@@ -1,7 +1,14 @@
 import { Box, Tooltip, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import CustomPagination from "./CustomPagination";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import {
+  tooltipLabelSx,
+  getHeaderWrapperSx,
+  headerLabelSx,
+  containerSx,
+  gridSx,
+} from "./CommonDataGrid.styles";
 
 const withHeaderTooltip = (columns) =>
   columns.map((col) => {
@@ -16,15 +23,7 @@ const withHeaderTooltip = (columns) =>
 
         return (
           <Tooltip title={params.colDef.headerName} placement="right">
-            <Box
-              sx={{
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-                width: "100%",
-                display: "block",
-              }}
-            >
+            <Box sx={tooltipLabelSx}>
               {originalHeader}
             </Box>
           </Tooltip>
@@ -49,8 +48,9 @@ const CommonDataGrid = ({
 
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
-  const [localRows, setLocalRows] = useState(rowData || []);
+  const containerRef = useRef(null);
 
+  const [localRows, setLocalRows] = useState(rowData || []);
   const [sortConfig, setSortConfig] = useState({
     field: null,
     direction: "asc",
@@ -59,6 +59,69 @@ const CommonDataGrid = ({
   useEffect(() => {
     setLocalRows(rowData || []);
   }, [rowData]);
+  useEffect(() => {
+    const root = containerRef.current;
+    if (!root) return undefined;
+
+    let virtualScroller = null;
+    let scrollHandler = null;
+    let frame = null;
+
+    const applyTransforms = () => {
+      frame = null;
+      if (!virtualScroller) return;
+      const scrollLeft = virtualScroller.scrollLeft;
+      const stickyHeaders = root.querySelectorAll(
+        ".MuiDataGrid-columnHeader.sticky-col-left-1, .MuiDataGrid-columnHeader.sticky-col-left-2",
+      );
+      stickyHeaders.forEach((el) => {
+        el.style.setProperty(
+          "transform",
+          `translate3d(${scrollLeft}px, 0, 0)`,
+          "important",
+        );
+      });
+    };
+
+    const requestApply = () => {
+      if (frame === null) {
+        frame = window.requestAnimationFrame(applyTransforms);
+      }
+    };
+
+    const attachScrollListener = () => {
+      const nextScroller = root.querySelector(".MuiDataGrid-virtualScroller");
+      if (nextScroller && nextScroller !== virtualScroller) {
+        if (virtualScroller && scrollHandler) {
+          virtualScroller.removeEventListener("scroll", scrollHandler);
+        }
+        virtualScroller = nextScroller;
+        scrollHandler = requestApply;
+        virtualScroller.addEventListener("scroll", scrollHandler, {
+          passive: true,
+        });
+        requestApply();
+      }
+    };
+
+    // Initial attach + handle elements that mount asynchronously.
+    attachScrollListener();
+    const observer = new MutationObserver(() => {
+      attachScrollListener();
+      requestApply();
+    });
+    observer.observe(root, { childList: true, subtree: true });
+
+    return () => {
+      observer.disconnect();
+      if (virtualScroller && scrollHandler) {
+        virtualScroller.removeEventListener("scroll", scrollHandler);
+      }
+      if (frame !== null) {
+        window.cancelAnimationFrame(frame);
+      }
+    };
+  }, []);
 
   const handleSort = (field) => {
     let direction = "asc";
@@ -87,6 +150,7 @@ const CommonDataGrid = ({
 
       if (aValue < bValue) return direction === "asc" ? -1 : 1;
       if (aValue > bValue) return direction === "asc" ? 1 : -1;
+
       return 0;
     });
 
@@ -94,19 +158,16 @@ const CommonDataGrid = ({
     setLocalRows(sortedRows);
   };
 
-  const applyEqualWidth = (columns) => {
-    return columns.map((col, index) => {
-      // keep first 2 sticky columns as it is
-      if (index < 2) return col;
+  const stickyWidth = { width: 150, minWidth: 150, maxWidth: 150 };
 
-      return {
-        ...col,
-        flex: 1,
-        minWidth: 150,
-        width: 500,
-        maxWidth: 500,
-      };
-    });
+  const applyEqualWidth = (columns) => {
+    return columns.map((col, index) =>
+      index === 0
+        ? { ...col, ...stickyWidth, cellClassName: "sticky-col-left-1", headerClassName: "sticky-col-left-1" }
+        : index === 1
+          ? { ...col, ...stickyWidth, cellClassName: "sticky-col-left-2", headerClassName: "sticky-col-left-2" }
+          : { ...col, flex: 1, minWidth: 150, width: 500, maxWidth: 500 }
+    );
   };
 
   const updatedColumns = applyEqualWidth(columnsData);
@@ -117,31 +178,14 @@ const CommonDataGrid = ({
     return {
       ...col,
       sortable: false,
-
       renderHeader: () => (
         <Box
-          sx={{
-            cursor: isSortable ? "pointer" : "default",
-            fontWeight: 500,
-            display: "flex",
-            alignItems: "center",
-            width: "100%",
-            gap: 0.5,
-          }}
+          sx={getHeaderWrapperSx(isSortable)}
           onClick={() => {
             if (isSortable) handleSort(col.field);
           }}
         >
-          <Box
-            sx={{
-              flex: 1,
-              minWidth: 0,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              fontWeight: 500,
-            }}
-          >
+          <Box sx={headerLabelSx}>
             {col.headerName}
           </Box>
           {isSortable &&
@@ -154,12 +198,8 @@ const CommonDataGrid = ({
 
   return (
     <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        flex: 1,
-        minHeight: 0,
-      }}
+      ref={containerRef}
+      sx={containerSx}
     >
       <DataGrid
         rows={localRows}
@@ -171,10 +211,11 @@ const CommonDataGrid = ({
         disableColumnMenu
         disableColumnSorting
         pageSizeOptions={[10]}
+        disableVirtualization
         disableRowSelectionOnClick
         hideFooter={hideFooter}
         getRowHeight={getRowHeight}
-        disableVirtualization
+        checkboxSelection={checkboxSelection}
         onPaginationModelChange={(model) =>
           setData((prev) => ({
             ...prev,
@@ -185,118 +226,7 @@ const CommonDataGrid = ({
         slots={{
           pagination: CustomPagination,
         }}
-        checkboxSelection={checkboxSelection}
-        sx={{
-          flex: 1,
-          "& .MuiDataGrid-cell": {
-            paddingTop: "8px",
-            paddingBottom: "8px",
-            display: "flex",
-            alignItems: "center",
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: theme.palette.grey[isDark ? 100 : 100],
-            fontSize: "14px",
-            width: "100%",
-            position: "sticky",
-            top: 0,
-            zIndex: 4,
-          },
-          "& .MuiDataGrid-columnHeaderTitle": {
-            fontWeight: 500,
-          },
-          "& .MuiDataGrid-row": {
-            fontSize: "14px",
-            fontWeight: 400,
-          },
-          "& .MuiDataGrid-columnHeadersInner": {
-            backgroundColor: theme.palette.grey[isDark ? 100 : 100],
-          },
-
-          "& .MuiDataGrid-columnHeader": {
-            backgroundColor: isDark ? theme.palette.grey[100] : "#F6F6F6",
-          },
-          "& .MuiDataGrid-overlay": {
-            height: "100%",
-          },
-          "& .MuiDataGrid-cell:focus": {
-            outline: "none",
-          },
-          "& .MuiDataGrid-cell:focus-within": {
-            outline: "none",
-          },
-          "& .MuiDataGrid-columnHeader:focus": {
-            outline: "none",
-          },
-          "& .MuiDataGrid-columnHeader:focus-within": {
-            outline: "none",
-          },
-          "& .sticky-col-left-1": {
-            position: "sticky",
-            left: 0,
-            backgroundColor: "#fff",
-            zIndex: 2,
-          },
-
-          "& .sticky-col-left-2": {
-            position: "sticky",
-            left: 150,
-            backgroundColor: "#fff",
-            zIndex: 2,
-            borderRight: "1.5px solid rgba(0, 0, 0, 0.2)",
-          },
-
-          "& .MuiDataGrid-row:hover .sticky-col-left-1": {
-            backgroundColor: "inherit !important",
-          },
-
-          "& .MuiDataGrid-row:hover .sticky-col-left-2": {
-            backgroundColor: "inherit !important",
-          },
-
-          "& .sticky-col-right": {
-            position: "sticky",
-            right: 0,
-            backgroundColor: "#fff",
-            zIndex: 2,
-            borderLeft: "2px solid rgba(0, 0, 0, 0.2)",
-            borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
-          },
-          "& .MuiDataGrid-columnHeader.sticky-col-left-1": {
-            position: "sticky",
-            left: 0,
-            backgroundColor: "#F6F6F6",
-            zIndex: 5,
-            borderRight: "none !important",
-          },
-
-          "& .MuiDataGrid-columnHeader.sticky-col-left-2": {
-            position: "sticky",
-            left: 150,
-            backgroundColor: "#F6F6F6",
-            zIndex: 5,
-            borderRight: "none !important",
-          },
-
-          "& .MuiDataGrid-columnHeaders .sticky-col-right": {
-            backgroundColor: "#F6F6F6",
-            zIndex: 5,
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            overflowX: "auto",
-          },
-          "& .MuiDataGrid-virtualScrollerRenderZone": {
-            transform: "none !important",
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            position: "sticky",
-            top: 0,
-            zIndex: 4,
-          },
-          "& .MuiDataGrid-row": {
-            transform: "none !important",
-          },
-        }}
+        sx={(theme) => gridSx(theme)}
       />
     </Box>
   );
