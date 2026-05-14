@@ -66,7 +66,24 @@ const CommonAutocompleteDropdown = ({
           }));
         }
       }}
-      sx={{ minWidth }}
+      sx={{
+        width: "100%",
+        "& .MuiInputBase-root": {
+          minHeight: "40px",
+        },
+
+        "& .MuiOutlinedInput-root": {
+          paddingRight: "32px !important",
+        },
+
+        "& .MuiAutocomplete-endAdornment": {
+          right: "8px",
+        },
+
+        "& .MuiInputLabel-root": {
+          fontSize: "14px",
+        },
+      }}
       loading={loading}
       disabled={disabled}
       renderInput={(params) => (

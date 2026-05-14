@@ -15,84 +15,100 @@ const CommonFilters = ({
   allowDateClear = false,
 }) => {
   return (
-    <Grid container spacing={2} mt={2} alignItems="center" wrap="wrap">
+    <Box
+      sx={{
+        mt: 2,
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        gap: 1.5,
+        flexWrap: "wrap",
+      }}
+    >
       {showSearch && (
-        <Grid item xs={12} md flexGrow={1}>
+        <Box
+          sx={{
+            width: { xs: "100%", md: "35%" },
+            minWidth: { md: 220 },
+            flexShrink: 0,
+          }}
+        >
           <CommonSearch
             key={searchKey}
             value={data.search}
             setData={setData}
             placeholder="Search by All"
           />
-        </Grid>
+        </Box>
       )}
 
-      <Grid item xs={12} md="auto">
-        <Grid
-          container
-          spacing={2}
-          alignItems="center"
-          justifyContent={{ xs: "flex-start", md: "flex-end" }}
-          wrap="wrap"
-        >
-          {showDateRange && (
-            <Grid item xs={12} sm={6} md="auto">
-              <CommonDateRangeSelector
-                value={{
-                  start: data.fromDate,
-                  end: data.toDate,
-                }}
-                allowClear={allowDateClear}
-                onChange={(range) =>
-                  setData((prev) => ({
-                    ...prev,
-                    page: 1,
-                    fromDate: range?.start || null,
-                    toDate: range?.end || null,
-                  }))
-                }
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1.5,
+          flexWrap: "wrap",
+          flex: 1,
+          justifyContent: { xs: "flex-start", md: "flex-end" },
+        }}
+      >
+        {showDateRange && (
+          <Box
+            sx={{
+              width: { xs: "100%", sm: "calc(50% - 6px)", md: "auto" },
+              minWidth: 180,
+            }}
+          >
+            <CommonDateRangeSelector
+              value={{ start: data.fromDate, end: data.toDate }}
+              allowClear={allowDateClear}
+              onChange={(range) =>
+                setData((prev) => ({
+                  ...prev,
+                  page: 1,
+                  fromDate: range?.start || null,
+                  toDate: range?.end || null,
+                }))
+              }
+            />
+          </Box>
+        )}
+
+        {filters.map((filter) => (
+          <Box
+            key={filter.dataKey || filter.name}
+            sx={{
+              width: { xs: "100%", sm: "calc(50% - 6px)", md: "auto" },
+              minWidth: 140,
+              maxWidth: { md: 180 },
+            }}
+          >
+            {filter.type === "violation" ? (
+              <ViolationTypeAutocomplete
+                label={filter.label}
+                value={data[filter.dataKey]}
+                options={filter.options}
+                iconMap={filter.iconMap}
+                setData={setData}
+                dataKey={filter.dataKey}
               />
-            </Grid>
-          )}
+            ) : (
+              <CommonAutocompleteDropdown
+                label={filter.label}
+                value={data[filter.dataKey] || data[filter.name]}
+                options={filter.options}
+                setData={setData}
+                dataKey={filter.dataKey || filter.name}
+              />
+            )}
+          </Box>
+        ))}
 
-          {filters.map((filter) => (
-            <Grid item key={filter.dataKey} xs={12} sm={6} md="auto">
-              {filter.type === "violation" ? (
-                <ViolationTypeAutocomplete
-                  label={filter.label}
-                  value={data[filter.dataKey]}
-                  options={filter.options}
-                  iconMap={filter.iconMap}
-                  setData={setData}
-                  dataKey={filter.dataKey}
-                />
-              ) : (
-                <CommonAutocompleteDropdown
-                  label={filter.label}
-                  value={data[filter.dataKey]}
-                  options={filter.options}
-                  setData={setData}
-                  dataKey={filter.dataKey}
-                />
-              )}
-            </Grid>
-          ))}
-
-          {actionButton && (
-            <Grid item xs={12} sm="auto">
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: { xs: "stretch", sm: "flex-start" },
-                }}
-              >
-                {actionButton}
-              </Box>
-            </Grid>
-          )}
-        </Grid>
-      </Grid>
-    </Grid>
+        {actionButton && (
+          <Box sx={{ width: { xs: "100%", sm: "auto" } }}>{actionButton}</Box>
+        )}
+      </Box>
+    </Box>
   );
 };
 
