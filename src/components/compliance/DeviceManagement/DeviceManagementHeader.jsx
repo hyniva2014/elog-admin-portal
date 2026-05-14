@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import CommonPageHeader from "../../../common/CommonPageHeader";
 import CommonFilters from "../../../common/CommonFilters";
 import {
@@ -7,7 +7,7 @@ import {
   DEVICE_TRUCK_FILTER_OPTIONS,
 } from "./Constants";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
-import { HeaderContainer, AddButton,SummaryCardBox } from "./DeviceManagement.styles";
+import { HeaderContainer, AddButton, SummaryCardBox } from "./DeviceManagement.styles";
 
 const DeviceManagementHeader = (props) => {
   const {
@@ -17,10 +17,11 @@ const DeviceManagementHeader = (props) => {
     summaryCards = [],
     handleClick,
   } = props;
+
   return (
     <HeaderContainer>
       <CommonPageHeader
-        title="Device  Management"
+        title="Device Management"
         handleClick={handleClick}
         addButton={true}
         rightContent={
@@ -35,7 +36,6 @@ const DeviceManagementHeader = (props) => {
       <SummaryCardBox>
         <CommonSummaryCardGroup cards={summaryCards} showAccentBar={true} />
       </SummaryCardBox>
-
       <CommonFilters
         data={data}
         setData={setData}
@@ -44,12 +44,12 @@ const DeviceManagementHeader = (props) => {
         filters={[
           {
             label: "All Truck",
-            dataKey: "status",
+            dataKey: "truckNumber",
             options: DEVICE_TRUCK_FILTER_OPTIONS,
           },
           {
             label: "All Carrier",
-            dataKey: "status",
+            dataKey: "carrierId",
             options: DEVICE_CARRIER_ID_FILTER_OPTIONS,
           },
           {

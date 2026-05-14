@@ -6,8 +6,8 @@ export const HeaderContainer = styled(Box)(({ theme }) => ({
 }));
 
 export const AddButton = styled(Button)(({ theme }) => ({
-  color: "#FFFFFF",
-  backgroundColor: "#284495",
+  color: theme.palette.common.white,
+  backgroundColor: theme.palette.brand.main,
   fontSize: 14,
   fontWeight: 400,
 }));
@@ -20,6 +20,6 @@ export const FormBox = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
 }));
 
-export const StatusTypography = styled(Typography)(({ value }) => ({
-  color: value === "Active" ? "#2e7d32" : "#c62828",
+export const StatusTypography = styled(Typography)(({ theme, value }) => ({
+  color: value === "Active" ? theme.palette.success.dark : theme.palette.error.dark,
 }));

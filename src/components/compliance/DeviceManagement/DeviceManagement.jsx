@@ -1,25 +1,15 @@
-import React, { useState } from "react";
-
+import React from "react";
 import CommonDataGrid from "@src/common/CommonDataGrid";
 import { PageContainer } from "../../../common/PageContainer";
-import {
-  mockData,columns,summaryCards
-} from "./Constants";
+import { mockData, columns, summaryCards } from "./Constants";
 import CommonLoading from "../../../common/CommonLoading";
 import DeviceManagementHeader from "./DeviceManagementHeader";
+import useDeviceManagement from "../../../hooks/useDeviceManagement";
 
 const DeviceManagement = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const { setLoading, LoadingContainer } = CommonLoading();
-  const [data, setData] = useState({
-    isLoading: false,
-  });
-  const [mode, setMode] = useState("");
+  const { searchQuery, data, setData, mode, setMode, handleClick } = useDeviceManagement();
+  const { LoadingContainer } = CommonLoading();
 
-  const handleClick = () => {
-  
-    console.log("Add device asset clicked");
-  };
   return (
     <>
       <LoadingContainer />
