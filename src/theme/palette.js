@@ -41,6 +41,7 @@ const paletteTheme = themeMode => {
       A700: "#444d57"
     },
     primary: getColorVariants("#3e60d5", "#fff"),
+    sidebar: getColorVariants("#284394", "#fff"),
     secondary: getColorVariants("#6c757d", "#fff"),
     success: getColorVariants("#26c362", "#fff"),
     info: getColorVariants("#3FC6FC", "#fff"),
@@ -81,6 +82,7 @@ const paletteTheme = themeMode => {
         A700: "#dee2e6"
       },
       primary: getColorVariants("#3e60d5", "#fff"),
+      sidebar: getColorVariants("#284394", "#fff"),
       secondary: getColorVariants("#6c757d", "#fff"),
       success: getColorVariants("#26c362", "#fff"),
       info: getColorVariants("#3FC6FC", "#fff"),
