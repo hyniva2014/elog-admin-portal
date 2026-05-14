@@ -158,38 +158,16 @@ const CommonDataGrid = ({
     setLocalRows(sortedRows);
   };
 
+  const stickyWidth = { width: 150, minWidth: 150, maxWidth: 150 };
+
   const applyEqualWidth = (columns) => {
-    return columns.map((col, index) => {
-      if (index === 0) {
-        return {
-          ...col,
-          width: 150,
-          minWidth: 150,
-          maxWidth: 150,
-          cellClassName: "sticky-col-left-1",
-          headerClassName: "sticky-col-left-1",
-        };
-      }
-
-      if (index === 1) {
-        return {
-          ...col,
-          width: 150,
-          minWidth: 150,
-          maxWidth: 150,
-          cellClassName: "sticky-col-left-2",
-          headerClassName: "sticky-col-left-2",
-        };
-      }
-
-      return {
-        ...col,
-        flex: 1,
-        minWidth: 150,
-        width: 500,
-        maxWidth: 500,
-      };
-    });
+    return columns.map((col, index) =>
+      index === 0
+        ? { ...col, ...stickyWidth, cellClassName: "sticky-col-left-1", headerClassName: "sticky-col-left-1" }
+        : index === 1
+          ? { ...col, ...stickyWidth, cellClassName: "sticky-col-left-2", headerClassName: "sticky-col-left-2" }
+          : { ...col, flex: 1, minWidth: 150, width: 500, maxWidth: 500 }
+    );
   };
 
   const updatedColumns = applyEqualWidth(columnsData);
@@ -248,7 +226,7 @@ const CommonDataGrid = ({
         slots={{
           pagination: CustomPagination,
         }}
-        sx={gridSx}
+        sx={(theme) => gridSx(theme)}
       />
     </Box>
   );

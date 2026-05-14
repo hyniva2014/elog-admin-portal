@@ -33,7 +33,7 @@ export const containerSx = {
   width: "100%",
 };
 
-export const gridSx = {
+export const gridSx = (theme) => ({
   flex: 1,
 
   "& .MuiDataGrid-virtualScrollerRenderZone": {
@@ -48,18 +48,18 @@ export const gridSx = {
     paddingBottom: "8px",
     display: "flex",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: theme.palette.background.paper,
   },
 
   "& .MuiDataGrid-columnHeaders": {
-    backgroundColor: "#F6F6F6",
+    backgroundColor: theme.palette.grey[50],
     position: "sticky",
     top: 0,
     zIndex: 10,
   },
 
   "& .MuiDataGrid-columnHeader": {
-    backgroundColor: "#F6F6F6",
+    backgroundColor: theme.palette.grey[50],
     fontWeight: 600,
   },
 
@@ -87,33 +87,33 @@ export const gridSx = {
   "& .MuiDataGrid-cell.sticky-col-left-1": {
     position: "sticky",
     left: 0,
-    backgroundColor: "#fff",
+    backgroundColor: theme.palette.background.paper,
     zIndex: 3,
   },
   "& .MuiDataGrid-cell.sticky-col-left-2": {
     position: "sticky",
     left: 150,
-    backgroundColor: "#fff",
+    backgroundColor: theme.palette.background.paper,
     zIndex: 3,
-    borderRight: "1.5px solid rgba(0, 0, 0, 0.2)",
+    borderRight: `1.5px solid ${theme.palette.divider}`,
   },
 
   "& .MuiDataGrid-columnHeader.sticky-col-left-1": {
     zIndex: 1000,
-    backgroundColor: "#F6F6F6",
+    backgroundColor: theme.palette.grey[50],
     willChange: "transform",
   },
 
   "& .MuiDataGrid-columnHeader.sticky-col-left-2": {
     zIndex: 1000,
-    backgroundColor: "#F6F6F6",
-    borderRight: "1.5px solid rgba(0, 0, 0, 0.2)",
+    backgroundColor: theme.palette.grey[50],
+    borderRight: `1.5px solid ${theme.palette.divider}`,
     willChange: "transform",
   },
 
   "& .MuiDataGrid-row:hover .sticky-col-left-1, & .MuiDataGrid-row:hover .sticky-col-left-2":
     {
-      backgroundColor: "#f5f5f5",
+      backgroundColor: theme.palette.grey[100],
     },
 
   "& .MuiDataGrid-main": {
@@ -122,4 +122,4 @@ export const gridSx = {
   "& .MuiDataGrid-virtualScroller": {
     overflowX: "auto",
   },
-};
+});

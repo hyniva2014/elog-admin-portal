@@ -1,6 +1,14 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { ThemeProvider, createTheme } from "@mui/material";
 import AddAccountDialog from "./AddAccountDialog";
+
+const theme = createTheme();
+
+const render = (ui, options) => {
+  const Wrapper = ({ children }) => <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+  return rtlRender(ui, { wrapper: Wrapper, ...options });
+};
 
 const mockOnClose = jest.fn();
 const mockOnSubmit = jest.fn();

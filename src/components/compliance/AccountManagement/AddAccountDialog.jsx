@@ -6,7 +6,7 @@ import * as yup from "yup";
 
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonTextField from "../../../common/CommonTextField";
-import { DialogFormContainer, SectionHeaderText } from "./AccountMangemement.styled";
+import { DialogFormContainer, PrimarySectionHeader, SecondarySectionHeader } from "./AccountManagement.styled";
 
 import { formatTaxId, formatPhoneNumber } from "./utils";
 
@@ -106,6 +106,10 @@ const defaultValues = {
   secondaryContactName: "",
   secondaryContactNumber: "",
   secondaryContactEmail: "",
+};
+
+const createFormatChangeHandler = (field, formatter) => (event) => {
+  field.onChange(formatter(event.target.value));
 };
 
 const AddAccountDialog = ({ open, onClose, onSubmit, loading = false }) => {
@@ -215,7 +219,7 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false }) => {
                   fullWidth
                   size="small"
                   placeholder="XX-XXXXXXX"
-                  onChange={(e) => field.onChange(formatTaxId(e.target.value))}
+                  onChange={createFormatChangeHandler(field, formatTaxId)}
                 />
               )}
             />
@@ -293,7 +297,7 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false }) => {
                   fullWidth
                   size="small"
                   placeholder="(XXX) XXX-XXXX"
-                  onChange={(e) => field.onChange(formatPhoneNumber(e.target.value))}
+                  onChange={createFormatChangeHandler(field, formatPhoneNumber)}
                 />
               )}
             />
@@ -314,16 +318,16 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false }) => {
                   fullWidth
                   size="small"
                   placeholder="(XXX) XXX-XXXX"
-                  onChange={(e) => field.onChange(formatPhoneNumber(e.target.value))}
+                  onChange={createFormatChangeHandler(field, formatPhoneNumber)}
                 />
               )}
             />
           </Grid>
 
           <Grid item xs={12}>
-            <SectionHeaderText sx={{ mt: 0.5 }}>
+            <PrimarySectionHeader>
               PRIMARY DETAILS
-            </SectionHeaderText>
+            </PrimarySectionHeader>
 
             <Divider />
           </Grid>
@@ -362,7 +366,7 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false }) => {
                   fullWidth
                   size="small"
                   placeholder="(XXX) XXX-XXXX"
-                  onChange={(e) => field.onChange(formatPhoneNumber(e.target.value))}
+                  onChange={createFormatChangeHandler(field, formatPhoneNumber)}
                 />
               )}
             />
@@ -388,9 +392,9 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false }) => {
           </Grid>
 
           <Grid item xs={12}>
-            <SectionHeaderText sx={{ mt: 1 }}>
+            <SecondarySectionHeader>
               SECONDARY DETAILS
-            </SectionHeaderText>
+            </SecondarySectionHeader>
 
             <Divider />
           </Grid>
@@ -429,7 +433,7 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false }) => {
                   fullWidth
                   size="small"
                   placeholder="(XXX) XXX-XXXX"
-                  onChange={(e) => field.onChange(formatPhoneNumber(e.target.value))}
+                  onChange={createFormatChangeHandler(field, formatPhoneNumber)}
                 />
               )}
             />

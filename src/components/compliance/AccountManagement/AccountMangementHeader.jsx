@@ -1,5 +1,5 @@
 import CommonPageHeader from "../../../common/CommonPageHeader";
-import { AddAccountButton, HeaderContainer } from "./AccountMangemement.styled";
+import { AddAccountButton, HeaderContainer } from "./AccountManagement.styled";
 import CommonFilters from "../../../common/CommonFilters";
 
 const AccountManagementHeader = ({
@@ -20,9 +20,7 @@ const AccountManagementHeader = ({
         rightContent={
           <AddAccountButton
             variant="contained"
-            onClick={() => {
-              handleClick();
-            }}
+            onClick={handleClick}
           >
             Add Account
           </AddAccountButton>

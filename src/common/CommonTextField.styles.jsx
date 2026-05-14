@@ -9,25 +9,23 @@ const CommonTextFieldStyled = styled(TextField, {
   "& .MuiOutlinedInput-root": {
     borderRadius: 5,
     opacity: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: theme.palette.background.paper,
 
     ...(multiline ? {} : {}),
 
     "& fieldset": {
-      borderColor: "#ccc",
+      borderColor: theme.palette.divider,
     },
 
     "&.Mui-disabled": {
-      backgroundColor: "#F9F9F9",
+      backgroundColor: theme.palette.grey[100],
       opacity: 1,
     },
 
     "& .MuiOutlinedInput-input": {
       fontSize: 14,
-      color:
-        theme.palette.mode === "dark" ? "#000000" : theme.palette.text.primary,
-      caretColor:
-        theme.palette.mode === "dark" ? "#000000" : theme.palette.text.primary,
+      color: theme.palette.text.primary,
+      caretColor: theme.palette.text.primary,
     },
 
     "& .MuiOutlinedInput-inputMultiline": {
@@ -38,20 +36,18 @@ const CommonTextFieldStyled = styled(TextField, {
 
   "& .MuiInputLabel-root": {
     fontSize: 13,
-    color:
-      theme.palette.mode === "dark" ? "#000000" : theme.palette.text.secondary,
+    color: theme.palette.text.secondary,
   },
 
   "& .MuiInputLabel-root.Mui-focused": {
-    color:
-      theme.palette.mode === "dark" ? "#000000" : theme.palette.primary.main,
+    color: theme.palette.primary.main,
   },
 
   "& .MuiInputLabel-root.Mui-error": {
     color: theme.palette.error.main,
   },
   "& .MuiFormLabel-asterisk": {
-    color: "#d32f2f",
+    color: theme.palette.error.main,
     fontWeight: 600,
   },
 }));

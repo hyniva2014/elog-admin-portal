@@ -1,5 +1,13 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent } from "@testing-library/react";
+import { ThemeProvider, createTheme } from "@mui/material";
 import AccountManagementHeader from "./AccountMangementHeader";
+
+const theme = createTheme();
+
+const render = (ui, options) => {
+  const Wrapper = ({ children }) => <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+  return rtlRender(ui, { wrapper: Wrapper, ...options });
+};
 
 const mockData = {
   rows: [],

@@ -11,7 +11,7 @@ import {
   GridContainer,
   AddressCellText,
   actionIconSx,
-} from "./AccountMangemement.styled";
+} from "./AccountManagement.styled";
 import AddAccountDialog from "./AddAccountDialog";
 
 const accountSeedData = [
@@ -203,7 +203,7 @@ const getAccountColumns = (onViewAccount) => [
     headerTooltip: true,
     renderCell: (params) => (
       <Tooltip title="View">
-        <IconButton size="small" onClick={() => onViewAccount(params.row)}>
+        <IconButton size="small" onClick={onViewAccount} data-row={params.row}>
           <VisibilityOutlinedIcon sx={actionIconSx} />
         </IconButton>
       </Tooltip>
@@ -253,6 +253,10 @@ const AccountManagement = () => {
     setIsAddAccountOpen(false);
   }, []);
 
+  const handleSnackbarClose = useCallback(() => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  }, []);
+
   const handleCreateAccount = useCallback(
     (account) => {
       const today = dayjs().format("YYYY-MM-DD");
@@ -286,7 +290,8 @@ const AccountManagement = () => {
   );
 
   const handleViewAccount = useCallback(
-    (row) => {
+    (event) => {
+      const row = event.currentTarget.dataset.row;
       handleSnackbar(`${row.carrierName} account selected.`);
     },
     [handleSnackbar],
@@ -379,7 +384,7 @@ const AccountManagement = () => {
         open={snackbar.open}
         message={snackbar.message}
         severity={snackbar.severity}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+        onClose={handleSnackbarClose}
       />
 
       <AddAccountDialog
