@@ -7,6 +7,7 @@ import {
   DEVICE_TRUCK_FILTER_OPTIONS,
 } from "./Constants";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
+import { HeaderContainer, AddButton,SummaryCardBox } from "./DeviceManagement.styles";
 
 const DeviceManagementHeader = (props) => {
   const {
@@ -17,27 +18,23 @@ const DeviceManagementHeader = (props) => {
     handleClick,
   } = props;
   return (
-    <Box sx={{ mb: 2 }}>
+    <HeaderContainer>
       <CommonPageHeader
         title="Device  Management"
         handleClick={handleClick}
         addButton={true}
         rightContent={
-          <Button
-            sx={{ color: "#FFFFFF", backgroundColor: "#284495" }}
-            variant="contained"
-            onClick={handleClick}
-          >
+          <AddButton variant="contained" onClick={handleClick}>
             Add Device
-          </Button>
+          </AddButton>
         }
       />
       <Typography variant="h6" fontWeight="300">
         Assign unassigned devices to carriers
       </Typography>
-      <Box mt={2}>
+      <SummaryCardBox>
         <CommonSummaryCardGroup cards={summaryCards} showAccentBar={true} />
-      </Box>
+      </SummaryCardBox>
 
       <CommonFilters
         data={data}
@@ -62,7 +59,7 @@ const DeviceManagementHeader = (props) => {
           },
         ]}
       />
-    </Box>
+    </HeaderContainer>
   );
 };
 

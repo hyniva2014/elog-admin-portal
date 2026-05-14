@@ -1,3 +1,13 @@
+import eyeIcon from "../../../assets/images/svg/eyeicon.png";
+import DevicesIcon from "@mui/icons-material/Devices";
+import WifiIcon from "@mui/icons-material/Wifi";
+import WifiOffIcon from "@mui/icons-material/WifiOff";
+import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
+import {
+  Typography,
+  IconButton,
+} from "@mui/material";
+import { StatusTypography } from "./DeviceManagement.styles";
 export const DEVICE_STATUS_FILTER_OPTIONS = [
   { value: "Active", label: "Active" },
   { value: "Warning", label: "Warning" },
@@ -21,11 +31,7 @@ export const DEVICE_CARRIER_ID_FILTER_OPTIONS = [
   { value: "C-03", label: "C-03" },
   { value: "C-04", label: "C-04" },
   { value: "C-05", label: "C-05" },
-  { value: "C-06", label: "C-06" },
-  { value: "C-07", label: "C-07" },
-  { value: "C-08", label: "C-08" },
-  { value: "C-09", label: "C-09" },
-  { value: "C-10", label: "C-10" },
+  { value: "C-06", label: "C-06" }
 ];
 
 export const DEVICE_ASSET_CARRIER_NAME_FILTER_OPTIONS = [
@@ -42,22 +48,231 @@ export const DEVICE_TRUCK_FILTER_OPTIONS = [
   { value: "TRK-102", label: "TRK-102" },
   { value: "TRK-067", label: "TRK-067" },
   { value: "TRK-088", label: "TRK-088" },
-  { value: "TRK-091", label: "TRK-091" },
-  { value: "TRK-054", label: "TRK-054" },
-  { value: "TRK-072", label: "TRK-072" },
-  { value: "TRK-103", label: "TRK-103" },
-  { value: "TRK-081", label: "TRK-081" },
 ];
 
-export const DEVICE_ASSET_SERIAL_NUMBER_FILTER_OPTIONS = [
-  { value: "SN-ABC12345", label: "SN-ABC12345" },
-  { value: "SN-ABC12346", label: "SN-ABC12346" },
-  { value: "HSN-ABC12347", label: "HSN-ABC12347" },
-  { value: "SN-ABC12348", label: "SN-ABC12348" },
-  { value: "SN-ABC12350", label: "SN-ABC12350" },
-  { value: "8SN-ABC12351", label: "8SN-ABC12351" },
-  { value: "SN-ABC12354", label: "SN-ABC12354" },
-  { value: "SN-ABC12356", label: "SN-ABC12356" },
-  { value: "SN-ABC12359", label: "SN-ABC12359" },
-  { value: "SN-ABC12357", label: "SN-ABC12357" },
-];
+  export const mockData = [
+    {
+      id: 1,
+      deviceId: "DEV-1001",
+      carrierId: "C-01",
+      carrierName: "Swift Transportation",
+      deviceModel: "Geotab GO9",
+      serialNumber: "SN-ABC12345",
+      truckNumber: "TRK-089",
+      latitude: "30.250661",
+      longitude: "-97.735925",
+      ignition: "ON",
+      speed: "80",
+      createdOn: "05 05 2026",
+      lastSync: "05 05 2026",
+      status: "Active",
+    },
+    {
+      id: 2,
+      deviceId: "DEV-1002",
+      carrierId: "C-03",
+      carrierName: "J.B. Hunt",
+      deviceModel: "Samsara VG34",
+      serialNumber: "SN-ABC12346",
+      truckNumber: "TRK-045",
+      latitude: "31.924816",
+      longitude: "-97.102912",
+      ignition: "ON",
+      speed: "60",
+      createdOn: "05 05 2026",
+      lastSync: "05 05 2026",
+      status: "Active",
+    },
+    {
+      id: 3,
+      deviceId: "DEV-1003",
+      carrierId: "C-03",
+      carrierName: "Schneider National",
+      deviceModel: "KeepTruckin K5",
+      serialNumber: "HSN-ABC12347",
+      truckNumber: "TRK-102",
+      latitude: "27.490996",
+      longitude: "-99.460743",
+      ignition: "OFF",
+      speed: "0",
+      createdOn: "05 05 2026",
+      lastSync: "05 05 2026",
+      status: "Warning",
+    },
+    {
+      id: 4,
+      deviceId: "DEV-1004",
+      carrierId: "C-04",
+      carrierName: "Werner Enterprises",
+      deviceModel: "Omnitracs IVG",
+      serialNumber: "SN-ABC12348",
+      truckNumber: "TRK-067",
+      latitude: "30.250661",
+      longitude: "-97.102912",
+      ignition: "ON",
+      speed: "30",
+      createdOn: "05 05 2026",
+      lastSync: "05 05 2026",
+      status: "Active",
+    }
+  ];
+
+  export const columns = [
+    {
+      field: "carrierId",
+      headerName: "Carrier ID",
+      width: 120,
+      minWidth: 150,
+      maxWidth: 180,
+      headerTooltip: true,
+      flex: 1,
+      cellClassName: "sticky-col-left-1",
+      headerClassName: "sticky-col-left-1",
+    },
+    {
+      field: "carrierName",
+      headerName: "Carrier Name",
+     width: 120,
+      minWidth: 150,
+      maxWidth: 180,
+      headerTooltip: true,
+      flex: 1,
+      cellClassName: "sticky-col-left-2",
+      headerClassName: "sticky-col-left-2",
+    },
+    {
+      field: "deviceModel",
+      headerName: "Device Model",
+      flex: 1,
+      minWidth: 90,
+    },
+    {
+      field: "serialNumber",
+      headerName: "Serial Number",
+      flex: 1,
+      minWidth: 90,
+    },
+    {
+      field: "truckNumber",
+      headerName: "Truck Number",
+      flex: 1,
+      minWidth: 90,
+    },
+    {
+      field: "latitude",
+      headerName: "Latitude",
+      flex: 1,
+      minWidth: 90,
+    },
+    {
+      field: "longitude",
+      headerName: "Longitude",
+      flex: 1,
+      minWidth: 90,
+    },
+    {
+      field: "ignition",
+      headerName: "Ignition",
+      flex: 1,
+      minWidth: 90,
+    },
+    {
+      field: "speed",
+      headerName: "Speed",
+      flex: 1,
+      minWidth: 90,
+    },
+    {
+      field: "createdOn",
+      headerName: "Created On",
+      flex: 1,
+      minWidth: 90,
+    },
+    {
+      field: "lastSync",
+      headerName: "Last Sync",
+      flex: 1,
+      minWidth: 90,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+      minWidth: 90,
+      renderCell: (params) => (
+              <StatusTypography variant="body2" value={params.value}>
+                {params.value}
+              </StatusTypography>
+            ),
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 1,
+      minWidth: 100,
+      renderCell: () => (
+        <IconButton size="small" color="primary">
+          <img src={eyeIcon} alt="view" width={16} height={16} />
+        </IconButton>
+      ),
+    },
+  ];
+
+  export const summaryCards = [
+      {
+        id: "total_devices",
+        title: "Total Devices",
+        value: "1095",
+        accentcolor: "#284495",
+        icon: (
+          <DevicesIcon
+            sx={{
+              fontSize: 28,
+              color: "#284495",
+            }}
+          />
+        ),
+      },
+      {
+        id: "online_devices",
+        title: "Online Devices",
+        value: "1077",
+        accentcolor: "#008236",
+        icon: (
+          <WifiIcon
+            sx={{
+              fontSize: 28,
+              color: "#008236",
+            }}
+          />
+        ),
+      },
+      {
+        id: "offline_devices",
+        title: "Offline Devices",
+        value: "18",
+        accentcolor: "#FF0000",
+        icon: (
+          <WifiOffIcon
+            sx={{
+              fontSize: 28,
+              color: "#FF0000",
+            }}
+          />
+        ),
+      },
+      {
+        id: "unassigned_devices",
+        title: "Unassigned Devices",
+        value: "34",
+        accentcolor: "#E69500",
+        icon: (
+          <Inventory2OutlinedIcon
+            sx={{
+              fontSize: 28,
+              color: "#E69500",
+            }}
+          />
+        ),
+      },
+    ];
