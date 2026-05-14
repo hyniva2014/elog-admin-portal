@@ -1,116 +1,59 @@
-import { Controller } from "react-hook-form";
-import CommonTextFieldStyled from "./CommonTextField.styles";
+import { TextField } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
-const CommonTextField = ({
-  name,
-  label,
-  control,
-  register,
-  isEdit,
-  multiline = false,
-  rows = 1,
-  disabled = false,
-  placeholder,
-  fullWidth = true,
-  type = "text",
-  error = false,
-  helperText = "",
-  children,
-  value,
-  onChange,
-  shrinkLabel = false,
-  required,
-  ...rest
-}) => {
-  if (children && control) {
-    return (
-      <Controller
-        name={name}
-        control={control}
-        defaultValue=""
-        render={({ field }) => (
-          <CommonTextFieldStyled
-            size="small"
-            {...field}
-            label={label}
-            select
-            InputLabelProps={{
-              shrink: Boolean(field.value) || shrinkLabel || disabled,
-              required: required,
-            }}
-            multiline={multiline}
-            rows={multiline ? rows : undefined}
-            disabled={disabled}
-            isEdit={isEdit}
-            placeholder={placeholder}
-            fullWidth={fullWidth}
-            error={error}
-            helperText={helperText}
-            slotProps={{
-              select: {
-                MenuProps: {
-                  PaperProps: {
-                    sx: {
-                      maxHeight: 30 * 5,
-                    },
-                  },
-                },
-              },
-            }}
-          >
-            {children}
-          </CommonTextFieldStyled>
-        )}
-      />
-    );
-  }
+const CommonTextFieldStyled = styled(TextField, {
+  shouldForwardProp: (prop) => prop !== "isEdit" && prop !== "required",
+})(({ theme, isEdit, multiline }) => ({
+  width: "100%",
 
-  if (register && name) {
-    return (
-      <CommonTextFieldStyled
-        size="small"
-        label={label}
-        multiline={multiline}
-        rows={multiline ? rows : undefined}
-        InputLabelProps={{
-          shrink: Boolean(value) || shrinkLabel || true,
-          required: required,
-        }}
-        disabled={disabled}
-        isEdit={isEdit}
-        placeholder={placeholder}
-        fullWidth={fullWidth}
-        type={type}
-        error={error}
-        helperText={helperText}
-        {...register(name)}
-        {...rest}
-      />
-    );
-  }
+  "& .MuiOutlinedInput-root": {
+    borderRadius: 5,
+    opacity: 1,
+    backgroundColor: "#FFFFFF",
 
-  return (
-    <CommonTextFieldStyled
-      size="small"
-      label={label}
-      multiline={multiline}
-      rows={multiline ? rows : undefined}
-      InputLabelProps={{
-        shrink: Boolean(value) || shrinkLabel,
-        required: required,
-      }}
-      disabled={disabled}
-      isEdit={isEdit}
-      placeholder={placeholder}
-      fullWidth={fullWidth}
-      type={type}
-      error={error}
-      helperText={helperText}
-      value={value}
-      onChange={onChange}
-      {...rest}
-    />
-  );
-};
+    ...(multiline ? {} : {}),
 
-export default CommonTextField;
+    "& fieldset": {
+      borderColor: "#ccc",
+    },
+
+    "&.Mui-disabled": {
+      backgroundColor: "#F9F9F9",
+      opacity: 1,
+    },
+
+    "& .MuiOutlinedInput-input": {
+      fontSize: 14,
+      color:
+        theme.palette.mode === "dark" ? "#000000" : theme.palette.text.primary,
+      caretColor:
+        theme.palette.mode === "dark" ? "#000000" : theme.palette.text.primary,
+    },
+
+    "& .MuiOutlinedInput-inputMultiline": {
+      paddingTop: "16px",
+      paddingBottom: "12px",
+    },
+  },
+
+  "& .MuiInputLabel-root": {
+    fontSize: 13,
+    color:
+      theme.palette.mode === "dark" ? "#000000" : theme.palette.text.secondary,
+  },
+
+  "& .MuiInputLabel-root.Mui-focused": {
+    color:
+      theme.palette.mode === "dark" ? "#000000" : theme.palette.primary.main,
+  },
+
+  "& .MuiInputLabel-root.Mui-error": {
+    color: theme.palette.error.main,
+  },
+  "& .MuiFormLabel-asterisk": {
+    color: "#d32f2f",
+    fontWeight: 600,
+  },
+}));
+
+export default CommonTextFieldStyled;
