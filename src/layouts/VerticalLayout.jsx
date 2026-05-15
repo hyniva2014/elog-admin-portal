@@ -4,53 +4,27 @@
  * Author: Coderthemes
  */
 
-import { LinearProgress, styled } from "@mui/material";
 import { Suspense, lazy } from "react";
+import { useLayoutContext } from "@src/states";
+import { ContentWrapper, MainContent, LoadingProgress } from "./VerticalLayout.styles";
 const LeftSideBar = lazy(() => import("@src/layouts/LeftSideBar"));
 const RightSideBar = lazy(() => import("@src/layouts/RightSideBar"));
 const Topbar = lazy(() => import("@src/layouts/Topbar"));
 const Footer = lazy(() => import("@src/layouts/Footer"));
-const ContentWrapper = styled("div")(({ theme }) => {
-  return {
-    backgroundColor: theme.palette.background.default,
-    padding: "24px",
-    paddingTop: 0,
-    height: "100%",
-  };
-});
 const VerticalLayout = ({ children }) => {
+  const { settings } = useLayoutContext();
   return (
-    <div
-      style={{
-        display: "flex",
-      }}
-    >
+    <div>
       <Suspense fallback={<div />}>
         <LeftSideBar />
       </Suspense>
-      <div
-        style={{
-          flexDirection: "column",
-          display: "flex",
-          width: "100%",
-        }}
-      >
+      <MainContent settings={settings}>
         <Suspense fallback={<div />}>
           <Topbar />
         </Suspense>
 
         <ContentWrapper>
-          <Suspense
-            fallback={
-              <LinearProgress
-                color="primary"
-                sx={{
-                  width: "110%",
-                  marginLeft: -3,
-                }}
-              />
-            }
-          >
+          <Suspense fallback={<LoadingProgress color="primary" />}>
             {children}
           </Suspense>
         </ContentWrapper>
@@ -60,7 +34,7 @@ const VerticalLayout = ({ children }) => {
         <Suspense fallback={<div />}>
           <RightSideBar />
         </Suspense>
-      </div>
+      </MainContent>
     </div>
   );
 };
