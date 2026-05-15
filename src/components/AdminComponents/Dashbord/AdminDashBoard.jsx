@@ -10,6 +10,7 @@ import IncidentDistribution from "./IncidentDistribution";
 import DeviceLifecycleStatus from "../../compliance/DeviceManagement/DeviceLifecycleStatus";
 import ActiveDevicesIcon from "../../../assets/images/Active Devices.png";
 import FMCSA from "../../../assets/images/Avg FMCSA Score.png";
+import { StretchGridContainer, FlexGridItem } from "./AdminDashBoard.styles";
 
 const AdminDashboard = () => {
   return (
@@ -58,14 +59,14 @@ const AdminDashboard = () => {
           </Grid>
         </Grid>
 
-        <Grid container spacing={2} alignItems="stretch" sx={{ mt: 2 }}>
-          <Grid item xs={12} lg={6} sx={{ display: "flex" }}>
+        <StretchGridContainer container spacing={2}>
+          <FlexGridItem item xs={12} lg={6}>
             <IncidentDistribution />
-          </Grid>
-          <Grid item xs={12} lg={6} sx={{ display: "flex" }}>
+          </FlexGridItem>
+          <FlexGridItem item xs={12} lg={6}>
             <DeviceLifecycleStatus />
-          </Grid>
-        </Grid>
+          </FlexGridItem>
+        </StretchGridContainer>
       </PageContainer>
     </>
   );

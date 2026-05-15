@@ -19,6 +19,7 @@ import {
   LegendLabel,
   getChartStyles,
 } from "./IncidentDistribution.styles";
+import { getIncidentChartOptions } from "./IncidentDistribution.config";
 
 const CATEGORIES = ["Mar 28", "Mar 29", "Mar 30", "Mar 31", "Apr 1", "Apr 2", "Apr 3", "Apr 4"];
 
@@ -28,6 +29,27 @@ const INCIDENT_SERIES = [
   { name: "Mobile - Driver Log",         color: "#E20021", data: [2, 2, 1, 2, 2, 1, 2, 2] },
   { name: "Fleet Management",            color: "#30C151", data: [3, 2, 4, 3, 2, 3, 2, 3] },
 ];
+
+// ─── Sub-component ────────────────────────────────────────────────────────────
+
+const ChartLegendItem = ({ seriesItem }) => (
+  <LegendItem key={seriesItem.name}>
+    <LegendDot dotcolor={seriesItem.color} />
+    <LegendLabel>{seriesItem.name}</LegendLabel>
+  </LegendItem>
+);
+
+// ─── Legend row helper ────────────────────────────────────────────────────────
+
+const renderLegendRow = (items) => (
+  <LegendRow>
+    {items.map((s) => (
+      <ChartLegendItem key={s.name} seriesItem={s} />
+    ))}
+  </LegendRow>
+);
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 const IncidentDistribution = () => {
   const theme = useTheme();
@@ -39,6 +61,11 @@ const IncidentDistribution = () => {
   const [incidentScope, setIncidentScope] = useState("all");
   const [period, setPeriod] = useState("7d");
 
+  // ── Named handlers ──────────────────────────────────────────────────────────
+  const handleIncidentChange = (e) => setIncidentScope(e.target.value);
+  const handlePeriodChange = (e) => setPeriod(e.target.value);
+
+  // ── Series / colors ─────────────────────────────────────────────────────────
   const series = useMemo(
     () => INCIDENT_SERIES.map(({ name, data }) => ({ name, data })),
     [],
@@ -46,96 +73,16 @@ const IncidentDistribution = () => {
 
   const colors = useMemo(() => INCIDENT_SERIES.map((s) => s.color), []);
 
+  // ── Chart options (extracted to config file) ────────────────────────────────
   const chartOptions = useMemo(
-    () => ({
-      chart: {
-        type: "bar",
-        stacked: true,
-        stackType: "normal",
-        toolbar: { show: false },
-        fontFamily: theme.typography.fontFamily,
-      },
-      plotOptions: {
-        bar: { horizontal: false, columnWidth: "58%", borderRadius: 2 },
-      },
-      colors,
-      dataLabels: { enabled: false },
-      stroke: { width: 0 },
-      xaxis: {
-        categories: CATEGORIES,
-        labels: {
-          style: {
-            colors: CHART_STYLES.axisLabelColor,
-            fontSize: CHART_STYLES.axisLabelFontSize,
-            fontWeight: CHART_STYLES.axisLabelFontWeight,
-          },
-        },
-        axisBorder: { show: true, color: CHART_STYLES.axisBorderColor },
-        axisTicks: { show: false },
-      },
-      yaxis: {
-        max: 20,
-        tickAmount: 4,
-        title: {
-          text: "Incident Distribution",
-          style: {
-            color: CHART_STYLES.axisLabelColor,
-            fontSize: CHART_STYLES.yAxisTitleFontSize,
-            fontWeight: CHART_STYLES.yAxisTitleFontWeight,
-          },
-        },
-        labels: {
-          style: {
-            colors: CHART_STYLES.axisLabelColor,
-            fontSize: CHART_STYLES.axisLabelFontSize,
-          },
-        },
-        axisBorder: { show: true, color: CHART_STYLES.axisBorderColor },
-      },
-      grid: {
-        borderColor: CHART_STYLES.gridBorderColor,
-        strokeDashArray: 4,
-        padding: { left: 8, right: 8 },
-      },
-      legend: { show: false },
-      tooltip: {
-        shared: true,
-        intersect: false,
-        custom: ({ series, dataPointIndex, w }) => {
-          const category = w.globals.labels[dataPointIndex];
-          const total = series.reduce((sum, s) => sum + (s[dataPointIndex] ?? 0), 0);
-
-          const rows = w.globals.seriesNames
-            .map((name, i) => {
-              const val = series[i][dataPointIndex];
-              if (val == null || val === 0) return "";
-              const color = w.globals.colors[i];
-              return `
-                <div style="display:flex;align-items:center;gap:${CHART_STYLES.tooltipRowGap};padding:${CHART_STYLES.tooltipRowPadding};">
-                  <span style="width:${CHART_STYLES.tooltipDotSize};height:${CHART_STYLES.tooltipDotSize};border-radius:50%;background:${color};flex-shrink:0;display:inline-block;"></span>
-                  <span style="color:${CHART_STYLES.tooltipLabelColor};font-size:${CHART_STYLES.tooltipLabelFontSize};flex:1;">${name}:</span>
-                  <span style="color:${CHART_STYLES.tooltipValueColor};font-weight:${CHART_STYLES.tooltipValueFontWeight};font-size:${CHART_STYLES.tooltipValueFontSize};">${val}</span>
-                </div>`;
-            })
-            .join("");
-
-          return `
-            <div style="background:${CHART_STYLES.tooltipBg};border:1px solid ${CHART_STYLES.tooltipBorder};border-radius:${CHART_STYLES.tooltipBorderRadius};padding:${CHART_STYLES.tooltipPadding};box-shadow:${CHART_STYLES.tooltipShadow};min-width:${CHART_STYLES.tooltipMinWidth};">
-              <div style="font-weight:${CHART_STYLES.tooltipCategoryFontWeight};font-size:${CHART_STYLES.tooltipCategoryFontSize};color:${CHART_STYLES.tooltipCategoryColor};margin-bottom:${CHART_STYLES.tooltipCategoryMarginBottom};padding-bottom:${CHART_STYLES.tooltipCategoryPaddingBottom};border-bottom:1px solid ${CHART_STYLES.tooltipDivider};">
-                ${category}
-              </div>
-              ${rows}
-              <div style="display:flex;align-items:center;gap:${CHART_STYLES.tooltipRowGap};padding:${CHART_STYLES.tooltipTotalPaddingTop} 0 0;margin-top:${CHART_STYLES.tooltipTotalMarginTop};border-top:1px solid ${CHART_STYLES.tooltipDivider};">
-                <span style="width:${CHART_STYLES.tooltipDotSize};height:${CHART_STYLES.tooltipDotSize};flex-shrink:0;display:inline-block;"></span>
-                <span style="color:${CHART_STYLES.tooltipLabelColor};font-size:${CHART_STYLES.tooltipLabelFontSize};flex:1;font-weight:${CHART_STYLES.tooltipTotalFontWeight};">Total:</span>
-                <span style="color:${CHART_STYLES.tooltipValueColor};font-weight:${CHART_STYLES.tooltipValueFontWeight};font-size:${CHART_STYLES.tooltipValueFontSize};">${total}</span>
-              </div>
-            </div>`;
-        },
-      },
-    }),
+    () => getIncidentChartOptions(theme, colors, CHART_STYLES, CATEGORIES),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [colors, theme.typography.fontFamily],
   );
+
+  // ── Pre-computed legend rows ─────────────────────────────────────────────────
+  const topLegendItems    = INCIDENT_SERIES.slice(0, 3);
+  const bottomLegendItems = INCIDENT_SERIES.slice(3);
 
   return (
     <CardContainer variant="outlined">
@@ -157,7 +104,7 @@ const IncidentDistribution = () => {
                 labelId="incident-filter-label"
                 label="Incident"
                 value={incidentScope}
-                onChange={(e) => setIncidentScope(e.target.value)}
+                onChange={handleIncidentChange}
               >
                 <MenuItem value="all">All Incident</MenuItem>
                 <MenuItem value="open">Open only</MenuItem>
@@ -170,7 +117,7 @@ const IncidentDistribution = () => {
                 labelId="period-label"
                 label="Period"
                 value={period}
-                onChange={(e) => setPeriod(e.target.value)}
+                onChange={handlePeriodChange}
               >
                 <MenuItem value="7d">7 days</MenuItem>
                 <MenuItem value="30d">30 days</MenuItem>
@@ -191,22 +138,8 @@ const IncidentDistribution = () => {
         </ChartWrapper>
 
         <LegendGrid>
-          <LegendRow>
-            {INCIDENT_SERIES.slice(0, 3).map((s) => (
-              <LegendItem key={s.name}>
-                <LegendDot dotcolor={s.color} />
-                <LegendLabel>{s.name}</LegendLabel>
-              </LegendItem>
-            ))}
-          </LegendRow>
-          <LegendRow>
-            {INCIDENT_SERIES.slice(3).map((s) => (
-              <LegendItem key={s.name}>
-                <LegendDot dotcolor={s.color} />
-                <LegendLabel>{s.name}</LegendLabel>
-              </LegendItem>
-            ))}
-          </LegendRow>
+          {renderLegendRow(topLegendItems)}
+          {renderLegendRow(bottomLegendItems)}
         </LegendGrid>
       </StyledCardContent>
     </CardContainer>

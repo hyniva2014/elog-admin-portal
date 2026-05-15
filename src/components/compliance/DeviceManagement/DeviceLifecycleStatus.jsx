@@ -143,6 +143,46 @@ const DeviceLifecycleStatus = ({ segments = DEFAULT_SEGMENTS }) => {
     [colors, segments],
   );
 
+
+  const chartElement = chartPx > 0 ? (
+    <ChartBox chartsize={chartPx}>
+      <ReactApexChart
+        key={chartPx}
+        type="donut"
+        height={chartPx}
+        width={chartPx}
+        series={series}
+        options={chartOptions}
+      />
+      <ChartCenterLabel>
+        <ChartCenterSubText fontsize={centerSubSize}>
+          Total
+        </ChartCenterSubText>
+        <ChartCenterTotal fontsize={totalFontSize}>
+          {total.toLocaleString()}
+        </ChartCenterTotal>
+      </ChartCenterLabel>
+    </ChartBox>
+  ) : null;
+
+  const segmentCards = segments.map((s) => (
+    <Grid item xs={6} key={s.key}>
+      <StatCardBox
+        bordercolor={s.borderColor}
+        bgcolor={s.bg}
+        cardpx={cardPx}
+        cardpy={cardPy}
+      >
+        <StatCardLabel labelcolor={s.labelColor} fontsize={labelSize}>
+          {s.label}
+        </StatCardLabel>
+        <StatCardCount labelcolor={s.labelColor} fontsize={numberSize}>
+          {s.count.toLocaleString()}
+        </StatCardCount>
+      </StatCardBox>
+    </Grid>
+  ));
+
   return (
     <CardContainer variant="outlined" ref={containerRef}>
       <StyledCardContent>
@@ -155,27 +195,7 @@ const DeviceLifecycleStatus = ({ segments = DEFAULT_SEGMENTS }) => {
           spacing={2}
           alignItems="center"
         >
-          {/* Donut Chart */}
-          {chartPx > 0 && (
-            <ChartBox sx={{ width: chartPx, height: chartPx }}>
-              <ReactApexChart
-                key={chartPx}
-                type="donut"
-                height={chartPx}
-                width={chartPx}
-                series={series}
-                options={chartOptions}
-              />
-              <ChartCenterLabel>
-                <ChartCenterSubText sx={{ fontSize: centerSubSize }}>
-                  Total
-                </ChartCenterSubText>
-                <ChartCenterTotal sx={{ fontSize: totalFontSize }}>
-                  {total.toLocaleString()}
-                </ChartCenterTotal>
-              </ChartCenterLabel>
-            </ChartBox>
-          )}
+          {chartElement}
 
           <StatCardsWrapper>
             <Grid
@@ -184,28 +204,7 @@ const DeviceLifecycleStatus = ({ segments = DEFAULT_SEGMENTS }) => {
               rowSpacing={isNarrow ? 2.5 : 4.5}
               alignItems="stretch"
             >
-              {segments.map((s) => (
-                <Grid item xs={6} key={s.key}>
-                  <StatCardBox
-                    bordercolor={s.borderColor}
-                    bgcolor={s.bg}
-                    sx={{ px: cardPx, py: cardPy }}
-                  >
-                    <StatCardLabel
-                      labelcolor={s.labelColor}
-                      sx={{ fontSize: labelSize }}
-                    >
-                      {s.label}
-                    </StatCardLabel>
-                    <StatCardCount
-                      labelcolor={s.labelColor}
-                      sx={{ fontSize: numberSize, variant:"inherit" }}
-                    >
-                      {s.count.toLocaleString()}
-                    </StatCardCount>
-                  </StatCardBox>
-                </Grid>
-              ))}
+              {segmentCards}
             </Grid>
           </StatCardsWrapper>
         </ContentStack>

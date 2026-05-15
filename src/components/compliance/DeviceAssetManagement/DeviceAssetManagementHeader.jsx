@@ -22,6 +22,17 @@ const DeviceAssetManagementHeader = (props) => {
     statusOptions = [],
   } = props;
 
+  const resolvedModelOptions =
+    modelOptions.length > 0 ? modelOptions : DEVICE_ASSET_MODEL_FILTER_OPTIONS;
+
+  const resolvedStatusOptions =
+    statusOptions.length > 0 ? statusOptions : DEVICE_ASSET_STATUS_FILTER_OPTIONS;
+
+  const filters = [
+    { label: "Model Type", dataKey: "deviceModel", options: resolvedModelOptions },
+    { label: "All Status", dataKey: "status",       options: resolvedStatusOptions },
+  ];
+
   return (
     <HeaderContainer>
       <CommonPageHeader
@@ -46,18 +57,7 @@ const DeviceAssetManagementHeader = (props) => {
         setData={setData}
         searchKey={searchKey}
         allowDateClear={true}
-        filters={[
-          {
-            label: "Model Type",
-            dataKey: "deviceModel",
-            options: modelOptions.length > 0 ? modelOptions : DEVICE_ASSET_MODEL_FILTER_OPTIONS,
-          },
-          {
-            label: "All Status",
-            dataKey: "status",
-            options: statusOptions.length > 0 ? statusOptions : DEVICE_ASSET_STATUS_FILTER_OPTIONS,
-          },
-        ]}
+        filters={filters}
       />
     </HeaderContainer>
   );

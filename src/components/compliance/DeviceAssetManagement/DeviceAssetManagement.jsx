@@ -15,19 +15,9 @@ import {
   CancelEditButton,
 } from "./DeviceAssetManagement.styles";
 import { actionIconSx, GridContainer } from "../AccountManagement/AccountManagement.styled";
+import { deviceAssetSeedData } from "./DeviceAssetManagement.mockData";
 
-const deviceAssetSeedData = [
-  { serialNumber: "SN-ABC12345", deviceModel: "Geotab GO9",     createdOn: "2026-05-05", updatedOn: null,         status: "Active",  },
-  { serialNumber: "SN-ABC12346", deviceModel: "Samsara VG34",   createdOn: "2026-05-05", updatedOn: "2026-05-05", status: "Active" },
-  { serialNumber: "HSN-ABC12347",deviceModel: "KeepTruckin K5", createdOn: "2026-05-05", updatedOn: "2026-05-05", status: "Active" },
-  { serialNumber: "SN-ABC12348", deviceModel: "Omnitracs IVG",  createdOn: "2026-05-05", updatedOn: "2026-05-05", status: "Active" },
-  { serialNumber: "SN-ABC12350", deviceModel: "KeepTruckin K5", createdOn: "2026-05-05", updatedOn: "2026-05-05", status: "Active" },
-  { serialNumber: "8SN-ABC12351",deviceModel: "VG34",           createdOn: "2026-05-05", updatedOn: "2026-05-05", status: "Active" },
-  { serialNumber: "SN-ABC12354", deviceModel: "Samsara VG34",   createdOn: "2026-05-05", updatedOn: "2026-05-05", status: "Active" },
-  { serialNumber: "SN-ABC12356", deviceModel: "Geotab GO9",     createdOn: "2026-05-05", updatedOn: "2026-05-05", status: "Active" },
-  { serialNumber: "SN-ABC12359", deviceModel: "Omnitracs IVG",  createdOn: "2026-05-05", updatedOn: "2026-05-05", status: "Active" },
-  { serialNumber: "SN-ABC12357", deviceModel: "VG34",           createdOn: "2026-05-05", updatedOn: "2026-05-05", status: "Active" },
-];
+// ─── Static helpers ────────────────────────────────────────────────────────────
 
 const buildRows = () =>
   deviceAssetSeedData.map((seed, index) => ({ ...seed, id: index + 1 }));
@@ -40,6 +30,11 @@ const getOptions = (rows, key) =>
     value: v,
     label: v,
   }));
+
+// ─── Static row-height function (avoids inline arrow in JSX) ──────────────────
+const getRowHeight = () => "auto";
+
+// ─── Column factory ────────────────────────────────────────────────────────────
 
 const getColumns = (onView) => [
   {
@@ -107,6 +102,8 @@ const getColumns = (onView) => [
   },
 ];
 
+// ─── Component ─────────────────────────────────────────────────────────────────
+
 const DeviceAssetManagement = () => {
   const { LoadingContainer } = CommonLoading();
 
@@ -129,6 +126,7 @@ const DeviceAssetManagement = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
+  // ── Snackbar ────────────────────────────────────────────────────────────────
   const handleSnackbar = useCallback((message, severity = "info") => {
     setSnackbar({ open: true, message, severity });
   }, []);
@@ -137,6 +135,7 @@ const DeviceAssetManagement = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   }, []);
 
+  // ── Add / View ──────────────────────────────────────────────────────────────
   const handleClick = useCallback(() => {
     setIsEditMode(false);
     setDefaultValues({ modelName: "", imeiNumber: "" });
@@ -150,9 +149,11 @@ const DeviceAssetManagement = () => {
     setIsAddModalOpen(true);
   }, []);
 
+  // ── Edit ────────────────────────────────────────────────────────────────────
   const handleEditClick = useCallback(() => setIsEditing(true), []);
   const handleCancelEdit = useCallback(() => setIsEditing(false), []);
 
+  // ── Form submit / cancel ────────────────────────────────────────────────────
   const handleAddSubmit = useCallback(
     (formData) => {
       if (!isEditMode) {
@@ -189,6 +190,10 @@ const DeviceAssetManagement = () => {
     setIsEditing(false);
   }, []);
 
+  // ── No-op mode setter (stable reference, avoids inline arrow) ───────────────
+  const handleSetMode = useCallback(() => {}, []);
+
+  // ── Derived data ────────────────────────────────────────────────────────────
   const columns = useMemo(() => getColumns(handleViewClick), [handleViewClick]);
 
   const filteredRows = useMemo(() => {
@@ -231,6 +236,22 @@ const DeviceAssetManagement = () => {
     total: filteredRows.length,
   };
 
+  // ── Pre-computed header actions element ─────────────────────────────────────
+  let headerActionsElement = null;
+  if (isEditMode && !isEditing) {
+    headerActionsElement = (
+      <EditButton variant="contained" onClick={handleEditClick}>
+        Edit
+      </EditButton>
+    );
+  } else if (isEditMode && isEditing) {
+    headerActionsElement = (
+      <CancelEditButton variant="outlined" onClick={handleCancelEdit}>
+        Cancel Edit
+      </CancelEditButton>
+    );
+  }
+
   return (
     <>
       <LoadingContainer />
@@ -241,7 +262,7 @@ const DeviceAssetManagement = () => {
           searchKey={0}
           summaryCards={[]}
           mode=""
-          setMode={() => {}}
+          setMode={handleSetMode}
           handleClick={handleClick}
           modelOptions={getOptions(allRows, "deviceModel")}
           statusOptions={getOptions(allRows, "status")}
@@ -253,7 +274,7 @@ const DeviceAssetManagement = () => {
             data={gridData}
             setData={setData}
             paginationMode="server"
-            getRowHeight={() => "auto"}
+            getRowHeight={getRowHeight}
           />
         </GridContainer>
       </PageContainer>
@@ -273,17 +294,7 @@ const DeviceAssetManagement = () => {
         onSubmit={handleAddSubmit}
         onCancel={handleAddCancel}
         submitButtonText={isEditMode ? (isEditing ? "Update" : "Save") : "Add Asset"}
-        headerActions={
-          isEditMode && !isEditing ? (
-            <EditButton variant="contained" onClick={handleEditClick}>
-              Edit
-            </EditButton>
-          ) : isEditMode && isEditing ? (
-            <CancelEditButton variant="outlined" onClick={handleCancelEdit}>
-              Cancel Edit
-            </CancelEditButton>
-          ) : null
-        }
+        headerActions={headerActionsElement}
         content={
           <DeviceAssetManagementForm
             formId="addAssetForm"
