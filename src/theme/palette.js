@@ -41,6 +41,7 @@ const paletteTheme = themeMode => {
       A700: "#444d57"
     },
     primary: getColorVariants("#3e60d5", "#fff"),
+    sidebar: getColorVariants("#284394", "#fff"),
     secondary: getColorVariants("#6c757d", "#fff"),
     success: getColorVariants("#26c362", "#fff"),
     info: getColorVariants("#3FC6FC", "#fff"),
@@ -48,6 +49,7 @@ const paletteTheme = themeMode => {
     error: getColorVariants("#ff0a0a", "#fff"),
     light: getColorVariants("#eef2f7", "#6c757d"),
     dark: getColorVariants("#313a46", "#fff"),
+    brand: getColorVariants("#284495", "#fff"),
     background: {
       paper: "#fff",
       default: "#f2f4f7"
@@ -81,6 +83,7 @@ const paletteTheme = themeMode => {
         A700: "#dee2e6"
       },
       primary: getColorVariants("#3e60d5", "#fff"),
+      sidebar: getColorVariants("#284394", "#fff"),
       secondary: getColorVariants("#6c757d", "#fff"),
       success: getColorVariants("#26c362", "#fff"),
       info: getColorVariants("#3FC6FC", "#fff"),
@@ -88,6 +91,7 @@ const paletteTheme = themeMode => {
       error: getColorVariants("#ff0a0a", "#fff"),
       light: getColorVariants("#464f5b", "#f1f1f1"),
       dark: getColorVariants("#f1f1f1", "#000"),
+      brand: getColorVariants("#284495", "#fff"),
       background: {
         paper: "#1e2328",
         default: "#171c21"

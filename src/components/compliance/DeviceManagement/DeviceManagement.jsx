@@ -1,13 +1,41 @@
 import React from "react";
-import { Grid, Typography, Box, Button } from "@mui/material";
-import { ComponentContainerCard, PageBreadcrumb } from "@src/components";
+import CommonDataGrid from "@src/common/CommonDataGrid";
+import { PageContainer } from "../../../common/PageContainer";
+import { mockData, columns, summaryCards } from "./Constants";
+import CommonLoading from "../../../common/CommonLoading";
+import DeviceManagementHeader from "./DeviceManagementHeader";
+import useDeviceManagement from "../../../hooks/useDeviceManagement";
 
 const DeviceManagement = () => {
+  const { searchQuery, data, setData, mode, setMode, handleClick } = useDeviceManagement();
+  const { LoadingContainer } = CommonLoading();
+
   return (
     <>
-      <Typography variant="h6" gutterBottom>
-        Device Management
-      </Typography>
+      <LoadingContainer />
+      <PageContainer>
+        <DeviceManagementHeader
+          data={data}
+          setData={setData}
+          searchKey={searchQuery}
+          summaryCards={summaryCards}
+          mode={mode}
+          setMode={setMode}
+          handleClick={handleClick}
+        />
+        <CommonDataGrid
+          columnsData={columns}
+          rowData={mockData}
+          data={{
+            ...data,
+            total: data.total,
+            isLoading: data.isLoading,
+          }}
+          setData={setData}
+          paginationMode="server"
+          getRowHeight={() => "auto"}
+        />
+      </PageContainer>
     </>
   );
 };

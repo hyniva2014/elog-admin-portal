@@ -4,6 +4,7 @@
  * Author: Coderthemes
  */
 import { createTheme as muiCreateTheme } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import componentOverrides from "@src/theme/components";
 import gridTheme from "@src/theme/grid";
 import paletteTheme from "@src/theme/palette";
@@ -24,9 +25,13 @@ const createTheme = theme => {
       drawer: 1200
     }
   };
-  return muiCreateTheme({
+  const createdTheme = muiCreateTheme({
     ...themeOption,
     components: componentOverrides(themeOption)
   });
+
+  createdTheme.alpha = alpha;
+
+  return createdTheme;
 };
 export { createTheme };
