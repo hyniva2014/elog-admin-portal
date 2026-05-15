@@ -1,13 +1,13 @@
 import DevicesIcon from "@mui/icons-material/Devices";
-import WifiIcon from "@mui/icons-material/Wifi";
 import WifiOffIcon from "@mui/icons-material/WifiOff";
-import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import { Box, Grid } from "@mui/material";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { PageContainer } from "../component.styled";
 import CarrierGrowthTrend from "./CarrierGrowthTrend";
 import CommonAlertCenter from "./AlertCenter";
 import { HeaderContainer, HeaderSubtitle, HeaderTitle } from "./AlertCenter.styles";
+import IncidentDistribution from "./IncidentDistribution";
+import DeviceLifecycleStatus from "../../compliance/DeviceManagement/DeviceLifecycleStatus";
 import ActiveDevicesIcon from "../../../assets/images/Active Devices.png";
 import FMCSA from "../../../assets/images/Avg FMCSA Score.png";
 
@@ -55,6 +55,15 @@ const AdminDashboard = () => {
               alerts={alerts}
               onViewAll={() => console.log("View All")}
             />
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={2} alignItems="stretch" sx={{ mt: 2 }}>
+          <Grid item xs={12} lg={6} sx={{ display: "flex" }}>
+            <IncidentDistribution />
+          </Grid>
+          <Grid item xs={12} lg={6} sx={{ display: "flex" }}>
+            <DeviceLifecycleStatus />
           </Grid>
         </Grid>
       </PageContainer>

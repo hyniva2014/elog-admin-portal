@@ -1,17 +1,13 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import CommonPageHeader from "../../../common/CommonPageHeader";
 import CommonFilters from "../../../common/CommonFilters";
 import {
   DEVICE_ASSET_STATUS_FILTER_OPTIONS,
-  DEVICE_ASSET_IGNITION_FILTER_OPTIONS,
   DEVICE_ASSET_MODEL_FILTER_OPTIONS,
 } from "./Constants";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
-import { useEffect, useState } from "react";
-import { useServices } from "../../../services/services";
 import { useSelector } from "react-redux";
 import { HeaderContainer, AddButton, SummaryCardBox } from "./DeviceAssetManagement.styles";
-// import { hasPermission } from "../../CommonRowColumnUtils";
 
 const DeviceAssetManagementHeader = (props) => {
   const {
@@ -22,57 +18,9 @@ const DeviceAssetManagementHeader = (props) => {
     mode,
     setMode,
     handleClick,
+    modelOptions = [],
+    statusOptions = [],
   } = props;
-
-  const { fetchApi } = useServices();
-  const [deviceModelOptions, setDeviceModelOptions] = useState([]);
-  const [ignitionOptions, setIgnitionOptions] = useState([]);
-  const [statusOptions, setStatusOptions] = useState([]);
-
-  const companyId = useSelector(
-    (state) =>
-      state.loginSlice.loginDetails?.body?.data?.userdetails?.company_id,
-  );
-
-  const roleId = useSelector(
-    (state) => state.loginSlice.loginDetails?.body?.data?.userdetails?.role_id,
-  );
-
-  // const permissions = useSelector((state) => state.rolePermissions.permissions);
-
-  // const canCreate = hasPermission(
-  //   permissions,
-  //   "DEVICE_ASSET_MANAGEMENT",
-  //   "CREATE_DEVICE_ASSET",
-  // );
-
-  // useEffect(() => {
-  //   loadDeviceAssets();
-  // }, []);
-
-  // const loadDeviceAssets = async () => {
-  //   try {
-  //     const response = await fetchApi(
-  //       `/device-asset/get-device-assets?company_id=${companyId}&role_id=${roleId}&page=1&limit=1000`
-  //     );
-
-  //     const deviceAssets = response?.body?.deviceAssets || [];
-
-  //     setDeviceModelOptions(
-  //       deviceAssets.map((asset) => ({
-  //         value: asset.deviceModel,
-  //         label: asset.deviceModel || `Model ${asset.deviceModel}`,
-  //       })),
-  //     );
-
-  //     setIgnitionOptions(DEVICE_ASSET_IGNITION_FILTER_OPTIONS);
-  //     setStatusOptions(DEVICE_ASSET_STATUS_FILTER_OPTIONS);
-  //   } catch (err) {
-  //     console.error("Device Assets API error", err);
-  //     setIgnitionOptions(DEVICE_ASSET_IGNITION_FILTER_OPTIONS);
-  //     setStatusOptions(DEVICE_ASSET_STATUS_FILTER_OPTIONS);
-  //   }
-  // };
 
   return (
     <HeaderContainer>
@@ -82,11 +30,13 @@ const DeviceAssetManagementHeader = (props) => {
         addButton={true}
         rightContent={
           <AddButton variant="contained" onClick={handleClick}>
-            Add Model
+            Add Asset
           </AddButton>
         }
       />
-      <Typography variant="h6" fontWeight="300">Assign unassigned devices to carriers</Typography>
+      <Typography variant="h6" fontWeight="300">
+        Assign unassigned devices to carriers
+      </Typography>
       <SummaryCardBox>
         <CommonSummaryCardGroup cards={summaryCards} />
       </SummaryCardBox>
@@ -100,12 +50,12 @@ const DeviceAssetManagementHeader = (props) => {
           {
             label: "Model Type",
             dataKey: "deviceModel",
-            options: deviceModelOptions.length > 0 ? deviceModelOptions : DEVICE_ASSET_MODEL_FILTER_OPTIONS,
+            options: modelOptions.length > 0 ? modelOptions : DEVICE_ASSET_MODEL_FILTER_OPTIONS,
           },
           {
             label: "All Status",
             dataKey: "status",
-            options: DEVICE_ASSET_STATUS_FILTER_OPTIONS,
+            options: statusOptions.length > 0 ? statusOptions : DEVICE_ASSET_STATUS_FILTER_OPTIONS,
           },
         ]}
       />
