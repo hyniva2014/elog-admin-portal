@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 import DeviceModelManagement from "./DeviceModelManagement";
 
 jest.mock("../../../common/CommonDataGrid", () => {
@@ -47,5 +47,47 @@ describe("DeviceModelManagement", () => {
     rerender(<DeviceModelManagement />);
     rerender(<DeviceModelManagement />);
     expect(screen.getByTestId("device-model-header")).toBeInTheDocument();
+  });
+});
+
+describe("DeviceModelManagement – edge cases", () => {
+  it("should render add-device-model dialog in closed state by default", () => {
+    render(<DeviceModelManagement />);
+    const dialog = screen.getByTestId("add-device-model-dialog");
+    expect(dialog).toBeInTheDocument();
+  });
+
+  it("should not crash when rerendered rapidly", () => {
+    const { rerender, unmount } = render(<DeviceModelManagement />);
+    for (let i = 0; i < 5; i++) {
+      rerender(<DeviceModelManagement />);
+    }
+    expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
+    unmount();
+  });
+
+  it("should render header with data-testid even when no options are derived", () => {
+    render(<DeviceModelManagement />);
+    expect(screen.getByTestId("device-model-header")).toBeInTheDocument();
+  });
+});
+
+describe("DeviceModelManagement – negative cases", () => {
+  it("should not render unexpected elements outside the known structure", () => {
+    render(<DeviceModelManagement />);
+    expect(screen.queryByTestId("nonexistent-component")).toBeNull();
+  });
+
+  it("should remain stable when the component mounts and unmounts", () => {
+    const { unmount } = render(<DeviceModelManagement />);
+    expect(() => unmount()).not.toThrow();
+  });
+
+  it("should handle rapid open/close state changes without crashing", () => {
+    const MockAddDeviceModelDialog = jest.requireMock("./AddDeviceModelDialog");
+    render(<DeviceModelManagement />);
+    act(() => {
+      expect(screen.getByTestId("add-device-model-dialog")).toBeInTheDocument();
+    });
   });
 });

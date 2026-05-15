@@ -13,6 +13,12 @@ import {
 
 const ADD_DEVICE_MODEL_FORM_ID = "add-device-model-form";
 
+const SelectMenuItem = ({ value, label }) => (
+  <MenuItem key={value} value={value}>
+    {label}
+  </MenuItem>
+);
+
 const validationSchema = yup.object({
   modelName: yup
     .string()
@@ -139,9 +145,7 @@ const AddDeviceModelDialog = ({
                   select
                 >
                   {DEVICE_MODEL_ASSET_OPTIONS.map(({ value, label }) => (
-                    <MenuItem key={value} value={value}>
-                      {label}
-                    </MenuItem>
+                    <SelectMenuItem key={value} value={value} label={label} />
                   ))}
                 </CommonTextField>
               )}
@@ -165,9 +169,7 @@ const AddDeviceModelDialog = ({
                   select
                 >
                   {DEVICE_MODEL_ELOG_OPTIONS.map(({ value, label }) => (
-                    <MenuItem key={value} value={value}>
-                      {label}
-                    </MenuItem>
+                    <SelectMenuItem key={value} value={value} label={label} />
                   ))}
                 </CommonTextField>
               )}

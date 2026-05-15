@@ -51,6 +51,8 @@ const getOptions = (rows, key) =>
     }),
   );
 
+const getRowHeight = () => "auto";
+
 const getDeviceModelColumns = (onViewDeviceModel) => [
   {
     field: "model",
@@ -105,14 +107,17 @@ const getDeviceModelColumns = (onViewDeviceModel) => [
     flex: 1,
     minWidth: 100,
     sortable: false,
-    renderCell: (params) => (
-      <IconButton
-        size="small"
-        onClick={() => onViewDeviceModel(params.row)}
-      >
-        <ActionIcon src={eyeIcon} alt="view" />
-      </IconButton>
-    ),
+    renderCell: (params) => {
+      const handleViewClick = () => onViewDeviceModel(params.row);
+      return (
+        <IconButton
+          size="small"
+          onClick={handleViewClick}
+        >
+          <ActionIcon src={eyeIcon} alt="view" />
+        </IconButton>
+      );
+    },
   },
 ];
 
@@ -249,7 +254,7 @@ const DeviceModelManagement = () => {
             data={gridData}
             setData={setData}
             paginationMode="server"
-            getRowHeight={() => "auto"}
+            getRowHeight={getRowHeight}
           />
         </GridContainer>
 
