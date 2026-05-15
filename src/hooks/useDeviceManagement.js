@@ -15,7 +15,6 @@ const useDeviceManagement = () => {
   }, []);
 
   const handleAddDevice = useCallback((deviceData) => {
-    // TODO: wire up to createApi when backend is ready
     console.log("New device submitted:", deviceData);
     setIsAddDeviceOpen(false);
   }, []);

@@ -10,37 +10,15 @@ import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdo
 import { DialogFormContainer, SectionHeader } from "./DeviceManagement.styles";
 
 import {
+  ADD_DEVICE_FORM_ID,
   DEVICE_CARRIER_ID_FILTER_OPTIONS,
   DEVICE_MODEL_FILTER_OPTIONS,
   DEVICE_STATUS_FILTER_OPTIONS,
   DEVICE_TRUCK_FILTER_OPTIONS,
+  GVWR_OPTIONS,
+  MAKE_OPTIONS,
+  STATE_OPTIONS,
 } from "./Constants";
-
-const ADD_DEVICE_FORM_ID = "add-device-form";
-
-const GVWR_OPTIONS = [
-  { value: "26,001 lbs", label: "26,001 lbs" },
-  { value: "33,001 lbs", label: "33,001 lbs" },
-  { value: "60,000 lbs", label: "60,000 lbs" },
-  { value: "80,000 lbs", label: "80,000 lbs" },
-];
-
-const MAKE_OPTIONS = [
-  { value: "Daimler", label: "Daimler" },
-  { value: "Freightliner", label: "Freightliner" },
-  { value: "Kenworth", label: "Kenworth" },
-  { value: "Peterbilt", label: "Peterbilt" },
-  { value: "Volvo", label: "Volvo" },
-];
-
-const STATE_OPTIONS = [
-  { value: "Alabama", label: "Alabama" },
-  { value: "Alaska", label: "Alaska" },
-  { value: "Arizona", label: "Arizona" },
-  { value: "California", label: "California" },
-  { value: "Florida", label: "Florida" },
-  { value: "Texas", label: "Texas" },
-];
 
 const validationSchema = yup.object({
   carrierId: yup.string().required("Carrier ID is required"),
@@ -117,8 +95,6 @@ const AddDeviceDialog = ({ open, onClose, onSubmit, loading = false }) => {
     <form id={ADD_DEVICE_FORM_ID} onSubmit={handleSubmit(submitHandler)}>
       <DialogFormContainer>
         <Grid container spacing={2}>
-
-          {/* ── DEVICE INFORMATION ── */}
           <Grid item xs={12}>
             <SectionHeader>DEVICE INFORMATION</SectionHeader>
             <Divider />
@@ -228,8 +204,6 @@ const AddDeviceDialog = ({ open, onClose, onSubmit, loading = false }) => {
               )}
             />
           </Grid>
-
-          {/* ── CURRENT STATUS ── */}
           <Grid item xs={12}>
             <SectionHeader>CURRENT STATUS</SectionHeader>
             <Divider />
@@ -253,8 +227,6 @@ const AddDeviceDialog = ({ open, onClose, onSubmit, loading = false }) => {
               )}
             />
           </Grid>
-
-          {/* ── VEHICLE DETAILS ── */}
           <Grid item xs={12}>
             <SectionHeader>VEHICLE DETAILS</SectionHeader>
             <Divider />
