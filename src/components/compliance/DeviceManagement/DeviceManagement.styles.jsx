@@ -23,3 +23,18 @@ export const FormBox = styled(Box)(({ theme }) => ({
 export const StatusTypography = styled(Typography)(({ theme, value }) => ({
   color: value === "Active" ? theme.palette.success.dark : theme.palette.error.dark,
 }));
+
+export const DialogFormContainer = styled(Box)(() => ({
+  paddingLeft: 16,
+  paddingRight: 16,
+  paddingTop: 12,
+  paddingBottom: 8,
+}));
+
+export const SectionHeader = styled(Typography)(({ theme }) => ({
+  fontSize: "12px",
+  fontWeight: 600,
+  color: theme.palette.text.primary,
+  marginBottom: 8,
+  marginTop: 4,
+}));

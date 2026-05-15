@@ -1,13 +1,24 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 const useDeviceManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [data, setData] = useState({ isLoading: false });
   const [mode, setMode] = useState("");
+  const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
 
-  const handleClick = () => {
-    console.log("Add device asset clicked");
-  };
+  const handleClick = useCallback(() => {
+    setIsAddDeviceOpen(true);
+  }, []);
+
+  const handleCloseAddDevice = useCallback(() => {
+    setIsAddDeviceOpen(false);
+  }, []);
+
+  const handleAddDevice = useCallback((deviceData) => {
+    // TODO: wire up to createApi when backend is ready
+    console.log("New device submitted:", deviceData);
+    setIsAddDeviceOpen(false);
+  }, []);
 
   return {
     searchQuery,
@@ -17,6 +28,9 @@ const useDeviceManagement = () => {
     mode,
     setMode,
     handleClick,
+    isAddDeviceOpen,
+    handleCloseAddDevice,
+    handleAddDevice,
   };
 };
 
