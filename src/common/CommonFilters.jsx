@@ -1,8 +1,16 @@
-import { Box, Grid } from "@mui/material";
+import { Box } from "@mui/material";
 import CommonSearch from "./CommonSearch";
 import CommonDateRangeSelector from "./CommonDateRangeSelector";
 import CommonAutocompleteDropdown from "./CommonAutocompleteDropdown";
 import ViolationTypeAutocomplete from "./ViolationTypeAutocomplete";
+import {
+  FiltersContainer,
+  SearchWrapper,
+  RightFiltersContainer,
+  DateRangeWrapper,
+  FilterWrapper,
+  ActionButtonWrapper,
+} from "./CommonFilters.styled";
 
 const CommonFilters = ({
   data,
@@ -14,75 +22,41 @@ const CommonFilters = ({
   actionButton,
   allowDateClear = false,
 }) => {
+  const handleDateRangeChange = (range) => {
+    setData((prev) => ({
+      ...prev,
+      page: 1,
+      fromDate: range?.start || null,
+      toDate: range?.end || null,
+    }));
+  };
+
   return (
-    <Box
-      sx={{
-        mt: 2,
-        width: "100%",
-        display: "flex",
-        alignItems: "center",
-        gap: 1.5,
-        flexWrap: "wrap",
-      }}
-    >
+    <FiltersContainer>
       {showSearch && (
-        <Box
-          sx={{
-            width: { xs: "100%", md: "35%" },
-            minWidth: { md: 220 },
-            flexShrink: 0,
-          }}
-        >
+        <SearchWrapper>
           <CommonSearch
             key={searchKey}
             value={data.search}
             setData={setData}
             placeholder="Search by All"
           />
-        </Box>
+        </SearchWrapper>
       )}
 
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: 1.5,
-          flexWrap: "wrap",
-          flex: 1,
-          justifyContent: { xs: "flex-start", md: "flex-end" },
-        }}
-      >
+      <RightFiltersContainer>
         {showDateRange && (
-          <Box
-            sx={{
-              width: { xs: "100%", sm: "calc(50% - 6px)", md: "auto" },
-              minWidth: 180,
-            }}
-          >
+          <DateRangeWrapper>
             <CommonDateRangeSelector
               value={{ start: data.fromDate, end: data.toDate }}
               allowClear={allowDateClear}
-              onChange={(range) =>
-                setData((prev) => ({
-                  ...prev,
-                  page: 1,
-                  fromDate: range?.start || null,
-                  toDate: range?.end || null,
-                }))
-              }
+              onChange={handleDateRangeChange}
             />
-          </Box>
+          </DateRangeWrapper>
         )}
 
         {filters.map((filter) => (
-          <Box
-            key={filter.dataKey || filter.name}
-            sx={{
-              width: { xs: "100%", sm: "calc(50% - 6px)", md: "auto" },
-              minWidth: 140,
-              maxWidth: { md: 180 },
-            }}
-          >
+          <FilterWrapper key={filter.dataKey || filter.name}>
             {filter.type === "violation" ? (
               <ViolationTypeAutocomplete
                 label={filter.label}
@@ -101,14 +75,14 @@ const CommonFilters = ({
                 dataKey={filter.dataKey || filter.name}
               />
             )}
-          </Box>
+          </FilterWrapper>
         ))}
 
         {actionButton && (
-          <Box sx={{ width: { xs: "100%", sm: "auto" } }}>{actionButton}</Box>
+          <ActionButtonWrapper>{actionButton}</ActionButtonWrapper>
         )}
-      </Box>
-    </Box>
+      </RightFiltersContainer>
+    </FiltersContainer>
   );
 };
 

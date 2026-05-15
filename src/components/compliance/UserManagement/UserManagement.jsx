@@ -28,6 +28,8 @@ const UserManagement = () => {
     setOpenForm(false);
   };
 
+  const handleGetRowHeight = () => "auto";
+
   return (
     <>
       <LoadingContainer />
@@ -51,7 +53,7 @@ const UserManagement = () => {
           }}
           setData={setData}
           paginationMode="server"
-          getRowHeight={() => "auto"}
+          getRowHeight={handleGetRowHeight}
         />
       </PageContainer>
       <UserManagementForm open={openForm} onClose={handleClose} mode="add" />

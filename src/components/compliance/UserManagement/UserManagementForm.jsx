@@ -37,6 +37,7 @@ const UserManagementForm = ({
     register,
     formState: { errors },
     reset,
+    setValue,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -66,6 +67,14 @@ const UserManagementForm = ({
     onClose();
   };
 
+  const handleAccountChange = (value) => {
+    setValue("selectAccount", value, { shouldValidate: true });
+  };
+
+  const handleUserProfileChange = (value) => {
+    setValue("userProfile", value, { shouldValidate: true });
+  };
+
   const formContent = (
     <Box
       component="form"
@@ -93,9 +102,7 @@ const UserManagementForm = ({
                 value: "Knight Transportation",
               },
             ]}
-            onChange={(value) => {
-              control._formValues.selectAccount = value;
-            }}
+            onChange={handleAccountChange}
             error={!!errors.selectAccount}
             helperText={errors.selectAccount?.message}
             required
@@ -122,9 +129,7 @@ const UserManagementForm = ({
                 value: "User",
               },
             ]}
-            onChange={(value) => {
-              control._formValues.userProfile = value;
-            }}
+            onChange={handleUserProfileChange}
             error={!!errors.userProfile}
             helperText={errors.userProfile?.message}
             required

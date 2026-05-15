@@ -1,10 +1,22 @@
 import eyeIcon from "../../src/assets/images/svg/eyeicon.png";
 import { IconButton } from "@mui/material";
+import { StatusText } from "./CommonRowColumnUtils.styled";
+
+const StatusCell = (params) => (
+  <StatusText statuscolor={params.row.statusColor}>{params.value}</StatusText>
+);
+
+const ActionCell = () => (
+  <IconButton size="small" color="primary">
+    <img src={eyeIcon} alt="view" width={16} height={16} />
+  </IconButton>
+);
+
 export const UserManagementColumnData = [
   {
     field: "carrierId",
     headerName: "Carrier ID",
-    width: 180,
+    width: 50,
     minWidth: 150,
     maxWidth: 220,
     headerTooltip: true,
@@ -46,6 +58,22 @@ export const UserManagementColumnData = [
     headerTooltip: true,
   },
   {
+    field: "createdOn",
+    headerName: "Created ON",
+    flex: 1,
+    minWidth: 180,
+    maxWidth: 250,
+    headerTooltip: true,
+  },
+  {
+    field: "updatedOn",
+    headerName: "Updated ON",
+    flex: 1,
+    minWidth: 180,
+    maxWidth: 250,
+    headerTooltip: true,
+  },
+  {
     field: "primaryContactEmail",
     headerName: "Primary Contact Email",
     minWidth: 180,
@@ -63,27 +91,14 @@ export const UserManagementColumnData = [
     maxWidth: 250,
     flex: 1,
     headerTooltip: true,
-    renderCell: (params) => (
-      <span
-        style={{
-          color: params.row.statusColor,
-          fontWeight: 400,
-        }}
-      >
-        {params.value}
-      </span>
-    ),
+    renderCell: StatusCell,
   },
   {
     field: "action",
     headerName: "Action",
     flex: 1,
     minWidth: 100,
-    renderCell: () => (
-      <IconButton size="small" color="primary">
-        <img src={eyeIcon} alt="view" width={16} height={16} />
-      </IconButton>
-    ),
+    renderCell: ActionCell,
   },
 ];
 export const UserManagementRowData = [
@@ -94,6 +109,8 @@ export const UserManagementRowData = [
     userProfile: "Admin",
     firstName: "John",
     lastName: "Doe",
+    createdOn: "05-05-2026",
+    updatedOn: "10-05-2026",
     primaryContactEmail: "john.doe@swift.com",
     status: "Active",
   },
@@ -104,6 +121,8 @@ export const UserManagementRowData = [
     userProfile: "Super Admin",
     firstName: "Sarah",
     lastName: "Smith",
+    createdOn: "05-05-2025",
+    updatedOn: "10-05-2025",
     primaryContactEmail: "sarah.smith@jbhunt.com",
     status: "Inactive",
   },
@@ -114,6 +133,8 @@ export const UserManagementRowData = [
     userProfile: "User",
     firstName: "Michael",
     lastName: "Johnson",
+    createdOn: "05-05-2025",
+    updatedOn: "10-05-2025",
     primaryContactEmail: "michael.johnson@knight.com",
     status: "Active",
   },
@@ -124,6 +145,8 @@ export const UserManagementRowData = [
     userProfile: "Admin",
     firstName: "Emily",
     lastName: "Williams",
+    createdOn: "05-05-2025",
+    updatedOn: "10-05-2025",
     primaryContactEmail: "emily.williams@werner.com",
     status: "Active",
   },
@@ -131,9 +154,11 @@ export const UserManagementRowData = [
     id: 5,
     carrierId: 5,
     carrierName: "Schneider National",
-    userProfile: "User",
+    userProfile: "Admin",
     firstName: "David",
     lastName: "Brown",
+    createdOn: "05-05-2025",
+    updatedOn: "10-05-2025",
     primaryContactEmail: "david.brown@schneider.com",
     status: "Inactive",
   },
@@ -144,6 +169,8 @@ export const UserManagementRowData = [
     userProfile: "Super Admin",
     firstName: "Olivia",
     lastName: "Taylor",
+    createdOn: "05-05-2025",
+    updatedOn: "10-05-2025",
     primaryContactEmail: "olivia.taylor@xpo.com",
     status: "Active",
   },
@@ -154,6 +181,8 @@ export const UserManagementRowData = [
     userProfile: "Admin",
     firstName: "Daniel",
     lastName: "Anderson",
+    createdOn: "05-05-2025",
+    updatedOn: "10-05-2025",
     primaryContactEmail: "daniel.anderson@fedex.com",
     status: "Active",
   },
@@ -161,9 +190,11 @@ export const UserManagementRowData = [
     id: 8,
     carrierId: 8,
     carrierName: "Old Dominion",
-    userProfile: "User",
+    userProfile: "Admin",
     firstName: "Sophia",
     lastName: "Thomas",
+    createdOn: "05-05-2025",
+    updatedOn: "10-05-2025",
     primaryContactEmail: "sophia.thomas@odfl.com",
     status: "Inactive",
   },

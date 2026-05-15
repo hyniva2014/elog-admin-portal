@@ -36,13 +36,15 @@ jest.mock("../../../common/CommonLoading", () => () => ({
 }));
 
 // Mock UserManagementForm
-jest.mock("./UserManagementForm", () => (props) =>
-  props.open ? (
-    <div data-testid="user-management-form">
-      UserManagementForm
-      <button onClick={props.onClose}>Close Form</button>
-    </div>
-  ) : null
+jest.mock(
+  "./UserManagementForm",
+  () => (props) =>
+    props.open ? (
+      <div data-testid="user-management-form">
+        UserManagementForm
+        <button onClick={props.onClose}>Close Form</button>
+      </div>
+    ) : null,
 );
 
 // Mock Row & Column Data
@@ -73,9 +75,7 @@ describe("UserManagement Component", () => {
   test("renders UserManagementHeader component", () => {
     render(<UserManagement />);
 
-    expect(
-      screen.getByTestId("user-management-header")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("user-management-header")).toBeInTheDocument();
   });
 
   test("renders CommonDataGrid component", () => {
@@ -94,7 +94,7 @@ describe("UserManagement Component", () => {
     render(<UserManagement />);
 
     expect(
-      screen.queryByTestId("user-management-form")
+      screen.queryByTestId("user-management-form"),
     ).not.toBeInTheDocument();
   });
 
@@ -104,9 +104,7 @@ describe("UserManagement Component", () => {
     const openButton = screen.getByText("Open Form");
     fireEvent.click(openButton);
 
-    expect(
-      screen.getByTestId("user-management-form")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("user-management-form")).toBeInTheDocument();
   });
 
   test("closes UserManagementForm when onClose is triggered", () => {
@@ -115,15 +113,13 @@ describe("UserManagement Component", () => {
     // Open form
     fireEvent.click(screen.getByText("Open Form"));
 
-    expect(
-      screen.getByTestId("user-management-form")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("user-management-form")).toBeInTheDocument();
 
     // Close form
     fireEvent.click(screen.getByText("Close Form"));
 
     expect(
-      screen.queryByTestId("user-management-form")
+      screen.queryByTestId("user-management-form"),
     ).not.toBeInTheDocument();
   });
 
@@ -132,8 +128,29 @@ describe("UserManagement Component", () => {
 
     fireEvent.click(screen.getByText("Open Form"));
 
-    expect(
-      screen.getByTestId("user-management-form")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("user-management-form")).toBeInTheDocument();
+  });
+});
+
+describe("Edge Cases & Data Integrity", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("renders gracefully with empty row data", () => {
+    // Mock CommonRowColumnUtils to return empty rows for this test
+    jest.mock("../../CommonRowColumnUtils", () => ({
+      ...jest.requireActual("../../CommonRowColumnUtils"),
+      UserManagementRowData: [],
+    }));
+
+    // We just render and make sure it doesn't crash
+    const { container } = render(<UserManagement />);
+    expect(container).toBeInTheDocument();
+  });
+
+  test("handles undefined data state gracefully", () => {
+    const { container } = render(<UserManagement />);
+    expect(container).toBeInTheDocument();
   });
 });

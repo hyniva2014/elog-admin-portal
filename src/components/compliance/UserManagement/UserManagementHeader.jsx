@@ -1,7 +1,8 @@
 import CommonFilters from "../../../common/CommonFilters";
 import CommonPageHeader from "../../../common/CommonPageHeader";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
+import { AddUserButton } from "./UserManagementHeader.styled";
 
 const UserManagementHeader = (props) => {
   const {
@@ -18,13 +19,9 @@ const UserManagementHeader = (props) => {
         title="User Management"
         subtitle="Manage user accounts and permissions"
         rightContent={
-          <Button
-            sx={{ color: "#FFFFFF", backgroundColor: "#284495" }}
-            variant="contained"
-            onClick={handleClick}
-          >
+          <AddUserButton variant="contained" onClick={handleClick}>
             Add User
-          </Button>
+          </AddUserButton>
         }
       />
       <Box mt={1}>
@@ -42,16 +39,13 @@ const UserManagementHeader = (props) => {
         allowDateClear={true}
         filters={[
           {
-            label: "AssetType",
-            name: "assetType",
+            label: "User Profile",
+            name: "userProfile",
             type: "select",
             options: [
-              { label: "Truck", value: "truck" },
-              { label: "Trailer", value: "trailer" },
+              { label: "Admin", value: "1" },
+              { label: "Super Admin", value: "2" },
             ],
-          },
-          {
-            label: "All Truck",
           },
           {
             label: "All Carrier",
