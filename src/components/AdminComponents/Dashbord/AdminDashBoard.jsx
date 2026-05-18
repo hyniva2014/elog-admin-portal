@@ -1,15 +1,16 @@
 import DevicesIcon from "@mui/icons-material/Devices";
-import WifiIcon from "@mui/icons-material/Wifi";
 import WifiOffIcon from "@mui/icons-material/WifiOff";
-import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import { Box, Grid } from "@mui/material";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { PageContainer } from "../component.styled";
 import CarrierGrowthTrend from "./CarrierGrowthTrend";
 import CommonAlertCenter from "./AlertCenter";
 import { HeaderContainer, HeaderSubtitle, HeaderTitle } from "./AlertCenter.styles";
+import IncidentDistribution from "./IncidentDistribution";
+import DeviceLifecycleStatus from "../../compliance/DeviceManagement/DeviceLifecycleStatus";
 import ActiveDevicesIcon from "../../../assets/images/Active Devices.png";
 import FMCSA from "../../../assets/images/Avg FMCSA Score.png";
+import { StretchGridContainer, FlexGridItem } from "./AdminDashBoard.styles";
 
 const AdminDashboard = () => {
   return (
@@ -57,6 +58,15 @@ const AdminDashboard = () => {
             />
           </Grid>
         </Grid>
+
+        <StretchGridContainer container spacing={2}>
+          <FlexGridItem item xs={12} lg={6}>
+            <IncidentDistribution />
+          </FlexGridItem>
+          <FlexGridItem item xs={12} lg={6}>
+            <DeviceLifecycleStatus />
+          </FlexGridItem>
+        </StretchGridContainer>
       </PageContainer>
     </>
   );

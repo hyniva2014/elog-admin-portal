@@ -15,8 +15,8 @@ export const SummaryCardRoot = styled(Box)(({ theme }) => {
     borderRadius: theme.shape.borderRadius * 1,
 
     boxShadow: isDark
-      ? "0px 2px 6px rgba(0,0,0,0.4)"
-      : "0px 1px 4px rgba(0,0,0,0.25)",
+      ? `0px 2px 6px ${theme.palette.grey[900]}66`
+      : `0px 1px 4px ${theme.palette.grey[900]}40`,
 
     display: "flex",
     alignItems: "center",
@@ -26,7 +26,9 @@ export const SummaryCardRoot = styled(Box)(({ theme }) => {
   };
 });
 
-export const AccentBar = styled(Box)(({ accentcolor }) => ({
+export const AccentBar = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "accentcolor",
+})(({ accentcolor }) => ({
   width: 4,
   height: "100%",
   backgroundColor: accentcolor,
