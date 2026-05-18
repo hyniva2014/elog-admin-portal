@@ -258,14 +258,14 @@ export const summaryCards = [
     icon: <Inventory2OutlinedIcon sx={{ fontSize: 28 }} color="warning" />,
   },
 ];
- export const GVWR_OPTIONS = [
+export const GVWR_OPTIONS = [
   { value: "26,001 lbs", label: "26,001 lbs" },
   { value: "33,001 lbs", label: "33,001 lbs" },
   { value: "60,000 lbs", label: "60,000 lbs" },
   { value: "80,000 lbs", label: "80,000 lbs" },
 ];
 
-  export const MAKE_OPTIONS = [
+export const MAKE_OPTIONS = [
   { value: "Daimler", label: "Daimler" },
   { value: "Freightliner", label: "Freightliner" },
   { value: "Kenworth", label: "Kenworth" },
@@ -281,4 +281,5 @@ export const STATE_OPTIONS = [
   { value: "Florida", label: "Florida" },
   { value: "Texas", label: "Texas" },
 ];
- export const ADD_DEVICE_FORM_ID = "add-device-form";
+
+export const ADD_DEVICE_FORM_ID = "add-device-form";

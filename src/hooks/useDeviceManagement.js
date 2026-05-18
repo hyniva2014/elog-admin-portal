@@ -15,7 +15,7 @@ const useDeviceManagement = () => {
   }, []);
 
   const handleAddDevice = useCallback((deviceData) => {
-    console.log("New device submitted:", deviceData);
+    // TODO: EL-833 — integrate with POST /devices API via services.js
     setIsAddDeviceOpen(false);
   }, []);
 

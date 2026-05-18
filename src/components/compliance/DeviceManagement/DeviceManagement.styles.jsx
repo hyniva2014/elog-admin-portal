@@ -24,17 +24,17 @@ export const StatusTypography = styled(Typography)(({ theme, value }) => ({
   color: value === "Active" ? theme.palette.success.dark : theme.palette.error.dark,
 }));
 
-export const DialogFormContainer = styled(Box)(() => ({
-  paddingLeft: 16,
-  paddingRight: 16,
-  paddingTop: 12,
-  paddingBottom: 8,
+export const DialogFormContainer = styled(Box)(({ theme }) => ({
+  paddingLeft: theme.spacing(2),
+  paddingRight: theme.spacing(2),
+  paddingTop: theme.spacing(1.5),
+  paddingBottom: theme.spacing(1),
 }));
 
 export const SectionHeader = styled(Typography)(({ theme }) => ({
-  fontSize: "12px",
+  fontSize: theme.typography.caption.fontSize,
   fontWeight: 600,
   color: theme.palette.text.primary,
-  marginBottom: 8,
-  marginTop: 4,
+  marginBottom: theme.spacing(1),
+  marginTop: theme.spacing(0.5),
 }));
