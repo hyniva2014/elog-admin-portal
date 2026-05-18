@@ -1,198 +1,101 @@
-import DevicesIcon from "@mui/icons-material/Devices";
-import WifiOffIcon from "@mui/icons-material/WifiOff";
-import { Box, Grid } from "@mui/material";
+import React, { useState } from "react";
+import { Grid } from "@mui/material";
+
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { PageContainer } from "../component.styled";
 import CarrierGrowthTrend from "./CarrierGrowthTrend";
 import CommonAlertCenter from "./AlertCenter";
-import { HeaderContainer, HeaderSubtitle, HeaderTitle } from "./AlertCenter.styles";
 import IncidentDistribution from "./IncidentDistribution";
 import DeviceLifecycleStatus from "../../compliance/DeviceManagement/DeviceLifecycleStatus";
 import ActiveDevicesIcon from "../../../assets/images/Active Devices.png";
 import FMCSA from "../../../assets/images/Avg FMCSA Score.png";
-import { StretchGridContainer, FlexGridItem } from "./AdminDashBoard.styles";
+import { StretchGridContainer, ChartGrid, AlertGrid, IncidentGrid, DeviceGrid } from "./AdminDashBoard.styles";
+
+import {
+  HeaderContainer,
+  HeaderLeft,
+  ComplianceTitle,
+  DateRangeText,
+  HeaderSubtitle,
+} from "./AlertCenter.styles";
+
+import { alerts, chartData, summaryCards, TooltipKeys } from "./AdminConstant";
+import DateRangeSelector from "./DateRangeSelector";
+
+const getTodayRange = () => {
+  const today = new Date();
+
+  const formatDate = (date) =>
+    date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+
+  return {
+    period: "Today",
+    date: formatDate(today),
+    startDateObj: today,
+    endDateObj: today,
+  };
+};
 
 const AdminDashboard = () => {
+  const [selectedRange, setSelectedRange] = useState(getTodayRange());
+
+  const handleDateChange = (data) => {
+    setSelectedRange(data);
+  };
+
   return (
-    <>
-      <PageContainer>
-        <HeaderContainer>
-          <HeaderTitle variant="h4">Dashboard</HeaderTitle>
-
-          <HeaderSubtitle variant="h6">
-            Overview of platform operations and key metrics
+    <PageContainer>
+      {/* Header */}
+      <HeaderContainer>
+        <HeaderLeft>
+          <ComplianceTitle variant="inherit">Dashboard</ComplianceTitle>
+          <HeaderSubtitle variant="inherit">
+            Overview of key metrics and alerts
           </HeaderSubtitle>
-        </HeaderContainer>
-        <CommonSummaryCardGroup
-          cards={summaryCards}
-          showAccentBar={false}
-          layout="dashboard"
-        />
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={7}>
-            <CarrierGrowthTrend
-              title="Carrier Growth Trend"
-              data={chartData}
-              dataKey="value"
-              xAxisKey="month"
-              lineColor="#2563EB"
-              tooltipKeys={[
-                {
-                  key: "newAddition",
-                  label: "New Addition",
-                  color: "green",
-                },
-                {
-                  key: "loss",
-                  label: "Loss",
-                  color: "red",
-                },
-              ]}
-            />
-          </Grid>
-          <Grid item xs={12} md={5}>
-            <CommonAlertCenter
-              title="Alert Center"
-              alerts={alerts}
-              onViewAll={() => console.log("View All")}
-            />
-          </Grid>
-        </Grid>
 
-        <StretchGridContainer container spacing={2}>
-          <FlexGridItem item xs={12} lg={6}>
-            <IncidentDistribution />
-          </FlexGridItem>
-          <FlexGridItem item xs={12} lg={6}>
-            <DeviceLifecycleStatus />
-          </FlexGridItem>
-        </StretchGridContainer>
-      </PageContainer>
-    </>
+          <DateRangeText>
+            {selectedRange.period === "Today"
+              ? selectedRange.date
+              : `${selectedRange.startDate} - ${selectedRange.endDate}`}
+          </DateRangeText>
+        </HeaderLeft>
+
+        <DateRangeSelector onDateRangeChange={handleDateChange} />
+      </HeaderContainer>
+
+      <CommonSummaryCardGroup
+        cards={summaryCards}
+        showAccentBar={false}
+        layout="default"
+      />
+
+      <StretchGridContainer container spacing={2}>
+        <ChartGrid item xs={12} md={7}>
+          <CarrierGrowthTrend/>
+        </ChartGrid>
+
+        <AlertGrid item xs={12} md={5}>
+          <CommonAlertCenter
+            title="Alert Center"
+            alerts={alerts}
+            onViewAll={() => console.log("View All")}
+          />
+        </AlertGrid>
+
+        <IncidentGrid item xs={12} md={6}>
+          <IncidentDistribution />
+        </IncidentGrid>
+
+        <DeviceGrid item xs={12} md={6}>
+          <DeviceLifecycleStatus />
+        </DeviceGrid>
+      </StretchGridContainer>
+    </PageContainer>
   );
 };
 
 export default AdminDashboard;
-
-// Staic Data
-
-const summaryCards = [
-  {
-    id: "total_carriers",
-    title: "Total Carriers",
-    value: "1,095",
-    accentcolor: "#284495",
-    icon: (
-      <DevicesIcon
-        sx={{
-          //     fontSize: 18,
-          color: "#284495",
-        }}
-      />
-    ),
-  },
-  {
-    id: "active_devices",
-    title: "Active Devices",
-    value: "1,077",
-    accentcolor: "#008236",
-    icon: (
-      <Box
-        component="img"
-        src={ActiveDevicesIcon}
-        alt="ActiveDevicesIcon"
-        sx={{
-          width: 24,
-          height: 24,
-          objectFit: "contain",
-        }}
-      />
-    ),
-  },
-  {
-    id: "open_incidents",
-    title: "Open Incidents",
-    value: "18",
-    accentcolor: "#FF0000",
-    icon: (
-      <WifiOffIcon
-        sx={{
-          //     fontSize: 18,
-          color: "#FF0000",
-        }}
-      />
-    ),
-  },
-  {
-    id: "avg_fmcsa_score",
-    title: "Average FMCSA Score",
-    value: "85.5",
-    accentcolor: "#E69500",
-    icon: (
-      <Box
-        component="img"
-        src={FMCSA}
-        alt="FMCSA"
-        sx={{
-          width: 24,
-          height: 24,
-          objectFit: "contain",
-        }}
-      />
-    ),
-  },
-];
-
-const chartData = [
-  {
-    month: "Jan",
-    value: 45,
-    newAddition: 20,
-    loss: 10,
-  },
-  {
-    month: "Feb",
-    value: 52,
-    newAddition: 25,
-    loss: 12,
-  },
-  {
-    month: "Mar",
-    value: 60,
-    newAddition: 30,
-    loss: 15,
-  },
-  {
-    month: "Apr",
-    value: 78,
-    newAddition: 35,
-    loss: 14,
-  },
-];
-
-const alerts = [
-  {
-    severity: "Critical",
-    message: "5 devices offline for Swift Transportation",
-    time: "2 min ago",
-    color: "#EF4444",
-  },
-  {
-    severity: "Warning",
-    message: "Failed onboarding for account ACC-240176",
-    time: "15 min ago",
-    color: "#F59E0B",
-  },
-  {
-    severity: "Escalated",
-    message: "Incident #INC-2301 requires attention",
-    time: "30 min ago",
-    color: "#F59E0B",
-  },
-  {
-    severity: "Info",
-    message: "12 new devices assigned today",
-    time: "1 hour ago",
-    color: "#3B82F6",
-  },
-];

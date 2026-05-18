@@ -132,7 +132,7 @@ const LoginScreen = () => {
 
       const response = await createApi(
         { user_name: username, password },
-        "/user/login",
+        "/admin/user/login",
       );
 
       if (response?.statusCode === 200) {

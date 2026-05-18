@@ -6,6 +6,10 @@ export const StretchGridContainer = styled(Grid)(({ theme }) => ({
   alignItems: "stretch",
 }));
 
-export const FlexGridItem = styled(Grid)({
-  display: "flex",
-});
+export const ChartGrid = styled(Grid)({});
+
+export const AlertGrid = styled(Grid)({});
+
+export const IncidentGrid = styled(Grid)({});
+
+export const DeviceGrid = styled(Grid)({});

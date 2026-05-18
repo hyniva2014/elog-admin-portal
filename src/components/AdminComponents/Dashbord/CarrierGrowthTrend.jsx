@@ -8,81 +8,74 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import { useTheme } from "@mui/material";
-// import { TooltipContainer } from "./CarrierGrowthTrend.styled";
+import { useState } from "react";
+import { useTheme, TextField, MenuItem } from "@mui/material";
 
 import {
   ChartContainer,
+  ChartHeader,
   ChartTitle,
-  TooltipContainer,
-  TooltipLabel,
-  TooltipRow,
-  TooltipText,
-  TooltipValue,
+  ChartSubtitle,
+  YearSelect,
 } from "./CarrierGrowthTrend.styled";
 
-const CarrierGrowthTrend = ({
-  title = "Chart",
-  data = [],
-  dataKey = "value",
-  xAxisKey = "month",
-  lineColor = "#2563EB",
-  height = 360,
-  tooltipKeys = [],
-}) => {
+import ChartCustomTooltip from "./ChartCustomTooltip";
+import { chartData, TooltipKeys } from "./AdminConstant";
+import { TitleBox } from "./IncidentDistribution.styles";
+
+const CarrierGrowthTrend = () => {
+  const [selectedYear, setSelectedYear] = useState("2026");
+
   const theme = useTheme();
-  const isDark = theme.palette.mode === "dark";
 
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      const tooltipData = payload[0].payload;
+  const title = "Carrier Growth Trend";
+  const subtitle = "Jan.26 - Jun 26";
+  const dataKey = "value";
+  const xAxisKey = "month";
+  const height = 360;
+  const chartLineColor = theme.palette.primary.main;
 
-      return (
-        <TooltipContainer elevation={3}>
-          <TooltipLabel>{label}</TooltipLabel>
-
-          {tooltipKeys.map((item) => (
-            <TooltipRow key={item.key}>
-              <TooltipText>{item.label}</TooltipText>
-
-              <TooltipValue textcolor={item.color}>
-                {tooltipData[item.key]}
-              </TooltipValue>
-            </TooltipRow>
-          ))}
-        </TooltipContainer>
-      );
-    }
-
-    return null;
-  };
 
   return (
     <ChartContainer elevation={0} chartheight={height}>
-      <ChartTitle isdark={isDark}>{title}</ChartTitle>
+      <ChartHeader>
+        <TitleBox>
+          <ChartTitle variant="h6" component="h2">
+            {title}
+          </ChartTitle>
+          <ChartSubtitle variant="body2">{subtitle}</ChartSubtitle>
+        </TitleBox>
 
-      <ResponsiveContainer width="100%" height="80%">
-        <LineChart data={data}>
+        <YearSelect
+          select
+          size="small"
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(e.target.value)}
+        >
+          <MenuItem value="2024">2024</MenuItem>
+          <MenuItem value="2025">2025</MenuItem>
+          <MenuItem value="2026">2026</MenuItem>
+        </YearSelect>
+      </ChartHeader>
+
+      <ResponsiveContainer width="100%" height={260}>
+        <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" />
-
           <XAxis dataKey={xAxisKey} />
-
           <YAxis />
 
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<ChartCustomTooltip tooltipKeys={TooltipKeys} />} />
 
           <Line
             type="monotone"
             dataKey={dataKey}
-            stroke={lineColor}
+            stroke={chartLineColor}
             strokeWidth={3}
             dot={{
               r: 5,
-              fill: lineColor,
+              fill: chartLineColor,
             }}
-            activeDot={{
-              r: 7,
-            }}
+            activeDot={{ r: 7 }}
           />
         </LineChart>
       </ResponsiveContainer>
