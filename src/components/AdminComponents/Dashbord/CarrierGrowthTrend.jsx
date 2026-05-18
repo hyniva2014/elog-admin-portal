@@ -9,7 +9,7 @@ import {
 } from "recharts";
 
 import { useState } from "react";
-import { useTheme, TextField, MenuItem } from "@mui/material";
+import { useTheme, MenuItem } from "@mui/material";
 
 import {
   ChartContainer,
@@ -23,52 +23,63 @@ import ChartCustomTooltip from "./ChartCustomTooltip";
 import { chartData, TooltipKeys } from "./AdminConstant";
 import { TitleBox } from "./IncidentDistribution.styles";
 
+const AVAILABLE_YEARS = ["2024", "2025", "2026"];
+
+const CHART_TITLE = "Carrier Growth Trend";
+const CHART_SUBTITLE = "Jan.26 - Jun 26";
+const DATA_KEY = "value";
+const X_AXIS_KEY = "month";
+const CHART_HEIGHT = 360;
+
+const getFilteredData = (year) =>
+  chartData.filter((item) => !item.year || item.year === year);
+
 const CarrierGrowthTrend = () => {
   const [selectedYear, setSelectedYear] = useState("2026");
 
   const theme = useTheme();
-
-  const title = "Carrier Growth Trend";
-  const subtitle = "Jan.26 - Jun 26";
-  const dataKey = "value";
-  const xAxisKey = "month";
-  const height = 360;
   const chartLineColor = theme.palette.primary.main;
+  const filteredData = getFilteredData(selectedYear);
 
+  const handleYearChange = (e) => {
+    setSelectedYear(e.target.value);
+  };
 
   return (
-    <ChartContainer elevation={0} chartheight={height}>
+    <ChartContainer elevation={0} chartheight={CHART_HEIGHT}>
       <ChartHeader>
         <TitleBox>
           <ChartTitle variant="h6" component="h2">
-            {title}
+            {CHART_TITLE}
           </ChartTitle>
-          <ChartSubtitle variant="body2">{subtitle}</ChartSubtitle>
+          <ChartSubtitle variant="body2">{CHART_SUBTITLE}</ChartSubtitle>
         </TitleBox>
 
         <YearSelect
           select
           size="small"
           value={selectedYear}
-          onChange={(e) => setSelectedYear(e.target.value)}
+          onChange={handleYearChange}
         >
-          <MenuItem value="2024">2024</MenuItem>
-          <MenuItem value="2025">2025</MenuItem>
-          <MenuItem value="2026">2026</MenuItem>
+          {AVAILABLE_YEARS.map((year) => (
+            <MenuItem key={year} value={year}>
+              {year}
+            </MenuItem>
+          ))}
         </YearSelect>
       </ChartHeader>
 
       <ResponsiveContainer width="100%" height={260}>
-        <LineChart data={chartData}>
+        <LineChart data={filteredData}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey={xAxisKey} />
+          <XAxis dataKey={X_AXIS_KEY} />
           <YAxis />
 
           <Tooltip content={<ChartCustomTooltip tooltipKeys={TooltipKeys} />} />
 
           <Line
             type="monotone"
-            dataKey={dataKey}
+            dataKey={DATA_KEY}
             stroke={chartLineColor}
             strokeWidth={3}
             dot={{

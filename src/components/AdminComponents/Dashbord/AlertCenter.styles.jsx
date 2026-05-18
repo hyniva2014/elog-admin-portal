@@ -1,17 +1,19 @@
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, ButtonGroup, Button, Paper, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-export const AlertContainer = styled(Paper)(() => ({
+// ─── Alert Center ────────────────────────────────────────────────────────────
+
+export const AlertContainer = styled(Paper)(({ theme }) => ({
   padding: "16px",
   paddingTop: 0,
-  border: "1px solid #E5E7EB",
+  border: `1px solid ${theme.palette.grey[200]}`,
   borderRadius: "16px",
   height: 360,
   overflow: "auto",
   boxShadow: "none",
 }));
 
-export const AlertHeader = styled(Box)(() => ({
+export const AlertHeader = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
@@ -19,21 +21,21 @@ export const AlertHeader = styled(Box)(() => ({
   position: "sticky",
   top: 0,
   zIndex: 10,
-  background: "#FFFFFF",
+  background: theme.palette.common.white,
   paddingTop: "8px",
   paddingBottom: "8px",
 }));
 
-export const AlertTitle = styled(Typography)(() => ({
+export const AlertTitle = styled(Typography)(({ theme }) => ({
   fontSize: 18,
   fontWeight: 700,
-  color: "#0F172A",
+  color: theme.palette.text.primary,
 }));
 
-export const ViewAllText = styled(Typography)(() => ({
+export const ViewAllText = styled(Typography)(({ theme }) => ({
   fontSize: 11,
   fontWeight: 500,
-  color: "#64748B",
+  color: theme.palette.text.secondary,
   cursor: "pointer",
   textDecoration: "underline",
 }));
@@ -44,14 +46,14 @@ export const AlertList = styled(Box)(() => ({
   gap: "8px",
 }));
 
-export const AlertCard = styled(Box)(() => ({
+export const AlertCard = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "stretch",
-  background: "#F8FAFC",
+  background: theme.palette.grey[50],
   borderRadius: "10px",
   overflow: "hidden",
   minHeight: 90,
-  border: "1px solid rgba(226,232,240,0.8)",
+  border: `1px solid ${theme.palette.grey[200]}`,
   position: "relative",
 }));
 
@@ -74,10 +76,10 @@ export const AlertDetails = styled(Box)(() => ({
   gap: "12px",
 }));
 
-export const AlertCardTitle = styled(Typography)(() => ({
+export const AlertCardTitle = styled(Typography)(({ theme }) => ({
   fontSize: 18,
   fontWeight: 700,
-  color: "#0F172A",
+  color: theme.palette.text.primary,
   lineHeight: 1.2,
 }));
 
@@ -88,29 +90,28 @@ export const AlertDetailRow = styled(Box)(() => ({
   alignItems: "center",
 }));
 
-export const AlertDetailItem = styled(Box)(() => ({
+export const AlertDetailItem = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   gap: "8px",
-  color: "#475569",
+  color: theme.palette.text.secondary,
   fontSize: 13,
   fontWeight: 500,
 }));
 
-export const AlertTime = styled(Typography)(() => ({
+export const AlertTime = styled(Typography)(({ theme }) => ({
   fontSize: 14,
   fontWeight: 500,
-  color: "#64748B",
+  color: theme.palette.text.disabled,
   whiteSpace: "nowrap",
 }));
 
-//Header styles for AdminDashBoard.jsx
-export const HeaderSubtitle = styled(Typography)(() => ({
-  fontSize: "14px",
-  fontWeight: 400,
-  color: "#6B7280",
-  marginBottom: 16,
-}));
+export const AlertIcon = styled("img")({
+  width: 14,
+  height: 14,
+});
+
+// ─── AdminDashBoard Header ────────────────────────────────────────────────────
 
 export const HeaderContainer = styled(Box)(() => ({
   display: "flex",
@@ -125,51 +126,22 @@ export const HeaderLeft = styled(Box)(() => ({
   flexDirection: "column",
 }));
 
-export const ComplianceTitle = styled(Typography)(() => ({
+export const ComplianceTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 600,
   fontSize: "20px",
-  color: "#202027",
+  color: theme.palette.text.primary,
 }));
 
-export const DateRangeText = styled(Typography)(() => ({
+export const HeaderSubtitle = styled(Typography)(({ theme }) => ({
+  fontSize: "14px",
+  fontWeight: 400,
+  color: theme.palette.text.secondary,
+  marginBottom: 16,
+}));
+
+export const DateRangeText = styled(Typography)(({ theme }) => ({
   fontWeight: 400,
   fontSize: "13px",
-  color: "#202027",
+  color: theme.palette.text.primary,
   marginTop: 4,
 }));
-
-export const AlertIcon = styled("img")({
-  width: 14,
-  height: 14,
-});
-
-
-
-
-//DateRangeSelector styles for AdminDashBoard.jsx
-export const buttonGroupStyles = (theme) => ({
-  boxShadow: "none",
-
-  "& .MuiButton-root": {
-    textTransform: "none",
-    backgroundColor: theme.palette.common.white,
-    color: theme.palette.text.secondary,
-    border: "none",
-    fontSize: "0.8rem",
-    fontWeight: 500,
-
-    "&:hover": {
-      backgroundColor: theme.palette.grey[100],
-    },
-
-    "&.selected": {
-      backgroundColor: "#284495",
-      color: theme.palette.common.white,
-      fontWeight: 600,
-
-      "&:hover": {
-        backgroundColor: "#284495",
-      },
-    },
-  },
-});

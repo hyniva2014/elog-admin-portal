@@ -1,14 +1,12 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Typography,
-  useTheme,
-  Grid,
-} from "@mui/material";
-import { buttonGroupStyles } from "./AlertCenter.styles";
+import { StyledButtonGroup, PeriodButton } from "./DateRangeSelector.styled";
 
+const DEFAULT_PERIODS = [
+  { label: "Today", value: "Today" },
+  { label: "7D", value: "7D" },
+  { label: "14D", value: "14D" },
+  { label: "30D", value: "30D" },
+];
 
 const calculateDateRange = (period) => {
   const today = new Date();
@@ -45,18 +43,8 @@ const calculateDateRange = (period) => {
 const DateRangeSelector = ({
   onDateRangeChange,
   initialPeriod = "Today",
-  title = "",
-  periods = [
-    { label: "Today", value: "Today" },
-    { label: "7D", value: "7D" },
-    { label: "14D", value: "14D" },
-    { label: "30D", value: "30D" },
-  ],
+  periods = DEFAULT_PERIODS,
 }) => {
-  const theme = useTheme();
-
-  const buttonStyles = buttonGroupStyles(theme);
-
   const [selectedPeriod, setSelectedPeriod] = useState(initialPeriod);
 
   const handlePeriodChange = (period) => {
@@ -73,30 +61,17 @@ const DateRangeSelector = ({
   };
 
   return (
-    <ButtonGroup
-      variant="contained"
-      sx={{
-        ...buttonStyles,
-        border: "1px solid",
-        borderColor: "divider",
-      }}
-    >
+    <StyledButtonGroup variant="contained">
       {periods.map((period) => (
-        <Button
+        <PeriodButton
           key={period.value}
           onClick={() => handlePeriodChange(period.value)}
           className={selectedPeriod === period.value ? "selected" : ""}
-          sx={{
-            "&:not(:last-of-type)": {
-              borderRight: "1px solid",
-              borderRightColor: "divider",
-            },
-          }}
         >
           {period.label}
-        </Button>
+        </PeriodButton>
       ))}
-    </ButtonGroup>
+    </StyledButtonGroup>
   );
 };
 
