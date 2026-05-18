@@ -1,4 +1,4 @@
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Paper, TextField, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 export const ChartContainer = styled(Paper, {
@@ -21,7 +21,6 @@ export const ChartTitle = styled(Typography, {
 })(({ isdark, theme }) => ({
   fontSize: 18,
   fontWeight: 700,
-  marginBottom: "24px",
   color: isdark ? theme.palette.common.white : theme.palette.grey[900],
 }));
 
@@ -33,6 +32,21 @@ export const ChartWrapper = styled(Box)({
   position: "relative",
   display: "block",
 });
+export const ChartHeader = styled(Box)(() => ({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "flex-start",
+  gap: "16px",
+  marginBottom: "16px",
+}));
+
+
+export const ChartSubtitle = styled(Typography)(({ theme }) => ({
+  color: theme.palette.text.secondary,
+  marginTop: 4,
+  fontSize: 12,
+  fontWeight: 400,
+}));
 
 export const TooltipContainer = styled(Paper)(() => ({
   padding: "16px",
@@ -64,3 +78,11 @@ export const TooltipValue = styled(Typography, {
   fontWeight: 700,
   color: textcolor,
 }));
+
+export const YearSelect = styled(TextField)({
+  minWidth: 100,
+  maxWidth: 120,
+});
+
+
+

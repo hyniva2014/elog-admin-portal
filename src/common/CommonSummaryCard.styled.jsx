@@ -1,4 +1,4 @@
-import { Box, styled } from "@mui/material";
+import { Box, styled, Typography } from "@mui/material";
 
 export const SummaryCardRoot = styled(Box)(({ theme }) => {
   const isDark = theme.palette.mode === "dark";
@@ -40,4 +40,45 @@ export const AccentBar = styled(Box, {
 
 export const ContentWrapper = styled(Box)(({ theme }) => ({
   marginLeft: theme.spacing(1),
+}));
+
+
+
+
+export const ValueText = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== "isdashboard",
+})(({ theme, isdashboard }) => ({
+  fontSize: isdashboard ? 44 : 22,
+  fontWeight: isdashboard ? 700 : 500,
+  lineHeight: isdashboard ? 1 : "normal",
+  color: isdashboard
+    ? theme.palette.text.primary
+    : theme.palette.text.secondary,
+}));
+
+export const CardContentWrapper = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "flex-start",
+  gap: theme.spacing(1),
+}));
+
+export const TextContainer = styled(Box)({
+  display: "flex",
+  flexDirection: "column",
+});
+
+export const TitleRow = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "isdashboard",
+})(({ theme, isdashboard }) => ({
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing(1),
+  marginBottom: isdashboard ? theme.spacing(1) : 0,
+}));
+
+export const TitleText = styled(Typography)(({ theme }) => ({
+  ...theme.typography.body2,
+  fontSize: 14,
+  fontWeight: 400,
+  color: theme.palette.text.secondary,
 }));
