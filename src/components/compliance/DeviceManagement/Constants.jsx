@@ -6,8 +6,6 @@ import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import { IconButton } from "@mui/material";
 import { StatusTypography } from "./DeviceManagement.styles";
 
-// ─── Filter Options ───────────────────────────────────────────────────────────
-
 export const DEVICE_STATUS_FILTER_OPTIONS = [
   { value: "Active", label: "Active" },
   { value: "Warning", label: "Warning" },
@@ -50,7 +48,7 @@ export const DEVICE_TRUCK_FILTER_OPTIONS = [
   { value: "TRK-088", label: "TRK-088" },
 ];
 
-// ─── Mock Data (temporary — replace with API service) ─────────────────────────
+
 
 export const mockData = [
   {
@@ -119,7 +117,7 @@ export const mockData = [
   },
 ];
 
-// ─── Column renderCell Components ─────────────────────────────────────────────
+
 
 const StatusCell = ({ value }) => (
   <StatusTypography variant="body2" value={value}>
@@ -133,7 +131,7 @@ const ActionCell = () => (
   </IconButton>
 );
 
-// ─── Column Definitions ───────────────────────────────────────────────────────
+
 
 export const columns = [
   {
@@ -207,8 +205,8 @@ export const columns = [
     minWidth: 90,
   },
   {
-    field: "lastSync",
-    headerName: "Last Sync",
+    field: "updatedOn",
+    headerName: "Updated On",
     flex: 1,
     minWidth: 90,
   },
@@ -228,7 +226,7 @@ export const columns = [
   },
 ];
 
-// ─── Summary Cards ────────────────────────────────────────────────────────────
+
 
 export const summaryCards = [
   {
@@ -260,3 +258,28 @@ export const summaryCards = [
     icon: <Inventory2OutlinedIcon sx={{ fontSize: 28 }} color="warning" />,
   },
 ];
+export const GVWR_OPTIONS = [
+  { value: "26,001 lbs", label: "26,001 lbs" },
+  { value: "33,001 lbs", label: "33,001 lbs" },
+  { value: "60,000 lbs", label: "60,000 lbs" },
+  { value: "80,000 lbs", label: "80,000 lbs" },
+];
+
+export const MAKE_OPTIONS = [
+  { value: "Daimler", label: "Daimler" },
+  { value: "Freightliner", label: "Freightliner" },
+  { value: "Kenworth", label: "Kenworth" },
+  { value: "Peterbilt", label: "Peterbilt" },
+  { value: "Volvo", label: "Volvo" },
+];
+
+export const STATE_OPTIONS = [
+  { value: "Alabama", label: "Alabama" },
+  { value: "Alaska", label: "Alaska" },
+  { value: "Arizona", label: "Arizona" },
+  { value: "California", label: "California" },
+  { value: "Florida", label: "Florida" },
+  { value: "Texas", label: "Texas" },
+];
+
+export const ADD_DEVICE_FORM_ID = "add-device-form";
