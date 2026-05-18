@@ -1,15 +1,13 @@
 import { useCallback, useMemo, useState } from "react";
-import { IconButton } from "@mui/material";
 import CommonDataGrid from "@src/common/CommonDataGrid";
 import { PageContainer } from "@src/common/PageContainer";
 import DeviceModelManagementHeader from "./DeviceModelManagementHeader";
 import CommonLoading from "@src/common/CommonLoading";
 import AddDeviceModelDialog from "./AddDeviceModelDialog";
-import eyeIcon from "../../../assets/images/svg/eyeicon.png";
 import {
   StatusText,
-  ActionIcon,
   GridContainer,
+  ActionCell,
 } from "./DeviceModelManagement.styled.jsx";
 import {
   DEVICE_MODEL_SEED_DATA,
@@ -85,17 +83,9 @@ const getDeviceModelColumns = (onViewDeviceModel) => [
     flex: 1,
     minWidth: 100,
     sortable: false,
-    renderCell: (params) => {
-      const handleViewClick = () => onViewDeviceModel(params.row);
-      return (
-        <IconButton
-          size="small"
-          onClick={handleViewClick}
-        >
-          <ActionIcon src={eyeIcon} alt="view" />
-        </IconButton>
-      );
-    },
+    renderCell: (params) => (
+      <ActionCell row={params.row} onView={onViewDeviceModel} />
+    ),
   },
 ];
 

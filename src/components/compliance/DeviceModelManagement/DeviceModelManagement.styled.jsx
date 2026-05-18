@@ -1,8 +1,9 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Typography, IconButton } from "@mui/material";
 import styled from "@emotion/styled";
+import eyeIcon from "../../../assets/images/svg/eyeicon.png";
 
-export const HeaderContainer = styled(Box)(() => ({
-  marginBottom: 16,
+export const HeaderContainer = styled(Box)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
 }));
 
 export const AddButton = styled(Button)(({ theme }) => ({
@@ -36,9 +37,18 @@ export const ActionIcon = styled("img")({
   cursor: "pointer",
 });
 
-export const DialogFormContainer = styled(Box)(() => ({
-  paddingLeft: 16,
-  paddingRight: 16,
-  paddingTop: 12,
-  paddingBottom: 8,
+export const ActionCell = ({ row, onView }) => {
+  const handleClick = () => onView(row);
+  return (
+    <IconButton size="small" onClick={handleClick}>
+      <ActionIcon src={eyeIcon} alt="view" />
+    </IconButton>
+  );
+};
+
+export const DialogFormContainer = styled(Box)(({ theme }) => ({
+  paddingLeft: theme.spacing(2),
+  paddingRight: theme.spacing(2),
+  paddingTop: theme.spacing(1.5),
+  paddingBottom: theme.spacing(1),
 }));
