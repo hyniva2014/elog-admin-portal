@@ -12,33 +12,11 @@ import {
   GridContainer,
 } from "./DeviceModelManagement.styled.jsx";
 import {
-  DEVICE_MODEL_ASSET_OPTIONS,
-  DEVICE_MODEL_ELOG_OPTIONS,
+  DEVICE_MODEL_SEED_DATA,
 } from "./Constants";
 
-const deviceModelSeedData = [
-  {
-    model: "Geotab GO9",
-    assetType: "Truck",
-    description: "HSPA",
-    eLogs: "Yes",
-    createdOn: "05 05 2026",
-    updatedOn: "05 05 2026",
-    status: "Active",
-  },
-  {
-    model: "Samsara VG34",
-    assetType: "Truck",
-    description: "HSPA",
-    eLogs: "Yes",
-    createdOn: "05 05 2026",
-    updatedOn: "05 05 2026",
-    status: "Active",
-  },
-];
-
 const buildDeviceModelRows = () =>
-  deviceModelSeedData.map((seed, index) => ({
+  DEVICE_MODEL_SEED_DATA.map((seed, index) => ({
     ...seed,
     id: index + 1,
   }));
@@ -231,6 +209,21 @@ const DeviceModelManagement = () => {
     total: filteredRows.length,
   };
 
+  const assetTypeOptions = useMemo(
+    () => getOptions(allDeviceModels, "assetType"),
+    [allDeviceModels],
+  );
+
+  const modelOptions = useMemo(
+    () => getOptions(allDeviceModels, "model"),
+    [allDeviceModels],
+  );
+
+  const statusOptions = useMemo(
+    () => getOptions(allDeviceModels, "status"),
+    [allDeviceModels],
+  );
+
   const { setLoading, LoadingContainer } = CommonLoading();
 
   return (
@@ -242,9 +235,9 @@ const DeviceModelManagement = () => {
           setData={setData}
           searchKey={0}
           handleClick={handleAddDeviceModel}
-          assetTypeOptions={getOptions(allDeviceModels, "assetType")}
-          modelOptions={getOptions(allDeviceModels, "model")}
-          statusOptions={getOptions(allDeviceModels, "status")}
+          assetTypeOptions={assetTypeOptions}
+          modelOptions={modelOptions}
+          statusOptions={statusOptions}
         />
 
         <GridContainer>

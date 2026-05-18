@@ -19,6 +19,14 @@ const SelectMenuItem = ({ value, label }) => (
   </MenuItem>
 );
 
+const assetOptionElements = DEVICE_MODEL_ASSET_OPTIONS.map(({ value, label }) => (
+  <SelectMenuItem key={value} value={value} label={label} />
+));
+
+const elogOptionElements = DEVICE_MODEL_ELOG_OPTIONS.map(({ value, label }) => (
+  <SelectMenuItem key={value} value={value} label={label} />
+));
+
 const validationSchema = yup.object({
   modelName: yup
     .string()
@@ -82,6 +90,68 @@ const AddDeviceModelDialog = ({
     reset(defaultValues);
   };
 
+  const renderModelNameField = ({ field }) => (
+    <CommonTextField
+      {...field}
+      label="Model Name"
+      required
+      disabled={loading}
+      error={!!errors.modelName}
+      helperText={errors.modelName?.message}
+      fullWidth
+      size="small"
+      placeholder="Enter model name"
+    />
+  );
+
+  const renderDescriptionField = ({ field }) => (
+    <CommonTextField
+      {...field}
+      label="Description"
+      required
+      disabled={loading}
+      error={!!errors.description}
+      helperText={errors.description?.message}
+      fullWidth
+      size="small"
+      multiline
+      rows={3}
+      placeholder="Enter description"
+    />
+  );
+
+  const renderAssetTypeField = ({ field }) => (
+    <CommonTextField
+      {...field}
+      label="Asset Type"
+      required
+      disabled={loading}
+      error={!!errors.assetType}
+      helperText={errors.assetType?.message}
+      fullWidth
+      size="small"
+      select
+    >
+      {assetOptionElements}
+    </CommonTextField>
+  );
+
+  const renderELogsField = ({ field }) => (
+    <CommonTextField
+      {...field}
+      label="E-Logs"
+      required
+      disabled={loading}
+      error={!!errors.eLogs}
+      helperText={errors.eLogs?.message}
+      fullWidth
+      size="small"
+      select
+    >
+      {elogOptionElements}
+    </CommonTextField>
+  );
+
   const formContent = (
     <form id={ADD_DEVICE_MODEL_FORM_ID} onSubmit={handleSubmit(submitHandler)}>
       <DialogFormContainer>
@@ -90,19 +160,7 @@ const AddDeviceModelDialog = ({
             <Controller
               name="modelName"
               control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Model Name"
-                  required
-                  disabled={loading}
-                  error={!!errors.modelName}
-                  helperText={errors.modelName?.message}
-                  fullWidth
-                  size="small"
-                  placeholder="Enter model name"
-                />
-              )}
+              render={renderModelNameField}
             />
           </Grid>
 
@@ -110,21 +168,7 @@ const AddDeviceModelDialog = ({
             <Controller
               name="description"
               control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Description"
-                  required
-                  disabled={loading}
-                  error={!!errors.description}
-                  helperText={errors.description?.message}
-                  fullWidth
-                  size="small"
-                  multiline
-                  rows={3}
-                  placeholder="Enter description"
-                />
-              )}
+              render={renderDescriptionField}
             />
           </Grid>
 
@@ -132,23 +176,7 @@ const AddDeviceModelDialog = ({
             <Controller
               name="assetType"
               control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Asset Type"
-                  required
-                  disabled={loading}
-                  error={!!errors.assetType}
-                  helperText={errors.assetType?.message}
-                  fullWidth
-                  size="small"
-                  select
-                >
-                  {DEVICE_MODEL_ASSET_OPTIONS.map(({ value, label }) => (
-                    <SelectMenuItem key={value} value={value} label={label} />
-                  ))}
-                </CommonTextField>
-              )}
+              render={renderAssetTypeField}
             />
           </Grid>
 
@@ -156,23 +184,7 @@ const AddDeviceModelDialog = ({
             <Controller
               name="eLogs"
               control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="E-Logs"
-                  required
-                  disabled={loading}
-                  error={!!errors.eLogs}
-                  helperText={errors.eLogs?.message}
-                  fullWidth
-                  size="small"
-                  select
-                >
-                  {DEVICE_MODEL_ELOG_OPTIONS.map(({ value, label }) => (
-                    <SelectMenuItem key={value} value={value} label={label} />
-                  ))}
-                </CommonTextField>
-              )}
+              render={renderELogsField}
             />
           </Grid>
         </Grid>
