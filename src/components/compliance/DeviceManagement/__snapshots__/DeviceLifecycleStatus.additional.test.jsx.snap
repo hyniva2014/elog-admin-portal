@@ -1,0 +1,145 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`DeviceLifecycleStatus Additional Test Cases component matches snapshot 1`] = `
+<DocumentFragment>
+  <div
+    class="MuiPaper-root MuiPaper-outlined MuiPaper-rounded MuiCard-root css-h7g6bq-MuiPaper-root-MuiCard-root"
+  >
+    <div
+      class="MuiCardContent-root css-uwel0q-MuiCardContent-root"
+    >
+      <h2
+        class="MuiTypography-root MuiTypography-h6 css-94xir8-MuiTypography-root"
+      >
+        Device Lifecycle Status
+      </h2>
+      <div
+        class="MuiStack-root css-1xb2eeo-MuiStack-root"
+      >
+        <div
+          class="MuiBox-root css-2ew3vw"
+        >
+          <div
+            data-testid="mock-chart"
+          >
+            <span
+              data-testid="chart-type"
+            >
+              donut
+            </span>
+            <span
+              data-testid="chart-width"
+            >
+              360
+            </span>
+            <span
+              data-testid="chart-height"
+            >
+              360
+            </span>
+            <span
+              data-testid="chart-series"
+            >
+              [1095,227,35,23]
+            </span>
+          </div>
+          <div
+            class="MuiBox-root css-ph4d99"
+          >
+            <p
+              class="MuiTypography-root MuiTypography-body1 css-eqfffa-MuiTypography-root"
+            >
+              Total
+            </p>
+            <p
+              class="MuiTypography-root MuiTypography-body1 css-1bulcc5-MuiTypography-root"
+            >
+              1,380
+            </p>
+          </div>
+        </div>
+        <div
+          class="MuiBox-root css-18p8lrm"
+        >
+          <div
+            class="MuiGrid-root MuiGrid-container css-2015bx-MuiGrid-root"
+          >
+            <div
+              class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6 css-1osj8n2-MuiGrid-root"
+            >
+              <div
+                class="MuiBox-root css-7d9fyd"
+              >
+                <p
+                  class="MuiTypography-root MuiTypography-body1 css-2j7e00-MuiTypography-root"
+                >
+                  Active
+                </p>
+                <p
+                  class="MuiTypography-root MuiTypography-body1 css-1ifftf3-MuiTypography-root"
+                >
+                  1,095
+                </p>
+              </div>
+            </div>
+            <div
+              class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6 css-1osj8n2-MuiGrid-root"
+            >
+              <div
+                class="MuiBox-root css-1y6cnn9"
+              >
+                <p
+                  class="MuiTypography-root MuiTypography-body1 css-x76065-MuiTypography-root"
+                >
+                  In Stock
+                </p>
+                <p
+                  class="MuiTypography-root MuiTypography-body1 css-ujx5jg-MuiTypography-root"
+                >
+                  227
+                </p>
+              </div>
+            </div>
+            <div
+              class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6 css-1osj8n2-MuiGrid-root"
+            >
+              <div
+                class="MuiBox-root css-127c5qn"
+              >
+                <p
+                  class="MuiTypography-root MuiTypography-body1 css-ujf6hq-MuiTypography-root"
+                >
+                  In Maintenance
+                </p>
+                <p
+                  class="MuiTypography-root MuiTypography-body1 css-sh98d7-MuiTypography-root"
+                >
+                  35
+                </p>
+              </div>
+            </div>
+            <div
+              class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6 css-1osj8n2-MuiGrid-root"
+            >
+              <div
+                class="MuiBox-root css-18rg4hv"
+              >
+                <p
+                  class="MuiTypography-root MuiTypography-body1 css-12nu6oe-MuiTypography-root"
+                >
+                  Retired
+                </p>
+                <p
+                  class="MuiTypography-root MuiTypography-body1 css-1wruhj6-MuiTypography-root"
+                >
+                  23
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

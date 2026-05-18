@@ -100,18 +100,18 @@ describe("DeviceAssetManagementHeader Component", () => {
     ).toBeInTheDocument();
   });
 
-  test("renders add model button", () => {
+  test("renders add asset button", () => {
     render(<DeviceAssetManagementHeader {...defaultProps} />);
 
     expect(
-      screen.getByText("Add Model")
+      screen.getByText("Add Asset")
     ).toBeInTheDocument();
   });
 
-  test("calls handleClick when add model button clicked", () => {
+  test("calls handleClick when add asset button clicked", () => {
     render(<DeviceAssetManagementHeader {...defaultProps} />);
 
-    fireEvent.click(screen.getByText("Add Model"));
+    fireEvent.click(screen.getByText("Add Asset"));
 
     expect(mockHandleClick).toHaveBeenCalledTimes(1);
   });
