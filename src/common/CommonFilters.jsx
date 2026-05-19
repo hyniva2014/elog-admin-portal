@@ -12,6 +12,35 @@ import {
   ActionButtonWrapper,
 } from "./CommonFilters.styled";
 
+const FilterItem = ({ filter, data, setData }) => {
+  if (filter.type === "violation") {
+    return (
+      <FilterWrapper>
+        <ViolationTypeAutocomplete
+          label={filter.label}
+          value={data[filter.dataKey]}
+          options={filter.options}
+          iconMap={filter.iconMap}
+          setData={setData}
+          dataKey={filter.dataKey}
+        />
+      </FilterWrapper>
+    );
+  }
+
+  return (
+    <FilterWrapper>
+      <CommonAutocompleteDropdown
+        label={filter.label}
+        value={data[filter.dataKey] || data[filter.name]}
+        options={filter.options}
+        setData={setData}
+        dataKey={filter.dataKey || filter.name}
+      />
+    </FilterWrapper>
+  );
+};
+
 const CommonFilters = ({
   data,
   setData,
@@ -31,56 +60,47 @@ const CommonFilters = ({
     }));
   };
 
+  const searchElement = showSearch ? (
+    <SearchWrapper>
+      <CommonSearch
+        key={searchKey}
+        value={data.search}
+        setData={setData}
+        placeholder="Search by All"
+      />
+    </SearchWrapper>
+  ) : null;
+
+  const dateRangeElement = showDateRange ? (
+    <DateRangeWrapper>
+      <CommonDateRangeSelector
+        value={{ start: data.fromDate, end: data.toDate }}
+        allowClear={allowDateClear}
+        onChange={handleDateRangeChange}
+      />
+    </DateRangeWrapper>
+  ) : null;
+
+  const filterElements = filters.map((filter) => (
+    <FilterItem
+      key={filter.dataKey || filter.name}
+      filter={filter}
+      data={data}
+      setData={setData}
+    />
+  ));
+
+  const actionButtonElement = actionButton ? (
+    <ActionButtonWrapper>{actionButton}</ActionButtonWrapper>
+  ) : null;
+
   return (
     <FiltersContainer>
-      {showSearch && (
-        <SearchWrapper>
-          <CommonSearch
-            key={searchKey}
-            value={data.search}
-            setData={setData}
-            placeholder="Search by All"
-          />
-        </SearchWrapper>
-      )}
-
+      {searchElement}
       <RightFiltersContainer>
-        {showDateRange && (
-          <DateRangeWrapper>
-            <CommonDateRangeSelector
-              value={{ start: data.fromDate, end: data.toDate }}
-              allowClear={allowDateClear}
-              onChange={handleDateRangeChange}
-            />
-          </DateRangeWrapper>
-        )}
-
-        {filters.map((filter) => (
-          <FilterWrapper key={filter.dataKey || filter.name}>
-            {filter.type === "violation" ? (
-              <ViolationTypeAutocomplete
-                label={filter.label}
-                value={data[filter.dataKey]}
-                options={filter.options}
-                iconMap={filter.iconMap}
-                setData={setData}
-                dataKey={filter.dataKey}
-              />
-            ) : (
-              <CommonAutocompleteDropdown
-                label={filter.label}
-                value={data[filter.dataKey] || data[filter.name]}
-                options={filter.options}
-                setData={setData}
-                dataKey={filter.dataKey || filter.name}
-              />
-            )}
-          </FilterWrapper>
-        ))}
-
-        {actionButton && (
-          <ActionButtonWrapper>{actionButton}</ActionButtonWrapper>
-        )}
+        {dateRangeElement}
+        {filterElements}
+        {actionButtonElement}
       </RightFiltersContainer>
     </FiltersContainer>
   );

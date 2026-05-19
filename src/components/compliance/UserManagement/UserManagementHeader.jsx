@@ -2,7 +2,7 @@ import CommonFilters from "../../../common/CommonFilters";
 import CommonPageHeader from "../../../common/CommonPageHeader";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { Box } from "@mui/material";
-import { AddUserButton } from "./UserManagementHeader.styled";
+import { AddUserButton, HeaderContainer } from "./UserManagementHeader.styled";
 
 const UserManagementHeader = (props) => {
   const {
@@ -14,7 +14,7 @@ const UserManagementHeader = (props) => {
   } = props;
 
   return (
-    <Box sx={{ mb: 2 }}>
+    <HeaderContainer>
       <CommonPageHeader
         title="User Management"
         subtitle="Manage user accounts and permissions"
@@ -67,7 +67,7 @@ const UserManagementHeader = (props) => {
           },
         ]}
       />
-    </Box>
+    </HeaderContainer>
   );
 };
 

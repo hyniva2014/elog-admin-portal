@@ -7,6 +7,7 @@ import * as yup from "yup";
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonTextField from "../../../common/CommonTextField";
 import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdown";
+import { FormContainer } from "./UserManagementForm.styled";
 
 const schema = yup.object().shape({
   selectAccount: yup.string().required("Account is required"),
@@ -76,11 +77,10 @@ const UserManagementForm = ({
   };
 
   const formContent = (
-    <Box
+    <FormContainer
       component="form"
       id="user-management-form"
       onSubmit={handleSubmit(handleFormSubmit)}
-      sx={{ mt: 1 }}
     >
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -196,19 +196,22 @@ const UserManagementForm = ({
           />
         </Grid>
       </Grid>
-    </Box>
+    </FormContainer>
   );
+
+  const dialogTitle = mode === "edit" ? "Edit User" : "Add User";
+  const dialogSubmitText = mode === "edit" ? "Update User" : "Add User";
 
   return (
     <CommonDialogForm
       open={open}
-      title={mode === "edit" ? "Edit User" : "Add User"}
+      title={dialogTitle}
       content={formContent}
       formId="user-management-form"
       onCancel={handleCancel}
       loading={loading}
       mode={mode}
-      submitButtonText={mode === "edit" ? "Update User" : "Add User"}
+      submitButtonText={dialogSubmitText}
       maxWidth="sm"
     />
   );

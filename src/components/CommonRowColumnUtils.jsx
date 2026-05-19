@@ -59,7 +59,7 @@ export const UserManagementColumnData = [
   },
   {
     field: "createdOn",
-    headerName: "Created ON",
+    headerName: "Created On",
     flex: 1,
     minWidth: 180,
     maxWidth: 250,
@@ -67,7 +67,7 @@ export const UserManagementColumnData = [
   },
   {
     field: "updatedOn",
-    headerName: "Updated ON",
+    headerName: "Updated On",
     flex: 1,
     minWidth: 180,
     maxWidth: 250,
