@@ -1,10 +1,13 @@
-import eyeIcon from "../../src/assets/images/svg/eyeicon.png";
+// import eyeIcon from "../../../src/assets/images/svg/eyeicon.png";
+import { STATUS_COLOR_MAP } from "./Constants";
+import eyeIcon from "../../../../src/assets/images/svg/eyeicon.png";
 import { IconButton } from "@mui/material";
 import { StatusText } from "./CommonRowColumnUtils.styled";
 
-const StatusCell = (params) => (
-  <StatusText statuscolor={params.row.statusColor}>{params.value}</StatusText>
-);
+const StatusCell = (params) => {
+  const color = STATUS_COLOR_MAP[params.value] || params.row.statusColor;
+  return <StatusText statuscolor={color}>{params.value}</StatusText>;
+};
 
 const ActionCell = () => (
   <IconButton size="small" color="primary">
@@ -113,6 +116,7 @@ export const UserManagementRowData = [
     updatedOn: "10-05-2026",
     primaryContactEmail: "john.doe@swift.com",
     status: "Active",
+    statusColor: "success",
   },
   {
     id: 2,
@@ -125,6 +129,7 @@ export const UserManagementRowData = [
     updatedOn: "10-05-2025",
     primaryContactEmail: "sarah.smith@jbhunt.com",
     status: "Inactive",
+    statusColor: "error",
   },
   {
     id: 3,
@@ -137,6 +142,7 @@ export const UserManagementRowData = [
     updatedOn: "10-05-2025",
     primaryContactEmail: "michael.johnson@knight.com",
     status: "Active",
+    statusColor: "success",
   },
   {
     id: 4,
@@ -149,6 +155,7 @@ export const UserManagementRowData = [
     updatedOn: "10-05-2025",
     primaryContactEmail: "emily.williams@werner.com",
     status: "Active",
+    statusColor: "success",
   },
   {
     id: 5,
@@ -161,6 +168,7 @@ export const UserManagementRowData = [
     updatedOn: "10-05-2025",
     primaryContactEmail: "david.brown@schneider.com",
     status: "Inactive",
+    statusColor: "error",
   },
   {
     id: 6,
@@ -173,6 +181,7 @@ export const UserManagementRowData = [
     updatedOn: "10-05-2025",
     primaryContactEmail: "olivia.taylor@xpo.com",
     status: "Active",
+    statusColor: "success",
   },
   {
     id: 7,
@@ -185,6 +194,7 @@ export const UserManagementRowData = [
     updatedOn: "10-05-2025",
     primaryContactEmail: "daniel.anderson@fedex.com",
     status: "Active",
+    statusColor: "success",
   },
   {
     id: 8,
@@ -197,5 +207,19 @@ export const UserManagementRowData = [
     updatedOn: "10-05-2025",
     primaryContactEmail: "sophia.thomas@odfl.com",
     status: "Inactive",
+    statusColor: "error",
   },
+  {
+    id: 9,
+    carrierId: 9,
+    carrierName: "Old Dominion",
+    userProfile: "Admin",
+    firstName: "Sophia",
+    lastName: "Thomas",
+    createdOn: "05-05-2025",
+    updatedOn: "10-05-2025",
+    primaryContactEmail: "sophia.thomas@odfl.com",
+    status: "Inactive",
+    statusColor: "error",
+  }
 ];

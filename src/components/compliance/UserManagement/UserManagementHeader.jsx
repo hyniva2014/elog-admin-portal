@@ -1,8 +1,8 @@
 import CommonFilters from "../../../common/CommonFilters";
 import CommonPageHeader from "../../../common/CommonPageHeader";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
-import { Box } from "@mui/material";
-import { AddUserButton, HeaderContainer } from "./UserManagementHeader.styled";
+import { AddUserButton, HeaderContainer, SummaryCardWrapper } from "./UserManagementHeader.styled";
+import { USER_MANAGEMENT_FILTERS } from "./Constants";
 
 const UserManagementHeader = (props) => {
   const {
@@ -24,48 +24,19 @@ const UserManagementHeader = (props) => {
           </AddUserButton>
         }
       />
-      <Box mt={1}>
+      <SummaryCardWrapper>
         <CommonSummaryCardGroup
           cards={summaryCards}
           showAccentBar={true}
-          layout="default"
         />
-      </Box>
+      </SummaryCardWrapper>
 
       <CommonFilters
         data={data}
         setData={setData}
         searchKey={searchKey}
         allowDateClear={true}
-        filters={[
-          {
-            label: "User Profile",
-            name: "userProfile",
-            type: "select",
-            options: [
-              { label: "Admin", value: "1" },
-              { label: "Super Admin", value: "2" },
-            ],
-          },
-          {
-            label: "All Carrier",
-            name: "carrier",
-            type: "select",
-            options: [
-              { label: "Carrier 1", value: "1" },
-              { label: "Carrier 2", value: "2" },
-            ],
-          },
-          {
-            label: "All Status",
-            name: "status",
-            type: "select",
-            options: [
-              { label: "Active", value: "active" },
-              { label: "Inactive", value: "inactive" },
-            ],
-          },
-        ]}
+        filters={USER_MANAGEMENT_FILTERS}
       />
     </HeaderContainer>
   );

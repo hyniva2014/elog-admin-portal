@@ -8,6 +8,7 @@ import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonTextField from "../../../common/CommonTextField";
 import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdown";
 import { FormContainer } from "./UserManagementForm.styled";
+import { ACCOUNT_OPTIONS, USER_PROFILE_OPTIONS } from "./Constants";
 
 const schema = yup.object().shape({
   selectAccount: yup.string().required("Account is required"),
@@ -88,20 +89,7 @@ const UserManagementForm = ({
             name="selectAccount"
             label="Select Account"
             value=""
-            options={[
-              {
-                label: "Swift Transportation",
-                value: "Swift Transportation",
-              },
-              {
-                label: "J.B. Hunt",
-                value: "J.B. Hunt",
-              },
-              {
-                label: "Knight Transportation",
-                value: "Knight Transportation",
-              },
-            ]}
+            options={ACCOUNT_OPTIONS}
             onChange={handleAccountChange}
             error={!!errors.selectAccount}
             helperText={errors.selectAccount?.message}
@@ -115,20 +103,7 @@ const UserManagementForm = ({
             name="userProfile"
             label="User Profile"
             value=""
-            options={[
-              {
-                label: "Admin",
-                value: "Admin",
-              },
-              {
-                label: "Super Admin",
-                value: "Super Admin",
-              },
-              {
-                label: "User",
-                value: "User",
-              },
-            ]}
+            options={USER_PROFILE_OPTIONS}
             onChange={handleUserProfileChange}
             error={!!errors.userProfile}
             helperText={errors.userProfile?.message}

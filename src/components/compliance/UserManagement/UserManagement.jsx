@@ -5,9 +5,10 @@ import CommonLoading from "../../../common/CommonLoading";
 import {
   UserManagementColumnData,
   UserManagementRowData,
-} from "../../CommonRowColumnUtils";
+} from "./CommonRowColumnUtils";
 import { useState } from "react";
 import UserManagementForm from "./UserManagementForm";
+import { summaryCards as summaryCardsData } from "./Constants";
 
 const UserManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,7 +19,7 @@ const UserManagement = () => {
     isLoading: false,
   });
   const [mode, setMode] = useState("");
-  const [summaryCards, setSummaryCards] = useState([]);
+  const [summaryCards, setSummaryCards] = useState(summaryCardsData);
   const [openForm, setOpenForm] = useState(false);
   const handleClick = () => {
     setOpenForm(true);

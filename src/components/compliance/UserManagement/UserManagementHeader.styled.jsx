@@ -13,3 +13,7 @@ export const AddUserButton = styled(Button)(({ theme }) => ({
     backgroundColor: theme.palette.primary.dark,
   },
 }));
+
+export const SummaryCardWrapper = styled(Box)(({ theme }) => ({
+  marginTop: theme.spacing(1),
+}));
