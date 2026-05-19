@@ -48,7 +48,7 @@ jest.mock(
 );
 
 // Mock Row & Column Data
-jest.mock("../../CommonRowColumnUtils", () => ({
+jest.mock("./CommonRowColumnUtils", () => ({
   UserManagementColumnData: [
     { field: "id", headerName: "ID" },
     { field: "name", headerName: "Name" },
@@ -139,8 +139,8 @@ describe("Edge Cases & Data Integrity", () => {
 
   test("renders gracefully with empty row data", () => {
     // Mock CommonRowColumnUtils to return empty rows for this test
-    jest.mock("../../CommonRowColumnUtils", () => ({
-      ...jest.requireActual("../../CommonRowColumnUtils"),
+    jest.mock("./CommonRowColumnUtils", () => ({
+      ...jest.requireActual("./CommonRowColumnUtils"),
       UserManagementRowData: [],
     }));
 

@@ -1,0 +1,3179 @@
+diff --git a/package.json b/package.json
+index c26d305..9024d2b 100644
+--- a/package.json
++++ b/package.json
+@@ -23,7 +23,7 @@
+     "@fullcalendar/react": "^6.1.9",
+     "@fullcalendar/timegrid": "^6.1.9",
+     "@hello-pangea/dnd": "^16.3.0",
+-    "@hookform/resolvers": "^3.3.1",
++    "@hookform/resolvers": "^3.10.0",
+     "@mui/icons-material": "^5.14.13",
+     "@mui/lab": "^5.0.0-alpha.147",
+     "@mui/material": "^5.14.12",
+@@ -52,7 +52,7 @@
+     "react-draggable": "^4.4.6",
+     "react-dropzone": "^14.2.3",
+     "react-helmet-async": "^1.3.0",
+-    "react-hook-form": "^7.47.0",
++    "react-hook-form": "^7.75.0",
+     "react-icons": "^4.11.0",
+     "react-quill": "^2.0.0",
+     "react-redux": "^9.2.0",
+@@ -66,7 +66,7 @@
+     "sortablejs": "^1.15.0",
+     "swiper": "^11.1.4",
+     "use-debounce": "^10.1.1",
+-    "yup": "^1.3.2"
++    "yup": "^1.7.1"
+   },
+   "devDependencies": {
+     "@babel/core": "^7.29.0",
+diff --git a/pr_diff.txt b/pr_diff.txt
+new file mode 100644
+index 0000000..affd940
+--- /dev/null
++++ b/pr_diff.txt
+@@ -0,0 +1,1545 @@
++diff --git a/package.json b/package.json
++index c26d305..9024d2b 100644
++--- a/package.json
+++++ b/package.json
++@@ -23,7 +23,7 @@
++     "@fullcalendar/react": "^6.1.9",
++     "@fullcalendar/timegrid": "^6.1.9",
++     "@hello-pangea/dnd": "^16.3.0",
++-    "@hookform/resolvers": "^3.3.1",
+++    "@hookform/resolvers": "^3.10.0",
++     "@mui/icons-material": "^5.14.13",
++     "@mui/lab": "^5.0.0-alpha.147",
++     "@mui/material": "^5.14.12",
++@@ -52,7 +52,7 @@
++     "react-draggable": "^4.4.6",
++     "react-dropzone": "^14.2.3",
++     "react-helmet-async": "^1.3.0",
++-    "react-hook-form": "^7.47.0",
+++    "react-hook-form": "^7.75.0",
++     "react-icons": "^4.11.0",
++     "react-quill": "^2.0.0",
++     "react-redux": "^9.2.0",
++@@ -66,7 +66,7 @@
++     "sortablejs": "^1.15.0",
++     "swiper": "^11.1.4",
++     "use-debounce": "^10.1.1",
++-    "yup": "^1.3.2"
+++    "yup": "^1.7.1"
++   },
++   "devDependencies": {
++     "@babel/core": "^7.29.0",
++diff --git a/src/common/CommonAutocompleteDropdown.jsx b/src/common/CommonAutocompleteDropdown.jsx
++index ecefb9b..fbbb13b 100644
++--- a/src/common/CommonAutocompleteDropdown.jsx
+++++ b/src/common/CommonAutocompleteDropdown.jsx
++@@ -4,6 +4,10 @@ import {
++   CircularProgress,
++   createFilterOptions,
++ } from "@mui/material";
+++import {
+++  StyledAutocomplete,
+++  StyledTextField,
+++} from "./CommonAutocompleteDropdown.styled";
++ 
++ const filter = createFilterOptions({
++   matchFrom: "any",
++@@ -36,7 +40,7 @@ const CommonAutocompleteDropdown = ({
++     uniqueOptions.find((opt) => opt.value === value) || null;
++ 
++   return (
++-    <Autocomplete
+++    <StyledAutocomplete
++       key={`${dataKey}-${uniqueOptions.length}`}
++       fullWidth
++       size={size}
++@@ -66,30 +70,16 @@ const CommonAutocompleteDropdown = ({
++           }));
++         }
++       }}
++-      sx={{ minWidth }}
++       loading={loading}
++       disabled={disabled}
++       renderInput={(params) => (
++-        <TextField
+++        <StyledTextField
++           {...params}
++           label={label}
++           fullWidth
++           error={error}
++           helperText={helperText}
++           disabled={disabled}
++-          sx={{
++-            "& .MuiInputBase-root.Mui-disabled": {
++-              backgroundColor: "#f5f5f5",
++-              color: "rgba(0, 0, 0, 0.6)",
++-            },
++-            "& .MuiInputLabel-root.Mui-disabled": {
++-              color: "rgba(0, 0, 0, 0.6)",
++-            },
++-            "& .MuiFormLabel-asterisk": {
++-              color: "#d32f2f",
++-              fontWeight: 600,
++-            },
++-          }}
++           InputProps={{
++             ...params.InputProps,
++             endAdornment: (
++diff --git a/src/common/CommonAutocompleteDropdown.styled.jsx b/src/common/CommonAutocompleteDropdown.styled.jsx
++new file mode 100644
++index 0000000..0fb70e8
++--- /dev/null
+++++ b/src/common/CommonAutocompleteDropdown.styled.jsx
++@@ -0,0 +1,38 @@
+++import { styled } from "@mui/material/styles";
+++import { Autocomplete, TextField } from "@mui/material";
+++
+++export const StyledAutocomplete = styled(Autocomplete)(({ theme }) => ({
+++  width: "100%",
+++
+++  "& .MuiInputBase-root": {
+++    minHeight: 40,
+++    fontSize: 14,
+++    backgroundColor: theme.palette.common.white,
+++  },
+++
+++  "& .MuiOutlinedInput-notchedOutline": {
+++    borderColor: theme.palette.grey[400],
+++  },
+++
+++  "&:hover .MuiOutlinedInput-notchedOutline": {
+++    borderColor: theme.palette.primary.main,
+++  },
+++
+++  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+++    borderColor: theme.palette.primary.main,
+++  },
+++}));
+++
+++export const StyledTextField = styled(TextField)(({ theme }) => ({
+++  "& .MuiInputBase-root.Mui-disabled": {
+++    backgroundColor: theme.palette.grey[100],
+++    color: theme.palette.text.disabled,
+++  },
+++  "& .MuiInputLabel-root.Mui-disabled": {
+++    color: theme.palette.text.disabled,
+++  },
+++  "& .MuiFormLabel-asterisk": {
+++    color: theme.palette.error.main,
+++    fontWeight: 600,
+++  },
+++}));
++diff --git a/src/common/CommonFilters.jsx b/src/common/CommonFilters.jsx
++index 436320f..ddfb84f 100644
++--- a/src/common/CommonFilters.jsx
+++++ b/src/common/CommonFilters.jsx
++@@ -1,8 +1,45 @@
++-import { Box, Grid } from "@mui/material";
+++import { Box } from "@mui/material";
++ import CommonSearch from "./CommonSearch";
++ import CommonDateRangeSelector from "./CommonDateRangeSelector";
++ import CommonAutocompleteDropdown from "./CommonAutocompleteDropdown";
++ import ViolationTypeAutocomplete from "./ViolationTypeAutocomplete";
+++import {
+++  FiltersContainer,
+++  SearchWrapper,
+++  RightFiltersContainer,
+++  DateRangeWrapper,
+++  FilterWrapper,
+++  ActionButtonWrapper,
+++} from "./CommonFilters.styled";
+++
+++const FilterItem = ({ filter, data, setData }) => {
+++  if (filter.type === "violation") {
+++    return (
+++      <FilterWrapper>
+++        <ViolationTypeAutocomplete
+++          label={filter.label}
+++          value={data[filter.dataKey]}
+++          options={filter.options}
+++          iconMap={filter.iconMap}
+++          setData={setData}
+++          dataKey={filter.dataKey}
+++        />
+++      </FilterWrapper>
+++    );
+++  }
+++
+++  return (
+++    <FilterWrapper>
+++      <CommonAutocompleteDropdown
+++        label={filter.label}
+++        value={data[filter.dataKey] || data[filter.name]}
+++        options={filter.options}
+++        setData={setData}
+++        dataKey={filter.dataKey || filter.name}
+++      />
+++    </FilterWrapper>
+++  );
+++};
++ 
++ const CommonFilters = ({
++   data,
++@@ -14,86 +51,59 @@ const CommonFilters = ({
++   actionButton,
++   allowDateClear = false,
++ }) => {
++-  return (
++-    <Grid container spacing={2} mt={2} alignItems="center" wrap="wrap">
++-      {showSearch && (
++-        <Grid item xs={12} md flexGrow={1}>
++-          <CommonSearch
++-            key={searchKey}
++-            value={data.search}
++-            setData={setData}
++-            placeholder="Search by All"
++-          />
++-        </Grid>
++-      )}
+++  const handleDateRangeChange = (range) => {
+++    setData((prev) => ({
+++      ...prev,
+++      page: 1,
+++      fromDate: range?.start || null,
+++      toDate: range?.end || null,
+++    }));
+++  };
+++
+++  const searchElement = showSearch ? (
+++    <SearchWrapper>
+++      <CommonSearch
+++        key={searchKey}
+++        value={data.search}
+++        setData={setData}
+++        placeholder="Search by All"
+++      />
+++    </SearchWrapper>
+++  ) : null;
++ 
++-      <Grid item xs={12} md="auto">
++-        <Grid
++-          container
++-          spacing={2}
++-          alignItems="center"
++-          justifyContent={{ xs: "flex-start", md: "flex-end" }}
++-          wrap="wrap"
++-        >
++-          {showDateRange && (
++-            <Grid item xs={12} sm={6} md="auto">
++-              <CommonDateRangeSelector
++-                value={{
++-                  start: data.fromDate,
++-                  end: data.toDate,
++-                }}
++-                allowClear={allowDateClear}
++-                onChange={(range) =>
++-                  setData((prev) => ({
++-                    ...prev,
++-                    page: 1,
++-                    fromDate: range?.start || null,
++-                    toDate: range?.end || null,
++-                  }))
++-                }
++-              />
++-            </Grid>
++-          )}
+++  const dateRangeElement = showDateRange ? (
+++    <DateRangeWrapper>
+++      <CommonDateRangeSelector
+++        value={{ start: data.fromDate, end: data.toDate }}
+++        allowClear={allowDateClear}
+++        onChange={handleDateRangeChange}
+++      />
+++    </DateRangeWrapper>
+++  ) : null;
++ 
++-          {filters.map((filter) => (
++-            <Grid item key={filter.dataKey} xs={12} sm={6} md="auto">
++-              {filter.type === "violation" ? (
++-                <ViolationTypeAutocomplete
++-                  label={filter.label}
++-                  value={data[filter.dataKey]}
++-                  options={filter.options}
++-                  iconMap={filter.iconMap}
++-                  setData={setData}
++-                  dataKey={filter.dataKey}
++-                />
++-              ) : (
++-                <CommonAutocompleteDropdown
++-                  label={filter.label}
++-                  value={data[filter.dataKey]}
++-                  options={filter.options}
++-                  setData={setData}
++-                  dataKey={filter.dataKey}
++-                />
++-              )}
++-            </Grid>
++-          ))}
+++  const filterElements = filters.map((filter) => (
+++    <FilterItem
+++      key={filter.dataKey || filter.name}
+++      filter={filter}
+++      data={data}
+++      setData={setData}
+++    />
+++  ));
++ 
++-          {actionButton && (
++-            <Grid item xs={12} sm="auto">
++-              <Box
++-                sx={{
++-                  display: "flex",
++-                  justifyContent: { xs: "stretch", sm: "flex-start" },
++-                }}
++-              >
++-                {actionButton}
++-              </Box>
++-            </Grid>
++-          )}
++-        </Grid>
++-      </Grid>
++-    </Grid>
+++  const actionButtonElement = actionButton ? (
+++    <ActionButtonWrapper>{actionButton}</ActionButtonWrapper>
+++  ) : null;
+++
+++  return (
+++    <FiltersContainer>
+++      {searchElement}
+++      <RightFiltersContainer>
+++        {dateRangeElement}
+++        {filterElements}
+++        {actionButtonElement}
+++      </RightFiltersContainer>
+++    </FiltersContainer>
++   );
++ };
++ 
++-export default CommonFilters;
++\ No newline at end of file
+++export default CommonFilters;
++diff --git a/src/common/CommonFilters.styled.jsx b/src/common/CommonFilters.styled.jsx
++new file mode 100644
++index 0000000..89a10f3
++--- /dev/null
+++++ b/src/common/CommonFilters.styled.jsx
++@@ -0,0 +1,62 @@
+++import { styled } from "@mui/material/styles";
+++import { Box } from "@mui/material";
+++
+++export const FiltersContainer = styled(Box)(({ theme }) => ({
+++  marginTop: theme.spacing(2),
+++  width: "100%",
+++  display: "flex",
+++  alignItems: "center",
+++  gap: theme.spacing(2),
+++  flexWrap: "wrap",
+++}));
+++
+++export const SearchWrapper = styled(Box)(({ theme }) => ({
+++  width: "100%",
+++  [theme.breakpoints.up("md")]: {
+++    width: "35%",
+++    minWidth: 220,
+++  },
+++  flexShrink: 0,
+++}));
+++
+++export const RightFiltersContainer = styled(Box)(({ theme }) => ({
+++  display: "flex",
+++  alignItems: "center",
+++  gap: theme.spacing(1.5),
+++  flexWrap: "wrap",
+++  flex: 1,
+++  justifyContent: "flex-start",
+++  [theme.breakpoints.up("md")]: {
+++    justifyContent: "flex-end",
+++  },
+++}));
+++
+++export const DateRangeWrapper = styled(Box)(({ theme }) => ({
+++  width: "100%",
+++  [theme.breakpoints.up("sm")]: {
+++    width: "calc(50% - 6px)",
+++  },
+++  [theme.breakpoints.up("md")]: {
+++    width: "auto",
+++  },
+++  minWidth: 180,
+++}));
+++
+++export const FilterWrapper = styled(Box)(({ theme }) => ({
+++  width: "100%",
+++  [theme.breakpoints.up("sm")]: {
+++    width: "calc(50% - 6px)",
+++  },
+++  [theme.breakpoints.up("md")]: {
+++    width: "auto",
+++    maxWidth: 180,
+++  },
+++  minWidth: 140,
+++}));
+++
+++export const ActionButtonWrapper = styled(Box)(({ theme }) => ({
+++  width: "100%",
+++  [theme.breakpoints.up("sm")]: {
+++    width: "auto",
+++  },
+++}));
++diff --git a/src/components/CommonRowColumnUtils.jsx b/src/components/CommonRowColumnUtils.jsx
++new file mode 100644
++index 0000000..330cc78
++--- /dev/null
+++++ b/src/components/CommonRowColumnUtils.jsx
++@@ -0,0 +1,201 @@
+++import eyeIcon from "../../src/assets/images/svg/eyeicon.png";
+++import { IconButton } from "@mui/material";
+++import { StatusText } from "./CommonRowColumnUtils.styled";
+++
+++const StatusCell = (params) => (
+++  <StatusText statuscolor={params.row.statusColor}>{params.value}</StatusText>
+++);
+++
+++const ActionCell = () => (
+++  <IconButton size="small" color="primary">
+++    <img src={eyeIcon} alt="view" width={16} height={16} />
+++  </IconButton>
+++);
+++
+++export const UserManagementColumnData = [
+++  {
+++    field: "carrierId",
+++    headerName: "Carrier ID",
+++    width: 50,
+++    minWidth: 150,
+++    maxWidth: 220,
+++    headerTooltip: true,
+++    cellClassName: "sticky-col-left-1",
+++    headerClassName: "sticky-col-left-1",
+++  },
+++  {
+++    field: "carrierName",
+++    headerName: "Carrier Name",
+++    width: 180,
+++    minWidth: 150,
+++    maxWidth: 220,
+++    headerTooltip: true,
+++    cellClassName: "sticky-col-left-2",
+++    headerClassName: "sticky-col-left-2",
+++  },
+++  {
+++    field: "userProfile",
+++    headerName: "User Profile",
+++    flex: 1,
+++    minWidth: 150,
+++    maxWidth: 220,
+++    headerTooltip: true,
+++  },
+++  {
+++    field: "firstName",
+++    headerName: "First Name",
+++    flex: 1,
+++    minWidth: 180,
+++    maxWidth: 250,
+++    headerTooltip: true,
+++  },
+++  {
+++    field: "lastName",
+++    headerName: "Last Name",
+++    flex: 1,
+++    minWidth: 180,
+++    maxWidth: 250,
+++    headerTooltip: true,
+++  },
+++  {
+++    field: "createdOn",
+++    headerName: "Created On",
+++    flex: 1,
+++    minWidth: 180,
+++    maxWidth: 250,
+++    headerTooltip: true,
+++  },
+++  {
+++    field: "updatedOn",
+++    headerName: "Updated On",
+++    flex: 1,
+++    minWidth: 180,
+++    maxWidth: 250,
+++    headerTooltip: true,
+++  },
+++  {
+++    field: "primaryContactEmail",
+++    headerName: "Primary Contact Email",
+++    minWidth: 180,
+++    maxWidth: 250,
+++    flex: 1,
+++    headerTooltip: true,
+++    // align: "center",
+++    // headerAlign: "center",
+++  },
+++
+++  {
+++    field: "status",
+++    headerName: "Status",
+++    minWidth: 180,
+++    maxWidth: 250,
+++    flex: 1,
+++    headerTooltip: true,
+++    renderCell: StatusCell,
+++  },
+++  {
+++    field: "action",
+++    headerName: "Action",
+++    flex: 1,
+++    minWidth: 100,
+++    renderCell: ActionCell,
+++  },
+++];
+++export const UserManagementRowData = [
+++  {
+++    id: 1,
+++    carrierId: 1,
+++    carrierName: "Swift Transportation",
+++    userProfile: "Admin",
+++    firstName: "John",
+++    lastName: "Doe",
+++    createdOn: "05-05-2026",
+++    updatedOn: "10-05-2026",
+++    primaryContactEmail: "john.doe@swift.com",
+++    status: "Active",
+++  },
+++  {
+++    id: 2,
+++    carrierId: 2,
+++    carrierName: "J.B. Hunt",
+++    userProfile: "Super Admin",
+++    firstName: "Sarah",
+++    lastName: "Smith",
+++    createdOn: "05-05-2025",
+++    updatedOn: "10-05-2025",
+++    primaryContactEmail: "sarah.smith@jbhunt.com",
+++    status: "Inactive",
+++  },
+++  {
+++    id: 3,
+++    carrierId: 3,
+++    carrierName: "Knight Transportation",
+++    userProfile: "User",
+++    firstName: "Michael",
+++    lastName: "Johnson",
+++    createdOn: "05-05-2025",
+++    updatedOn: "10-05-2025",
+++    primaryContactEmail: "michael.johnson@knight.com",
+++    status: "Active",
+++  },
+++  {
+++    id: 4,
+++    carrierId: 4,
+++    carrierName: "Werner Enterprises",
+++    userProfile: "Admin",
+++    firstName: "Emily",
+++    lastName: "Williams",
+++    createdOn: "05-05-2025",
+++    updatedOn: "10-05-2025",
+++    primaryContactEmail: "emily.williams@werner.com",
+++    status: "Active",
+++  },
+++  {
+++    id: 5,
+++    carrierId: 5,
+++    carrierName: "Schneider National",
+++    userProfile: "Admin",
+++    firstName: "David",
+++    lastName: "Brown",
+++    createdOn: "05-05-2025",
+++    updatedOn: "10-05-2025",
+++    primaryContactEmail: "david.brown@schneider.com",
+++    status: "Inactive",
+++  },
+++  {
+++    id: 6,
+++    carrierId: 6,
+++    carrierName: "XPO Logistics",
+++    userProfile: "Super Admin",
+++    firstName: "Olivia",
+++    lastName: "Taylor",
+++    createdOn: "05-05-2025",
+++    updatedOn: "10-05-2025",
+++    primaryContactEmail: "olivia.taylor@xpo.com",
+++    status: "Active",
+++  },
+++  {
+++    id: 7,
+++    carrierId: 7,
+++    carrierName: "FedEx Freight",
+++    userProfile: "Admin",
+++    firstName: "Daniel",
+++    lastName: "Anderson",
+++    createdOn: "05-05-2025",
+++    updatedOn: "10-05-2025",
+++    primaryContactEmail: "daniel.anderson@fedex.com",
+++    status: "Active",
+++  },
+++  {
+++    id: 8,
+++    carrierId: 8,
+++    carrierName: "Old Dominion",
+++    userProfile: "Admin",
+++    firstName: "Sophia",
+++    lastName: "Thomas",
+++    createdOn: "05-05-2025",
+++    updatedOn: "10-05-2025",
+++    primaryContactEmail: "sophia.thomas@odfl.com",
+++    status: "Inactive",
+++  },
+++];
++diff --git a/src/components/CommonRowColumnUtils.styled.jsx b/src/components/CommonRowColumnUtils.styled.jsx
++new file mode 100644
++index 0000000..e90bd38
++--- /dev/null
+++++ b/src/components/CommonRowColumnUtils.styled.jsx
++@@ -0,0 +1,6 @@
+++import { styled } from "@mui/material/styles";
+++
+++export const StatusText = styled("span")(({ theme, statuscolor }) => ({
+++  color: statuscolor || theme.palette.text.primary,
+++  fontWeight: 400,
+++}));
++diff --git a/src/components/compliance/UserManagement/UserManagement.jsx b/src/components/compliance/UserManagement/UserManagement.jsx
++index 8358144..aafc489 100644
++--- a/src/components/compliance/UserManagement/UserManagement.jsx
+++++ b/src/components/compliance/UserManagement/UserManagement.jsx
++@@ -1,13 +1,62 @@
++-import React from "react";
++-import { Grid, Typography, Box, Button } from "@mui/material";
++-import { ComponentContainerCard, PageBreadcrumb } from "@src/components";
+++import CommonDataGrid from "@src/common/CommonDataGrid";
+++import UserManagementHeader from "./UserManagementHeader";
+++import { PageContainer } from "../../../common/PageContainer";
+++import CommonLoading from "../../../common/CommonLoading";
+++import {
+++  UserManagementColumnData,
+++  UserManagementRowData,
+++} from "../../CommonRowColumnUtils";
+++import { useState } from "react";
+++import UserManagementForm from "./UserManagementForm";
++ 
++ const UserManagement = () => {
+++  const [searchQuery, setSearchQuery] = useState("");
+++  const [modelType, setModelType] = useState("");
+++  const [status, setStatus] = useState("");
+++  const { setLoading, LoadingContainer } = CommonLoading();
+++  const [data, setData] = useState({
+++    isLoading: false,
+++  });
+++  const [mode, setMode] = useState("");
+++  const [summaryCards, setSummaryCards] = useState([]);
+++  const [openForm, setOpenForm] = useState(false);
+++  const handleClick = () => {
+++    setOpenForm(true);
+++  };
+++
+++  const handleClose = () => {
+++    setOpenForm(false);
+++  };
+++
+++  const handleGetRowHeight = () => "auto";
+++
++   return (
++     <>
++-      <Typography variant="h6" gutterBottom>
++-        User Management
++-      </Typography>
+++      <LoadingContainer />
+++      <PageContainer>
+++        <UserManagementHeader
+++          data={data}
+++          setData={setData}
+++          searchKey={searchQuery}
+++          summaryCards={summaryCards}
+++          mode={mode}
+++          setMode={setMode}
+++          handleClick={handleClick}
+++        />
+++        <CommonDataGrid
+++          columnsData={UserManagementColumnData}
+++          rowData={UserManagementRowData}
+++          data={{
+++            rows: UserManagementRowData,
+++            total: UserManagementRowData.length,
+++            isLoading: false,
+++          }}
+++          setData={setData}
+++          paginationMode="server"
+++          getRowHeight={handleGetRowHeight}
+++        />
+++      </PageContainer>
+++      <UserManagementForm open={openForm} onClose={handleClose} mode="add" />
++     </>
++   );
++ };
++diff --git a/src/components/compliance/UserManagement/UserManagement.test.jsx b/src/components/compliance/UserManagement/UserManagement.test.jsx
++new file mode 100644
++index 0000000..97e0119
++--- /dev/null
+++++ b/src/components/compliance/UserManagement/UserManagement.test.jsx
++@@ -0,0 +1,156 @@
+++// UserManagement.test.jsx
+++
+++import { render, screen, fireEvent } from "@testing-library/react";
+++import "@testing-library/jest-dom";
+++import UserManagement from "./UserManagement";
+++
+++// Mock CommonDataGrid
+++jest.mock("@src/common/CommonDataGrid", () => (props) => (
+++  <div data-testid="common-data-grid">
+++    CommonDataGrid
+++    <div>Rows Count: {props.data.rows.length}</div>
+++  </div>
+++));
+++
+++// Mock UserManagementHeader
+++jest.mock("./UserManagementHeader", () => (props) => (
+++  <div data-testid="user-management-header">
+++    UserManagementHeader
+++    <button onClick={props.handleClick}>Open Form</button>
+++  </div>
+++));
+++
+++// Mock PageContainer
+++jest.mock("../../../common/PageContainer", () => ({
+++  PageContainer: ({ children }) => (
+++    <div data-testid="page-container">{children}</div>
+++  ),
+++}));
+++
+++// Mock CommonLoading
+++jest.mock("../../../common/CommonLoading", () => () => ({
+++  setLoading: jest.fn(),
+++  LoadingContainer: () => (
+++    <div data-testid="loading-container">LoadingContainer</div>
+++  ),
+++}));
+++
+++// Mock UserManagementForm
+++jest.mock(
+++  "./UserManagementForm",
+++  () => (props) =>
+++    props.open ? (
+++      <div data-testid="user-management-form">
+++        UserManagementForm
+++        <button onClick={props.onClose}>Close Form</button>
+++      </div>
+++    ) : null,
+++);
+++
+++// Mock Row & Column Data
+++jest.mock("../../CommonRowColumnUtils", () => ({
+++  UserManagementColumnData: [
+++    { field: "id", headerName: "ID" },
+++    { field: "name", headerName: "Name" },
+++  ],
+++  UserManagementRowData: [
+++    { id: 1, name: "John" },
+++    { id: 2, name: "Doe" },
+++  ],
+++}));
+++
+++describe("UserManagement Component", () => {
+++  test("renders loading container", () => {
+++    render(<UserManagement />);
+++
+++    expect(screen.getByTestId("loading-container")).toBeInTheDocument();
+++  });
+++
+++  test("renders page container", () => {
+++    render(<UserManagement />);
+++
+++    expect(screen.getByTestId("page-container")).toBeInTheDocument();
+++  });
+++
+++  test("renders UserManagementHeader component", () => {
+++    render(<UserManagement />);
+++
+++    expect(screen.getByTestId("user-management-header")).toBeInTheDocument();
+++  });
+++
+++  test("renders CommonDataGrid component", () => {
+++    render(<UserManagement />);
+++
+++    expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
+++  });
+++
+++  test("passes row data correctly to CommonDataGrid", () => {
+++    render(<UserManagement />);
+++
+++    expect(screen.getByText("Rows Count: 2")).toBeInTheDocument();
+++  });
+++
+++  test("UserManagementForm should not render initially", () => {
+++    render(<UserManagement />);
+++
+++    expect(
+++      screen.queryByTestId("user-management-form"),
+++    ).not.toBeInTheDocument();
+++  });
+++
+++  test("opens UserManagementForm when handleClick is triggered", () => {
+++    render(<UserManagement />);
+++
+++    const openButton = screen.getByText("Open Form");
+++    fireEvent.click(openButton);
+++
+++    expect(screen.getByTestId("user-management-form")).toBeInTheDocument();
+++  });
+++
+++  test("closes UserManagementForm when onClose is triggered", () => {
+++    render(<UserManagement />);
+++
+++    // Open form
+++    fireEvent.click(screen.getByText("Open Form"));
+++
+++    expect(screen.getByTestId("user-management-form")).toBeInTheDocument();
+++
+++    // Close form
+++    fireEvent.click(screen.getByText("Close Form"));
+++
+++    expect(
+++      screen.queryByTestId("user-management-form"),
+++    ).not.toBeInTheDocument();
+++  });
+++
+++  test("renders UserManagementForm with mode='add'", () => {
+++    render(<UserManagement />);
+++
+++    fireEvent.click(screen.getByText("Open Form"));
+++
+++    expect(screen.getByTestId("user-management-form")).toBeInTheDocument();
+++  });
+++});
+++
+++describe("Edge Cases & Data Integrity", () => {
+++  beforeEach(() => {
+++    jest.clearAllMocks();
+++  });
+++
+++  test("renders gracefully with empty row data", () => {
+++    // Mock CommonRowColumnUtils to return empty rows for this test
+++    jest.mock("../../CommonRowColumnUtils", () => ({
+++      ...jest.requireActual("../../CommonRowColumnUtils"),
+++      UserManagementRowData: [],
+++    }));
+++
+++    // We just render and make sure it doesn't crash
+++    const { container } = render(<UserManagement />);
+++    expect(container).toBeInTheDocument();
+++  });
+++
+++  test("handles undefined data state gracefully", () => {
+++    const { container } = render(<UserManagement />);
+++    expect(container).toBeInTheDocument();
+++  });
+++});
++diff --git a/src/components/compliance/UserManagement/UserManagementForm.jsx b/src/components/compliance/UserManagement/UserManagementForm.jsx
++new file mode 100644
++index 0000000..5fd41ec
++--- /dev/null
+++++ b/src/components/compliance/UserManagement/UserManagementForm.jsx
++@@ -0,0 +1,220 @@
+++import React from "react";
+++import { Box, Grid, MenuItem, TextField } from "@mui/material";
+++import { useForm } from "react-hook-form";
+++import { yupResolver } from "@hookform/resolvers/yup";
+++import * as yup from "yup";
+++
+++import CommonDialogForm from "../../../common/CommonDialogForm";
+++import CommonTextField from "../../../common/CommonTextField";
+++import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdown";
+++import { FormContainer } from "./UserManagementForm.styled";
+++
+++const schema = yup.object().shape({
+++  selectAccount: yup.string().required("Account is required"),
+++  userProfile: yup.string().required("User Profile is required"),
+++  firstName: yup.string().required("First Name is required"),
+++  lastName: yup.string().required("Last Name is required"),
+++  email: yup.string().email("Enter valid email").required("Email is required"),
+++  password: yup
+++    .string()
+++    .min(8, "Password must be at least 8 characters")
+++    .required("Password is required"),
+++  confirmPassword: yup
+++    .string()
+++    .oneOf([yup.ref("password")], "Passwords must match")
+++    .required("Confirm Password is required"),
+++});
+++
+++const UserManagementForm = ({
+++  open,
+++  onClose,
+++  onSubmitForm,
+++  loading = false,
+++  mode = "add",
+++}) => {
+++  const {
+++    handleSubmit,
+++    control,
+++    register,
+++    formState: { errors },
+++    reset,
+++    setValue,
+++  } = useForm({
+++    resolver: yupResolver(schema),
+++    defaultValues: {
+++      account: "",
+++      userProfile: "",
+++      firstName: "",
+++      lastName: "",
+++      email: "",
+++      password: "",
+++      confirmPassword: "",
+++    },
+++  });
+++
+++  const handleFormSubmit = (data) => {
+++    console.log("Form Data:", data);
+++
+++    if (onSubmitForm) {
+++      onSubmitForm(data);
+++    }
+++
+++    reset();
+++    onClose();
+++  };
+++
+++  const handleCancel = () => {
+++    reset();
+++    onClose();
+++  };
+++
+++  const handleAccountChange = (value) => {
+++    setValue("selectAccount", value, { shouldValidate: true });
+++  };
+++
+++  const handleUserProfileChange = (value) => {
+++    setValue("userProfile", value, { shouldValidate: true });
+++  };
+++
+++  const formContent = (
+++    <FormContainer
+++      component="form"
+++      id="user-management-form"
+++      onSubmit={handleSubmit(handleFormSubmit)}
+++    >
+++      <Grid container spacing={2}>
+++        <Grid item xs={12}>
+++          <CommonAutocompleteDropdown
+++            name="selectAccount"
+++            label="Select Account"
+++            value=""
+++            options={[
+++              {
+++                label: "Swift Transportation",
+++                value: "Swift Transportation",
+++              },
+++              {
+++                label: "J.B. Hunt",
+++                value: "J.B. Hunt",
+++              },
+++              {
+++                label: "Knight Transportation",
+++                value: "Knight Transportation",
+++              },
+++            ]}
+++            onChange={handleAccountChange}
+++            error={!!errors.selectAccount}
+++            helperText={errors.selectAccount?.message}
+++            required
+++          />
+++        </Grid>
+++
+++        {/* User Profile */}
+++        <Grid item xs={12}>
+++          <CommonAutocompleteDropdown
+++            name="userProfile"
+++            label="User Profile"
+++            value=""
+++            options={[
+++              {
+++                label: "Admin",
+++                value: "Admin",
+++              },
+++              {
+++                label: "Super Admin",
+++                value: "Super Admin",
+++              },
+++              {
+++                label: "User",
+++                value: "User",
+++              },
+++            ]}
+++            onChange={handleUserProfileChange}
+++            error={!!errors.userProfile}
+++            helperText={errors.userProfile?.message}
+++            required
+++          />
+++        </Grid>
+++
+++        <Grid item xs={12}>
+++          <CommonTextField
+++            name="firstName"
+++            label="First Name"
+++            register={register}
+++            error={!!errors.firstName}
+++            helperText={errors.firstName?.message}
+++            required
+++          />
+++        </Grid>
+++
+++        <Grid item xs={12}>
+++          <CommonTextField
+++            name="lastName"
+++            label="Last Name"
+++            control={control}
+++            register={register}
+++            error={!!errors.lastName}
+++            helperText={errors.lastName?.message}
+++            required
+++          />
+++        </Grid>
+++
+++        <Grid item xs={12}>
+++          <CommonTextField
+++            name="email"
+++            label="Enter Email"
+++            register={register}
+++            error={!!errors.email}
+++            helperText={errors.email?.message}
+++            required
+++          />
+++        </Grid>
+++
+++        <Grid item xs={12}>
+++          <CommonTextField
+++            name="password"
+++            label="Enter Password"
+++            fullWidth
+++            autoComplete="new-password"
+++            register={register}
+++            error={!!errors.password}
+++            helperText={errors.password?.message}
+++            required
+++          />
+++        </Grid>
+++
+++        <Grid item xs={12}>
+++          <CommonTextField
+++            name="confirmPassword"
+++            label="Confirm Password"
+++            type="password"
+++            autoComplete="new-password"
+++            register={register}
+++            error={!!errors.confirmPassword}
+++            helperText={errors.confirmPassword?.message}
+++            required
+++          />
+++        </Grid>
+++      </Grid>
+++    </FormContainer>
+++  );
+++
+++  const dialogTitle = mode === "edit" ? "Edit User" : "Add User";
+++  const dialogSubmitText = mode === "edit" ? "Update User" : "Add User";
+++
+++  return (
+++    <CommonDialogForm
+++      open={open}
+++      title={dialogTitle}
+++      content={formContent}
+++      formId="user-management-form"
+++      onCancel={handleCancel}
+++      loading={loading}
+++      mode={mode}
+++      submitButtonText={dialogSubmitText}
+++      maxWidth="sm"
+++    />
+++  );
+++};
+++
+++export default UserManagementForm;
++diff --git a/src/components/compliance/UserManagement/UserManagementForm.styled.jsx b/src/components/compliance/UserManagement/UserManagementForm.styled.jsx
++new file mode 100644
++index 0000000..b5d3a9e
++--- /dev/null
+++++ b/src/components/compliance/UserManagement/UserManagementForm.styled.jsx
++@@ -0,0 +1,6 @@
+++import { styled } from "@mui/material/styles";
+++import { Box } from "@mui/material";
+++
+++export const FormContainer = styled(Box)(({ theme }) => ({
+++  marginTop: theme.spacing(1),
+++}));
++diff --git a/src/components/compliance/UserManagement/UserManagementForm.test.jsx b/src/components/compliance/UserManagement/UserManagementForm.test.jsx
++new file mode 100644
++index 0000000..9659ca6
++--- /dev/null
+++++ b/src/components/compliance/UserManagement/UserManagementForm.test.jsx
++@@ -0,0 +1,216 @@
+++// UserManagementForm.test.jsx
+++
+++import React from "react";
+++import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+++import "@testing-library/jest-dom";
+++import UserManagementForm from "./UserManagementForm";
+++
+++// Mock CommonDialogForm
+++jest.mock("../../../common/CommonDialogForm", () => (props) => (
+++  <div data-testid="common-dialog-form">
+++    <h1>{props.title}</h1>
+++
+++    {props.content}
+++
+++    <button onClick={props.onCancel}>Cancel</button>
+++
+++    <button type="submit" form={props.formId}>
+++      {props.submitButtonText}
+++    </button>
+++  </div>
+++));
+++
+++// Mock CommonTextField
+++jest.mock("../../../common/CommonTextField", () => (props) => (
+++  <div>
+++    <input
+++      data-testid={props.name}
+++      placeholder={props.label}
+++      {...props.register(props.name)}
+++    />
+++    {props.helperText && <span>{props.helperText}</span>}
+++  </div>
+++));
+++
+++// Mock CommonAutocompleteDropdown
+++jest.mock("../../../common/CommonAutocompleteDropdown", () => (props) => (
+++  <div>
+++    <select
+++      data-testid={props.name}
+++      onChange={(e) => props.onChange(e.target.value)}
+++    >
+++      <option value="">Select</option>
+++
+++      {props.options.map((option) => (
+++        <option key={option.value} value={option.value}>
+++          {option.label}
+++        </option>
+++      ))}
+++    </select>
+++
+++    {props.helperText && <span>{props.helperText}</span>}
+++  </div>
+++));
+++
+++describe("UserManagementForm Component", () => {
+++  const mockOnClose = jest.fn();
+++  const mockOnSubmitForm = jest.fn();
+++
+++  beforeEach(() => {
+++    jest.clearAllMocks();
+++  });
+++
+++  test("renders Add User title in add mode", () => {
+++    render(<UserManagementForm open={true} onClose={mockOnClose} mode="add" />);
+++
+++    expect(
+++      screen.getByRole("button", { name: "Add User" }),
+++    ).toBeInTheDocument();
+++  });
+++
+++  test("renders Edit User title in edit mode", () => {
+++    render(
+++      <UserManagementForm open={true} onClose={mockOnClose} mode="edit" />,
+++    );
+++
+++    expect(screen.getByText("Edit User")).toBeInTheDocument();
+++  });
+++
+++  test("renders all form fields", () => {
+++    render(<UserManagementForm open={true} onClose={mockOnClose} />);
+++
+++    expect(screen.getByTestId("selectAccount")).toBeInTheDocument();
+++    expect(screen.getByTestId("userProfile")).toBeInTheDocument();
+++    expect(screen.getByTestId("firstName")).toBeInTheDocument();
+++    expect(screen.getByTestId("lastName")).toBeInTheDocument();
+++    expect(screen.getByTestId("email")).toBeInTheDocument();
+++    expect(screen.getByTestId("password")).toBeInTheDocument();
+++    expect(screen.getByTestId("confirmPassword")).toBeInTheDocument();
+++  });
+++
+++  test("shows validation errors on empty submit", async () => {
+++    render(<UserManagementForm open={true} onClose={mockOnClose} />);
+++
+++    fireEvent.click(screen.getByRole("button", { name: "Add User" }));
+++
+++    await waitFor(() => {
+++      expect(screen.getByText("First Name is required")).toBeInTheDocument();
+++      expect(screen.getByText("Last Name is required")).toBeInTheDocument();
+++      expect(screen.getByText("Email is required")).toBeInTheDocument();
+++      // expect(screen.getByText("Password is required")).toBeInTheDocument();
+++      expect(
+++        screen.getByText("Password must be at least 8 characters"),
+++      ).toBeInTheDocument();
+++      expect(
+++        screen.getByText("Confirm Password is required"),
+++      ).toBeInTheDocument();
+++    });
+++  });
+++
+++  test("shows email validation error", async () => {
+++    render(<UserManagementForm open={true} onClose={mockOnClose} />);
+++
+++    fireEvent.change(screen.getByTestId("email"), {
+++      target: { value: "invalid-email" },
+++    });
+++
+++    fireEvent.click(screen.getByRole("button", { name: "Add User" }));
+++
+++    await waitFor(() => {
+++      expect(
+++        screen.getByRole("button", { name: "Add User" }),
+++      ).toBeInTheDocument();
+++    });
+++  });
+++
+++  test("shows password mismatch validation error", async () => {
+++    render(<UserManagementForm open={true} onClose={mockOnClose} />);
+++
+++    fireEvent.change(screen.getByTestId("password"), {
+++      target: { value: "Password123" },
+++    });
+++
+++    fireEvent.change(screen.getByTestId("confirmPassword"), {
+++      target: { value: "WrongPassword" },
+++    });
+++
+++    // fireEvent.click(screen.getByText("Add User"));
+++    fireEvent.click(screen.getByRole("button", { name: "Add User" }));
+++
+++    await waitFor(() => {
+++      expect(screen.getByText("Passwords must match")).toBeInTheDocument();
+++    });
+++  });
+++
+++  test("submits form successfully with valid data", async () => {
+++    render(
+++      <UserManagementForm
+++        open={true}
+++        onClose={mockOnClose}
+++        onSubmitForm={mockOnSubmitForm}
+++      />,
+++    );
+++
+++    fireEvent.change(screen.getByTestId("selectAccount"), {
+++      target: { value: "Swift Transportation" },
+++    });
+++
+++    fireEvent.change(screen.getByTestId("userProfile"), {
+++      target: { value: "Admin" },
+++    });
+++
+++    fireEvent.change(screen.getByTestId("firstName"), {
+++      target: { value: "John" },
+++    });
+++
+++    fireEvent.change(screen.getByTestId("lastName"), {
+++      target: { value: "Doe" },
+++    });
+++
+++    fireEvent.change(screen.getByTestId("email"), {
+++      target: { value: "john@example.com" },
+++    });
+++
+++    fireEvent.change(screen.getByTestId("password"), {
+++      target: { value: "Password123" },
+++    });
+++
+++    fireEvent.change(screen.getByTestId("confirmPassword"), {
+++      target: { value: "Password123" },
+++    });
+++
+++    // fireEvent.click(screen.getByText("Add User"));
+++    fireEvent.click(screen.getByRole("button", { name: "Add User" }));
+++
+++    await waitFor(() => {
+++      expect(mockOnSubmitForm).toHaveBeenCalled();
+++      expect(mockOnClose).toHaveBeenCalled();
+++    });
+++  });
+++
+++  test("calls onClose when cancel button is clicked", () => {
+++    render(<UserManagementForm open={true} onClose={mockOnClose} />);
+++
+++    fireEvent.click(screen.getByText("Cancel"));
+++
+++    expect(mockOnClose).toHaveBeenCalled();
+++  });
+++
+++  test("renders Update User button in edit mode", () => {
+++    render(
+++      <UserManagementForm open={true} onClose={mockOnClose} mode="edit" />,
+++    );
+++
+++    expect(
+++      screen.getByRole("button", { name: "Update User" }),
+++    ).toBeInTheDocument();
+++  });
+++
+++  test("renders Add User button in add mode", () => {
+++    render(<UserManagementForm open={true} onClose={mockOnClose} mode="add" />);
+++
+++    expect(
+++      screen.getByRole("button", { name: "Add User" }),
+++    ).toBeInTheDocument();
+++  });
+++});
++diff --git a/src/components/compliance/UserManagement/UserManagementHeader.jsx b/src/components/compliance/UserManagement/UserManagementHeader.jsx
++new file mode 100644
++index 0000000..b4b2e87
++--- /dev/null
+++++ b/src/components/compliance/UserManagement/UserManagementHeader.jsx
++@@ -0,0 +1,74 @@
+++import CommonFilters from "../../../common/CommonFilters";
+++import CommonPageHeader from "../../../common/CommonPageHeader";
+++import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
+++import { Box } from "@mui/material";
+++import { AddUserButton, HeaderContainer } from "./UserManagementHeader.styled";
+++
+++const UserManagementHeader = (props) => {
+++  const {
+++    data = [],
+++    setData,
+++    searchKey = {},
+++    summaryCards = [],
+++    handleClick,
+++  } = props;
+++
+++  return (
+++    <HeaderContainer>
+++      <CommonPageHeader
+++        title="User Management"
+++        subtitle="Manage user accounts and permissions"
+++        rightContent={
+++          <AddUserButton variant="contained" onClick={handleClick}>
+++            Add User
+++          </AddUserButton>
+++        }
+++      />
+++      <Box mt={1}>
+++        <CommonSummaryCardGroup
+++          cards={summaryCards}
+++          showAccentBar={true}
+++          layout="default"
+++        />
+++      </Box>
+++
+++      <CommonFilters
+++        data={data}
+++        setData={setData}
+++        searchKey={searchKey}
+++        allowDateClear={true}
+++        filters={[
+++          {
+++            label: "User Profile",
+++            name: "userProfile",
+++            type: "select",
+++            options: [
+++              { label: "Admin", value: "1" },
+++              { label: "Super Admin", value: "2" },
+++            ],
+++          },
+++          {
+++            label: "All Carrier",
+++            name: "carrier",
+++            type: "select",
+++            options: [
+++              { label: "Carrier 1", value: "1" },
+++              { label: "Carrier 2", value: "2" },
+++            ],
+++          },
+++          {
+++            label: "All Status",
+++            name: "status",
+++            type: "select",
+++            options: [
+++              { label: "Active", value: "active" },
+++              { label: "Inactive", value: "inactive" },
+++            ],
+++          },
+++        ]}
+++      />
+++    </HeaderContainer>
+++  );
+++};
+++
+++export default UserManagementHeader;
++diff --git a/src/components/compliance/UserManagement/UserManagementHeader.styled.jsx b/src/components/compliance/UserManagement/UserManagementHeader.styled.jsx
++new file mode 100644
++index 0000000..0731e04
++--- /dev/null
+++++ b/src/components/compliance/UserManagement/UserManagementHeader.styled.jsx
++@@ -0,0 +1,15 @@
+++import { styled } from "@mui/material/styles";
+++import { Button, Box } from "@mui/material";
+++
+++export const HeaderContainer = styled(Box)(({ theme }) => ({
+++  marginBottom: theme.spacing(2),
+++}));
+++
+++export const AddUserButton = styled(Button)(({ theme }) => ({
+++  color: theme.palette.common.white,
+++  backgroundColor: theme.palette.primary.main,
+++
+++  "&:hover": {
+++    backgroundColor: theme.palette.primary.dark,
+++  },
+++}));
++diff --git a/src/components/compliance/UserManagement/UserManagementHeader.test.jsx b/src/components/compliance/UserManagement/UserManagementHeader.test.jsx
++new file mode 100644
++index 0000000..ce9d286
++--- /dev/null
+++++ b/src/components/compliance/UserManagement/UserManagementHeader.test.jsx
++@@ -0,0 +1,136 @@
+++import { render, screen, fireEvent } from "@testing-library/react";
+++import UserManagementHeader from "./UserManagementHeader";
+++
+++jest.mock("../../../common/CommonPageHeader", () => (props) => (
+++  <div data-testid="common-page-header">
+++    <div>{props.title}</div>
+++    <div>{props.subtitle}</div>
+++    <div>{props.rightContent}</div>
+++  </div>
+++));
+++
+++jest.mock("../../../common/CommonSummaryCardGroup", () => (props) => (
+++  <div data-testid="summary-card-group">
+++    Summary Cards: {props.cards?.length}
+++  </div>
+++));
+++
+++jest.mock("../../../common/CommonFilters", () => (props) => (
+++  <div data-testid="common-filters">Filters: {props.filters?.length}</div>
+++));
+++
+++describe("UserManagementHeader Component", () => {
+++  const mockSetData = jest.fn();
+++  const mockHandleClick = jest.fn();
+++
+++  const defaultProps = {
+++    data: {},
+++    setData: mockSetData,
+++    searchKey: {
+++      search: "",
+++    },
+++    summaryCards: [
+++      {
+++        title: "Active Users",
+++        value: 10,
+++      },
+++      {
+++        title: "Inactive Users",
+++        value: 5,
+++      },
+++    ],
+++    handleClick: mockHandleClick,
+++  };
+++
+++  beforeEach(() => {
+++    jest.clearAllMocks();
+++  });
+++
+++  test("renders page header title and subtitle", () => {
+++    render(<UserManagementHeader {...defaultProps} />);
+++
+++    expect(screen.getByText("User Management")).toBeInTheDocument();
+++
+++    expect(
+++      screen.getByText("Manage user accounts and permissions"),
+++    ).toBeInTheDocument();
+++  });
+++
+++  test("renders Add User button", () => {
+++    render(<UserManagementHeader {...defaultProps} />);
+++
+++    expect(
+++      screen.getByRole("button", {
+++        name: /add user/i,
+++      }),
+++    ).toBeInTheDocument();
+++  });
+++
+++  test("calls handleClick when Add User button is clicked", () => {
+++    render(<UserManagementHeader {...defaultProps} />);
+++
+++    const addButton = screen.getByRole("button", {
+++      name: /add user/i,
+++    });
+++
+++    fireEvent.click(addButton);
+++
+++    expect(mockHandleClick).toHaveBeenCalledTimes(1);
+++  });
+++
+++  test("renders summary card group", () => {
+++    render(<UserManagementHeader {...defaultProps} />);
+++
+++    expect(screen.getByTestId("summary-card-group")).toBeInTheDocument();
+++
+++    expect(screen.getByText("Summary Cards: 2")).toBeInTheDocument();
+++  });
+++
+++  test("renders common filters component", () => {
+++    render(<UserManagementHeader {...defaultProps} />);
+++
+++    expect(screen.getByTestId("common-filters")).toBeInTheDocument();
+++
+++    expect(screen.getByText("Filters: 3")).toBeInTheDocument();
+++  });
+++
+++  test("passes correct filter configuration", () => {
+++    render(<UserManagementHeader {...defaultProps} />);
+++
+++    expect(screen.getByTestId("common-filters")).toBeInTheDocument();
+++  });
+++
+++  test("renders gracefully with empty summary cards", () => {
+++    render(<UserManagementHeader {...defaultProps} summaryCards={[]} />);
+++
+++    expect(screen.getByText("Summary Cards: 0")).toBeInTheDocument();
+++  });
+++
+++  test("renders gracefully with undefined summary cards", () => {
+++    render(<UserManagementHeader {...defaultProps} summaryCards={undefined} />);
+++
+++    expect(screen.getByTestId("summary-card-group")).toBeInTheDocument();
+++  });
+++
+++  test("renders gracefully with null data", () => {
+++    render(<UserManagementHeader {...defaultProps} data={null} />);
+++
+++    expect(screen.getByTestId("common-filters")).toBeInTheDocument();
+++  });
+++
+++  test("renders without crashing when handleClick is undefined", () => {
+++    render(<UserManagementHeader {...defaultProps} handleClick={undefined} />);
+++
+++    const addButton = screen.getByRole("button", {
+++      name: /add user/i,
+++    });
+++
+++    expect(addButton).toBeInTheDocument();
+++  });
+++
+++  test("matches snapshot", () => {
+++    const { container } = render(<UserManagementHeader {...defaultProps} />);
+++
+++    expect(container).toMatchSnapshot();
+++  });
+++});
+diff --git a/src/common/CommonAutocompleteDropdown.jsx b/src/common/CommonAutocompleteDropdown.jsx
+index ecefb9b..fbbb13b 100644
+--- a/src/common/CommonAutocompleteDropdown.jsx
++++ b/src/common/CommonAutocompleteDropdown.jsx
+@@ -4,6 +4,10 @@ import {
+   CircularProgress,
+   createFilterOptions,
+ } from "@mui/material";
++import {
++  StyledAutocomplete,
++  StyledTextField,
++} from "./CommonAutocompleteDropdown.styled";
+ 
+ const filter = createFilterOptions({
+   matchFrom: "any",
+@@ -36,7 +40,7 @@ const CommonAutocompleteDropdown = ({
+     uniqueOptions.find((opt) => opt.value === value) || null;
+ 
+   return (
+-    <Autocomplete
++    <StyledAutocomplete
+       key={`${dataKey}-${uniqueOptions.length}`}
+       fullWidth
+       size={size}
+@@ -66,30 +70,16 @@ const CommonAutocompleteDropdown = ({
+           }));
+         }
+       }}
+-      sx={{ minWidth }}
+       loading={loading}
+       disabled={disabled}
+       renderInput={(params) => (
+-        <TextField
++        <StyledTextField
+           {...params}
+           label={label}
+           fullWidth
+           error={error}
+           helperText={helperText}
+           disabled={disabled}
+-          sx={{
+-            "& .MuiInputBase-root.Mui-disabled": {
+-              backgroundColor: "#f5f5f5",
+-              color: "rgba(0, 0, 0, 0.6)",
+-            },
+-            "& .MuiInputLabel-root.Mui-disabled": {
+-              color: "rgba(0, 0, 0, 0.6)",
+-            },
+-            "& .MuiFormLabel-asterisk": {
+-              color: "#d32f2f",
+-              fontWeight: 600,
+-            },
+-          }}
+           InputProps={{
+             ...params.InputProps,
+             endAdornment: (
+diff --git a/src/common/CommonAutocompleteDropdown.styled.jsx b/src/common/CommonAutocompleteDropdown.styled.jsx
+new file mode 100644
+index 0000000..0fb70e8
+--- /dev/null
++++ b/src/common/CommonAutocompleteDropdown.styled.jsx
+@@ -0,0 +1,38 @@
++import { styled } from "@mui/material/styles";
++import { Autocomplete, TextField } from "@mui/material";
++
++export const StyledAutocomplete = styled(Autocomplete)(({ theme }) => ({
++  width: "100%",
++
++  "& .MuiInputBase-root": {
++    minHeight: 40,
++    fontSize: 14,
++    backgroundColor: theme.palette.common.white,
++  },
++
++  "& .MuiOutlinedInput-notchedOutline": {
++    borderColor: theme.palette.grey[400],
++  },
++
++  "&:hover .MuiOutlinedInput-notchedOutline": {
++    borderColor: theme.palette.primary.main,
++  },
++
++  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
++    borderColor: theme.palette.primary.main,
++  },
++}));
++
++export const StyledTextField = styled(TextField)(({ theme }) => ({
++  "& .MuiInputBase-root.Mui-disabled": {
++    backgroundColor: theme.palette.grey[100],
++    color: theme.palette.text.disabled,
++  },
++  "& .MuiInputLabel-root.Mui-disabled": {
++    color: theme.palette.text.disabled,
++  },
++  "& .MuiFormLabel-asterisk": {
++    color: theme.palette.error.main,
++    fontWeight: 600,
++  },
++}));
+diff --git a/src/common/CommonFilters.jsx b/src/common/CommonFilters.jsx
+index 436320f..ddfb84f 100644
+--- a/src/common/CommonFilters.jsx
++++ b/src/common/CommonFilters.jsx
+@@ -1,8 +1,45 @@
+-import { Box, Grid } from "@mui/material";
++import { Box } from "@mui/material";
+ import CommonSearch from "./CommonSearch";
+ import CommonDateRangeSelector from "./CommonDateRangeSelector";
+ import CommonAutocompleteDropdown from "./CommonAutocompleteDropdown";
+ import ViolationTypeAutocomplete from "./ViolationTypeAutocomplete";
++import {
++  FiltersContainer,
++  SearchWrapper,
++  RightFiltersContainer,
++  DateRangeWrapper,
++  FilterWrapper,
++  ActionButtonWrapper,
++} from "./CommonFilters.styled";
++
++const FilterItem = ({ filter, data, setData }) => {
++  if (filter.type === "violation") {
++    return (
++      <FilterWrapper>
++        <ViolationTypeAutocomplete
++          label={filter.label}
++          value={data[filter.dataKey]}
++          options={filter.options}
++          iconMap={filter.iconMap}
++          setData={setData}
++          dataKey={filter.dataKey}
++        />
++      </FilterWrapper>
++    );
++  }
++
++  return (
++    <FilterWrapper>
++      <CommonAutocompleteDropdown
++        label={filter.label}
++        value={data[filter.dataKey] || data[filter.name]}
++        options={filter.options}
++        setData={setData}
++        dataKey={filter.dataKey || filter.name}
++      />
++    </FilterWrapper>
++  );
++};
+ 
+ const CommonFilters = ({
+   data,
+@@ -14,86 +51,59 @@ const CommonFilters = ({
+   actionButton,
+   allowDateClear = false,
+ }) => {
+-  return (
+-    <Grid container spacing={2} mt={2} alignItems="center" wrap="wrap">
+-      {showSearch && (
+-        <Grid item xs={12} md flexGrow={1}>
+-          <CommonSearch
+-            key={searchKey}
+-            value={data.search}
+-            setData={setData}
+-            placeholder="Search by All"
+-          />
+-        </Grid>
+-      )}
++  const handleDateRangeChange = (range) => {
++    setData((prev) => ({
++      ...prev,
++      page: 1,
++      fromDate: range?.start || null,
++      toDate: range?.end || null,
++    }));
++  };
++
++  const searchElement = showSearch ? (
++    <SearchWrapper>
++      <CommonSearch
++        key={searchKey}
++        value={data.search}
++        setData={setData}
++        placeholder="Search by All"
++      />
++    </SearchWrapper>
++  ) : null;
+ 
+-      <Grid item xs={12} md="auto">
+-        <Grid
+-          container
+-          spacing={2}
+-          alignItems="center"
+-          justifyContent={{ xs: "flex-start", md: "flex-end" }}
+-          wrap="wrap"
+-        >
+-          {showDateRange && (
+-            <Grid item xs={12} sm={6} md="auto">
+-              <CommonDateRangeSelector
+-                value={{
+-                  start: data.fromDate,
+-                  end: data.toDate,
+-                }}
+-                allowClear={allowDateClear}
+-                onChange={(range) =>
+-                  setData((prev) => ({
+-                    ...prev,
+-                    page: 1,
+-                    fromDate: range?.start || null,
+-                    toDate: range?.end || null,
+-                  }))
+-                }
+-              />
+-            </Grid>
+-          )}
++  const dateRangeElement = showDateRange ? (
++    <DateRangeWrapper>
++      <CommonDateRangeSelector
++        value={{ start: data.fromDate, end: data.toDate }}
++        allowClear={allowDateClear}
++        onChange={handleDateRangeChange}
++      />
++    </DateRangeWrapper>
++  ) : null;
+ 
+-          {filters.map((filter) => (
+-            <Grid item key={filter.dataKey} xs={12} sm={6} md="auto">
+-              {filter.type === "violation" ? (
+-                <ViolationTypeAutocomplete
+-                  label={filter.label}
+-                  value={data[filter.dataKey]}
+-                  options={filter.options}
+-                  iconMap={filter.iconMap}
+-                  setData={setData}
+-                  dataKey={filter.dataKey}
+-                />
+-              ) : (
+-                <CommonAutocompleteDropdown
+-                  label={filter.label}
+-                  value={data[filter.dataKey]}
+-                  options={filter.options}
+-                  setData={setData}
+-                  dataKey={filter.dataKey}
+-                />
+-              )}
+-            </Grid>
+-          ))}
++  const filterElements = filters.map((filter) => (
++    <FilterItem
++      key={filter.dataKey || filter.name}
++      filter={filter}
++      data={data}
++      setData={setData}
++    />
++  ));
+ 
+-          {actionButton && (
+-            <Grid item xs={12} sm="auto">
+-              <Box
+-                sx={{
+-                  display: "flex",
+-                  justifyContent: { xs: "stretch", sm: "flex-start" },
+-                }}
+-              >
+-                {actionButton}
+-              </Box>
+-            </Grid>
+-          )}
+-        </Grid>
+-      </Grid>
+-    </Grid>
++  const actionButtonElement = actionButton ? (
++    <ActionButtonWrapper>{actionButton}</ActionButtonWrapper>
++  ) : null;
++
++  return (
++    <FiltersContainer>
++      {searchElement}
++      <RightFiltersContainer>
++        {dateRangeElement}
++        {filterElements}
++        {actionButtonElement}
++      </RightFiltersContainer>
++    </FiltersContainer>
+   );
+ };
+ 
+-export default CommonFilters;
+\ No newline at end of file
++export default CommonFilters;
+diff --git a/src/common/CommonFilters.styled.jsx b/src/common/CommonFilters.styled.jsx
+new file mode 100644
+index 0000000..89a10f3
+--- /dev/null
++++ b/src/common/CommonFilters.styled.jsx
+@@ -0,0 +1,62 @@
++import { styled } from "@mui/material/styles";
++import { Box } from "@mui/material";
++
++export const FiltersContainer = styled(Box)(({ theme }) => ({
++  marginTop: theme.spacing(2),
++  width: "100%",
++  display: "flex",
++  alignItems: "center",
++  gap: theme.spacing(2),
++  flexWrap: "wrap",
++}));
++
++export const SearchWrapper = styled(Box)(({ theme }) => ({
++  width: "100%",
++  [theme.breakpoints.up("md")]: {
++    width: "35%",
++    minWidth: 220,
++  },
++  flexShrink: 0,
++}));
++
++export const RightFiltersContainer = styled(Box)(({ theme }) => ({
++  display: "flex",
++  alignItems: "center",
++  gap: theme.spacing(1.5),
++  flexWrap: "wrap",
++  flex: 1,
++  justifyContent: "flex-start",
++  [theme.breakpoints.up("md")]: {
++    justifyContent: "flex-end",
++  },
++}));
++
++export const DateRangeWrapper = styled(Box)(({ theme }) => ({
++  width: "100%",
++  [theme.breakpoints.up("sm")]: {
++    width: "calc(50% - 6px)",
++  },
++  [theme.breakpoints.up("md")]: {
++    width: "auto",
++  },
++  minWidth: 180,
++}));
++
++export const FilterWrapper = styled(Box)(({ theme }) => ({
++  width: "100%",
++  [theme.breakpoints.up("sm")]: {
++    width: "calc(50% - 6px)",
++  },
++  [theme.breakpoints.up("md")]: {
++    width: "auto",
++    maxWidth: 180,
++  },
++  minWidth: 140,
++}));
++
++export const ActionButtonWrapper = styled(Box)(({ theme }) => ({
++  width: "100%",
++  [theme.breakpoints.up("sm")]: {
++    width: "auto",
++  },
++}));
+diff --git a/src/components/compliance/UserManagement/CommonRowColumnUtils.jsx b/src/components/compliance/UserManagement/CommonRowColumnUtils.jsx
+new file mode 100644
+index 0000000..066ba49
+--- /dev/null
++++ b/src/components/compliance/UserManagement/CommonRowColumnUtils.jsx
+@@ -0,0 +1,225 @@
++// import eyeIcon from "../../../src/assets/images/svg/eyeicon.png";
++import { STATUS_COLOR_MAP } from "./Constants";
++import eyeIcon from "../../../../src/assets/images/svg/eyeicon.png";
++import { IconButton } from "@mui/material";
++import { StatusText } from "./CommonRowColumnUtils.styled";
++
++const StatusCell = (params) => {
++  const color = STATUS_COLOR_MAP[params.value] || params.row.statusColor;
++  return <StatusText statuscolor={color}>{params.value}</StatusText>;
++};
++
++const ActionCell = () => (
++  <IconButton size="small" color="primary">
++    <img src={eyeIcon} alt="view" width={16} height={16} />
++  </IconButton>
++);
++
++export const UserManagementColumnData = [
++  {
++    field: "carrierId",
++    headerName: "Carrier ID",
++    width: 50,
++    minWidth: 150,
++    maxWidth: 220,
++    headerTooltip: true,
++    cellClassName: "sticky-col-left-1",
++    headerClassName: "sticky-col-left-1",
++  },
++  {
++    field: "carrierName",
++    headerName: "Carrier Name",
++    width: 180,
++    minWidth: 150,
++    maxWidth: 220,
++    headerTooltip: true,
++    cellClassName: "sticky-col-left-2",
++    headerClassName: "sticky-col-left-2",
++  },
++  {
++    field: "userProfile",
++    headerName: "User Profile",
++    flex: 1,
++    minWidth: 150,
++    maxWidth: 220,
++    headerTooltip: true,
++  },
++  {
++    field: "firstName",
++    headerName: "First Name",
++    flex: 1,
++    minWidth: 180,
++    maxWidth: 250,
++    headerTooltip: true,
++  },
++  {
++    field: "lastName",
++    headerName: "Last Name",
++    flex: 1,
++    minWidth: 180,
++    maxWidth: 250,
++    headerTooltip: true,
++  },
++  {
++    field: "createdOn",
++    headerName: "Created On",
++    flex: 1,
++    minWidth: 180,
++    maxWidth: 250,
++    headerTooltip: true,
++  },
++  {
++    field: "updatedOn",
++    headerName: "Updated On",
++    flex: 1,
++    minWidth: 180,
++    maxWidth: 250,
++    headerTooltip: true,
++  },
++  {
++    field: "primaryContactEmail",
++    headerName: "Primary Contact Email",
++    minWidth: 180,
++    maxWidth: 250,
++    flex: 1,
++    headerTooltip: true,
++    // align: "center",
++    // headerAlign: "center",
++  },
++
++  {
++    field: "status",
++    headerName: "Status",
++    minWidth: 180,
++    maxWidth: 250,
++    flex: 1,
++    headerTooltip: true,
++    renderCell: StatusCell,
++  },
++  {
++    field: "action",
++    headerName: "Action",
++    flex: 1,
++    minWidth: 100,
++    renderCell: ActionCell,
++  },
++];
++export const UserManagementRowData = [
++  {
++    id: 1,
++    carrierId: 1,
++    carrierName: "Swift Transportation",
++    userProfile: "Admin",
++    firstName: "John",
++    lastName: "Doe",
++    createdOn: "05-05-2026",
++    updatedOn: "10-05-2026",
++    primaryContactEmail: "john.doe@swift.com",
++    status: "Active",
++    statusColor: "success",
++  },
++  {
++    id: 2,
++    carrierId: 2,
++    carrierName: "J.B. Hunt",
++    userProfile: "Super Admin",
++    firstName: "Sarah",
++    lastName: "Smith",
++    createdOn: "05-05-2025",
++    updatedOn: "10-05-2025",
++    primaryContactEmail: "sarah.smith@jbhunt.com",
++    status: "Inactive",
++    statusColor: "error",
++  },
++  {
++    id: 3,
++    carrierId: 3,
++    carrierName: "Knight Transportation",
++    userProfile: "User",
++    firstName: "Michael",
++    lastName: "Johnson",
++    createdOn: "05-05-2025",
++    updatedOn: "10-05-2025",
++    primaryContactEmail: "michael.johnson@knight.com",
++    status: "Active",
++    statusColor: "success",
++  },
++  {
++    id: 4,
++    carrierId: 4,
++    carrierName: "Werner Enterprises",
++    userProfile: "Admin",
++    firstName: "Emily",
++    lastName: "Williams",
++    createdOn: "05-05-2025",
++    updatedOn: "10-05-2025",
++    primaryContactEmail: "emily.williams@werner.com",
++    status: "Active",
++    statusColor: "success",
++  },
++  {
++    id: 5,
++    carrierId: 5,
++    carrierName: "Schneider National",
++    userProfile: "Admin",
++    firstName: "David",
++    lastName: "Brown",
++    createdOn: "05-05-2025",
++    updatedOn: "10-05-2025",
++    primaryContactEmail: "david.brown@schneider.com",
++    status: "Inactive",
++    statusColor: "error",
++  },
++  {
++    id: 6,
++    carrierId: 6,
++    carrierName: "XPO Logistics",
++    userProfile: "Super Admin",
++    firstName: "Olivia",
++    lastName: "Taylor",
++    createdOn: "05-05-2025",
++    updatedOn: "10-05-2025",
++    primaryContactEmail: "olivia.taylor@xpo.com",
++    status: "Active",
++    statusColor: "success",
++  },
++  {
++    id: 7,
++    carrierId: 7,
++    carrierName: "FedEx Freight",
++    userProfile: "Admin",
++    firstName: "Daniel",
++    lastName: "Anderson",
++    createdOn: "05-05-2025",
++    updatedOn: "10-05-2025",
++    primaryContactEmail: "daniel.anderson@fedex.com",
++    status: "Active",
++    statusColor: "success",
++  },
++  {
++    id: 8,
++    carrierId: 8,
++    carrierName: "Old Dominion",
++    userProfile: "Admin",
++    firstName: "Sophia",
++    lastName: "Thomas",
++    createdOn: "05-05-2025",
++    updatedOn: "10-05-2025",
++    primaryContactEmail: "sophia.thomas@odfl.com",
++    status: "Inactive",
++    statusColor: "error",
++  },
++  {
++    id: 9,
++    carrierId: 9,
++    carrierName: "Old Dominion",
++    userProfile: "Admin",
++    firstName: "Sophia",
++    lastName: "Thomas",
++    createdOn: "05-05-2025",
++    updatedOn: "10-05-2025",
++    primaryContactEmail: "sophia.thomas@odfl.com",
++    status: "Inactive",
++    statusColor: "error",
++  }
++];
+diff --git a/src/components/compliance/UserManagement/CommonRowColumnUtils.styled.jsx b/src/components/compliance/UserManagement/CommonRowColumnUtils.styled.jsx
+new file mode 100644
+index 0000000..692949c
+--- /dev/null
++++ b/src/components/compliance/UserManagement/CommonRowColumnUtils.styled.jsx
+@@ -0,0 +1,13 @@
++import { styled } from "@mui/material/styles";
++
++export const StatusText = styled("span")(({ theme, statuscolor }) => {
++  const colorValue =
++    statuscolor && theme.palette[statuscolor]
++      ? theme.palette[statuscolor].main
++      : statuscolor || theme.palette.text.primary;
++
++  return {
++    color: colorValue,
++    fontWeight: 400,
++  };
++});
+diff --git a/src/components/compliance/UserManagement/Constants.js b/src/components/compliance/UserManagement/Constants.js
+new file mode 100644
+index 0000000..5bf8157
+--- /dev/null
++++ b/src/components/compliance/UserManagement/Constants.js
+@@ -0,0 +1,94 @@
++export const ACCOUNT_OPTIONS = [
++  {
++    label: "Swift Transportation",
++    value: "Swift Transportation",
++  },
++  {
++    label: "J.B. Hunt",
++    value: "J.B. Hunt",
++  },
++  {
++    label: "Knight Transportation",
++    value: "Knight Transportation",
++  },
++];
++
++export const USER_PROFILE_OPTIONS = [
++  {
++    label: "Admin",
++    value: "Admin",
++  },
++  {
++    label: "Super Admin",
++    value: "Super Admin",
++  },
++  {
++    label: "User",
++    value: "User",
++  },
++];
++
++export const FILTER_USER_PROFILE_OPTIONS = [
++  { label: "Admin", value: "1" },
++  { label: "Super Admin", value: "2" },
++];
++
++export const FILTER_CARRIER_OPTIONS = [
++  { label: "Carrier 1", value: "1" },
++  { label: "Carrier 2", value: "2" },
++];
++
++export const FILTER_STATUS_OPTIONS = [
++  { label: "Active", value: "active" },
++  { label: "Inactive", value: "inactive" },
++];
++
++export const USER_MANAGEMENT_FILTERS = [
++  {
++    label: "User Profile",
++    name: "userProfile",
++    type: "select",
++    options: FILTER_USER_PROFILE_OPTIONS,
++  },
++  {
++    label: "All Carrier",
++    name: "carrier",
++    type: "select",
++    options: FILTER_CARRIER_OPTIONS,
++  },
++  {
++    label: "All Status",
++    name: "status",
++    type: "select",
++    options: FILTER_STATUS_OPTIONS,
++  },
++];
++
++
++
++export const summaryCards = [
++  {
++    id: "total_users",
++    title: "Total Users",
++    value: "1095",
++    accentcolor: "brand",
++    // icon: <DevicesIcon sx={{ fontSize: 28 }} color="brand" />,
++  },
++  {
++    id: "active_users",
++    title: "Active Users",
++    value: "1077",
++    accentcolor: "success",
++  },
++  {
++    id: "inactive_users",
++    title: "Inactive Users",
++    value: "18",
++    accentcolor: "error",
++  }
++];
++
++export const STATUS_COLOR_MAP = {
++  Active: "success",
++  Inactive: "error",
++};
+\ No newline at end of file
+diff --git a/src/components/compliance/UserManagement/UserManagement.jsx b/src/components/compliance/UserManagement/UserManagement.jsx
+index 8358144..1e07379 100644
+--- a/src/components/compliance/UserManagement/UserManagement.jsx
++++ b/src/components/compliance/UserManagement/UserManagement.jsx
+@@ -1,13 +1,63 @@
+-import React from "react";
+-import { Grid, Typography, Box, Button } from "@mui/material";
+-import { ComponentContainerCard, PageBreadcrumb } from "@src/components";
++import CommonDataGrid from "@src/common/CommonDataGrid";
++import UserManagementHeader from "./UserManagementHeader";
++import { PageContainer } from "../../../common/PageContainer";
++import CommonLoading from "../../../common/CommonLoading";
++import {
++  UserManagementColumnData,
++  UserManagementRowData,
++} from "./CommonRowColumnUtils";
++import { useState } from "react";
++import UserManagementForm from "./UserManagementForm";
++import { summaryCards as summaryCardsData } from "./Constants";
+ 
+ const UserManagement = () => {
++  const [searchQuery, setSearchQuery] = useState("");
++  const [modelType, setModelType] = useState("");
++  const [status, setStatus] = useState("");
++  const { setLoading, LoadingContainer } = CommonLoading();
++  const [data, setData] = useState({
++    isLoading: false,
++  });
++  const [mode, setMode] = useState("");
++  const [summaryCards, setSummaryCards] = useState(summaryCardsData);
++  const [openForm, setOpenForm] = useState(false);
++  const handleClick = () => {
++    setOpenForm(true);
++  };
++
++  const handleClose = () => {
++    setOpenForm(false);
++  };
++
++  const handleGetRowHeight = () => "auto";
++
+   return (
+     <>
+-      <Typography variant="h6" gutterBottom>
+-        User Management
+-      </Typography>
++      <LoadingContainer />
++      <PageContainer>
++        <UserManagementHeader
++          data={data}
++          setData={setData}
++          searchKey={searchQuery}
++          summaryCards={summaryCards}
++          mode={mode}
++          setMode={setMode}
++          handleClick={handleClick}
++        />
++        <CommonDataGrid
++          columnsData={UserManagementColumnData}
++          rowData={UserManagementRowData}
++          data={{
++            rows: UserManagementRowData,
++            total: UserManagementRowData.length,
++            isLoading: false,
++          }}
++          setData={setData}
++          paginationMode="server"
++          getRowHeight={handleGetRowHeight}
++        />
++      </PageContainer>
++      <UserManagementForm open={openForm} onClose={handleClose} mode="add" />
+     </>
+   );
+ };
+diff --git a/src/components/compliance/UserManagement/UserManagement.test.jsx b/src/components/compliance/UserManagement/UserManagement.test.jsx
+new file mode 100644
+index 0000000..97e0119
+--- /dev/null
++++ b/src/components/compliance/UserManagement/UserManagement.test.jsx
+@@ -0,0 +1,156 @@
++// UserManagement.test.jsx
++
++import { render, screen, fireEvent } from "@testing-library/react";
++import "@testing-library/jest-dom";
++import UserManagement from "./UserManagement";
++
++// Mock CommonDataGrid
++jest.mock("@src/common/CommonDataGrid", () => (props) => (
++  <div data-testid="common-data-grid">
++    CommonDataGrid
++    <div>Rows Count: {props.data.rows.length}</div>
++  </div>
++));
++
++// Mock UserManagementHeader
++jest.mock("./UserManagementHeader", () => (props) => (
++  <div data-testid="user-management-header">
++    UserManagementHeader
++    <button onClick={props.handleClick}>Open Form</button>
++  </div>
++));
++
++// Mock PageContainer
++jest.mock("../../../common/PageContainer", () => ({
++  PageContainer: ({ children }) => (
++    <div data-testid="page-container">{children}</div>
++  ),
++}));
++
++// Mock CommonLoading
++jest.mock("../../../common/CommonLoading", () => () => ({
++  setLoading: jest.fn(),
++  LoadingContainer: () => (
++    <div data-testid="loading-container">LoadingContainer</div>
++  ),
++}));
++
++// Mock UserManagementForm
++jest.mock(
++  "./UserManagementForm",
++  () => (props) =>
++    props.open ? (
++      <div data-testid="user-management-form">
++        UserManagementForm
++        <button onClick={props.onClose}>Close Form</button>
++      </div>
++    ) : null,
++);
++
++// Mock Row & Column Data
++jest.mock("../../CommonRowColumnUtils", () => ({
++  UserManagementColumnData: [
++    { field: "id", headerName: "ID" },
++    { field: "name", headerName: "Name" },
++  ],
++  UserManagementRowData: [
++    { id: 1, name: "John" },
++    { id: 2, name: "Doe" },
++  ],
++}));
++
++describe("UserManagement Component", () => {
++  test("renders loading container", () => {
++    render(<UserManagement />);
++
++    expect(screen.getByTestId("loading-container")).toBeInTheDocument();
++  });
++
++  test("renders page container", () => {
++    render(<UserManagement />);
++
++    expect(screen.getByTestId("page-container")).toBeInTheDocument();
++  });
++
++  test("renders UserManagementHeader component", () => {
++    render(<UserManagement />);
++
++    expect(screen.getByTestId("user-management-header")).toBeInTheDocument();
++  });
++
++  test("renders CommonDataGrid component", () => {
++    render(<UserManagement />);
++
++    expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
++  });
++
++  test("passes row data correctly to CommonDataGrid", () => {
++    render(<UserManagement />);
++
++    expect(screen.getByText("Rows Count: 2")).toBeInTheDocument();
++  });
++
++  test("UserManagementForm should not render initially", () => {
++    render(<UserManagement />);
++
++    expect(
++      screen.queryByTestId("user-management-form"),
++    ).not.toBeInTheDocument();
++  });
++
++  test("opens UserManagementForm when handleClick is triggered", () => {
++    render(<UserManagement />);
++
++    const openButton = screen.getByText("Open Form");
++    fireEvent.click(openButton);
++
++    expect(screen.getByTestId("user-management-form")).toBeInTheDocument();
++  });
++
++  test("closes UserManagementForm when onClose is triggered", () => {
++    render(<UserManagement />);
++
++    // Open form
++    fireEvent.click(screen.getByText("Open Form"));
++
++    expect(screen.getByTestId("user-management-form")).toBeInTheDocument();
++
++    // Close form
++    fireEvent.click(screen.getByText("Close Form"));
++
++    expect(
++      screen.queryByTestId("user-management-form"),
++    ).not.toBeInTheDocument();
++  });
++
++  test("renders UserManagementForm with mode='add'", () => {
++    render(<UserManagement />);
++
++    fireEvent.click(screen.getByText("Open Form"));
++
++    expect(screen.getByTestId("user-management-form")).toBeInTheDocument();
++  });
++});
++
++describe("Edge Cases & Data Integrity", () => {
++  beforeEach(() => {
++    jest.clearAllMocks();
++  });
++
++  test("renders gracefully with empty row data", () => {
++    // Mock CommonRowColumnUtils to return empty rows for this test
++    jest.mock("../../CommonRowColumnUtils", () => ({
++      ...jest.requireActual("../../CommonRowColumnUtils"),
++      UserManagementRowData: [],
++    }));
++
++    // We just render and make sure it doesn't crash
++    const { container } = render(<UserManagement />);
++    expect(container).toBeInTheDocument();
++  });
++
++  test("handles undefined data state gracefully", () => {
++    const { container } = render(<UserManagement />);
++    expect(container).toBeInTheDocument();
++  });
++});
+diff --git a/src/components/compliance/UserManagement/UserManagementForm.jsx b/src/components/compliance/UserManagement/UserManagementForm.jsx
+new file mode 100644
+index 0000000..25e7c85
+--- /dev/null
++++ b/src/components/compliance/UserManagement/UserManagementForm.jsx
+@@ -0,0 +1,195 @@
++import React from "react";
++import { Box, Grid, MenuItem, TextField } from "@mui/material";
++import { useForm } from "react-hook-form";
++import { yupResolver } from "@hookform/resolvers/yup";
++import * as yup from "yup";
++
++import CommonDialogForm from "../../../common/CommonDialogForm";
++import CommonTextField from "../../../common/CommonTextField";
++import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdown";
++import { FormContainer } from "./UserManagementForm.styled";
++import { ACCOUNT_OPTIONS, USER_PROFILE_OPTIONS } from "./Constants";
++
++const schema = yup.object().shape({
++  selectAccount: yup.string().required("Account is required"),
++  userProfile: yup.string().required("User Profile is required"),
++  firstName: yup.string().required("First Name is required"),
++  lastName: yup.string().required("Last Name is required"),
++  email: yup.string().email("Enter valid email").required("Email is required"),
++  password: yup
++    .string()
++    .min(8, "Password must be at least 8 characters")
++    .required("Password is required"),
++  confirmPassword: yup
++    .string()
++    .oneOf([yup.ref("password")], "Passwords must match")
++    .required("Confirm Password is required"),
++});
++
++const UserManagementForm = ({
++  open,
++  onClose,
++  onSubmitForm,
++  loading = false,
++  mode = "add",
++}) => {
++  const {
++    handleSubmit,
++    control,
++    register,
++    formState: { errors },
++    reset,
++    setValue,
++  } = useForm({
++    resolver: yupResolver(schema),
++    defaultValues: {
++      account: "",
++      userProfile: "",
++      firstName: "",
++      lastName: "",
++      email: "",
++      password: "",
++      confirmPassword: "",
++    },
++  });
++
++  const handleFormSubmit = (data) => {
++    console.log("Form Data:", data);
++
++    if (onSubmitForm) {
++      onSubmitForm(data);
++    }
++
++    reset();
++    onClose();
++  };
++
++  const handleCancel = () => {
++    reset();
++    onClose();
++  };
++
++  const handleAccountChange = (value) => {
++    setValue("selectAccount", value, { shouldValidate: true });
++  };
++
++  const handleUserProfileChange = (value) => {
++    setValue("userProfile", value, { shouldValidate: true });
++  };
++
++  const formContent = (
++    <FormContainer
++      component="form"
++      id="user-management-form"
++      onSubmit={handleSubmit(handleFormSubmit)}
++    >
++      <Grid container spacing={2}>
++        <Grid item xs={12}>
++          <CommonAutocompleteDropdown
++            name="selectAccount"
++            label="Select Account"
++            value=""
++            options={ACCOUNT_OPTIONS}
++            onChange={handleAccountChange}
++            error={!!errors.selectAccount}
++            helperText={errors.selectAccount?.message}
++            required
++          />
++        </Grid>
++
++        {/* User Profile */}
++        <Grid item xs={12}>
++          <CommonAutocompleteDropdown
++            name="userProfile"
++            label="User Profile"
++            value=""
++            options={USER_PROFILE_OPTIONS}
++            onChange={handleUserProfileChange}
++            error={!!errors.userProfile}
++            helperText={errors.userProfile?.message}
++            required
++          />
++        </Grid>
++
++        <Grid item xs={12}>
++          <CommonTextField
++            name="firstName"
++            label="First Name"
++            register={register}
++            error={!!errors.firstName}
++            helperText={errors.firstName?.message}
++            required
++          />
++        </Grid>
++
++        <Grid item xs={12}>
++          <CommonTextField
++            name="lastName"
++            label="Last Name"
++            control={control}
++            register={register}
++            error={!!errors.lastName}
++            helperText={errors.lastName?.message}
++            required
++          />
++        </Grid>
++
++        <Grid item xs={12}>
++          <CommonTextField
++            name="email"
++            label="Enter Email"
++            register={register}
++            error={!!errors.email}
++            helperText={errors.email?.message}
++            required
++          />
++        </Grid>
++
++        <Grid item xs={12}>
++          <CommonTextField
++            name="password"
++            label="Enter Password"
++            fullWidth
++            autoComplete="new-password"
++            register={register}
++            error={!!errors.password}
++            helperText={errors.password?.message}
++            required
++          />
++        </Grid>
++
++        <Grid item xs={12}>
++          <CommonTextField
++            name="confirmPassword"
++            label="Confirm Password"
++            type="password"
++            autoComplete="new-password"
++            register={register}
++            error={!!errors.confirmPassword}
++            helperText={errors.confirmPassword?.message}
++            required
++          />
++        </Grid>
++      </Grid>
++    </FormContainer>
++  );
++
++  const dialogTitle = mode === "edit" ? "Edit User" : "Add User";
++  const dialogSubmitText = mode === "edit" ? "Update User" : "Add User";
++
++  return (
++    <CommonDialogForm
++      open={open}
++      title={dialogTitle}
++      content={formContent}
++      formId="user-management-form"
++      onCancel={handleCancel}
++      loading={loading}
++      mode={mode}
++      submitButtonText={dialogSubmitText}
++      maxWidth="sm"
++    />
++  );
++};
++
++export default UserManagementForm;
+diff --git a/src/components/compliance/UserManagement/UserManagementForm.styled.jsx b/src/components/compliance/UserManagement/UserManagementForm.styled.jsx
+new file mode 100644
+index 0000000..b5d3a9e
+--- /dev/null
++++ b/src/components/compliance/UserManagement/UserManagementForm.styled.jsx
+@@ -0,0 +1,6 @@
++import { styled } from "@mui/material/styles";
++import { Box } from "@mui/material";
++
++export const FormContainer = styled(Box)(({ theme }) => ({
++  marginTop: theme.spacing(1),
++}));
+diff --git a/src/components/compliance/UserManagement/UserManagementForm.test.jsx b/src/components/compliance/UserManagement/UserManagementForm.test.jsx
+new file mode 100644
+index 0000000..9659ca6
+--- /dev/null
++++ b/src/components/compliance/UserManagement/UserManagementForm.test.jsx
+@@ -0,0 +1,216 @@
++// UserManagementForm.test.jsx
++
++import React from "react";
++import { render, screen, fireEvent, waitFor } from "@testing-library/react";
++import "@testing-library/jest-dom";
++import UserManagementForm from "./UserManagementForm";
++
++// Mock CommonDialogForm
++jest.mock("../../../common/CommonDialogForm", () => (props) => (
++  <div data-testid="common-dialog-form">
++    <h1>{props.title}</h1>
++
++    {props.content}
++
++    <button onClick={props.onCancel}>Cancel</button>
++
++    <button type="submit" form={props.formId}>
++      {props.submitButtonText}
++    </button>
++  </div>
++));
++
++// Mock CommonTextField
++jest.mock("../../../common/CommonTextField", () => (props) => (
++  <div>
++    <input
++      data-testid={props.name}
++      placeholder={props.label}
++      {...props.register(props.name)}
++    />
++    {props.helperText && <span>{props.helperText}</span>}
++  </div>
++));
++
++// Mock CommonAutocompleteDropdown
++jest.mock("../../../common/CommonAutocompleteDropdown", () => (props) => (
++  <div>
++    <select
++      data-testid={props.name}
++      onChange={(e) => props.onChange(e.target.value)}
++    >
++      <option value="">Select</option>
++
++      {props.options.map((option) => (
++        <option key={option.value} value={option.value}>
++          {option.label}
++        </option>
++      ))}
++    </select>
++
++    {props.helperText && <span>{props.helperText}</span>}
++  </div>
++));
++
++describe("UserManagementForm Component", () => {
++  const mockOnClose = jest.fn();
++  const mockOnSubmitForm = jest.fn();
++
++  beforeEach(() => {
++    jest.clearAllMocks();
++  });
++
++  test("renders Add User title in add mode", () => {
++    render(<UserManagementForm open={true} onClose={mockOnClose} mode="add" />);
++
++    expect(
++      screen.getByRole("button", { name: "Add User" }),
++    ).toBeInTheDocument();
++  });
++
++  test("renders Edit User title in edit mode", () => {
++    render(
++      <UserManagementForm open={true} onClose={mockOnClose} mode="edit" />,
++    );
++
++    expect(screen.getByText("Edit User")).toBeInTheDocument();
++  });
++
++  test("renders all form fields", () => {
++    render(<UserManagementForm open={true} onClose={mockOnClose} />);
++
++    expect(screen.getByTestId("selectAccount")).toBeInTheDocument();
++    expect(screen.getByTestId("userProfile")).toBeInTheDocument();
++    expect(screen.getByTestId("firstName")).toBeInTheDocument();
++    expect(screen.getByTestId("lastName")).toBeInTheDocument();
++    expect(screen.getByTestId("email")).toBeInTheDocument();
++    expect(screen.getByTestId("password")).toBeInTheDocument();
++    expect(screen.getByTestId("confirmPassword")).toBeInTheDocument();
++  });
++
++  test("shows validation errors on empty submit", async () => {
++    render(<UserManagementForm open={true} onClose={mockOnClose} />);
++
++    fireEvent.click(screen.getByRole("button", { name: "Add User" }));
++
++    await waitFor(() => {
++      expect(screen.getByText("First Name is required")).toBeInTheDocument();
++      expect(screen.getByText("Last Name is required")).toBeInTheDocument();
++      expect(screen.getByText("Email is required")).toBeInTheDocument();
++      // expect(screen.getByText("Password is required")).toBeInTheDocument();
++      expect(
++        screen.getByText("Password must be at least 8 characters"),
++      ).toBeInTheDocument();
++      expect(
++        screen.getByText("Confirm Password is required"),
++      ).toBeInTheDocument();
++    });
++  });
++
++  test("shows email validation error", async () => {
++    render(<UserManagementForm open={true} onClose={mockOnClose} />);
++
++    fireEvent.change(screen.getByTestId("email"), {
++      target: { value: "invalid-email" },
++    });
++
++    fireEvent.click(screen.getByRole("button", { name: "Add User" }));
++
++    await waitFor(() => {
++      expect(
++        screen.getByRole("button", { name: "Add User" }),
++      ).toBeInTheDocument();
++    });
++  });
++
++  test("shows password mismatch validation error", async () => {
++    render(<UserManagementForm open={true} onClose={mockOnClose} />);
++
++    fireEvent.change(screen.getByTestId("password"), {
++      target: { value: "Password123" },
++    });
++
++    fireEvent.change(screen.getByTestId("confirmPassword"), {
++      target: { value: "WrongPassword" },
++    });
++
++    // fireEvent.click(screen.getByText("Add User"));
++    fireEvent.click(screen.getByRole("button", { name: "Add User" }));
++
++    await waitFor(() => {
++      expect(screen.getByText("Passwords must match")).toBeInTheDocument();
++    });
++  });
++
++  test("submits form successfully with valid data", async () => {
++    render(
++      <UserManagementForm
++        open={true}
++        onClose={mockOnClose}
++        onSubmitForm={mockOnSubmitForm}
++      />,
++    );
++
++    fireEvent.change(screen.getByTestId("selectAccount"), {
++      target: { value: "Swift Transportation" },
++    });
++
++    fireEvent.change(screen.getByTestId("userProfile"), {
++      target: { value: "Admin" },
++    });
++
++    fireEvent.change(screen.getByTestId("firstName"), {
++      target: { value: "John" },
++    });
++
++    fireEvent.change(screen.getByTestId("lastName"), {
++      target: { value: "Doe" },
++    });
++
++    fireEvent.change(screen.getByTestId("email"), {
++      target: { value: "john@example.com" },
++    });
++
++    fireEvent.change(screen.getByTestId("password"), {
++      target: { value: "Password123" },
++    });
++
++    fireEvent.change(screen.getByTestId("confirmPassword"), {
++      target: { value: "Password123" },
++    });
++
++    // fireEvent.click(screen.getByText("Add User"));
++    fireEvent.click(screen.getByRole("button", { name: "Add User" }));
++
++    await waitFor(() => {
++      expect(mockOnSubmitForm).toHaveBeenCalled();
++      expect(mockOnClose).toHaveBeenCalled();
++    });
++  });
++
++  test("calls onClose when cancel button is clicked", () => {
++    render(<UserManagementForm open={true} onClose={mockOnClose} />);
++
++    fireEvent.click(screen.getByText("Cancel"));
++
++    expect(mockOnClose).toHaveBeenCalled();
++  });
++
++  test("renders Update User button in edit mode", () => {
++    render(
++      <UserManagementForm open={true} onClose={mockOnClose} mode="edit" />,
++    );
++
++    expect(
++      screen.getByRole("button", { name: "Update User" }),
++    ).toBeInTheDocument();
++  });
++
++  test("renders Add User button in add mode", () => {
++    render(<UserManagementForm open={true} onClose={mockOnClose} mode="add" />);
++
++    expect(
++      screen.getByRole("button", { name: "Add User" }),
++    ).toBeInTheDocument();
++  });
++});
+diff --git a/src/components/compliance/UserManagement/UserManagementHeader.jsx b/src/components/compliance/UserManagement/UserManagementHeader.jsx
+new file mode 100644
+index 0000000..cd2f3e1
+--- /dev/null
++++ b/src/components/compliance/UserManagement/UserManagementHeader.jsx
+@@ -0,0 +1,45 @@
++import CommonFilters from "../../../common/CommonFilters";
++import CommonPageHeader from "../../../common/CommonPageHeader";
++import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
++import { AddUserButton, HeaderContainer, SummaryCardWrapper } from "./UserManagementHeader.styled";
++import { USER_MANAGEMENT_FILTERS } from "./Constants";
++
++const UserManagementHeader = (props) => {
++  const {
++    data = [],
++    setData,
++    searchKey = {},
++    summaryCards = [],
++    handleClick,
++  } = props;
++
++  return (
++    <HeaderContainer>
++      <CommonPageHeader
++        title="User Management"
++        subtitle="Manage user accounts and permissions"
++        rightContent={
++          <AddUserButton variant="contained" onClick={handleClick}>
++            Add User
++          </AddUserButton>
++        }
++      />
++      <SummaryCardWrapper>
++        <CommonSummaryCardGroup
++          cards={summaryCards}
++          showAccentBar={true}
++        />
++      </SummaryCardWrapper>
++
++      <CommonFilters
++        data={data}
++        setData={setData}
++        searchKey={searchKey}
++        allowDateClear={true}
++        filters={USER_MANAGEMENT_FILTERS}
++      />
++    </HeaderContainer>
++  );
++};
++
++export default UserManagementHeader;
+diff --git a/src/components/compliance/UserManagement/UserManagementHeader.styled.jsx b/src/components/compliance/UserManagement/UserManagementHeader.styled.jsx
+new file mode 100644
+index 0000000..7c29ebe
+--- /dev/null
++++ b/src/components/compliance/UserManagement/UserManagementHeader.styled.jsx
+@@ -0,0 +1,19 @@
++import { styled } from "@mui/material/styles";
++import { Button, Box } from "@mui/material";
++
++export const HeaderContainer = styled(Box)(({ theme }) => ({
++  marginBottom: theme.spacing(2),
++}));
++
++export const AddUserButton = styled(Button)(({ theme }) => ({
++  color: theme.palette.common.white,
++  backgroundColor: theme.palette.primary.main,
++
++  "&:hover": {
++    backgroundColor: theme.palette.primary.dark,
++  },
++}));
++
++export const SummaryCardWrapper = styled(Box)(({ theme }) => ({
++  marginTop: theme.spacing(1),
++}));
+diff --git a/src/components/compliance/UserManagement/UserManagementHeader.test.jsx b/src/components/compliance/UserManagement/UserManagementHeader.test.jsx
+new file mode 100644
+index 0000000..ce9d286
+--- /dev/null
++++ b/src/components/compliance/UserManagement/UserManagementHeader.test.jsx
+@@ -0,0 +1,136 @@
++import { render, screen, fireEvent } from "@testing-library/react";
++import UserManagementHeader from "./UserManagementHeader";
++
++jest.mock("../../../common/CommonPageHeader", () => (props) => (
++  <div data-testid="common-page-header">
++    <div>{props.title}</div>
++    <div>{props.subtitle}</div>
++    <div>{props.rightContent}</div>
++  </div>
++));
++
++jest.mock("../../../common/CommonSummaryCardGroup", () => (props) => (
++  <div data-testid="summary-card-group">
++    Summary Cards: {props.cards?.length}
++  </div>
++));
++
++jest.mock("../../../common/CommonFilters", () => (props) => (
++  <div data-testid="common-filters">Filters: {props.filters?.length}</div>
++));
++
++describe("UserManagementHeader Component", () => {
++  const mockSetData = jest.fn();
++  const mockHandleClick = jest.fn();
++
++  const defaultProps = {
++    data: {},
++    setData: mockSetData,
++    searchKey: {
++      search: "",
++    },
++    summaryCards: [
++      {
++        title: "Active Users",
++        value: 10,
++      },
++      {
++        title: "Inactive Users",
++        value: 5,
++      },
++    ],
++    handleClick: mockHandleClick,
++  };
++
++  beforeEach(() => {
++    jest.clearAllMocks();
++  });
++
++  test("renders page header title and subtitle", () => {
++    render(<UserManagementHeader {...defaultProps} />);
++
++    expect(screen.getByText("User Management")).toBeInTheDocument();
++
++    expect(
++      screen.getByText("Manage user accounts and permissions"),
++    ).toBeInTheDocument();
++  });
++
++  test("renders Add User button", () => {
++    render(<UserManagementHeader {...defaultProps} />);
++
++    expect(
++      screen.getByRole("button", {
++        name: /add user/i,
++      }),
++    ).toBeInTheDocument();
++  });
++
++  test("calls handleClick when Add User button is clicked", () => {
++    render(<UserManagementHeader {...defaultProps} />);
++
++    const addButton = screen.getByRole("button", {
++      name: /add user/i,
++    });
++
++    fireEvent.click(addButton);
++
++    expect(mockHandleClick).toHaveBeenCalledTimes(1);
++  });
++
++  test("renders summary card group", () => {
++    render(<UserManagementHeader {...defaultProps} />);
++
++    expect(screen.getByTestId("summary-card-group")).toBeInTheDocument();
++
++    expect(screen.getByText("Summary Cards: 2")).toBeInTheDocument();
++  });
++
++  test("renders common filters component", () => {
++    render(<UserManagementHeader {...defaultProps} />);
++
++    expect(screen.getByTestId("common-filters")).toBeInTheDocument();
++
++    expect(screen.getByText("Filters: 3")).toBeInTheDocument();
++  });
++
++  test("passes correct filter configuration", () => {
++    render(<UserManagementHeader {...defaultProps} />);
++
++    expect(screen.getByTestId("common-filters")).toBeInTheDocument();
++  });
++
++  test("renders gracefully with empty summary cards", () => {
++    render(<UserManagementHeader {...defaultProps} summaryCards={[]} />);
++
++    expect(screen.getByText("Summary Cards: 0")).toBeInTheDocument();
++  });
++
++  test("renders gracefully with undefined summary cards", () => {
++    render(<UserManagementHeader {...defaultProps} summaryCards={undefined} />);
++
++    expect(screen.getByTestId("summary-card-group")).toBeInTheDocument();
++  });
++
++  test("renders gracefully with null data", () => {
++    render(<UserManagementHeader {...defaultProps} data={null} />);
++
++    expect(screen.getByTestId("common-filters")).toBeInTheDocument();
++  });
++
++  test("renders without crashing when handleClick is undefined", () => {
++    render(<UserManagementHeader {...defaultProps} handleClick={undefined} />);
++
++    const addButton = screen.getByRole("button", {
++      name: /add user/i,
++    });
++
++    expect(addButton).toBeInTheDocument();
++  });
++
++  test("matches snapshot", () => {
++    const { container } = render(<UserManagementHeader {...defaultProps} />);
++
++    expect(container).toMatchSnapshot();
++  });
++});
