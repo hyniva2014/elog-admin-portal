@@ -1,4 +1,8 @@
 import { Box } from "@mui/material";
+import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
+import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
+import SmartphoneOutlinedIcon from "@mui/icons-material/SmartphoneOutlined";
+import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import {
   AlertContainer,
   AlertHeader,
@@ -8,13 +12,21 @@ import {
   AlertCard,
   AlertAccentBar,
   AlertContent,
-  AlertLeftContent,
-  AlertSeverity,
-  AlertMessage,
+  AlertCardTitle,
+  AlertDetails,
+  AlertDetailRow,
+  AlertDetailItem,
   AlertTime,
+  AlertIcon,
 } from "./AlertCenter.styles";
+import CarrierIcon from "../../../assets/images/active/Icon-1.png";
+import LocationIcon from "../../../assets/images/active/Icon-3.png";
+import DeviceIcon from "../../../assets/images/active/Icon-4.png";
+import TruckIcon from "../../../assets/images/active/Truck.png";
 
-const CommonAlertCenter = ({
+
+
+const AlertCenter = ({
   title = "Alert Center",
   viewAllText = "View All",
   alerts = [],
@@ -35,13 +47,52 @@ const CommonAlertCenter = ({
               <AlertAccentBar accentcolor={item.color} />
 
               <AlertContent>
-                <AlertLeftContent>
-                  <AlertSeverity>{item.severity}</AlertSeverity>
+                <AlertDetails>
+                  <AlertCardTitle>{item.title || item.message}</AlertCardTitle>
 
-                  <AlertMessage>{item.message}</AlertMessage>
-                </AlertLeftContent>
+                  <AlertDetailRow>
+                    <AlertDetailItem>
+                      <AlertIcon 
+                        src={CarrierIcon} 
+                        alt="Carrier" 
+                      />
+                      {item.company}
+                    </AlertDetailItem>
+                    <AlertDetailItem>
+                      <AlertIcon 
+                        src={TruckIcon} 
+                        alt="Truck" 
+                      />
+                      {item.truck}
+                    </AlertDetailItem>
+                    <AlertDetailItem>
+                      <AlertIcon
+                        src={DeviceIcon}
+                        alt="Device"
+                      />
+                      {item.serial}
+                    </AlertDetailItem>
+                  </AlertDetailRow>
 
-                <AlertTime>{item.time}</AlertTime>
+                  <AlertDetailRow>
+                    <AlertDetailItem>
+                      <AlertIcon
+                        src={LocationIcon}
+                        alt="Location"
+                      />
+                      {item.location1}
+                    </AlertDetailItem>
+                    <AlertDetailItem>
+                      <AlertIcon
+                        src={LocationIcon}
+                        alt="Location"
+                      />
+                      {item.location2}
+                    </AlertDetailItem>
+                  </AlertDetailRow>
+
+                  <AlertTime>{item.date || item.time}</AlertTime>
+                </AlertDetails>
               </AlertContent>
             </AlertCard>
           ))}
@@ -51,4 +102,4 @@ const CommonAlertCenter = ({
   );
 };
 
-export default CommonAlertCenter;
+export default AlertCenter;

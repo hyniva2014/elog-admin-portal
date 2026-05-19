@@ -4,10 +4,22 @@ import { PageContainer } from "../../../common/PageContainer";
 import { mockData, columns, summaryCards } from "./Constants";
 import CommonLoading from "../../../common/CommonLoading";
 import DeviceManagementHeader from "./DeviceManagementHeader";
+import AddDeviceDialog from "./AddDeviceDialog";
 import useDeviceManagement from "../../../hooks/useDeviceManagement";
 
 const DeviceManagement = () => {
-  const { searchQuery, data, setData, mode, setMode, handleClick } = useDeviceManagement();
+  const {
+    searchQuery,
+    data,
+    setData,
+    mode,
+    setMode,
+    handleClick,
+    isAddDeviceOpen,
+    handleCloseAddDevice,
+    handleAddDevice,
+  } = useDeviceManagement();
+
   const { LoadingContainer } = CommonLoading();
 
   return (
@@ -36,6 +48,12 @@ const DeviceManagement = () => {
           getRowHeight={() => "auto"}
         />
       </PageContainer>
+
+      <AddDeviceDialog
+        open={isAddDeviceOpen}
+        onClose={handleCloseAddDevice}
+        onSubmit={handleAddDevice}
+      />
     </>
   );
 };

@@ -18,11 +18,11 @@ jest.mock("@src/common/CommonDataGrid", () => {
           <span>{row.deviceModel}</span>
           <button
             onClick={() =>
-              columnsData[4]
+              columnsData[5]
                 .renderCell({
                   row,
                 })
-                .props.onClick()
+                .props.children.props.onClick()
             }
           >
             View

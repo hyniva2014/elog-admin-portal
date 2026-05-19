@@ -1,17 +1,19 @@
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, ButtonGroup, Button, Paper, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-export const AlertContainer = styled(Paper)(() => ({
+// ─── Alert Center ────────────────────────────────────────────────────────────
+
+export const AlertContainer = styled(Paper)(({ theme }) => ({
   padding: "16px",
   paddingTop: 0,
-  border: "1px solid #E5E7EB",
+  border: `1px solid ${theme.palette.grey[200]}`,
   borderRadius: "16px",
   height: 360,
   overflow: "auto",
   boxShadow: "none",
 }));
 
-export const AlertHeader = styled(Box)(() => ({
+export const AlertHeader = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
@@ -19,21 +21,21 @@ export const AlertHeader = styled(Box)(() => ({
   position: "sticky",
   top: 0,
   zIndex: 10,
-  background: "#FFFFFF",
+  background: theme.palette.common.white,
   paddingTop: "8px",
   paddingBottom: "8px",
 }));
 
-export const AlertTitle = styled(Typography)(() => ({
+export const AlertTitle = styled(Typography)(({ theme }) => ({
   fontSize: 18,
   fontWeight: 700,
-  color: "#0F172A",
+  color: theme.palette.text.primary,
 }));
 
-export const ViewAllText = styled(Typography)(() => ({
+export const ViewAllText = styled(Typography)(({ theme }) => ({
   fontSize: 11,
   fontWeight: 500,
-  color: "#64748B",
+  color: theme.palette.text.secondary,
   cursor: "pointer",
   textDecoration: "underline",
 }));
@@ -44,14 +46,14 @@ export const AlertList = styled(Box)(() => ({
   gap: "8px",
 }));
 
-export const AlertCard = styled(Box)(() => ({
+export const AlertCard = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "stretch",
-  background: "#F8FAFC",
+  background: theme.palette.grey[50],
   borderRadius: "10px",
   overflow: "hidden",
   minHeight: 90,
-  border: "1px solid rgba(226,232,240,0.8)",
+  border: `1px solid ${theme.palette.grey[200]}`,
   position: "relative",
 }));
 
@@ -68,50 +70,78 @@ export const AlertContent = styled(Box)(() => ({
   alignItems: "flex-start",
 }));
 
-export const AlertLeftContent = styled(Box)(() => ({
+export const AlertDetails = styled(Box)(() => ({
   display: "flex",
   flexDirection: "column",
+  gap: "12px",
 }));
 
-export const AlertSeverity = styled(Typography)(() => ({
+export const AlertCardTitle = styled(Typography)(({ theme }) => ({
+  fontSize: 18,
+  fontWeight: 700,
+  color: theme.palette.text.primary,
+  lineHeight: 1.2,
+}));
+
+export const AlertDetailRow = styled(Box)(() => ({
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "16px",
+  alignItems: "center",
+}));
+
+export const AlertDetailItem = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+  color: theme.palette.text.secondary,
+  fontSize: 13,
+  fontWeight: 500,
+}));
+
+export const AlertTime = styled(Typography)(({ theme }) => ({
   fontSize: 14,
-  fontWeight: 400,
-  color: "#475569",
-  marginBottom: "8px",
-}));
-
-export const AlertMessage = styled(Typography)(() => ({
-  fontSize: 20,
   fontWeight: 500,
-  color: "#0F172A",
-  lineHeight: 1.4,
-}));
-
-export const AlertTime = styled(Typography)(() => ({
-  fontSize: 16,
-  fontWeight: 500,
-  color: "#64748B",
+  color: theme.palette.text.disabled,
   whiteSpace: "nowrap",
 }));
 
+export const AlertIcon = styled("img")({
+  width: 14,
+  height: 14,
+});
 
+// ─── AdminDashBoard Header ────────────────────────────────────────────────────
 
-//Header styles for AdminDashBoard.jsx
 export const HeaderContainer = styled(Box)(() => ({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: 20,
+  width: "100%",
+}));
+
+export const HeaderLeft = styled(Box)(() => ({
   display: "flex",
   flexDirection: "column",
 }));
 
-export const HeaderTitle = styled(Typography)(() => ({
-  fontSize: "20px",
+export const ComplianceTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 600,
-  color: "#202027",
-  marginBottom: "4px",
+  fontSize: "20px",
+  color: theme.palette.text.primary,
 }));
 
-export const HeaderSubtitle = styled(Typography)(() => ({
+export const HeaderSubtitle = styled(Typography)(({ theme }) => ({
   fontSize: "14px",
   fontWeight: 400,
-  color: "#6B7280",
+  color: theme.palette.text.secondary,
   marginBottom: 16,
+}));
+
+export const DateRangeText = styled(Typography)(({ theme }) => ({
+  fontWeight: 400,
+  fontSize: "13px",
+  color: theme.palette.text.primary,
+  marginTop: 4,
 }));
