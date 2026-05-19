@@ -4,6 +4,10 @@ import {
   CircularProgress,
   createFilterOptions,
 } from "@mui/material";
+import {
+  StyledAutocomplete,
+  StyledTextField,
+} from "./CommonAutocompleteDropdown.styled";
 
 const filter = createFilterOptions({
   matchFrom: "any",
@@ -36,7 +40,7 @@ const CommonAutocompleteDropdown = ({
     uniqueOptions.find((opt) => opt.value === value) || null;
 
   return (
-    <Autocomplete
+    <StyledAutocomplete
       key={`${dataKey}-${uniqueOptions.length}`}
       fullWidth
       size={size}
@@ -66,30 +70,16 @@ const CommonAutocompleteDropdown = ({
           }));
         }
       }}
-      sx={{ minWidth }}
       loading={loading}
       disabled={disabled}
       renderInput={(params) => (
-        <TextField
+        <StyledTextField
           {...params}
           label={label}
           fullWidth
           error={error}
           helperText={helperText}
           disabled={disabled}
-          sx={{
-            "& .MuiInputBase-root.Mui-disabled": {
-              backgroundColor: "#f5f5f5",
-              color: "rgba(0, 0, 0, 0.6)",
-            },
-            "& .MuiInputLabel-root.Mui-disabled": {
-              color: "rgba(0, 0, 0, 0.6)",
-            },
-            "& .MuiFormLabel-asterisk": {
-              color: "#d32f2f",
-              fontWeight: 600,
-            },
-          }}
           InputProps={{
             ...params.InputProps,
             endAdornment: (
