@@ -75,7 +75,7 @@ const AdminDashboard = () => {
       <CommonSummaryCardGroup
         cards={summaryCards}
         showAccentBar={false}
-        layout="default"
+        layout="dashboard"
       />
 
       <StretchGridContainer container spacing={2}>
@@ -87,7 +87,7 @@ const AdminDashboard = () => {
           <CommonAlertCenter
             title="Alert Center"
             alerts={alerts}
-            onViewAll={handleViewAll}
+            // onViewAll={handleViewAll}
           />
         </AlertGrid>
 

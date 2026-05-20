@@ -117,3 +117,25 @@ export const TooltipKeys = [
     color: "red",
   },
 ];
+
+
+export const AlertCenterCards = [
+  {
+    id: "mobile_driver_log",
+    title: "Mobile Driver Log",
+    value: "06",
+    icon: ActiveDevicesCardIcon,
+  },
+  {
+    id: "web_compliance_management",
+    title: "Web-Compliance Management",
+    value: "01",
+    icon: ActiveDevicesCardIcon,
+  },
+  {
+    id: "eld_device_issues",
+    title: "ELD Device Issues",
+    value: "10",
+    icon: ActiveDevicesCardIcon,
+  },
+];

@@ -23,6 +23,7 @@ import CarrierIcon from "../../../assets/images/active/Icon-1.png";
 import LocationIcon from "../../../assets/images/active/Icon-3.png";
 import DeviceIcon from "../../../assets/images/active/Icon-4.png";
 import TruckIcon from "../../../assets/images/active/Truck.png";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -30,15 +31,21 @@ const AlertCenter = ({
   title = "Alert Center",
   viewAllText = "View All",
   alerts = [],
-  onViewAll,
+  // onViewAll,
 }) => {
+  const navigate = useNavigate();
+  
+  const handleViewAll = () => {
+    navigate("/alert-center");
+  };
+
   return (
     <AlertContainer elevation={0}>
       <Box>
         <AlertHeader>
           <AlertTitle>{title}</AlertTitle>
 
-          <ViewAllText onClick={onViewAll}>{viewAllText}</ViewAllText>
+          <ViewAllText onClick={handleViewAll}>{viewAllText}</ViewAllText>
         </AlertHeader>
 
         <AlertList>
