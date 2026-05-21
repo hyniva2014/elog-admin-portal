@@ -6,6 +6,7 @@ frontend:
       commands:
         - nvm install 20
         - nvm use 20
+        - npm config set script-shell /bin/bash
         - npm install
 
     build:
