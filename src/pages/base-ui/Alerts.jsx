@@ -8,7 +8,6 @@ import { Fragment, forwardRef, useState } from "react";
 import { Alert, AlertTitle, Box, Button, Collapse, Fade, Grid, Grow, IconButton, Slide, Snackbar } from "@mui/material";
 import { ComponentContainerCard, PageBreadcrumb } from "@src/components";
 import { LuAlertOctagon, LuAlertTriangle, LuBadgeInfo, LuCheckCircle, LuX } from "react-icons/lu";
-import { TransitionProps } from "@mui/material/transitions";
 const BasicAlerts = () => {
   return <ComponentContainerCard title="Basic" description="The alert offers four severity levels that set a distinctive icon and color." stackProps={{
     direction: "column"

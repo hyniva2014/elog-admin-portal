@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host --open",
-    "build": "tsc && vite build",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "build": "vite build",
+    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "latest": "yarn upgrade-interactive --latest",
-    "format": "prettier --write src/**/*.{ts,tsx}",
+    "format": "prettier --write src/**/*.{js,jsx}",
     "preview": "vite preview",
     "pr": "node scripts/create-pr.js",
     "test": "jest"
