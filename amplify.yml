@@ -4,10 +4,9 @@ frontend:
   phases:
     preBuild:
       commands:
-        nvm install 20
+        - nvm install 20
         - nvm use 20
-        # - nvm use 18 || nvm install 18
-        # - npm install
+        - npm install
 
     build:
       commands:
