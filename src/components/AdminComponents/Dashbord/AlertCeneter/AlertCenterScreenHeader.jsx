@@ -2,9 +2,7 @@ import CommonPageHeader from "../../../../common/CommonPageHeader";
 import CommonSummaryCardGroup from "../../../../common/CommonSummaryCardGroup";
 import CommonFilters from "../../../../common/CommonFilters";
 import { AlertCenterCards } from "../AdminConstant";
-import { HeaderContainer } from "../../../compliance/DeviceManagement/DeviceManagement.styles";
-import { SummaryCardBox } from "../../../compliance/DeviceAssetManagement/DeviceAssetManagement.styles";
-
+import { AlertScreenHeaderContainer, AlertSummaryCardBox } from "./AlertCenterScreenCard.styles.jsx";
 
 const AlertCenterScreenHeader = ({
   data,
@@ -14,41 +12,40 @@ const AlertCenterScreenHeader = ({
   severityOptions,
 }) => {
   return (
-    <>
-      <HeaderContainer>
-        <CommonPageHeader
-          title="Alert Center"
-          subtitle={false}
-          rightContent={false}
+    <AlertScreenHeaderContainer>
+      <CommonPageHeader
+        title="Alert Center"
+        subtitle={false}
+        rightContent={false}
+      />
+      <AlertSummaryCardBox>
+        <CommonSummaryCardGroup
+          cards={AlertCenterCards}
+          showAccentBar={false}
+          layout="default"
         />
-        <SummaryCardBox>
-          <CommonSummaryCardGroup
-            cards={AlertCenterCards}
-            showAccentBar={false}
-            layout="default"
-          />
-        </SummaryCardBox>
+      </AlertSummaryCardBox>
 
-        <CommonFilters
-          data={data}
-          setData={setData}
-          searchKey={searchKey}
-          allowDateClear={true}
-          filters={[
-            {
-              label: "Category",
-              dataKey: "category",
-              options: categoryOptions,
-            },
-            {
-              label: "Severity",
-              dataKey: "severity",
-              options: severityOptions,
-            },
-          ]}
-        />
-      </HeaderContainer>
-    </>
+      <CommonFilters
+        data={data}
+        setData={setData}
+        searchKey={searchKey}
+        allowDateClear={true}
+        filters={[
+          {
+            label: "Category",
+            dataKey: "category",
+            options: categoryOptions,
+          },
+          {
+            label: "Severity",
+            dataKey: "severity",
+            options: severityOptions,
+          },
+        ]}
+      />
+    </AlertScreenHeaderContainer>
   );
 };
+
 export default AlertCenterScreenHeader;

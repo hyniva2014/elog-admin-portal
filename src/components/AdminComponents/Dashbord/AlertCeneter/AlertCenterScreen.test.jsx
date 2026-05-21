@@ -1,14 +1,25 @@
 // AlertCenterScreen.test.jsx
 
-import React from "react";
 import { render, screen } from "@testing-library/react";
 import AlertCenterScreen from "./AlertCenterScreen";
 
-// Mock alerts if imported externally
+// Mock constants — alerts and options now live in AdminConstant
 jest.mock("../AdminConstant", () => ({
-  alerts: [
+  alertCenterAlerts: [
     { id: 1, title: "Test Alert" },
     { id: 2, title: "Alert 2" },
+  ],
+  alertCategoryOptions: [
+    { value: "", label: "All Category" },
+    { value: "maintenance", label: "Maintenance" },
+    { value: "safety", label: "Safety" },
+    { value: "performance", label: "Performance" },
+  ],
+  alertSeverityOptions: [
+    { value: "", label: "All Severity" },
+    { value: "low", label: "Low" },
+    { value: "medium", label: "Medium" },
+    { value: "high", label: "High" },
   ],
 }));
 
@@ -73,11 +84,11 @@ describe("AlertCenterScreen", () => {
   });
 
   test("passes setData function to Header", () => {
+    const MockHeader = require("./AlertCenterScreenHeader");
     render(<AlertCenterScreen />);
 
-    const props = JSON.parse(screen.getByTestId("header-props").textContent);
-
-    expect(props.setData).toBeDefined();
+    const lastCall = MockHeader.mock.calls[MockHeader.mock.calls.length - 1][0];
+    expect(typeof lastCall.setData).toBe("function");
   });
 
   test("passes alerts prop to Cards", () => {

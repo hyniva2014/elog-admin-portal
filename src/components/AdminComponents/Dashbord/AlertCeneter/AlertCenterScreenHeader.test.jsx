@@ -1,6 +1,5 @@
 // AlertCenterScreenHeader.test.jsx
 
-import React from "react";
 import { render, screen } from "@testing-library/react";
 import AlertCenterScreenHeader from "./AlertCenterScreenHeader";
 
@@ -134,10 +133,10 @@ describe("AlertCenterScreenHeader", () => {
   });
 
   test("setData function exists", () => {
+    const MockFilters = require("../../../../common/CommonFilters");
     render(<AlertCenterScreenHeader {...mockProps} />);
 
-    const props = JSON.parse(screen.getByTestId("filters-props").textContent);
-
-    expect(props.setData).toBeDefined();
+    const lastCall = MockFilters.mock.calls[MockFilters.mock.calls.length - 1][0];
+    expect(typeof lastCall.setData).toBe("function");
   });
 });

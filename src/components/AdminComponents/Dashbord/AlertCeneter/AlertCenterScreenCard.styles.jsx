@@ -1,43 +1,42 @@
 import { Box, Button, Paper, Typography } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { styled, alpha } from "@mui/material/styles";
 
 // Main Container
 export const AlertsContainer = styled(Box)(() => ({
   display: "flex",
-  // gap: 20,
   height: "100%",
 }));
 
-export const AlertCardContainer = styled(Paper)(({ theme }) => ({
+export const AlertCardContainer = styled(Paper)(({ theme, detailsPanel }) => ({
   paddingLeft: "16px",
   paddingTop: 0,
+  paddingRight: detailsPanel ? theme.spacing(2) : 0,
   border: `1px solid ${theme.palette.grey[200]}`,
   borderRadius: "0px",
   height: "675px",
-  overflow: "auto",
+  overflow: "none",
   boxShadow: "none",
 }));
 
 // Left Sidebar - Alert List
-export const AlertList = styled(Box)(() => ({
+export const AlertList = styled(Box)(({ theme }) => ({
   flex: "0 0 300px",
   overflowY: "auto",
   display: "flex",
   flexDirection: "column",
- 
 
   "&::-webkit-scrollbar": {
     width: 6,
   },
   "&::-webkit-scrollbar-track": {
-    background: "#f1f1f1",
+    background: theme.palette.grey[100],
   },
   "&::-webkit-scrollbar-thumb": {
-    background: "#ccc",
+    background: theme.palette.grey[400],
     borderRadius: 3,
   },
   "&::-webkit-scrollbar-thumb:hover": {
-    background: "#999",
+    background: theme.palette.grey[500],
   },
 }));
 
@@ -76,7 +75,7 @@ export const DetailSection = styled(Paper)(({ theme }) => ({
   flexDirection: "column",
   gap: 24,
   padding: 24,
-  background: "#ffffff",
+  background: theme.palette.background.paper,
   borderRadius: 8,
   border: `1px solid ${theme.palette.grey[200]}`,
   overflowY: "auto",
@@ -86,24 +85,24 @@ export const DetailSection = styled(Paper)(({ theme }) => ({
     width: 6,
   },
   "&::-webkit-scrollbar-track": {
-    background: "#f1f1f1",
+    background: theme.palette.grey[100],
   },
   "&::-webkit-scrollbar-thumb": {
-    background: "#ccc",
+    background: theme.palette.grey[400],
     borderRadius: 3,
   },
   "&::-webkit-scrollbar-thumb:hover": {
-    background: "#999",
+    background: theme.palette.grey[500],
   },
 }));
 
 // Header Section with Title and Badge
-export const DetailHeader = styled(Box)(() => ({
+export const DetailHeader = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
   paddingBottom: 16,
-  borderBottom: "1px solid #e5e7eb",
+  borderBottom: `1px solid ${theme.palette.divider}`,
 }));
 
 export const DetailTitleWrapper = styled(Box)(() => ({
@@ -112,18 +111,21 @@ export const DetailTitleWrapper = styled(Box)(() => ({
   gap: 4,
 }));
 
-export const DetailTitle = styled(Typography)(() => ({
+export const DetailTitle = styled(Typography)(({ theme }) => ({
   margin: 0,
   fontSize: 18,
   fontWeight: 700,
-  color: "#1f2937",
+  color: theme.palette.text.primary,
   lineHeight: 1.2,
 }));
 
-export const DetailSubTitle = styled(Typography)(() => ({
+export const DetailSubTitle = styled(Typography)(({ theme, severity }) => ({
   fontSize: 13,
   fontWeight: 400,
-  color: "#6B7280",
+  color:
+    severity === "Critical"
+      ? theme.palette.error.main
+      : theme.palette.warning.main,
 }));
 
 export const BadgeContainer = styled(Box)(() => ({
@@ -133,7 +135,7 @@ export const BadgeContainer = styled(Box)(() => ({
 
 export const Badge = styled(Box, {
   shouldForwardProp: (prop) => prop !== "variant",
-})(({ variant }) => ({
+})(({ theme, variant }) => ({
   padding: "4px 12px",
   borderRadius: 4,
   fontSize: 12,
@@ -141,24 +143,24 @@ export const Badge = styled(Box, {
   textTransform: "uppercase",
   backgroundColor:
     variant === "critical"
-      ? "#fee2e2"
+      ? theme.palette.error.lighter
       : variant === "warning"
-      ? "#fef3c7"
+      ? theme.palette.warning.lighter
       : variant === "info"
-      ? "#dbeafe"
+      ? theme.palette.info.lighter
       : variant === "success"
-      ? "#dcfce7"
-      : "#f3f4f6",
+      ? theme.palette.success.lighter
+      : theme.palette.grey[100],
   color:
     variant === "critical"
-      ? "#dc2626"
+      ? theme.palette.error.main
       : variant === "warning"
-      ? "#d97706"
+      ? theme.palette.warning.dark
       : variant === "info"
-      ? "#2563EB"
+      ? theme.palette.info.dark
       : variant === "success"
-      ? "#16A34A"
-      : "#6B7280",
+      ? theme.palette.success.dark
+      : theme.palette.text.secondary,
 }));
 
 // Information Grid Section
@@ -168,28 +170,47 @@ export const InfoSection = styled(Box)(() => ({
   gap: 16,
 }));
 
-export const TriggerSection = styled(Box)(() => ({
+export const TriggerSection = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   gap: 16,
-  backgroundColor : "#FFFBEB",
+  backgroundColor: alpha(theme.palette.warning.main, 0.09),
   padding: 16,
+  border : `1px solid ${theme.palette.warning.lighter}`,
+  borderRadius: 6,
 }));
 
-export const SectionTitle = styled(Typography)(() => ({
+export const SectionTitle = styled(Typography)(({ theme }) => ({
   margin: 0,
   fontSize: 14,
   fontWeight: 600,
   textTransform: "uppercase",
-  color: "#6B7280",
+  color: theme.palette.text.secondary,
   letterSpacing: 0.5,
   marginLeft: 12,
+  marginTop: 8,
+}));
+
+export const TriggerSectionTitle = styled(Typography)(({ theme }) => ({
+  margin: 0,
+  fontSize: 14,
+  fontWeight: 600,
+  textTransform: "uppercase",
+  color: theme.palette.text.secondary,
+  letterSpacing: 0.5,
+  marginLeft: 0,
   marginTop: 8,
 }));
 
 export const InfoGrid = styled(Box)(() => ({
   display: "grid",
   gridTemplateColumns: "1fr 1fr 1fr",
+  gap: 16,
+}));
+
+export const TriggerInfoGrid = styled(Box)(() => ({
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
   gap: 16,
 }));
 
@@ -208,60 +229,60 @@ export const TriggerInfoCard = styled(Paper)(() => ({
   gap: 6,
   padding: 12,
   paddingLeft: 0,
-  background:"none",
+  background: "none",
   boxShadow: "none",
 }));
 
-export const InfoLabel = styled(Typography)(() => ({
+export const InfoLabel = styled(Typography)(({ theme }) => ({
   fontSize: 12,
   fontWeight: 500,
-  color: "#6B7280",
+  color: theme.palette.text.secondary,
   textTransform: "uppercase",
   letterSpacing: 0.3,
 }));
 
-export const InfoValue = styled(Typography)(() => ({
+export const InfoValue = styled(Typography)(({ theme }) => ({
   fontSize: 14,
   fontWeight: 500,
-  color: "#1f2937",
+  color: theme.palette.text.primary,
 }));
 
-export const StatusBadge = styled(Box)(() => ({
+export const StatusBadge = styled(Box)(({ theme }) => ({
   display: "inline-flex",
   alignItems: "center",
   gap: 6,
   padding: "4px 8px",
-  borderRadius: 4,
+  borderRadius: 10,
   fontSize: 12,
   fontWeight: 500,
-  backgroundColor: "#dcfce7",
-  color: "#16a34a",
+  backgroundColor: theme.palette.success.lighter,
+  color: theme.palette.success.dark,
   width: "fit-content",
   "&::before": {
     content: '""',
     width: 6,
     height: 6,
-    background: "#16a34a",
+    background: theme.palette.success.dark,
     borderRadius: "50%",
   },
 }));
 
 // Alert Card Title in List
-export const AlertCardTitle = styled(Typography)(() => ({
+export const AlertCardTitle = styled(Typography)(({ theme }) => ({
   margin: 0,
   fontSize: 14,
   fontWeight: 600,
-  color: "#1f2937",
+  color: theme.palette.text.primary,
   lineHeight: 1.4,
 }));
 
 // Alert Detail Items
-export const AlertDetailItem = styled(Box)(() => ({
+export const AlertDetailItem = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   gap: 8,
   fontSize: 13,
-  color: "#4b5563",
+  color: theme.palette.text.secondary,
 }));
 
 export const AlertDetailRow = styled(Box)(() => ({
@@ -278,19 +299,25 @@ export const AlertIcon = styled("img")({
   objectFit: "contain",
 });
 
+export const DetailAlertIcon = styled("img")({
+  width: 24,
+  height: 24,
+  objectFit: "contain",
+});
+
 // Alert Time
-export const AlertTime = styled(Typography)(() => ({
+export const AlertTime = styled(Typography)(({ theme }) => ({
   margin: 0,
   fontSize: 12,
-  color: "#9ca3af",
+  color: theme.palette.text.disabled,
 }));
 
 // Action Buttons Section
-export const ActionSection = styled(Box)(() => ({
+export const ActionSection = styled(Box)(({ theme }) => ({
   display: "flex",
   gap: 12,
   paddingTop: 16,
-  borderTop: "1px solid #e5e7eb",
+  borderTop: `1px solid ${theme.palette.divider}`,
 }));
 
 export const ActionButton = styled(Button)(({ theme }) => ({
@@ -300,7 +327,6 @@ export const ActionButton = styled(Button)(({ theme }) => ({
   fontSize: 14,
   fontWeight: 600,
   textTransform: "none",
-
   backgroundColor: "transparent",
   color: theme.palette.text.primary,
   border: `1px solid ${theme.palette.grey[300]}`,
@@ -308,16 +334,16 @@ export const ActionButton = styled(Button)(({ theme }) => ({
 
   "&:hover": {
     backgroundColor: theme.palette.primary.main,
-    color: "#fff",
+    color: theme.palette.primary.contrastText,
     borderColor: theme.palette.primary.main,
   },
 }));
 
-export const LocationItem = styled(Box)(() => ({
+export const LocationItem = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   gap: 8,
-  color: "#4b5563",
+  color: theme.palette.text.secondary,
 }));
 
 export const CoordinateBadge = styled(Box)(() => ({
@@ -327,48 +353,57 @@ export const CoordinateBadge = styled(Box)(() => ({
   fontWeight: 500,
 }));
 
-
-
-export const AlertTopRow = styled(Box)({
+export const AlertTopRow = styled(Box)(() => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "flex-start",
-});
+}));
 
-export const AlertRight = styled(Box)({
+export const AlertRight = styled(Box)(() => ({
   display: "flex",
   alignItems: "center",
   gap: "16px",
-});
+}));
 
-export const AlertStatus = styled(Typography)({
+export const AlertStatus = styled(Typography)(({ theme }) => ({
   fontSize: "14px",
   fontWeight: 600,
-  color: "#dc2626",
-});
+  color: theme.palette.error.main,
+}));
 
-export const AlertOpen = styled(Typography)({
+export const AlertOpen = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== "inProgress",
+})(({ theme, inProgress }) => ({
   fontSize: "14px",
   fontWeight: 500,
-  color: "#1d4ed8",
+  color: inProgress ? theme.palette.warning.main : theme.palette.primary.dark,
   cursor: "pointer",
 
   "&:hover": {
     textDecoration: "underline",
   },
-});
+}));
 
-export const ELDTag = styled(Box)({
+export const ELDTag = styled(Box)(({ theme }) => ({
   padding: "4px 10px",
   borderRadius: 6,
-  background: "#EEF2FF",
-  color: "#2563EB",
+  background: theme.palette.primary.lighter,
+  color: theme.palette.primary.main,
   fontSize: 12,
   width: "fit-content",
-});
+}));
 
-export const LocationRow = styled(Box)({
+export const LocationRow = styled(Box)(() => ({
   display: "flex",
   gap: "20px",
   marginTop: 10,
-});
+}));
+
+// Alert Center Screen Header layout
+export const AlertScreenHeaderContainer = styled(Box)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+}));
+
+export const AlertSummaryCardBox = styled(Box)(({ theme }) => ({
+  marginTop: theme.spacing(2),
+}));

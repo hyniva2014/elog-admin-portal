@@ -1,8 +1,4 @@
 import { Box } from "@mui/material";
-import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
-import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
-import SmartphoneOutlinedIcon from "@mui/icons-material/SmartphoneOutlined";
-import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import {
   AlertContainer,
   AlertHeader,
@@ -27,14 +23,52 @@ import { useNavigate } from "react-router-dom";
 
 
 
+const AlertCardItem = ({ item }) => (
+  <AlertCard>
+    <AlertAccentBar accentcolor={item.color} />
+    <AlertContent>
+      <AlertDetails>
+        <AlertCardTitle>{item.title || item.message}</AlertCardTitle>
+
+        <AlertDetailRow>
+          <AlertDetailItem>
+            <AlertIcon src={CarrierIcon} alt="Carrier" />
+            {item.company}
+          </AlertDetailItem>
+          <AlertDetailItem>
+            <AlertIcon src={TruckIcon} alt="Truck" />
+            {item.truck}
+          </AlertDetailItem>
+          <AlertDetailItem>
+            <AlertIcon src={DeviceIcon} alt="Device" />
+            {item.serial}
+          </AlertDetailItem>
+        </AlertDetailRow>
+
+        <AlertDetailRow>
+          <AlertDetailItem>
+            <AlertIcon src={LocationIcon} alt="Location" />
+            {item.location1}
+          </AlertDetailItem>
+          <AlertDetailItem>
+            <AlertIcon src={LocationIcon} alt="Location" />
+            {item.location2}
+          </AlertDetailItem>
+        </AlertDetailRow>
+
+        <AlertTime>{item.date || item.time}</AlertTime>
+      </AlertDetails>
+    </AlertContent>
+  </AlertCard>
+);
+
 const AlertCenter = ({
   title = "Alert Center",
   viewAllText = "View All",
   alerts = [],
-  // onViewAll,
 }) => {
   const navigate = useNavigate();
-  
+
   const handleViewAll = () => {
     navigate("/alert-center");
   };
@@ -44,64 +78,12 @@ const AlertCenter = ({
       <Box>
         <AlertHeader>
           <AlertTitle>{title}</AlertTitle>
-
           <ViewAllText onClick={handleViewAll}>{viewAllText}</ViewAllText>
         </AlertHeader>
 
         <AlertList>
-          {alerts.map((item, index) => (
-            <AlertCard key={index}>
-              <AlertAccentBar accentcolor={item.color} />
-
-              <AlertContent>
-                <AlertDetails>
-                  <AlertCardTitle>{item.title || item.message}</AlertCardTitle>
-
-                  <AlertDetailRow>
-                    <AlertDetailItem>
-                      <AlertIcon 
-                        src={CarrierIcon} 
-                        alt="Carrier" 
-                      />
-                      {item.company}
-                    </AlertDetailItem>
-                    <AlertDetailItem>
-                      <AlertIcon 
-                        src={TruckIcon} 
-                        alt="Truck" 
-                      />
-                      {item.truck}
-                    </AlertDetailItem>
-                    <AlertDetailItem>
-                      <AlertIcon
-                        src={DeviceIcon}
-                        alt="Device"
-                      />
-                      {item.serial}
-                    </AlertDetailItem>
-                  </AlertDetailRow>
-
-                  <AlertDetailRow>
-                    <AlertDetailItem>
-                      <AlertIcon
-                        src={LocationIcon}
-                        alt="Location"
-                      />
-                      {item.location1}
-                    </AlertDetailItem>
-                    <AlertDetailItem>
-                      <AlertIcon
-                        src={LocationIcon}
-                        alt="Location"
-                      />
-                      {item.location2}
-                    </AlertDetailItem>
-                  </AlertDetailRow>
-
-                  <AlertTime>{item.date || item.time}</AlertTime>
-                </AlertDetails>
-              </AlertContent>
-            </AlertCard>
+          {alerts.map((item) => (
+            <AlertCardItem key={item.id} item={item} />
           ))}
         </AlertList>
       </Box>

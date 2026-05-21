@@ -1,6 +1,9 @@
+import { useCallback } from "react";
+import { Grid } from "@mui/material";
 import {
   AlertDetailItem,
   AlertIcon,
+  DetailAlertIcon,
   AlertCardContainer,
   DetailHeader,
   DetailTitleWrapper,
@@ -8,7 +11,9 @@ import {
   DetailSubTitle,
   InfoSection,
   SectionTitle,
+  TriggerSectionTitle,
   InfoGrid,
+  TriggerInfoGrid,
   InfoCard,
   InfoLabel,
   InfoValue,
@@ -19,19 +24,35 @@ import {
   TriggerInfoCard,
   ActionSection,
   ActionButton,
-} from "./AlertCenterScreenCard.styles";
+} from "./AlertCenterScreenCard.styles.jsx";
 
 import HOS from "../../../../assets/images/active/Hos.png";
 import LocationIcon from "../../../../assets/images/active/Icon-3.png";
 
-import { Grid } from "@mui/material";
+const ACTION_BUTTONS = ["Acknowledge", "Assign Operator", "Escalate", "Resolve"];
+
+const AlertActionButton = ({ label }) => {
+  const handleClick = useCallback(() => {
+    // TODO: wire up action handler per button label
+  }, []);
+
+  return (
+    <Grid item xs={6}>
+      <ActionButton fullWidth variant="outlined" onClick={handleClick}>
+        {label}
+      </ActionButton>
+    </Grid>
+  );
+};
 
 const AlertDetailsPanel = ({ selectedAlert }) => {
+  if (!selectedAlert) return null;
+
   return (
-    <AlertCardContainer>
+    <AlertCardContainer detailsPanel>
       <DetailHeader>
         <AlertDetailItem mt={2}>
-          <AlertIcon src={HOS} sx={{ height: 24, width: 24 }} />
+          <DetailAlertIcon src={HOS} alt="Alert type icon" />
 
           <DetailTitleWrapper>
             <DetailTitle>
@@ -39,14 +60,14 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
             </DetailTitle>
 
             <DetailSubTitle>
-              {selectedAlert.subTitle || "Critical"}
+              {selectedAlert.severity || "Critical"}
             </DetailSubTitle>
           </DetailTitleWrapper>
         </AlertDetailItem>
       </DetailHeader>
 
       <InfoSection>
-        <SectionTitle>Driver & Device Information</SectionTitle>
+        <SectionTitle>Driver &amp; Device Information</SectionTitle>
 
         <InfoGrid>
           <InfoCard>
@@ -83,7 +104,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
             <InfoLabel>Current Location</InfoLabel>
 
             <LocationItem>
-              <AlertIcon src={LocationIcon} />
+              <AlertIcon src={LocationIcon} alt="Location" />
 
               <CoordinateBadge>
                 {selectedAlert.location1 || selectedAlert.city}
@@ -91,8 +112,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
 
               {selectedAlert.location2 && (
                 <>
-                  <AlertIcon src={LocationIcon} />
-
+                  <AlertIcon src={LocationIcon} alt="Location" />
                   <CoordinateBadge>{selectedAlert.location2}</CoordinateBadge>
                 </>
               )}
@@ -102,15 +122,9 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
       </InfoSection>
 
       <TriggerSection>
-        <SectionTitle sx={{ marginLeft: "0px" }}>
-          Trigger Information
-        </SectionTitle>
+        <TriggerSectionTitle>Trigger Information</TriggerSectionTitle>
 
-        <InfoGrid
-          style={{
-            gridTemplateColumns: "1fr 1fr",
-          }}
-        >
+        <TriggerInfoGrid>
           <TriggerInfoCard>
             <InfoLabel>Alert Source</InfoLabel>
             <InfoValue>ELD Device</InfoValue>
@@ -120,20 +134,14 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
             <InfoLabel>Trigger Event</InfoLabel>
             <InfoValue>Device Connection Lost</InfoValue>
           </TriggerInfoCard>
-        </InfoGrid>
+        </TriggerInfoGrid>
       </TriggerSection>
 
       <ActionSection>
         <Grid container spacing={2}>
-          {["Acknowledge", "Assign Operator", "Escalate", "Resolve"].map(
-            (btn) => (
-              <Grid item xs={6} key={btn}>
-                <ActionButton fullWidth variant="outlined">
-                  {btn}
-                </ActionButton>
-              </Grid>
-            ),
-          )}
+          {ACTION_BUTTONS.map((label) => (
+            <AlertActionButton key={label} label={label} />
+          ))}
         </Grid>
       </ActionSection>
     </AlertCardContainer>
