@@ -754,7 +754,7 @@ const adminRoutes = [
     element: (
       <LoadComponent
         component={lazy(
-          () => import("../components/AdminComponents/dashbord/AdminDashBoard"),
+          () => import("../components/AdminComponents/Dashbord/AdminDashBoard"),
         )}
       />
     ),
@@ -828,7 +828,7 @@ const adminRoutes = [
       <LoadComponent
         component={lazy(
           () =>
-            import("../components/AdminComponents/dashbord/AlertCeneter/AlertCenterScreen"),
+            import("../components/AdminComponents/Dashbord/AlertCeneter/AlertCenterScreen"),
         )}
       />
     ),
