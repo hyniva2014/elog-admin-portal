@@ -69,6 +69,7 @@ export const chartData = [
 
 export const alerts = [
   {
+    id: "alert-eld-device-issue",
     title: "ELD device Issue",
     company: "Swift Transportation",
     truck: "TRK-256",
@@ -79,6 +80,7 @@ export const alerts = [
     color: "#EF4444",
   },
   {
+    id: "alert-incident-2301",
     title: "Incident #INC-2301 requires attention",
     company: "Schneider National",
     truck: "TRK-256",
@@ -89,6 +91,7 @@ export const alerts = [
     color: "#F59E0B",
   },
   {
+    id: "alert-new-devices",
     title: "12 new devices assigned",
     company: "Schneider National",
     truck: "TRK-256",
@@ -115,5 +118,113 @@ export const TooltipKeys = [
     key: "loss",
     label: "Loss",
     color: "red",
+  },
+];
+
+
+export const AlertCenterCards = [
+  {
+    id: "mobile_driver_log",
+    title: "Mobile Driver Log",
+    value: "06",
+    icon: ActiveDevicesCardIcon,
+  },
+  {
+    id: "web_compliance_management",
+    title: "Web-Compliance Management",
+    value: "01",
+    icon: ActiveDevicesCardIcon,
+  },
+  {
+    id: "eld_device_issues",
+    title: "ELD Device Issues",
+    value: "10",
+    icon: ActiveDevicesCardIcon,
+  },
+];
+
+export const alertCategoryOptions = [
+  { value: "", label: "All Category" },
+  { value: "maintenance", label: "Maintenance" },
+  { value: "safety", label: "Safety" },
+  { value: "performance", label: "Performance" },
+];
+
+export const alertSeverityOptions = [
+  { value: "", label: "All Severity" },
+  { value: "low", label: "Low" },
+  { value: "medium", label: "Medium" },
+  { value: "high", label: "High" },
+];
+
+export const alertCenterAlerts = [
+  {
+    id: "ac-device-offline",
+    title: "Device Offline Issue",
+    severity: "Critical",
+    status: "Open",
+    company: "Swift Transportation",
+    truck: "TRK-256",
+    serial: "SN-ABC12345",
+    role: "ELD",
+    location1: "30.250661",
+    location2: "-97.735925",
+    color: "#2563EB",
+    driver: null,
+    time: null,
+    type: "device",
+  },
+  {
+    id: "ac-eld-connection-lost",
+    title: "ELD - Device Connection Lost",
+    severity: "warning",
+    status: "in-progress",
+    driver: "Sarah Johnson",
+    truck: "TRK-109",
+    role: "System",
+    city: "Dallas, TX.",
+    time: "07:54 AM",
+    color: "#2563EB",
+    company: null,
+    serial: null,
+  },
+  {
+    id: "ac-eld-device-issue",
+    title: "ELD device Issue",
+    severity: "Critical",
+    status: "Open",
+    company: "Swift Transportation",
+    truck: "TRK-256",
+    serial: "SN-ABC12345",
+    role: "ELD",
+    location1: "30.250661",
+    location2: "-97.735925",
+    color: "#EF4444",
+  },
+  {
+    id: "ac-new-devices",
+    title: "New devices assigned",
+    driver: "John Miller",
+    truck: "TRK-221",
+    role: "Admin",
+    city: "Dallas, TX.",
+    time: "07:51 AM",
+    color: "#3B82F6",
+    severity: null,
+    status: null,
+  },
+  {
+    id: "ac-gps-failure",
+    title: "GPS Failure detected",
+    severity: "Critical",
+    status: "Open",
+    driver: "Linda Garcia",
+    truck: "TRK-256",
+    role: "ELD",
+    duration: "35 mins remaining",
+    city: "Phoenix, AZ",
+    time: "07:45 AM",
+    color: "#EF4444",
+    type: "gps",
   },
 ];

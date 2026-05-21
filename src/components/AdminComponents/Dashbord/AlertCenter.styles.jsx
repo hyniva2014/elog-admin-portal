@@ -50,7 +50,7 @@ export const AlertCard = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "stretch",
   background: theme.palette.grey[50],
-  borderRadius: "10px",
+  borderRadius: "2px",
   overflow: "hidden",
   minHeight: 90,
   border: `1px solid ${theme.palette.grey[200]}`,
@@ -58,7 +58,7 @@ export const AlertCard = styled(Box)(({ theme }) => ({
 }));
 
 export const AlertAccentBar = styled(Box)(({ accentcolor }) => ({
-  width: "6px",
+  width: "4px",
   backgroundColor: accentcolor,
 }));
 

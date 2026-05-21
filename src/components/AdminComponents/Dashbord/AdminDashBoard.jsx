@@ -48,10 +48,6 @@ const AdminDashboard = () => {
     setSelectedRange(data);
   };
 
-  const handleViewAll = () => {
-    // TODO: implement navigation to full alert list
-  };
-
   const dateLabel =
     selectedRange.period === "Today"
       ? selectedRange.date
@@ -75,7 +71,7 @@ const AdminDashboard = () => {
       <CommonSummaryCardGroup
         cards={summaryCards}
         showAccentBar={false}
-        layout="default"
+        layout="dashboard"
       />
 
       <StretchGridContainer container spacing={2}>
@@ -87,7 +83,6 @@ const AdminDashboard = () => {
           <CommonAlertCenter
             title="Alert Center"
             alerts={alerts}
-            onViewAll={handleViewAll}
           />
         </AlertGrid>
 
