@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo } from "react";
-import { Grid, MenuItem, FormControl, InputLabel, Select, FormHelperText } from "@mui/material";
+import React, { useEffect } from "react";
+import { Grid, MenuItem, TextField } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -12,11 +12,19 @@ import {
   DEVICE_MODEL_STATUS_OPTIONS,
 } from "./Constants";
 
-const SelectMenuItem = ({ value, label }) => (
-  <MenuItem value={value}>{label}</MenuItem>
-);
-
 const ADD_DEVICE_MODEL_FORM_ID = "add-device-model-form";
+
+const assetOptionElements = DEVICE_MODEL_ASSET_OPTIONS.map(({ value, label }) => (
+  <MenuItem key={value} value={value}>{label}</MenuItem>
+));
+
+const elogOptionElements = DEVICE_MODEL_ELOG_OPTIONS.map(({ value, label }) => (
+  <MenuItem key={value} value={value}>{label}</MenuItem>
+));
+
+const statusOptionElements = DEVICE_MODEL_STATUS_OPTIONS.map(({ value, label }) => (
+  <MenuItem key={value} value={value}>{label}</MenuItem>
+));
 
 const validationSchema = yup.object({
   modelName: yup
@@ -33,52 +41,22 @@ const validationSchema = yup.object({
     .min(5, "Description must be at least 5 characters")
     .max(500, "Description must not exceed 500 characters"),
 
-  assetType: yup
-    .string()
-    .required("Asset Type is required"),
+  assetType: yup.string().required("Asset Type is required"),
 
-  eLogs: yup
-    .string()
-    .required("E-Logs is required"),
+  eLogs: yup.string().required("E-Logs is required"),
 
-  status: yup
-    .string()
-    .when('$isEditMode', {
-      is: true,
-      then: (schema) => schema.required("Status is required"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
+  status: yup.string().nullable(),
 });
 
-const getDefaultValues = (selectedDeviceModel, isEditMode) => {
-  if (isEditMode && selectedDeviceModel) {
-    return {
-      modelName: selectedDeviceModel.model || "",
-      description: selectedDeviceModel.description || "",
-      assetType: selectedDeviceModel.assetType || "",
-      eLogs: selectedDeviceModel.eLogs || "",
-      status: selectedDeviceModel.status || "Active",
-    };
-  }
-  return {
-    modelName: "",
-    description: "",
-    assetType: "",
-    eLogs: "",
-    status: "Active",
-  };
+const initialValues = {
+  modelName: "",
+  description: "",
+  assetType: "",
+  eLogs: "",
+  status: "",
 };
 
-const AddDeviceModelDialog = ({
-  open,
-  onClose,
-  onSubmit,
-  loading = false,
-  isEditMode = false,
-  isEditing = false,
-  selectedDeviceModel,
-  headerActions,
-}) => {
+const AddDeviceModelForm = ({ formId, defaultValues, isEditing, isEditMode, loading, onSubmit }) => {
   const isDisabled = isEditMode && !isEditing;
 
   const {
@@ -88,28 +66,16 @@ const AddDeviceModelDialog = ({
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
-    defaultValues: getDefaultValues(selectedDeviceModel, isEditMode),
-    context: { isEditMode },
+    defaultValues: defaultValues || initialValues,
   });
 
   useEffect(() => {
-    if (open) {
-      reset(getDefaultValues(selectedDeviceModel, isEditMode));
-    }
-  }, [open, selectedDeviceModel, isEditMode, reset]);
+    reset(defaultValues || initialValues);
+  }, [defaultValues, reset]);
 
-  const handleCancel = useCallback(() => {
-    reset(getDefaultValues(null, false));
-    onClose();
-  }, [reset, onClose]);
-
-  const submitHandler = useCallback(
-    (data) => {
-      onSubmit(data);
-      reset(getDefaultValues(null, false));
-    },
-    [onSubmit, reset],
-  );
+  const submitHandler = (data) => {
+    onSubmit(data);
+  };
 
   const renderModelNameField = ({ field }) => (
     <CommonTextField
@@ -141,114 +107,111 @@ const AddDeviceModelDialog = ({
     />
   );
 
-  const renderAssetTypeField = ({ field }) => (
-    <FormControl fullWidth size="small" error={!!errors.assetType} disabled={loading || isDisabled}>
-      <InputLabel id="asset-type-label" required>Asset Type</InputLabel>
-      <Select {...field} labelId="asset-type-label" label="Asset Type">
-        {DEVICE_MODEL_ASSET_OPTIONS.map(({ value, label }) => (
-          <SelectMenuItem key={value} value={value} label={label} />
-        ))}
-      </Select>
-      {errors.assetType && <FormHelperText>{errors.assetType.message}</FormHelperText>}
-    </FormControl>
-  );
-
-  const renderELogsField = ({ field }) => (
-    <FormControl fullWidth size="small" error={!!errors.eLogs} disabled={loading || isDisabled}>
-      <InputLabel id="elogs-label" required>E-Logs</InputLabel>
-      <Select {...field} labelId="elogs-label" label="E-Logs">
-        {DEVICE_MODEL_ELOG_OPTIONS.map(({ value, label }) => (
-          <SelectMenuItem key={value} value={value} label={label} />
-        ))}
-      </Select>
-      {errors.eLogs && <FormHelperText>{errors.eLogs.message}</FormHelperText>}
-    </FormControl>
-  );
-
   const renderStatusField = ({ field }) => (
-    <FormControl fullWidth size="small" error={!!errors.status} disabled={loading || isDisabled}>
-      <InputLabel id="status-label" required>Status</InputLabel>
-      <Select {...field} labelId="status-label" label="Status">
-        {DEVICE_MODEL_STATUS_OPTIONS.map(({ value, label }) => (
-          <SelectMenuItem key={value} value={value} label={label} />
-        ))}
-      </Select>
-      {errors.status && <FormHelperText>{errors.status.message}</FormHelperText>}
-    </FormControl>
+    <TextField
+      {...field}
+      select
+      label="Status"
+      disabled={loading || isDisabled}
+      error={!!errors.status}
+      helperText={errors.status?.message}
+      fullWidth
+      size="small"
+      SelectProps={{ MenuProps: { disablePortal: true } }}
+    >
+      {statusOptionElements}
+    </TextField>
   );
 
-  const formContent = (
-    <form id={ADD_DEVICE_MODEL_FORM_ID} onSubmit={handleSubmit(submitHandler)}>
+  return (
+    <form id={formId} onSubmit={handleSubmit(submitHandler)}>
       <DialogFormContainer>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Controller
-              name="modelName"
-              control={control}
-              render={renderModelNameField}
-            />
+            <Controller name="modelName" control={control} render={renderModelNameField} />
           </Grid>
 
           <Grid item xs={12}>
-            <Controller
-              name="description"
-              control={control}
-              render={renderDescriptionField}
-            />
+            <Controller name="description" control={control} render={renderDescriptionField} />
           </Grid>
 
           <Grid item xs={12}>
-            <Controller
+            <CommonTextField
               name="assetType"
               control={control}
-              render={renderAssetTypeField}
-            />
+              label="Asset Type"
+              required
+              disabled={loading || isDisabled}
+              error={!!errors.assetType}
+              helperText={errors.assetType?.message}
+            >
+              {assetOptionElements}
+            </CommonTextField>
           </Grid>
 
           <Grid item xs={12}>
-            <Controller
+            <CommonTextField
               name="eLogs"
               control={control}
-              render={renderELogsField}
-            />
+              label="E-Logs"
+              required
+              disabled={loading || isDisabled}
+              error={!!errors.eLogs}
+              helperText={errors.eLogs?.message}
+            >
+              {elogOptionElements}
+            </CommonTextField>
           </Grid>
 
           {isEditMode && (
             <Grid item xs={12}>
-              <Controller
-                name="status"
-                control={control}
-                render={renderStatusField}
-              />
+              <Controller name="status" control={control} render={renderStatusField} />
             </Grid>
           )}
         </Grid>
       </DialogFormContainer>
     </form>
   );
+};
 
-  const title = useMemo(
-    () => (isEditMode ? "View Device Model" : "Add Device Model"),
-    [isEditMode],
-  );
-
-  const submitButtonText = useMemo(() => {
-    if (!isEditMode) return "Add Device";
-    return isEditing ? "Update" : "Save";
-  }, [isEditMode, isEditing]);
+const AddDeviceModelDialog = ({
+  open,
+  onClose,
+  onSubmit,
+  loading = false,
+  isEditMode = false,
+  isEditing = false,
+  defaultValues,
+  headerActions,
+}) => {
+  const title = isEditMode ? "View Device Model" : "Add Device Model";
+  const submitButtonText = isEditMode ? (isEditing ? "Update" : "Save") : "Add Device";
+  const dialogMode = isEditMode ? "edit" : "add";
+  const formKey = defaultValues ? `${defaultValues.modelName}|${defaultValues.assetType}` : "new";
 
   return (
     <CommonDialogForm
       open={open}
       title={title}
-      content={formContent}
       formId={ADD_DEVICE_MODEL_FORM_ID}
-      onCancel={handleCancel}
+      onCancel={onClose}
       loading={loading}
       submitButtonText={submitButtonText}
       maxWidth="sm"
       headerActions={headerActions}
-      hideActions={isEditMode && !isEditing}
+      mode={dialogMode}
+      isEditing={isEditing}
+      content={
+        <AddDeviceModelForm
+          key={formKey}
+          formId={ADD_DEVICE_MODEL_FORM_ID}
+          defaultValues={defaultValues}
+          isEditing={isEditing}
+          isEditMode={isEditMode}
+          loading={loading}
+          onSubmit={onSubmit}
+        />
+      }
     />
   );
 };

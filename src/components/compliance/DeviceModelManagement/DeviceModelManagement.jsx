@@ -134,7 +134,18 @@ const DeviceModelManagement = () => {
 
   const [allDeviceModels, setAllDeviceModels] = useState([]);
 
-  const filterKey = `${data.page}|${data.pageSize}|${data.search}|${data.assetType}|${data.status}|${data.model}`;
+  const [defaultValues, setDefaultValues] = useState({
+    modelName: "",
+    description: "",
+    assetType: "",
+    eLogs: "",
+    status: "",
+  });
+
+  const filterKey = useMemo(
+    () => `${data.page}|${data.pageSize}|${data.search}|${data.assetType}|${data.status}|${data.model}`,
+    [data.page, data.pageSize, data.search, data.assetType, data.status, data.model],
+  );
 
   const fetchApiRef = useRef(fetchApi);
   fetchApiRef.current = fetchApi;
@@ -187,6 +198,7 @@ const DeviceModelManagement = () => {
     setIsEditMode(false);
     setIsEditing(false);
     setSelectedDeviceModel(null);
+    setDefaultValues({ modelName: "", description: "", assetType: "", eLogs: "", status: "" });
     setIsAddDeviceModelOpen(true);
   }, []);
 
@@ -194,6 +206,13 @@ const DeviceModelManagement = () => {
     setIsEditMode(true);
     setIsEditing(false);
     setSelectedDeviceModel(row);
+    setDefaultValues({
+      modelName: row.model || "",
+      description: row.description || "",
+      assetType: row.assetType || "",
+      eLogs: row.eLogs || "",
+      status: row.status || "",
+    });
     setIsAddDeviceModelOpen(true);
   }, []);
 
@@ -210,6 +229,7 @@ const DeviceModelManagement = () => {
     setIsEditMode(false);
     setIsEditing(false);
     setSelectedDeviceModel(null);
+    setDefaultValues({ modelName: "", description: "", assetType: "", eLogs: "", status: "" });
   }, []);
 
   const handleCreateDeviceModel = useCallback(
@@ -339,7 +359,7 @@ const DeviceModelManagement = () => {
           loading={isCreateLoading}
           isEditMode={isEditMode}
           isEditing={isEditing}
-          selectedDeviceModel={selectedDeviceModel}
+          defaultValues={defaultValues}
           headerActions={headerActionsElement}
         />
       </PageContainer>
