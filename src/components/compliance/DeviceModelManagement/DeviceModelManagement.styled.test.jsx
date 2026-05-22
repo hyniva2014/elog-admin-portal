@@ -1,6 +1,6 @@
-import { render as rtlRender, screen } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent } from "@testing-library/react";
 import { ThemeProvider, createTheme } from "@mui/material";
-import { AddButton, StatusText } from "./DeviceModelManagement.styled.jsx";
+import { AddButton, StatusText, EditButton, CancelEditButton } from "./DeviceModelManagement.styled.jsx";
 
 const theme = createTheme();
 
@@ -31,6 +31,44 @@ describe("DeviceModelManagement.styled", () => {
     it("should render inactive status", () => {
       render(<StatusText status="Inactive">Inactive</StatusText>);
       expect(screen.getByText("Inactive")).toBeInTheDocument();
+    });
+  });
+
+  describe("EditButton", () => {
+    it("should render correctly with 'Edit' text", () => {
+      render(<EditButton>Edit</EditButton>);
+      expect(screen.getByText("Edit")).toBeInTheDocument();
+    });
+
+    it("should handle click events", () => {
+      const handleClick = jest.fn();
+      render(<EditButton onClick={handleClick}>Edit</EditButton>);
+      fireEvent.click(screen.getByText("Edit"));
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    it("should render with variant contained", () => {
+      render(<EditButton variant="contained">Edit</EditButton>);
+      expect(screen.getByText("Edit")).toBeInTheDocument();
+    });
+  });
+
+  describe("CancelEditButton", () => {
+    it("should render correctly with 'Cancel Edit' text", () => {
+      render(<CancelEditButton>Cancel Edit</CancelEditButton>);
+      expect(screen.getByText("Cancel Edit")).toBeInTheDocument();
+    });
+
+    it("should handle click events", () => {
+      const handleClick = jest.fn();
+      render(<CancelEditButton onClick={handleClick}>Cancel Edit</CancelEditButton>);
+      fireEvent.click(screen.getByText("Cancel Edit"));
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    it("should render with variant outlined", () => {
+      render(<CancelEditButton variant="outlined">Cancel Edit</CancelEditButton>);
+      expect(screen.getByText("Cancel Edit")).toBeInTheDocument();
     });
   });
 });

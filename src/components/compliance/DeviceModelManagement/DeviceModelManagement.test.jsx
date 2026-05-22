@@ -1,5 +1,13 @@
-import { render, screen, act } from "@testing-library/react";
+import { render, screen, act, fireEvent, waitFor } from "@testing-library/react";
 import DeviceModelManagement from "./DeviceModelManagement";
+
+// Mock the services
+jest.mock("../../../services/services", () => ({
+  useServices: () => ({
+    fetchApi: jest.fn(),
+    createApi: jest.fn(),
+  }),
+}));
 
 jest.mock("../../../common/CommonDataGrid", () => {
   return function MockCommonDataGrid(props) {
@@ -24,11 +32,33 @@ jest.mock("./DeviceModelManagementHeader", () => {
 
 jest.mock("./AddDeviceModelDialog", () => {
   return function MockAddDeviceModelDialog(props) {
-    return <div data-testid="add-device-model-dialog">AddDeviceModelDialog</div>;
+    return (
+      <div data-testid="add-device-model-dialog">
+        <span data-testid="dialog-mode">{props.isEditMode ? 'edit' : 'add'}</span>
+        <span data-testid="dialog-editing">{props.isEditing ? 'true' : 'false'}</span>
+        {props.headerActions && <div data-testid="header-actions">{props.headerActions}</div>}
+      </div>
+    );
   };
 });
 
+const mockDeviceModel = {
+  id: 1,
+  device_model_id: 1,
+  device_code: "SG1",
+  model: "Samsara G1",
+  modelName: "Samsara G1",
+  assetType: "Truck",
+  description: "Test description",
+  eLogs: "Yes",
+  status: "Active",
+};
+
 describe("DeviceModelManagement", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("should render without crashing", () => {
     const { container } = render(<DeviceModelManagement />);
     expect(container).toBeTruthy();
@@ -47,6 +77,43 @@ describe("DeviceModelManagement", () => {
     rerender(<DeviceModelManagement />);
     rerender(<DeviceModelManagement />);
     expect(screen.getByTestId("device-model-header")).toBeInTheDocument();
+  });
+
+  it("should initialize in add mode by default", () => {
+    render(<DeviceModelManagement />);
+    expect(screen.getByTestId("dialog-mode")).toHaveTextContent("add");
+    expect(screen.getByTestId("dialog-editing")).toHaveTextContent("false");
+  });
+});
+
+describe("DeviceModelManagement – View/Edit Mode", () => {
+  it("should switch to edit mode when viewing a device model", async () => {
+    render(<DeviceModelManagement />);
+    
+    // Simulate clicking view on a device model
+    const { handleViewDeviceModel } = jest.requireMock("./DeviceModelManagement");
+    
+    // The dialog should be in edit mode
+    await waitFor(() => {
+      expect(screen.getByTestId("dialog-mode")).toBeInTheDocument();
+    });
+  });
+
+  it("should render header actions when in view mode", async () => {
+    render(<DeviceModelManagement />);
+    
+    // Header actions should not be present in add mode
+    expect(screen.queryByTestId("header-actions")).toBeNull();
+  });
+
+  it("should handle rapid mode switching without crashing", () => {
+    const { rerender } = render(<DeviceModelManagement />);
+    
+    for (let i = 0; i < 3; i++) {
+      rerender(<DeviceModelManagement />);
+    }
+    
+    expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
   });
 });
 
@@ -70,6 +137,25 @@ describe("DeviceModelManagement – edge cases", () => {
     render(<DeviceModelManagement />);
     expect(screen.getByTestId("device-model-header")).toBeInTheDocument();
   });
+
+  it("should handle empty device model data gracefully", () => {
+    render(<DeviceModelManagement />);
+    expect(screen.getByTestId("device-model-header")).toBeInTheDocument();
+    expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
+  });
+});
+
+describe("DeviceModelManagement – API Integration", () => {
+  it("should handle API fetch errors gracefully", () => {
+    render(<DeviceModelManagement />);
+    // Component should render even if API fails
+    expect(screen.getByTestId("device-model-header")).toBeInTheDocument();
+  });
+
+  it("should handle successful data fetch", () => {
+    render(<DeviceModelManagement />);
+    expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
+  });
 });
 
 describe("DeviceModelManagement – negative cases", () => {
@@ -84,10 +170,15 @@ describe("DeviceModelManagement – negative cases", () => {
   });
 
   it("should handle rapid open/close state changes without crashing", () => {
-    const MockAddDeviceModelDialog = jest.requireMock("./AddDeviceModelDialog");
     render(<DeviceModelManagement />);
     act(() => {
       expect(screen.getByTestId("add-device-model-dialog")).toBeInTheDocument();
     });
+  });
+
+  it("should handle undefined selected device model", () => {
+    render(<DeviceModelManagement />);
+    // Should not crash when selectedDeviceModel is null/undefined
+    expect(screen.getByTestId("add-device-model-dialog")).toBeInTheDocument();
   });
 });

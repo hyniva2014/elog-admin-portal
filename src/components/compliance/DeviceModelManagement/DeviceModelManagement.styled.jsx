@@ -2,6 +2,26 @@ import { Box, Button, Typography, IconButton } from "@mui/material";
 import styled from "@emotion/styled";
 import eyeIcon from "../../../assets/images/svg/eyeicon.png";
 
+export const EditButton = styled(Button)(({ theme }) => ({
+  fontSize: 14,
+  fontWeight: 400,
+  color: "#FFFFFF",
+  backgroundColor: "#284495",
+  border: 1,
+  borderRadius: 2,
+  borderColor: "#284495",
+}));
+
+export const CancelEditButton = styled(Button)(({ theme }) => ({
+  fontSize: 14,
+  fontWeight: 400,
+  color: "#284495",
+  border: 1,
+  borderRadius: 2,
+  borderColor: "#284495",
+  backgroundColor: "#F3F8FF",
+}));
+
 export const HeaderContainer = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));

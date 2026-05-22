@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Grid, MenuItem } from "@mui/material";
+import { Grid, MenuItem, FormControl, InputLabel, Select, FormHelperText } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -12,20 +12,6 @@ import {
 } from "./Constants";
 
 const ADD_DEVICE_MODEL_FORM_ID = "add-device-model-form";
-
-const SelectMenuItem = ({ value, label }) => (
-  <MenuItem key={value} value={value}>
-    {label}
-  </MenuItem>
-);
-
-const assetOptionElements = DEVICE_MODEL_ASSET_OPTIONS.map(({ value, label }) => (
-  <SelectMenuItem key={value} value={value} label={label} />
-));
-
-const elogOptionElements = DEVICE_MODEL_ELOG_OPTIONS.map(({ value, label }) => (
-  <SelectMenuItem key={value} value={value} label={label} />
-));
 
 const validationSchema = yup.object({
   modelName: yup
@@ -49,13 +35,33 @@ const validationSchema = yup.object({
   eLogs: yup
     .string()
     .required("E-Logs is required"),
+
+  status: yup
+    .string()
+    .when('$isEditMode', {
+      is: true,
+      then: (schema) => schema.required("Status is required"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
 });
 
-const defaultValues = {
-  modelName: "",
-  description: "",
-  assetType: "",
-  eLogs: "",
+const getDefaultValues = (selectedDeviceModel, isEditMode) => {
+  if (isEditMode && selectedDeviceModel) {
+    return {
+      modelName: selectedDeviceModel.model || "",
+      description: selectedDeviceModel.description || "",
+      assetType: selectedDeviceModel.assetType || "",
+      eLogs: selectedDeviceModel.eLogs || "",
+      status: selectedDeviceModel.status || "Active",
+    };
+  }
+  return {
+    modelName: "",
+    description: "",
+    assetType: "",
+    eLogs: "",
+    status: "Active",
+  };
 };
 
 const AddDeviceModelDialog = ({
@@ -63,7 +69,13 @@ const AddDeviceModelDialog = ({
   onClose,
   onSubmit,
   loading = false,
+  isEditMode = false,
+  isEditing = false,
+  selectedDeviceModel,
+  headerActions,
 }) => {
+  const isDisabled = isEditMode && !isEditing;
+
   const {
     control,
     handleSubmit,
@@ -71,23 +83,25 @@ const AddDeviceModelDialog = ({
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
-    defaultValues,
+    defaultValues: getDefaultValues(selectedDeviceModel, isEditMode),
+    context: { isEditMode },
   });
 
   useEffect(() => {
-    if (!open) {
-      reset(defaultValues);
+    if (open) {
+      reset(getDefaultValues(selectedDeviceModel, isEditMode));
     }
-  }, [open, reset]);
+  }, [open, selectedDeviceModel, isEditMode, reset]);
 
   const handleCancel = () => {
-    reset(defaultValues);
+    // Always close the popup when Cancel button is clicked
+    reset(getDefaultValues(null, false));
     onClose();
   };
 
   const submitHandler = (data) => {
     onSubmit(data);
-    reset(defaultValues);
+    reset(getDefaultValues(null, false));
   };
 
   const renderModelNameField = ({ field }) => (
@@ -95,7 +109,7 @@ const AddDeviceModelDialog = ({
       {...field}
       label="Model Name"
       required
-      disabled={loading}
+      disabled={loading || isDisabled}
       error={!!errors.modelName}
       helperText={errors.modelName?.message}
       fullWidth
@@ -109,7 +123,7 @@ const AddDeviceModelDialog = ({
       {...field}
       label="Description"
       required
-      disabled={loading}
+      disabled={loading || isDisabled}
       error={!!errors.description}
       helperText={errors.description?.message}
       fullWidth
@@ -121,35 +135,54 @@ const AddDeviceModelDialog = ({
   );
 
   const renderAssetTypeField = ({ field }) => (
-    <CommonTextField
-      {...field}
-      label="Asset Type"
-      required
-      disabled={loading}
-      error={!!errors.assetType}
-      helperText={errors.assetType?.message}
-      fullWidth
-      size="small"
-      select
-    >
-      {assetOptionElements}
-    </CommonTextField>
+    <FormControl fullWidth size="small" error={!!errors.assetType} disabled={loading || isDisabled}>
+      <InputLabel id="asset-type-label" required>Asset Type</InputLabel>
+      <Select
+        {...field}
+        labelId="asset-type-label"
+        label="Asset Type"
+      >
+        {DEVICE_MODEL_ASSET_OPTIONS.map(({ value, label }) => (
+          <MenuItem key={value} value={value}>
+            {label}
+          </MenuItem>
+        ))}
+      </Select>
+      {errors.assetType && <FormHelperText>{errors.assetType.message}</FormHelperText>}
+    </FormControl>
   );
 
   const renderELogsField = ({ field }) => (
-    <CommonTextField
-      {...field}
-      label="E-Logs"
-      required
-      disabled={loading}
-      error={!!errors.eLogs}
-      helperText={errors.eLogs?.message}
-      fullWidth
-      size="small"
-      select
-    >
-      {elogOptionElements}
-    </CommonTextField>
+    <FormControl fullWidth size="small" error={!!errors.eLogs} disabled={loading || isDisabled}>
+      <InputLabel id="elogs-label" required>E-Logs</InputLabel>
+      <Select
+        {...field}
+        labelId="elogs-label"
+        label="E-Logs"
+      >
+        {DEVICE_MODEL_ELOG_OPTIONS.map(({ value, label }) => (
+          <MenuItem key={value} value={value}>
+            {label}
+          </MenuItem>
+        ))}
+      </Select>
+      {errors.eLogs && <FormHelperText>{errors.eLogs.message}</FormHelperText>}
+    </FormControl>
+  );
+
+  const renderStatusField = ({ field }) => (
+    <FormControl fullWidth size="small" error={!!errors.status} disabled={loading || isDisabled}>
+      <InputLabel id="status-label" required>Status</InputLabel>
+      <Select
+        {...field}
+        labelId="status-label"
+        label="Status"
+      >
+        <MenuItem value="Active">Active</MenuItem>
+        <MenuItem value="Inactive">Inactive</MenuItem>
+      </Select>
+      {errors.status && <FormHelperText>{errors.status.message}</FormHelperText>}
+    </FormControl>
   );
 
   const formContent = (
@@ -187,21 +220,45 @@ const AddDeviceModelDialog = ({
               render={renderELogsField}
             />
           </Grid>
+
+          {isEditMode && (
+            <Grid item xs={12}>
+              <Controller
+                name="status"
+                control={control}
+                render={renderStatusField}
+              />
+            </Grid>
+          )}
         </Grid>
       </DialogFormContainer>
     </form>
   );
 
+  const getTitle = () => {
+    if (isEditMode) return "View Device Model";
+    return "Add Device Model";
+  };
+
+  const getSubmitButtonText = () => {
+    if (isEditMode) {
+      return isEditing ? "Update" : "Save";
+    }
+    return "Add Device";
+  };
+
   return (
     <CommonDialogForm
       open={open}
-      title="Add Device Model"
+      title={getTitle()}
       content={formContent}
       formId={ADD_DEVICE_MODEL_FORM_ID}
       onCancel={handleCancel}
       loading={loading}
-      submitButtonText="Add Device"
+      submitButtonText={getSubmitButtonText()}
       maxWidth="sm"
+      headerActions={headerActions}
+      hideActions={isEditMode && !isEditing}
     />
   );
 };
