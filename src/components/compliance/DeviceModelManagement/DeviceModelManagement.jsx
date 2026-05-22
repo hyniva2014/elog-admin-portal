@@ -134,11 +134,16 @@ const DeviceModelManagement = () => {
 
   const [allDeviceModels, setAllDeviceModels] = useState([]);
 
-  const filtersRef = useRef({ page: data.page, pageSize: data.pageSize, search: data.search, assetType: data.assetType, status: data.status, model: data.model });
-  filtersRef.current = { page: data.page, pageSize: data.pageSize, search: data.search, assetType: data.assetType, status: data.status, model: data.model };
+  const filterKey = `${data.page}|${data.pageSize}|${data.search}|${data.assetType}|${data.status}|${data.model}`;
+
+  const fetchApiRef = useRef(fetchApi);
+  fetchApiRef.current = fetchApi;
+
+  const filtersRef = useRef(filterKey);
+  filtersRef.current = filterKey;
 
   const fetchDeviceModels = useCallback(async () => {
-    const { page, pageSize, search, assetType, status, model } = filtersRef.current;
+    const [page, pageSize, search, assetType, status, model] = filtersRef.current.split("|");
     setData((prev) => ({ ...prev, isLoading: true }));
     try {
       const searchValue = model || search;
@@ -150,7 +155,7 @@ const DeviceModelManagement = () => {
         ...(status && { status: STATUS_REVERSE_MAP[status] }),
       });
 
-      const response = await fetchApi(`/masteradmin/get-device-model?${queryParams.toString()}`);
+      const response = await fetchApiRef.current(`/masteradmin/get-device-model?${queryParams.toString()}`);
 
       if (response?.body?.data) {
         const apiData = Array.isArray(response.body.data)
@@ -169,11 +174,14 @@ const DeviceModelManagement = () => {
     } finally {
       setData((prev) => ({ ...prev, isLoading: false }));
     }
-  }, [fetchApi]);
+  }, []);
+
+  const fetchDeviceModelsRef = useRef(fetchDeviceModels);
+  fetchDeviceModelsRef.current = fetchDeviceModels;
 
   useEffect(() => {
-    fetchDeviceModels();
-  }, [fetchDeviceModels, data.page, data.pageSize, data.search, data.assetType, data.status, data.model]);
+    fetchDeviceModelsRef.current();
+  }, [filterKey]);
 
   const handleAddDeviceModel = useCallback(() => {
     setIsEditMode(false);
@@ -212,7 +220,7 @@ const DeviceModelManagement = () => {
         const response = await createApi(apiPayload, "/masteradmin/device-model");
 
         if (isApiSuccess(response)) {
-          await fetchDeviceModels();
+          await fetchDeviceModelsRef.current();
           setIsAddDeviceModelOpen(false);
         } else {
           console.error("Error creating device model:", response);
@@ -223,7 +231,7 @@ const DeviceModelManagement = () => {
         setIsCreateLoading(false);
       }
     },
-    [createApi, fetchDeviceModels, userId],
+    [createApi, userId],
   );
 
   const handleUpdateDeviceModel = useCallback(
@@ -234,7 +242,7 @@ const DeviceModelManagement = () => {
         const response = await createApi(apiPayload, "/masteradmin/device-model");
 
         if (isApiSuccess(response)) {
-          await fetchDeviceModels();
+          await fetchDeviceModelsRef.current();
           setIsAddDeviceModelOpen(false);
           setIsEditing(false);
           setSelectedDeviceModel(null);
@@ -247,7 +255,7 @@ const DeviceModelManagement = () => {
         setIsCreateLoading(false);
       }
     },
-    [createApi, fetchDeviceModels, selectedDeviceModel, userId],
+    [createApi, selectedDeviceModel, userId],
   );
 
   const columns = useMemo(
