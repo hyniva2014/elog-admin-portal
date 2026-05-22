@@ -3,6 +3,7 @@ import { Grid } from "@mui/material";
 
 import {
   AlertDetailItem,
+  AlertIcon,
   DetailAlertIcon,
   AlertCardContainer,
   DetailHeader,
@@ -17,7 +18,9 @@ import {
   InfoCard,
   InfoLabel,
   InfoValue,
+  StatusBadge,
   LocationItem,
+  CoordinateBadge,
   TriggerSection,
   TriggerInfoCard,
   ActionSection,
@@ -25,14 +28,12 @@ import {
 } from "./AlertCenterScreenCard.styles.jsx";
 
 import HOS from "../../../../assets/images/active/Hos.png";
+import LocationIcon from "../../../../assets/images/active/Icon-3.png";
 
 import {
   ACTION_BUTTONS,
   getDriverDeviceInfo,
-  getDriverInfoCards,
-  getLocationContent,
   getTriggerInfo,
-  getTriggerInfoCards,
 } from "./AlertDetailsPanel.utils";
 
 const AlertActionButton = ({ label }) => {
@@ -48,6 +49,45 @@ const AlertActionButton = ({ label }) => {
     </Grid>
   );
 };
+
+const DriverInfoCardItem = ({ label, value, isStatus }) => {
+  const content = isStatus ? (
+    <StatusBadge>{value}</StatusBadge>
+  ) : (
+    <InfoValue>{value}</InfoValue>
+  );
+
+  return (
+    <InfoCard>
+      <InfoLabel>{label}</InfoLabel>
+      {content}
+    </InfoCard>
+  );
+};
+
+const LocationContentItem = ({ primaryLocation, location2 }) => {
+  const secondaryLocation = location2 ? (
+    <>
+      <AlertIcon src={LocationIcon} alt="Location" />
+      <CoordinateBadge>{location2}</CoordinateBadge>
+    </>
+  ) : null;
+
+  return (
+    <>
+      <AlertIcon src={LocationIcon} alt="Location" />
+      <CoordinateBadge>{primaryLocation}</CoordinateBadge>
+      {secondaryLocation}
+    </>
+  );
+};
+
+const TriggerInfoCardItem = ({ label, value }) => (
+  <TriggerInfoCard>
+    <InfoLabel>{label}</InfoLabel>
+    <InfoValue>{value}</InfoValue>
+  </TriggerInfoCard>
+);
 
 const AlertDetailsPanel = ({ selectedAlert }) => {
   if (!selectedAlert) return null;
@@ -71,16 +111,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
 
   const driverInfo = getDriverDeviceInfo(company, truck);
 
-  const driverInfoCards = getDriverInfoCards(driverInfo);
-
-  const locationContent = getLocationContent(primaryLocation, location2);
-
-  const actionButtons = ACTION_BUTTONS.map((label) => (
-    <AlertActionButton key={label} label={label} />
-  ));
   const triggerInfo = getTriggerInfo();
-
-  const triggerInfoCards = getTriggerInfoCards(triggerInfo);
 
   return (
     <AlertCardContainer detailsPanel>
@@ -100,12 +131,24 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
         <SectionTitle>Driver &amp; Device Information</SectionTitle>
 
         <InfoGrid>
-          {driverInfoCards}
+          {driverInfo.map(({ label, value, isStatus }) => (
+            <DriverInfoCardItem
+              key={label}
+              label={label}
+              value={value}
+              isStatus={isStatus}
+            />
+          ))}
 
           <InfoCard>
             <InfoLabel>Current Location</InfoLabel>
 
-            <LocationItem>{locationContent}</LocationItem>
+            <LocationItem>
+              <LocationContentItem
+                primaryLocation={primaryLocation}
+                location2={location2}
+              />
+            </LocationItem>
           </InfoCard>
         </InfoGrid>
       </InfoSection>
@@ -113,12 +156,22 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
       <TriggerSection>
         <TriggerSectionTitle>Trigger Information</TriggerSectionTitle>
 
-        <TriggerInfoGrid>{triggerInfoCards}</TriggerInfoGrid>
+        <TriggerInfoGrid>
+          {triggerInfo.map(({ label, value }) => (
+            <TriggerInfoCardItem
+              key={label}
+              label={label}
+              value={value}
+            />
+          ))}
+        </TriggerInfoGrid>
       </TriggerSection>
 
       <ActionSection>
         <Grid container spacing={2}>
-          {actionButtons}
+          {ACTION_BUTTONS.map((label) => (
+            <AlertActionButton key={label} label={label} />
+          ))}
         </Grid>
       </ActionSection>
     </AlertCardContainer>

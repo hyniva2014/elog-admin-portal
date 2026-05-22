@@ -47,42 +47,7 @@ export const getDriverDeviceInfo = (company, truck) => [
   },
 ];
 
-export const getDriverInfoCards = (driverInfo) =>
-  driverInfo.map(({ label, value, isStatus }) => {
-    const content = isStatus ? (
-      <StatusBadge>{value}</StatusBadge>
-    ) : (
-      <InfoValue>{value}</InfoValue>
-    );
-
-    return (
-      <InfoCard key={label}>
-        <InfoLabel>{label}</InfoLabel>
-
-        {content}
-      </InfoCard>
-    );
-  });
-
-export const getLocationContent = (primaryLocation, location2) => {
-  const secondaryLocation = location2 ? (
-    <>
-      <AlertIcon src={LocationIcon} alt="Location" />
-
-      <CoordinateBadge>{location2}</CoordinateBadge>
-    </>
-  ) : null;
-
-  return (
-    <>
-      <AlertIcon src={LocationIcon} alt="Location" />
-
-      <CoordinateBadge>{primaryLocation}</CoordinateBadge>
-
-      {secondaryLocation}
-    </>
-  );
-};
+// Pure utility constants and helpers, no JSX rendering logic.
 
 export const getTriggerInfo = () => [
   {
@@ -94,12 +59,3 @@ export const getTriggerInfo = () => [
     value: "Device Connection Lost",
   },
 ];
-
-export const getTriggerInfoCards = (triggerInfo) =>
-  triggerInfo.map(({ label, value }) => (
-    <TriggerInfoCard key={label}>
-      <InfoLabel>{label}</InfoLabel>
-
-      <InfoValue>{value}</InfoValue>
-    </TriggerInfoCard>
-  ));

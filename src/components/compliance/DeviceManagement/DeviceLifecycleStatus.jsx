@@ -1,9 +1,8 @@
 import { useMemo, useRef, useState, useEffect } from "react";
-
-import { Grid } from "@mui/material";
+import { Grid, useTheme } from "@mui/material";
 import ReactApexChart from "react-apexcharts";
 
-import { useServices } from "../../../services/services";
+import { useDeviceLifecycle } from "../../../hooks";
 
 import {
   CardContainer,
@@ -21,7 +20,6 @@ import {
 } from "./DeviceLifecycleStatus.styles";
 
 import {
-  // DEFAULT_SEGMENTS,
   CURRENT_YEAR,
   mapLifecycleToSegments,
   getChartDimensions,
@@ -29,17 +27,81 @@ import {
   getChartOptions,
 } from "./DeviceLifecycleStatus.Utils";
 
+const mapSegmentsWithTheme = (segments, theme) => {
+  const isDark = theme.palette.mode === "dark";
+  return segments.map((s) => {
+    let chartColor, bg, borderColor, labelColor;
+    switch (s.key) {
+      case "active":
+        chartColor = theme.palette.success.main;
+        bg = isDark ? theme.palette.success.darker : theme.palette.success.lighter;
+        borderColor = theme.palette.success.light;
+        labelColor = theme.palette.success.main;
+        break;
+      case "inStock":
+        chartColor = theme.palette.info.main;
+        bg = isDark ? theme.palette.info.darker : theme.palette.info.lighter;
+        borderColor = theme.palette.info.light;
+        labelColor = theme.palette.info.main;
+        break;
+      case "inMaintenance":
+        chartColor = theme.palette.warning.main;
+        bg = isDark ? theme.palette.warning.darker : theme.palette.warning.lighter;
+        borderColor = theme.palette.warning.light;
+        labelColor = isDark ? theme.palette.warning.light : theme.palette.warning.dark;
+        break;
+      case "retired":
+      default:
+        chartColor = theme.palette.grey[500];
+        bg = theme.palette.grey[isDark ? 800 : 100];
+        borderColor = theme.palette.grey[isDark ? 700 : 300];
+        labelColor = theme.palette.grey[isDark ? 300 : 700];
+        break;
+    }
+    return {
+      ...s,
+      chartColor,
+      bg,
+      borderColor,
+      labelColor,
+    };
+  });
+};
+
+const StatCardItem = ({
+  segment,
+  cardPx,
+  cardPy,
+  labelSize,
+  numberSize,
+}) => (
+  <Grid item xs={6}>
+    <StatCardBox
+      bordercolor={segment.borderColor}
+      bgcolor={segment.bg}
+      cardpx={cardPx}
+      cardpy={cardPy}
+    >
+      <StatCardLabel labelcolor={segment.labelColor} fontsize={labelSize}>
+        {segment.label}
+      </StatCardLabel>
+
+      <StatCardCount labelcolor={segment.labelColor} fontsize={numberSize}>
+        {segment.count.toLocaleString()}
+      </StatCardCount>
+    </StatCardBox>
+  </Grid>
+);
+
 const DeviceLifecycleStatus = ({
-  // segments = DEFAULT_SEGMENTS,
   year = CURRENT_YEAR,
 }) => {
   const containerRef = useRef(null);
+  const theme = useTheme();
 
   const [containerWidth, setContainerWidth] = useState(0);
 
-  const [apiSegments, setApiSegments] = useState(null);
-
-  const { fetchApi } = useServices();
+  const { deviceLifecycle } = useDeviceLifecycle(year);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -57,27 +119,10 @@ const DeviceLifecycleStatus = ({
     return () => ro.disconnect();
   }, []);
 
-  const fetchLifecycle = async () => {
-    try {
-      const response = await fetchApi(
-        `/masteradmin/dashboard-metrics?year=${year}`,
-      );
-
-      const lifecycle = response?.body?.device_life_cycle;
-
-      if (lifecycle) {
-        setApiSegments(mapLifecycleToSegments(lifecycle));
-      }
-    } catch (error) {
-      console.error("Error fetching device lifecycle status:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchLifecycle();
-  }, [year]);
-
-  const displayedSegments = apiSegments ?? mapLifecycleToSegments();
+  const displayedSegments = useMemo(() => {
+    const rawSegments = mapLifecycleToSegments(deviceLifecycle || {});
+    return mapSegmentsWithTheme(rawSegments, theme);
+  }, [deviceLifecycle, theme]);
 
   const { isNarrow, isWide, chartPx, cardWidth } =
     getChartDimensions(containerWidth);
@@ -151,28 +196,14 @@ const DeviceLifecycleStatus = ({
               rowSpacing={isNarrow ? 2.5 : 4.5}
             >
               {displayedSegments.map((s) => (
-                <Grid item xs={6} key={s.key}>
-                  <StatCardBox
-                    bordercolor={s.borderColor}
-                    bgcolor={s.bg}
-                    cardpx={cardPx}
-                    cardpy={cardPy}
-                  >
-                    <StatCardLabel
-                      labelcolor={s.labelColor}
-                      fontsize={labelSize}
-                    >
-                      {s.label}
-                    </StatCardLabel>
-
-                    <StatCardCount
-                      labelcolor={s.labelColor}
-                      fontsize={numberSize}
-                    >
-                      {s.count.toLocaleString()}
-                    </StatCardCount>
-                  </StatCardBox>
-                </Grid>
+                <StatCardItem
+                  key={s.key}
+                  segment={s}
+                  cardPx={cardPx}
+                  cardPy={cardPy}
+                  labelSize={labelSize}
+                  numberSize={numberSize}
+                />
               ))}
             </Grid>
           </StatCardsWrapper>
