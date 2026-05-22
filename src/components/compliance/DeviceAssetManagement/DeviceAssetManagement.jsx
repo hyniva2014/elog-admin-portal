@@ -1,6 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { IconButton, Tooltip } from "@mui/material";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import dayjs from "dayjs";
 import CommonDataGrid from "@src/common/CommonDataGrid";
 import { PageContainer } from "../../../common/PageContainer";
@@ -10,234 +8,296 @@ import CommonSnackbar from "../../../common/CommonSnackbar";
 import DeviceAssetManagementHeader from "./DeviceAssetManagementHeader";
 import DeviceAssetManagementForm from "./DeviceAssetManagementForm";
 import {
-  StatusTypography,
   EditButton,
   CancelEditButton,
 } from "./DeviceAssetManagement.styles";
-import { actionIconSx, GridContainer } from "../AccountManagement/AccountManagement.styled";
-import { deviceAssetSeedData } from "./DeviceAssetManagement.mockData";
-
-// ─── Static helpers ────────────────────────────────────────────────────────────
-
-const buildRows = () =>
-  deviceAssetSeedData.map((seed, index) => ({ ...seed, id: index + 1 }));
-
-const formatDate = (value) =>
-  value ? dayjs(value).format("MM DD YYYY") : "-";
-
-const getOptions = (rows, key) =>
-  Array.from(new Set(rows.map((r) => r[key]).filter(Boolean))).map((v) => ({
-    value: v,
-    label: v,
-  }));
-
-// ─── Static row-height function (avoids inline arrow in JSX) ──────────────────
-const getRowHeight = () => "auto";
-
-// ─── Column factory ────────────────────────────────────────────────────────────
-
-const getColumns = (onView) => [
-  {
-    field: "serialNumber",
-    headerName: "Serial Number",
-    width: 250,
-    minWidth: 200,
-    maxWidth: 280,
-    headerTooltip: true,
-    cellClassName: "sticky-col-left-1",
-    headerClassName: "sticky-col-left-1",
-  },
-  {
-    field: "deviceModel",
-    headerName: "Device Model",
-    width: 180,
-    minWidth: 150,
-    maxWidth: 220,
-    headerTooltip: true,
-    cellClassName: "sticky-col-left-2",
-    headerClassName: "sticky-col-left-2",
-  },
-  {
-    field: "createdOn",
-    headerName: "Created On",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-    renderCell: (params) => formatDate(params.value),
-  },
-  {
-    field: "updatedOn",
-    headerName: "Updated On",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-    renderCell: (params) => formatDate(params.value),
-  },
-  {
-    field: "status",
-    headerName: "Status",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-    renderCell: (params) => (
-      <StatusTypography variant="body2" value={params.value}>
-        {params.value}
-      </StatusTypography>
-    ),
-  },
-  {
-    field: "action",
-    headerName: "Action",
-    minWidth: 180,
-    maxWidth: 250,
-    sortable: false,
-    headerTooltip: true,
-    renderCell: (params) => (
-      <Tooltip title="View">
-        <IconButton size="small" onClick={() => onView(params.row)}>
-          <VisibilityOutlinedIcon sx={actionIconSx} />
-        </IconButton>
-      </Tooltip>
-    ),
-  },
-];
-
-// ─── Component ─────────────────────────────────────────────────────────────────
+import {
+  GridContainer,
+} from "../AccountManagement/AccountManagement.styled";
+import { useServices } from "../../../services/services";
+import { DEVICE_ASSET_STATUS_FILTER_OPTIONS } from "./Constants";
+import {
+  getColumns,
+  getRowHeight,
+  transformDeviceAssetData,
+} from "./DeviceAssetManagementTable.utils";
 
 const DeviceAssetManagement = () => {
-  const { LoadingContainer } = CommonLoading();
-
-  const [allRows, setAllRows] = useState(() => buildRows());
+  const { fetchApi, createApi } = useServices();
+  const { setLoading, LoadingContainer } = CommonLoading();
+  const [allRows, setAllRows] = useState([]);
+  const [deviceModelOptions, setDeviceModelOptions] = useState([]);
   const [data, setData] = useState({
-    isLoading: false,
     total: 0,
     page: 1,
-    pageSize: 10,
+    pageSize: 25,
     search: "",
+    deviceId: "",
+    serialNumber: "",
     sortModel: [],
     fromDate: null,
     toDate: null,
     deviceModel: "",
     status: "",
   });
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [defaultValues, setDefaultValues] = useState({ modelName: "", imeiNumber: "" });
+  const [defaultValues, setDefaultValues] = useState({
+    deviceId: "",
+    modelName: "",
+    serialNumber: "",
+    firmware: "",
+    manufacturerName: "",
+    simNumber: "",
+    iccid: "",
+    hardwareVersion: "",
+    providerDeviceId: "",
+    integrationType: "",
+    networkStatus: "",
+    status: "1",
+  });
   const [isEditMode, setIsEditMode] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
-  // ── Snackbar ────────────────────────────────────────────────────────────────
   const handleSnackbar = useCallback((message, severity = "info") => {
-    setSnackbar({ open: true, message, severity });
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    });
   }, []);
-
   const handleSnackbarClose = useCallback(() => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
+    setSnackbar((prev) => ({
+      ...prev,
+      open: false,
+    }));
   }, []);
 
-  // ── Add / View ──────────────────────────────────────────────────────────────
+  useEffect(() => {
+    fetchDeviceAssets();
+  }, [
+    data.page,
+    data.pageSize,
+    data.search,
+    data.deviceId,
+    data.serialNumber,
+    data.deviceModel,
+    data.status,
+    data.fromDate,
+  ]);
+  useEffect(() => {
+    fetchDeviceModelDropdown();
+  }, []);
+
+  const fetchDeviceModelDropdown = async () => {
+    try {
+      const response = await fetchApi("/masteradmin/get-device-model-dropdown");
+      const dropdownData = response?.body?.data || [];
+      const formattedOptions = dropdownData.map((item) => ({
+        value: item.model_name,
+        label: item.model_name,
+      }));
+
+      setDeviceModelOptions(formattedOptions);
+    } catch (error) {
+      console.error("Device Model Dropdown Error:", error);
+    }
+  };
+
+  const fetchDeviceAssets = async () => {
+    try {
+      setLoading(true);
+      let endUrl = `/masteradmin/get-eld-devices?page=${data.page}&limit=${data.pageSize}`;
+      if (data.search) {
+        endUrl += `&search=${data.search}`;
+      }
+      if (data.deviceModel) {
+        endUrl += `&device_model_id=${data.deviceModel}`;
+      }
+      if (
+        data.status !== null &&
+        data.status !== undefined &&
+        data.status !== ""
+      ) {
+        endUrl += `&status=${String(data.status)}`;
+      }
+      if (data.fromDate) {
+        endUrl += `&created_at=${dayjs(data.fromDate).format("YYYY-MM-DD")}`;
+      }
+
+      const response = await fetchApi(endUrl);
+      const apiData = response?.body?.data || [];
+
+      const rows = transformDeviceAssetData(apiData);
+      setAllRows(rows);
+      setData((prev) => ({
+        ...prev,
+        total: response?.body?.pagination?.total_records || 0,
+      }));
+      setLoading(false);
+    } catch (error) {
+      console.error("Fetch Device Assets Error:", error);
+      setLoading(false);
+      handleSnackbar("Failed to fetch device assets", "error");
+    }
+  };
+
   const handleClick = useCallback(() => {
     setIsEditMode(false);
-    setDefaultValues({ modelName: "", imeiNumber: "" });
+
+    setDefaultValues({
+      deviceId: "",
+      modelName: "",
+      serialNumber: "",
+      firmware: "",
+      manufacturerName: "",
+      simNumber: "",
+      iccid: "",
+      hardwareVersion: "",
+      providerDeviceId: "",
+      integrationType: "",
+      networkStatus: "",
+      status: "1",
+    });
+
     setIsAddModalOpen(true);
   }, []);
 
-  const handleViewClick = useCallback((row) => {
+  const handleViewClick = useCallback(async (row) => {
     setIsEditMode(true);
+
     setIsEditing(false);
-    setDefaultValues({ modelName: row.deviceModel, imeiNumber: row.serialNumber });
-    setIsAddModalOpen(true);
+
+    await fetchDeviceById(row.id);
   }, []);
 
-  // ── Edit ────────────────────────────────────────────────────────────────────
-  const handleEditClick = useCallback(() => setIsEditing(true), []);
-  const handleCancelEdit = useCallback(() => setIsEditing(false), []);
+  const handleEditClick = useCallback(() => {
+    setIsEditing(true);
+  }, []);
 
-  // ── Form submit / cancel ────────────────────────────────────────────────────
-  const handleAddSubmit = useCallback(
-    (formData) => {
-      if (!isEditMode) {
-        const today = dayjs().format("YYYY-MM-DD");
-        setAllRows((prev) => {
-          const nextId = Math.max(...prev.map((r) => r.id)) + 1;
-          return [
-            {
-              id: nextId,
-              serialNumber: `SN-NEW${nextId}`,
-              deviceModel: formData.modelName || "-",
-              createdOn: today,
-              updatedOn: null,
-              status: "Active",
-            },
-            ...prev,
-          ];
-        });
-        setData((prev) => ({ ...prev, page: 1 }));
-        handleSnackbar("Asset added successfully.", "success");
+  const handleCancelEdit = useCallback(() => {
+    setIsEditing(false);
+  }, []);
+
+  const handleAddSubmit = async (formValues) => {
+    try {
+      setLoading(true);
+
+      const payload = {
+        device_serial_number: formValues.serialNumber,
+        device_model_id: formValues.modelName,
+        status: formValues.status || "1",
+      };
+      if (formValues.deviceId) {
+        payload.device_id = formValues.deviceId;
       }
-      setIsAddModalOpen(false);
-      setDefaultValues({ modelName: "", imeiNumber: "" });
-      setIsEditMode(false);
-      setIsEditing(false);
-    },
-    [isEditMode, handleSnackbar],
-  );
+      const response = await createApi(
+        payload,
+        "/masteradmin/onboard-eld-device",
+      );
+
+      if (response?.statusCode === 200) {
+        handleSnackbar(
+          formValues.deviceId
+            ? "Asset updated successfully"
+            : "Asset created successfully",
+          "success",
+        );
+        setIsAddModalOpen(false);
+        fetchDeviceAssets();
+      } else {
+        handleSnackbar(
+          response?.body?.message || "Something went wrong",
+          "warning",
+        );
+      }
+    } catch (error) {
+      console.error("Create/Update Device Error:", error);
+
+      handleSnackbar("Unexpected error occurred", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchDeviceById = async (deviceId) => {
+    try {
+      setLoading(true);
+
+      const response = await fetchApi(
+        `/masteradmin/get-eld-devices?device_id=${deviceId}`,
+      );
+
+      const deviceData = response?.body;
+      setDefaultValues({
+        deviceId: deviceData?.device_id || "",
+        modelName: deviceData?.device_model_id || "",
+        serialNumber: deviceData?.device_serial_number || "",
+        firmware: deviceData?.firmware || "",
+        manufacturerName: deviceData?.manufacturer_name || "",
+        simNumber: deviceData?.sim_number || "",
+        iccid: deviceData?.iccid || "",
+        hardwareVersion: deviceData?.hardware_version || "",
+        providerDeviceId: deviceData?.provider_device_id || "",
+        integrationType: deviceData?.integration_type || "",
+        networkStatus: deviceData?.network_status || "",
+        status:
+          deviceData?.status === 0 || deviceData?.status === "0"
+            ? "0"
+            : deviceData?.status === 1 || deviceData?.status === "1"
+              ? "1"
+              : "",
+      });
+
+      setIsAddModalOpen(true);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Fetch Device By Id Error:", error);
+
+      setLoading(false);
+
+      handleSnackbar("Failed to fetch device details", "error");
+    }
+  };
 
   const handleAddCancel = useCallback(() => {
     setIsAddModalOpen(false);
-    setDefaultValues({ modelName: "", imeiNumber: "" });
+
+    setDefaultValues({
+      deviceId: "",
+      modelName: "",
+      serialNumber: "",
+      firmware: "",
+      manufacturerName: "",
+      simNumber: "",
+      iccid: "",
+      hardwareVersion: "",
+      providerDeviceId: "",
+      integrationType: "",
+      networkStatus: "",
+    });
+
     setIsEditMode(false);
     setIsEditing(false);
   }, []);
 
-  // ── No-op mode setter (stable reference, avoids inline arrow) ───────────────
   const handleSetMode = useCallback(() => {}, []);
 
-  // ── Derived data ────────────────────────────────────────────────────────────
   const columns = useMemo(() => getColumns(handleViewClick), [handleViewClick]);
-
-  const filteredRows = useMemo(() => {
-    const searchValue = data.search.trim().toLowerCase();
-    return allRows.filter((row) => {
-      const matchesSearch =
-        !searchValue ||
-        [row.serialNumber, row.deviceModel, row.status]
-          .join(" ")
-          .toLowerCase()
-          .includes(searchValue);
-
-      const rowDate = dayjs(row.createdOn);
-      const matchesDate =
-        (!data.fromDate ||
-          rowDate.isSame(data.fromDate, "day") ||
-          rowDate.isAfter(data.fromDate, "day")) &&
-        (!data.toDate ||
-          rowDate.isSame(data.toDate, "day") ||
-          rowDate.isBefore(data.toDate, "day"));
-
-      return (
-        matchesSearch &&
-        matchesDate &&
-        (!data.deviceModel || row.deviceModel === data.deviceModel) &&
-        (!data.status || row.status === data.status)
-      );
-    });
-  }, [allRows, data]);
-
-  const paginatedRows = useMemo(() => {
-    const start = (data.page - 1) * data.pageSize;
-    return filteredRows.slice(start, start + data.pageSize);
-  }, [filteredRows, data.page, data.pageSize]);
 
   const gridData = {
     ...data,
-    rows: paginatedRows,
+    rows: allRows,
     columns,
-    total: filteredRows.length,
+    total: data.total,
   };
 
-  // ── Pre-computed header actions element ─────────────────────────────────────
   let headerActionsElement = null;
+
   if (isEditMode && !isEditing) {
     headerActionsElement = (
       <EditButton variant="contained" onClick={handleEditClick}>
@@ -252,6 +312,20 @@ const DeviceAssetManagement = () => {
     );
   }
 
+  const dialogMode = isEditMode ? "edit" : "add";
+
+  const dialogTitle = isEditMode
+    ? isEditing
+      ? "Edit Asset"
+      : "View Asset"
+    : "Add Asset";
+
+  const submitButtonLabel = isEditMode
+    ? isEditing
+      ? "Update"
+      : "Save"
+    : "Add Asset";
+
   return (
     <>
       <LoadingContainer />
@@ -264,13 +338,13 @@ const DeviceAssetManagement = () => {
           mode=""
           setMode={handleSetMode}
           handleClick={handleClick}
-          modelOptions={getOptions(allRows, "deviceModel")}
-          statusOptions={getOptions(allRows, "status")}
+          modelOptions={deviceModelOptions}
+          statusOptions={DEVICE_ASSET_STATUS_FILTER_OPTIONS}
         />
         <GridContainer>
           <CommonDataGrid
             columnsData={columns}
-            rowData={paginatedRows}
+            rowData={allRows}
             data={gridData}
             setData={setData}
             paginationMode="server"
@@ -288,13 +362,14 @@ const DeviceAssetManagement = () => {
 
       <CommonDialogForm
         open={isAddModalOpen}
-        title={isEditMode ? "View Asset" : "Add Asset"}
-        mode={isEditMode ? "edit" : "add"}
-        formId="addAssetForm"
-        onSubmit={handleAddSubmit}
         onCancel={handleAddCancel}
-        submitButtonText={isEditMode ? (isEditing ? "Update" : "Save") : "Add Asset"}
+        mode={dialogMode}
+        title={dialogTitle}
+        formId="addAssetForm"
+        loading={false}
+        isEditing={isEditing}
         headerActions={headerActionsElement}
+        submitButtonText={submitButtonLabel}
         content={
           <DeviceAssetManagementForm
             formId="addAssetForm"

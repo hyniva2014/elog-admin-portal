@@ -8,6 +8,7 @@ import {
   headerLabelSx,
   containerSx,
   gridSx,
+  getContainerSx,
 } from "./CommonDataGrid.styles";
 
 const withHeaderTooltip = (columns) =>
@@ -197,10 +198,7 @@ const CommonDataGrid = ({
   });
 
   return (
-    <Box
-      ref={containerRef}
-      sx={containerSx}
-    >
+    <Box ref={containerRef} sx={getContainerSx(localRows.length > 0)}>
       <DataGrid
         rows={localRows}
         columns={withHeaderTooltip(enhancedColumns)}
@@ -226,7 +224,9 @@ const CommonDataGrid = ({
         slots={{
           pagination: CustomPagination,
         }}
-        sx={(theme) => gridSx(theme)}
+        sx={(theme) => ({
+          ...gridSx(theme),
+        })}
       />
     </Box>
   );
