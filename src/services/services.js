@@ -84,9 +84,9 @@ export const useServices = () => {
   const createApi = async (payload, endUrl) => {
     try {
       const isPublicEndpoint =
-        endUrl.includes("/user/login") ||
-        endUrl.includes("/user/send-otp") ||
-        endUrl.includes("/user/reset-password");
+        endUrl.includes("/masteradmin/login") ||
+        endUrl.includes("/masteradmin/send-otp") ||
+        endUrl.includes("/masteradmin/reset-password");
 
       const response = await axios.post(
         `${ELOG_API_GATEWAY_URL}${endUrl}`,

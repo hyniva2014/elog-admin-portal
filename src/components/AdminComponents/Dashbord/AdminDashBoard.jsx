@@ -24,6 +24,7 @@ import { alerts, Device_Metrics_Cards } from "./AdminConstant";
 import DateRangeSelector from "./DateRangeSelector";
 import { useDashboardMetrics } from "../../../hooks";
 import { buildSummaryCards } from "../../../common/Commonutils";
+import CommonLoading from "../../../common/CommonLoading";
 
 const getTodayRange = () => {
   const today = new Date();
@@ -46,6 +47,7 @@ const getTodayRange = () => {
 const AdminDashboard = () => {
   const [selectedRange, setSelectedRange] = useState(getTodayRange());
   const { dashboardMetrics } = useDashboardMetrics(selectedRange);
+  const { loading, setLoading, LoadingContainer } = CommonLoading();
 
   const handleDateChange = (data) => {
     setSelectedRange(data);
@@ -62,6 +64,7 @@ const AdminDashboard = () => {
 
   return (
     <PageContainer>
+      <LoadingContainer/>
       {/* Header */}
       <HeaderContainer>
         <HeaderLeft>

@@ -50,7 +50,7 @@ const UserProfile = () => {
         {
           user_id: userDetails?.user_id,
         },
-        "/user/logout",
+        "/masteradmin/logout",
       );
 
       if (response?.statusCode === 200) {

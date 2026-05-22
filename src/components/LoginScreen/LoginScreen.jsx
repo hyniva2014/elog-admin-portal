@@ -132,7 +132,7 @@ const LoginScreen = () => {
 
       const response = await createApi(
         { user_name: username, password },
-        "/admin/user/login",
+        "/masteradmin/login",
       );
 
       if (response?.statusCode === 200) {
@@ -203,7 +203,7 @@ const LoginScreen = () => {
 
       const response = await createApi(
         { user_name: forgotEmail },
-        "/user/send-otp",
+        "/masteradmin/send-otp",
       );
 
       if (response?.statusCode === 200) {
@@ -246,7 +246,7 @@ const LoginScreen = () => {
           new_password: newPassword,
           confirm_password: confirmPassword,
         },
-        "/user/reset-password",
+        "/masteradmin/reset-password",
       );
 
       const apiMessage = response?.body?.message || "Password reset successful";
