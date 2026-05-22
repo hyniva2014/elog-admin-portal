@@ -283,13 +283,9 @@ const DeviceModelManagement = () => {
     [handleViewDeviceModel],
   );
 
-  const filteredRows = useMemo(() => {
-    return allDeviceModels;
-  }, [allDeviceModels]);
-
   const gridData = {
     ...data,
-    rows: filteredRows,
+    rows: allDeviceModels,
     columns,
     total: data.total,
   };
@@ -344,7 +340,7 @@ const DeviceModelManagement = () => {
         <GridContainer>
           <CommonDataGrid
             columnsData={columns}
-            rowData={filteredRows}
+            rowData={allDeviceModels}
             data={gridData}
             setData={setData}
             paginationMode="server"

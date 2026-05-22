@@ -14,6 +14,9 @@ const mockOnSubmit = jest.fn();
 const mockOnEditClick = jest.fn();
 const mockOnCancelEdit = jest.fn();
 
+const mockEditButton = <button data-testid="edit-button">Edit</button>;
+const mockCancelEditButton = <button data-testid="cancel-edit-button">Cancel Edit</button>;
+
 const defaultProps = {
   open: true,
   onClose: mockOnClose,
@@ -40,7 +43,7 @@ const viewModeProps = {
     eLogs: "Yes",
     status: "Active",
   },
-  headerActions: <button data-testid="edit-button">Edit</button>,
+  headerActions: mockEditButton,
 };
 
 const editModeProps = {
@@ -58,7 +61,7 @@ const editModeProps = {
     eLogs: "Yes",
     status: "Active",
   },
-  headerActions: <button data-testid="cancel-edit-button">Cancel Edit</button>,
+  headerActions: mockCancelEditButton,
 };
 
 describe("AddDeviceModelDialog - Add Mode", () => {
