@@ -100,6 +100,12 @@ const getDeviceModelColumns = (onViewDeviceModel) => [
   },
 ];
 
+const isApiSuccess = (response) =>
+  response?.statusCode === 200 ||
+  response?.statusCode === 201 ||
+  response?.body?.statusCode === 200 ||
+  response?.body?.statusCode === 201;
+
 const DeviceModelManagement = () => {
   const { fetchApi, createApi } = useServices();
   const userId = useSelector(
@@ -197,12 +203,6 @@ const DeviceModelManagement = () => {
     setIsEditing(false);
     setSelectedDeviceModel(null);
   }, []);
-
-  const isApiSuccess = (response) =>
-    response?.statusCode === 200 ||
-    response?.statusCode === 201 ||
-    response?.body?.statusCode === 200 ||
-    response?.body?.statusCode === 201;
 
   const handleCreateDeviceModel = useCallback(
     async (deviceModel) => {

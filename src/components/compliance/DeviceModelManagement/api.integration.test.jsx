@@ -3,12 +3,16 @@
  * Tests for GET, POST (Create), and POST (Update) API calls
  */
 
-import { renderHook, waitFor } from "@testing-library/react";
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 
-// Mock the services hook
 const mockFetchApi = jest.fn();
 const mockCreateApi = jest.fn();
+
+jest.mock("react-redux", () => ({
+  ...jest.requireActual("react-redux"),
+  useSelector: () => null,
+  useDispatch: () => jest.fn(),
+}));
 
 jest.mock("../../../services/services", () => ({
   useServices: () => ({
@@ -331,18 +335,7 @@ describe("DeviceModelManagement API Integration", () => {
       expect(screen.getByTestId("device-model-header")).toBeInTheDocument();
     });
 
-    it("should include correct created_by and updated_by in create payload", async () => {
-      const expectedPayload = {
-        device_code: "SG3",
-        model_name: "Samsara G3",
-        asset_type: 1,
-        description: "Test description",
-        supports_elogs: 1,
-        status: 2,
-        created_by: 9,
-        updated_by: 9,
-      };
-
+    it("should pass userId from Redux as created_by and updated_by in create payload", async () => {
       mockFetchApi.mockResolvedValueOnce({
         body: {
           data: { data: [], pagination: { total_records: 0 } },
@@ -386,17 +379,6 @@ describe("DeviceModelManagement API Integration", () => {
     });
 
     it("should include device_model_id in update payload", async () => {
-      const updatePayload = {
-        device_model_id: 1,
-        device_code: "SG1",
-        model_name: "Samsara G1 Updated",
-        asset_type: 1,
-        description: "Updated description",
-        supports_elogs: 1,
-        status: 1,
-        updated_by: 9,
-      };
-
       mockFetchApi.mockResolvedValueOnce({
         body: {
           data: {
@@ -430,8 +412,6 @@ describe("DeviceModelManagement API Integration", () => {
       await waitFor(() => {
         expect(mockFetchApi).toHaveBeenCalled();
       });
-
-      expect(updatePayload.device_model_id).toBe(1);
     });
 
     it("should preserve existing device_code in update payload", async () => {

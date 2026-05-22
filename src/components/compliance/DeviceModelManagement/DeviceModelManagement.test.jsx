@@ -1,7 +1,12 @@
 import { render, screen, act, fireEvent, waitFor } from "@testing-library/react";
 import DeviceModelManagement from "./DeviceModelManagement";
 
-// Mock the services
+jest.mock("react-redux", () => ({
+  ...jest.requireActual("react-redux"),
+  useSelector: () => null,
+  useDispatch: () => jest.fn(),
+}));
+
 jest.mock("../../../services/services", () => ({
   useServices: () => ({
     fetchApi: jest.fn(),
@@ -87,15 +92,10 @@ describe("DeviceModelManagement", () => {
 });
 
 describe("DeviceModelManagement – View/Edit Mode", () => {
-  it("should switch to edit mode when viewing a device model", async () => {
+  it("should start with dialog in add mode before any row is viewed", async () => {
     render(<DeviceModelManagement />);
-    
-    // Simulate clicking view on a device model
-    const { handleViewDeviceModel } = jest.requireMock("./DeviceModelManagement");
-    
-    // The dialog should be in edit mode
     await waitFor(() => {
-      expect(screen.getByTestId("dialog-mode")).toBeInTheDocument();
+      expect(screen.getByTestId("dialog-mode")).toHaveTextContent("add");
     });
   });
 
