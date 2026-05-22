@@ -357,7 +357,7 @@ const DeviceAssetManagement = () => {
             getRowHeight={getRowHeight}
             checkboxSelection
             rowSelectionModel={selectedRows}
-            onRowSelectionModelChange={setSelectedRows}
+            onRowSelectionModelChange = {setSelectedRows}
           />
         </GridContainer>
       </PageContainer>
