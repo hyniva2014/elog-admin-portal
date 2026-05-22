@@ -2,8 +2,10 @@ import React from "react";
 import { IconButton, Tooltip } from "@mui/material";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import dayjs from "dayjs";
-import { StatusTypography } from "./DeviceAssetManagement.styles";
-import { actionIconSx } from "../AccountManagement/AccountManagement.styled";
+import {
+  StatusTypography,
+  actionIconSx,
+} from "./DeviceAssetManagement.styles";
 
 export const formatDate = (value) =>
   value ? dayjs(value).format("MMM DD, YYYY") : "-";
@@ -16,13 +18,23 @@ const StatusCell = (params) => (
   </StatusTypography>
 );
 
-const ActionCell = (onView) => {
-  return (params) => (
+const ActionButton = ({ row, onView }) => {
+  const handleClick = () => {
+    onView(row);
+  };
+
+  return (
     <Tooltip title="View">
-      <IconButton size="small" onClick={() => onView(params.row)}>
+      <IconButton size="small" onClick={handleClick}>
         <VisibilityOutlinedIcon sx={actionIconSx} />
       </IconButton>
     </Tooltip>
+  );
+};
+
+const ActionCell = (onView) => {
+  return (params) => (
+    <ActionButton row={params.row} onView={onView} />
   );
 };
 
@@ -52,7 +64,7 @@ export const getColumns = (onView) => [
   {
     field: "createdOn",
     headerName: "Created On",
-    minWidth: 180,  
+    minWidth: 180,
     maxWidth: 250,
     headerTooltip: true,
     renderCell: (params) => formatDate(params.value),
@@ -86,3 +98,29 @@ export const getColumns = (onView) => [
     renderCell: ActionCell(onView),
   },
 ];
+
+export const transformDeviceAssetData = (apiData) => {
+  return apiData.map((item) => ({
+    id: item.device_id,
+    serialNumber: item.device_serial_number || "-",
+    deviceModel: item.device_model_id || "-",
+    createdOn: item.created_at || null,
+    updatedOn: item.updated_at || null,
+    status:
+      item.status === "1"
+        ? "Active"
+        : item.status === "0"
+          ? "Inactive"
+          : "-",
+    imeiNumber: item.imei_number || "-",
+    firmware: item.firmware || "-",
+    manufacturerName: item.manufacturer_name || "-",
+    simNumber: item.sim_number || "-",
+    iccid: item.iccid || "-",
+    hardwareVersion: item.hardware_version || "-",
+    providerDeviceId: item.provider_device_id || "-",
+    integrationType: item.integration_type || "-",
+    networkStatus: item.network_status || "-",
+    activationDate: item.activation_date || null,
+  }));
+};

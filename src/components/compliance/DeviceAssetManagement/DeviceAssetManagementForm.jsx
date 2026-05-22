@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
-
+import { FormBox, StyledForm } from "./DeviceAssetManagement.styles";
 import CommonTextField from "../../../common/CommonTextField";
 import { FormBox, formStyle } from "./DeviceAssetManagement.styles";
 import { DEVICE_ASSET_STATUS_FILTER_OPTIONS } from "./Constants";
@@ -50,7 +50,7 @@ const DeviceAssetManagementForm = ({
   };
 
   return (
-    <form id={formId} onSubmit={handleSubmit(submitHandler)} style={formStyle}>
+    <StyledForm id={formId} onSubmit={handleSubmit(submitHandler)}>
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Controller
@@ -115,7 +115,7 @@ const DeviceAssetManagementForm = ({
           </Grid>
         )}
       </Grid>
-    </form>
+    </StyledForm>
   );
 };
 

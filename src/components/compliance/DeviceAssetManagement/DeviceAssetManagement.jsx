@@ -21,6 +21,11 @@ import {
 import { useServices } from "../../../services/services";
 import { getColumns, getRowHeight } from "./DeviceAssetManagementTable.utils";
 import { DEVICE_ASSET_STATUS_FILTER_OPTIONS } from "./Constants";
+import {
+  getColumns,
+  getRowHeight,
+  transformDeviceAssetData,
+} from "./DeviceAssetManagementTable.utils";
 
 const DeviceAssetManagement = () => {
   const { fetchApi, createApi } = useServices();
@@ -131,29 +136,7 @@ const DeviceAssetManagement = () => {
       const response = await fetchApi(endUrl);
       const apiData = response?.body?.data || [];
 
-      const rows = apiData.map((item) => ({
-        id: item.device_id,
-        serialNumber: item.device_serial_number || "-",
-        deviceModel: item.device_model_id || "-",
-        createdOn: item.created_at || null,
-        updatedOn: item.updated_at || null,
-        status:
-          item.status === "1"
-            ? "Active"
-            : item.status === "0"
-              ? "Inactive"
-              : "-",
-        imeiNumber: item.imei_number || "-",
-        firmware: item.firmware || "-",
-        manufacturerName: item.manufacturer_name || "-",
-        simNumber: item.sim_number || "-",
-        iccid: item.iccid || "-",
-        hardwareVersion: item.hardware_version || "-",
-        providerDeviceId: item.provider_device_id || "-",
-        integrationType: item.integration_type || "-",
-        networkStatus: item.network_status || "-",
-        activationDate: item.activation_date || null,
-      }));
+      const rows = transformDeviceAssetData(apiData);
       setAllRows(rows);
       setData((prev) => ({
         ...prev,

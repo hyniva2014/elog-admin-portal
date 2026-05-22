@@ -29,6 +29,10 @@ export const FormBox = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
 }));
 
+export const StyledForm = styled("form")(() => ({
+  paddingTop: 15,
+}));
+
 export const EditButton = styled(Button)(({ theme }) => ({
   fontSize: 14,
   fontWeight: 400,
@@ -51,6 +55,7 @@ export const StatusTypography = styled(Typography)(({ value }) => ({
   color: value === "Active" ? COLORS.success : COLORS.error,
 }));
 
-export const formStyle = {
-  paddingTop: 15,
+export const actionIconSx = {
+  fontSize: 20,
+  color: COLORS.primary,
 };
