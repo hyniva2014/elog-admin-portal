@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Grid, MenuItem, FormControl, InputLabel, Select, FormHelperText } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -9,7 +9,12 @@ import { DialogFormContainer } from "./DeviceModelManagement.styled.jsx";
 import {
   DEVICE_MODEL_ASSET_OPTIONS,
   DEVICE_MODEL_ELOG_OPTIONS,
+  DEVICE_MODEL_STATUS_OPTIONS,
 } from "./Constants";
+
+const SelectMenuItem = ({ value, label }) => (
+  <MenuItem value={value}>{label}</MenuItem>
+);
 
 const ADD_DEVICE_MODEL_FORM_ID = "add-device-model-form";
 
@@ -93,16 +98,18 @@ const AddDeviceModelDialog = ({
     }
   }, [open, selectedDeviceModel, isEditMode, reset]);
 
-  const handleCancel = () => {
-    // Always close the popup when Cancel button is clicked
+  const handleCancel = useCallback(() => {
     reset(getDefaultValues(null, false));
     onClose();
-  };
+  }, [reset, onClose]);
 
-  const submitHandler = (data) => {
-    onSubmit(data);
-    reset(getDefaultValues(null, false));
-  };
+  const submitHandler = useCallback(
+    (data) => {
+      onSubmit(data);
+      reset(getDefaultValues(null, false));
+    },
+    [onSubmit, reset],
+  );
 
   const renderModelNameField = ({ field }) => (
     <CommonTextField
@@ -137,15 +144,9 @@ const AddDeviceModelDialog = ({
   const renderAssetTypeField = ({ field }) => (
     <FormControl fullWidth size="small" error={!!errors.assetType} disabled={loading || isDisabled}>
       <InputLabel id="asset-type-label" required>Asset Type</InputLabel>
-      <Select
-        {...field}
-        labelId="asset-type-label"
-        label="Asset Type"
-      >
+      <Select {...field} labelId="asset-type-label" label="Asset Type">
         {DEVICE_MODEL_ASSET_OPTIONS.map(({ value, label }) => (
-          <MenuItem key={value} value={value}>
-            {label}
-          </MenuItem>
+          <SelectMenuItem key={value} value={value} label={label} />
         ))}
       </Select>
       {errors.assetType && <FormHelperText>{errors.assetType.message}</FormHelperText>}
@@ -155,15 +156,9 @@ const AddDeviceModelDialog = ({
   const renderELogsField = ({ field }) => (
     <FormControl fullWidth size="small" error={!!errors.eLogs} disabled={loading || isDisabled}>
       <InputLabel id="elogs-label" required>E-Logs</InputLabel>
-      <Select
-        {...field}
-        labelId="elogs-label"
-        label="E-Logs"
-      >
+      <Select {...field} labelId="elogs-label" label="E-Logs">
         {DEVICE_MODEL_ELOG_OPTIONS.map(({ value, label }) => (
-          <MenuItem key={value} value={value}>
-            {label}
-          </MenuItem>
+          <SelectMenuItem key={value} value={value} label={label} />
         ))}
       </Select>
       {errors.eLogs && <FormHelperText>{errors.eLogs.message}</FormHelperText>}
@@ -173,13 +168,10 @@ const AddDeviceModelDialog = ({
   const renderStatusField = ({ field }) => (
     <FormControl fullWidth size="small" error={!!errors.status} disabled={loading || isDisabled}>
       <InputLabel id="status-label" required>Status</InputLabel>
-      <Select
-        {...field}
-        labelId="status-label"
-        label="Status"
-      >
-        <MenuItem value="Active">Active</MenuItem>
-        <MenuItem value="Inactive">Inactive</MenuItem>
+      <Select {...field} labelId="status-label" label="Status">
+        {DEVICE_MODEL_STATUS_OPTIONS.map(({ value, label }) => (
+          <SelectMenuItem key={value} value={value} label={label} />
+        ))}
       </Select>
       {errors.status && <FormHelperText>{errors.status.message}</FormHelperText>}
     </FormControl>
@@ -235,27 +227,25 @@ const AddDeviceModelDialog = ({
     </form>
   );
 
-  const getTitle = () => {
-    if (isEditMode) return "View Device Model";
-    return "Add Device Model";
-  };
+  const title = useMemo(
+    () => (isEditMode ? "View Device Model" : "Add Device Model"),
+    [isEditMode],
+  );
 
-  const getSubmitButtonText = () => {
-    if (isEditMode) {
-      return isEditing ? "Update" : "Save";
-    }
-    return "Add Device";
-  };
+  const submitButtonText = useMemo(() => {
+    if (!isEditMode) return "Add Device";
+    return isEditing ? "Update" : "Save";
+  }, [isEditMode, isEditing]);
 
   return (
     <CommonDialogForm
       open={open}
-      title={getTitle()}
+      title={title}
       content={formContent}
       formId={ADD_DEVICE_MODEL_FORM_ID}
       onCancel={handleCancel}
       loading={loading}
-      submitButtonText={getSubmitButtonText()}
+      submitButtonText={submitButtonText}
       maxWidth="sm"
       headerActions={headerActions}
       hideActions={isEditMode && !isEditing}

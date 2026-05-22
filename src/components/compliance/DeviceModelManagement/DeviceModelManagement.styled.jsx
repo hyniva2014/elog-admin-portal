@@ -5,21 +5,21 @@ import eyeIcon from "../../../assets/images/svg/eyeicon.png";
 export const EditButton = styled(Button)(({ theme }) => ({
   fontSize: 14,
   fontWeight: 400,
-  color: "#FFFFFF",
-  backgroundColor: "#284495",
+  color: theme.palette.common.white,
+  backgroundColor: theme.palette.brand.main,
   border: 1,
   borderRadius: 2,
-  borderColor: "#284495",
+  borderColor: theme.palette.brand.main,
 }));
 
 export const CancelEditButton = styled(Button)(({ theme }) => ({
   fontSize: 14,
   fontWeight: 400,
-  color: "#284495",
+  color: theme.palette.brand.main,
   border: 1,
   borderRadius: 2,
-  borderColor: "#284495",
-  backgroundColor: "#F3F8FF",
+  borderColor: theme.palette.brand.main,
+  backgroundColor: theme.palette.brand.lighter,
 }));
 
 export const HeaderContainer = styled(Box)(({ theme }) => ({
