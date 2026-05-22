@@ -7,7 +7,6 @@ import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import { FormBox, StyledForm } from "./DeviceAssetManagement.styles";
 import CommonTextField from "../../../common/CommonTextField";
-import { FormBox, formStyle } from "./DeviceAssetManagement.styles";
 import { DEVICE_ASSET_STATUS_FILTER_OPTIONS } from "./Constants";
 
 const validationSchema = yup.object({

@@ -1,6 +1,4 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { IconButton, Tooltip } from "@mui/material";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import dayjs from "dayjs";
 import CommonDataGrid from "@src/common/CommonDataGrid";
 import { PageContainer } from "../../../common/PageContainer";
@@ -10,16 +8,13 @@ import CommonSnackbar from "../../../common/CommonSnackbar";
 import DeviceAssetManagementHeader from "./DeviceAssetManagementHeader";
 import DeviceAssetManagementForm from "./DeviceAssetManagementForm";
 import {
-  StatusTypography,
   EditButton,
   CancelEditButton,
 } from "./DeviceAssetManagement.styles";
 import {
-  actionIconSx,
   GridContainer,
 } from "../AccountManagement/AccountManagement.styled";
 import { useServices } from "../../../services/services";
-import { getColumns, getRowHeight } from "./DeviceAssetManagementTable.utils";
 import { DEVICE_ASSET_STATUS_FILTER_OPTIONS } from "./Constants";
 import {
   getColumns,

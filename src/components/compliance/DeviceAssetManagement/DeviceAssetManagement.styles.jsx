@@ -7,6 +7,7 @@ export const COLORS = {
   lightBlue: "#F3F8FF",
   success: "#2e7d32",
   error: "#c62828",
+  grey: "#6B7280",
 };
 
 export const HeaderContainer = styled(Box)(({ theme }) => ({
@@ -57,5 +58,5 @@ export const StatusTypography = styled(Typography)(({ value }) => ({
 
 export const actionIconSx = {
   fontSize: 20,
-  color: COLORS.primary,
+  color: COLORS.grey,
 };
