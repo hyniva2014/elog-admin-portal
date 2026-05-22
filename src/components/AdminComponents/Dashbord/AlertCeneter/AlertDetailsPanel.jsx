@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { Grid } from "@mui/material";
+
 import {
   AlertDetailItem,
   AlertIcon,
@@ -29,11 +30,15 @@ import {
 import HOS from "../../../../assets/images/active/Hos.png";
 import LocationIcon from "../../../../assets/images/active/Icon-3.png";
 
-const ACTION_BUTTONS = ["Acknowledge", "Assign Operator", "Escalate", "Resolve"];
+import {
+  ACTION_BUTTONS,
+  getDriverDeviceInfo,
+  getTriggerInfo,
+} from "./AlertDetailsPanel.utils";
 
 const AlertActionButton = ({ label }) => {
   const handleClick = useCallback(() => {
-    // TODO: wire up action handler per button label
+    // TODO
   }, []);
 
   return (
@@ -45,8 +50,68 @@ const AlertActionButton = ({ label }) => {
   );
 };
 
+const DriverInfoCardItem = ({ label, value, isStatus }) => {
+  const content = isStatus ? (
+    <StatusBadge>{value}</StatusBadge>
+  ) : (
+    <InfoValue>{value}</InfoValue>
+  );
+
+  return (
+    <InfoCard>
+      <InfoLabel>{label}</InfoLabel>
+      {content}
+    </InfoCard>
+  );
+};
+
+const LocationContentItem = ({ primaryLocation, location2 }) => {
+  const secondaryLocation = location2 ? (
+    <>
+      <AlertIcon src={LocationIcon} alt="Location" />
+      <CoordinateBadge>{location2}</CoordinateBadge>
+    </>
+  ) : null;
+
+  return (
+    <>
+      <AlertIcon src={LocationIcon} alt="Location" />
+      <CoordinateBadge>{primaryLocation}</CoordinateBadge>
+      {secondaryLocation}
+    </>
+  );
+};
+
+const TriggerInfoCardItem = ({ label, value }) => (
+  <TriggerInfoCard>
+    <InfoLabel>{label}</InfoLabel>
+    <InfoValue>{value}</InfoValue>
+  </TriggerInfoCard>
+);
+
 const AlertDetailsPanel = ({ selectedAlert }) => {
   if (!selectedAlert) return null;
+
+  const {
+    title,
+    message,
+    severity,
+    company,
+    truck,
+    location1,
+    location2,
+    city,
+  } = selectedAlert;
+
+  const displayTitle = title || message;
+
+  const displaySeverity = severity || "Critical";
+
+  const primaryLocation = location1 || city;
+
+  const driverInfo = getDriverDeviceInfo(company, truck);
+
+  const triggerInfo = getTriggerInfo();
 
   return (
     <AlertCardContainer detailsPanel>
@@ -55,13 +120,9 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
           <DetailAlertIcon src={HOS} alt="Alert type icon" />
 
           <DetailTitleWrapper>
-            <DetailTitle>
-              {selectedAlert.title || selectedAlert.message}
-            </DetailTitle>
+            <DetailTitle>{displayTitle}</DetailTitle>
 
-            <DetailSubTitle>
-              {selectedAlert.severity || "Critical"}
-            </DetailSubTitle>
+            <DetailSubTitle>{displaySeverity}</DetailSubTitle>
           </DetailTitleWrapper>
         </AlertDetailItem>
       </DetailHeader>
@@ -70,52 +131,23 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
         <SectionTitle>Driver &amp; Device Information</SectionTitle>
 
         <InfoGrid>
-          <InfoCard>
-            <InfoLabel>Driver Name</InfoLabel>
-            <InfoValue>Sarah Johnson</InfoValue>
-          </InfoCard>
-
-          <InfoCard>
-            <InfoLabel>Driver Status</InfoLabel>
-            <StatusBadge>Active</StatusBadge>
-          </InfoCard>
-
-          <InfoCard>
-            <InfoLabel>Carrier Name</InfoLabel>
-            <InfoValue>{selectedAlert.company}</InfoValue>
-          </InfoCard>
-
-          <InfoCard>
-            <InfoLabel>Device ID</InfoLabel>
-            <InfoValue>DEV-8921</InfoValue>
-          </InfoCard>
-
-          <InfoCard>
-            <InfoLabel>Truck Number</InfoLabel>
-            <InfoValue>{selectedAlert.truck}</InfoValue>
-          </InfoCard>
-
-          <InfoCard>
-            <InfoLabel>Route</InfoLabel>
-            <InfoValue>US-75 South</InfoValue>
-          </InfoCard>
+          {driverInfo.map(({ label, value, isStatus }) => (
+            <DriverInfoCardItem
+              key={label}
+              label={label}
+              value={value}
+              isStatus={isStatus}
+            />
+          ))}
 
           <InfoCard>
             <InfoLabel>Current Location</InfoLabel>
 
             <LocationItem>
-              <AlertIcon src={LocationIcon} alt="Location" />
-
-              <CoordinateBadge>
-                {selectedAlert.location1 || selectedAlert.city}
-              </CoordinateBadge>
-
-              {selectedAlert.location2 && (
-                <>
-                  <AlertIcon src={LocationIcon} alt="Location" />
-                  <CoordinateBadge>{selectedAlert.location2}</CoordinateBadge>
-                </>
-              )}
+              <LocationContentItem
+                primaryLocation={primaryLocation}
+                location2={location2}
+              />
             </LocationItem>
           </InfoCard>
         </InfoGrid>
@@ -125,15 +157,13 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
         <TriggerSectionTitle>Trigger Information</TriggerSectionTitle>
 
         <TriggerInfoGrid>
-          <TriggerInfoCard>
-            <InfoLabel>Alert Source</InfoLabel>
-            <InfoValue>ELD Device</InfoValue>
-          </TriggerInfoCard>
-
-          <TriggerInfoCard>
-            <InfoLabel>Trigger Event</InfoLabel>
-            <InfoValue>Device Connection Lost</InfoValue>
-          </TriggerInfoCard>
+          {triggerInfo.map(({ label, value }) => (
+            <TriggerInfoCardItem
+              key={label}
+              label={label}
+              value={value}
+            />
+          ))}
         </TriggerInfoGrid>
       </TriggerSection>
 

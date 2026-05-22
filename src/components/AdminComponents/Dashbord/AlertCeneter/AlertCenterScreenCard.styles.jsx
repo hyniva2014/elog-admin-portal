@@ -5,6 +5,7 @@ import { styled, alpha } from "@mui/material/styles";
 export const AlertsContainer = styled(Box)(() => ({
   display: "flex",
   height: "100%",
+  // alignSelf: "stretch",
 }));
 
 export const AlertCardContainer = styled(Paper)(({ theme, detailsPanel }) => ({
@@ -13,9 +14,10 @@ export const AlertCardContainer = styled(Paper)(({ theme, detailsPanel }) => ({
   paddingRight: detailsPanel ? theme.spacing(2) : 0,
   border: `1px solid ${theme.palette.grey[200]}`,
   borderRadius: "0px",
-  height: "675px",
-  overflow: "none",
+  minHeight: "675px",
+  height: "100%",
   boxShadow: "none",
+  alignSelf: "stretch",
 }));
 
 // Left Sidebar - Alert List
@@ -202,10 +204,20 @@ export const TriggerSectionTitle = styled(Typography)(({ theme }) => ({
   marginTop: 8,
 }));
 
-export const InfoGrid = styled(Box)(() => ({
+export const InfoGrid = styled(Box)(({ theme }) => ({
   display: "grid",
-  gridTemplateColumns: "1fr 1fr 1fr",
+
+  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+
   gap: 16,
+
+  [theme.breakpoints.down("md")]: {
+    gridTemplateColumns: "repeat(2, 1fr)",
+  },
+
+  [theme.breakpoints.down("sm")]: {
+    gridTemplateColumns: "1fr",
+  },
 }));
 
 export const TriggerInfoGrid = styled(Box)(() => ({
@@ -344,6 +356,10 @@ export const LocationItem = styled(Box)(({ theme }) => ({
   alignItems: "center",
   gap: 8,
   color: theme.palette.text.secondary,
+  flexWrap: "wrap",
+  overflowWrap: "break-word",
+  wordBreak: "break-word",
+  maxWidth: "100%",
 }));
 
 export const CoordinateBadge = styled(Box)(() => ({
@@ -351,6 +367,9 @@ export const CoordinateBadge = styled(Box)(() => ({
   borderRadius: 4,
   fontSize: 12,
   fontWeight: 500,
+  maxWidth: "100%",
+  overflowWrap: "break-word",
+  wordBreak: "break-word",
 }));
 
 export const AlertTopRow = styled(Box)(() => ({

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { PageContainer } from "../component.styled";
@@ -20,8 +20,10 @@ import {
   DateRangeText,
   HeaderSubtitle,
 } from "./AlertCenter.styles";
-import { alerts, summaryCards } from "./AdminConstant";
+import { alerts, Device_Metrics_Cards } from "./AdminConstant";
 import DateRangeSelector from "./DateRangeSelector";
+import { useDashboardMetrics } from "../../../hooks";
+import { buildSummaryCards } from "../../../common/Commonutils";
 
 const getTodayRange = () => {
   const today = new Date();
@@ -43,10 +45,15 @@ const getTodayRange = () => {
 
 const AdminDashboard = () => {
   const [selectedRange, setSelectedRange] = useState(getTodayRange());
+  const { dashboardMetrics } = useDashboardMetrics(selectedRange);
 
   const handleDateChange = (data) => {
     setSelectedRange(data);
   };
+
+  const summaryCards = useMemo(() => {
+    return buildSummaryCards(dashboardMetrics || {}, Device_Metrics_Cards);
+  }, [dashboardMetrics]);
 
   const dateLabel =
     selectedRange.period === "Today"
@@ -80,10 +87,7 @@ const AdminDashboard = () => {
         </ChartGrid>
 
         <AlertGrid item xs={12} md={5}>
-          <CommonAlertCenter
-            title="Alert Center"
-            alerts={alerts}
-          />
+          <CommonAlertCenter title="Alert Center" alerts={alerts} />
         </AlertGrid>
 
         <IncidentGrid item xs={12} md={6}>
