@@ -6,11 +6,11 @@ frontend:
       commands:
         - nvm install 20
         - nvm use 20
-        - npm install
+        - npm install --script-shell=/bin/bash
 
     build:
       commands:
-        - npm run build
+        - npm run build --script-shell=/bin/bash
 
   artifacts:
     baseDirectory: dist
