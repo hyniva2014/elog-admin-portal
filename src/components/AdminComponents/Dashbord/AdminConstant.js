@@ -5,67 +5,61 @@ import {
   FMCSAIcon,
 } from "./AdminDashboard.icons";
 
-export const summaryCards = [
-  {
+export const Device_Metrics_Cards = {
+  total_carriers: {
     id: "total_carriers",
     title: "Total Carriers",
-    value: "1095",
-    accentcolor: "#284495",
     icon: TotalCarrierIcon,
   },
-  {
+  active_devices:{
     id: "active_devices",
     title: "Active Devices",
-    value: "1077",
-    accentcolor: "#008236",
     icon: ActiveDevicesCardIcon,
   },
-  {
+  open_incidents:{
     id: "open_incidents",
     title: "Open Incidents",
-    value: "18",
-    accentcolor: "#FF0000",
     icon: OpenIncidentsIcon,
   },
-  {
-    id: "avg_fmcsa_score",
+  average_fmcsa_score:{
+    id: "average_fmcsa_score",
     title: "Average FMCSA Score",
-    value: "85.5",
-    accentcolor: "#E69500",
     icon: FMCSAIcon,
   },
-];
+ 
+};
 
-export const chartData = [
-  {
-    month: "Jan",
-    value: 45,
-    Total: 15,
-    newAddition: 20,
-    loss: 10,
-  },
-  {
-    month: "Feb",
-    value: 52,
-    Total: 23,
-    newAddition: 25,
-    loss: 12,
-  },
-  {
-    month: "Mar",
-    value: 60,
-    Total: 40,
-    newAddition: 30,
-    loss: 15,
-  },
-  {
-    month: "Apr",
-    value: 78,
-    Total: 50,
-    newAddition: 35,
-    loss: 14,
-  },
-];
+
+// export const chartData = [
+//   {
+//     month: "Jan",
+//     value: 45,
+//     Total: 15,
+//     newAddition: 20,
+//     loss: 10,
+//   },
+//   {
+//     month: "Feb",
+//     value: 52,
+//     Total: 23,
+//     newAddition: 25,
+//     loss: 12,
+//   },
+//   {
+//     month: "Mar",
+//     value: 60,
+//     Total: 40,
+//     newAddition: 30,
+//     loss: 15,
+//   },
+//   {
+//     month: "Apr",
+//     value: 78,
+//     Total: 50,
+//     newAddition: 35,
+//     loss: 14,
+//   },
+// ];
 
 export const alerts = [
   {
