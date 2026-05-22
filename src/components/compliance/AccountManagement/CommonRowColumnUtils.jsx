@@ -12,6 +12,22 @@ const formatDate = (value) => {
   return dayjs(value).format("MMM DD, YYYY");
 };
 
+const renderAddressCell = (params) => <AddressCellText>{params.value}</AddressCellText>;
+
+const renderDateCell = (params) => formatDate(params.value);
+
+const renderStatusCell = (params) => (
+  <StatusText accountStatus={params.value}>{params.value}</StatusText>
+);
+
+const renderActionCell = (onViewAccount) => (params) => (
+  <Tooltip title="View">
+    <IconButton size="small" onClick={onViewAccount} data-row={params.row}>
+      <VisibilityOutlinedIcon sx={actionIconSx} />
+    </IconButton>
+  </Tooltip>
+);
+
 export const AccountManagementColumnsData = (onViewAccount) => [
   {
     field: "carrierName",
@@ -53,7 +69,7 @@ export const AccountManagementColumnsData = (onViewAccount) => [
     minWidth: 180,
     maxWidth: 250,
     headerTooltip: true,
-    renderCell: (params) => <AddressCellText>{params.value}</AddressCellText>,
+    renderCell: renderAddressCell,
   },
   {
     field: "primaryContactName",
@@ -131,7 +147,7 @@ export const AccountManagementColumnsData = (onViewAccount) => [
     minWidth: 180,
     maxWidth: 250,
     headerTooltip: true,
-    renderCell: (params) => formatDate(params.value),
+    renderCell: renderDateCell,
   },
   {
     field: "lastSync",
@@ -139,7 +155,7 @@ export const AccountManagementColumnsData = (onViewAccount) => [
     minWidth: 180,
     maxWidth: 250,
     headerTooltip: true,
-    renderCell: (params) => formatDate(params.value),
+    renderCell: renderDateCell,
   },
   {
     field: "status",
@@ -147,9 +163,7 @@ export const AccountManagementColumnsData = (onViewAccount) => [
     minWidth: 180,
     maxWidth: 250,
     headerTooltip: true,
-    renderCell: (params) => (
-      <StatusText accountStatus={params.value}>{params.value}</StatusText>
-    ),
+    renderCell: renderStatusCell,
   },
   {
     field: "action",
@@ -158,13 +172,7 @@ export const AccountManagementColumnsData = (onViewAccount) => [
     maxWidth: 250,
     sortable: false,
     headerTooltip: true,
-    renderCell: (params) => (
-      <Tooltip title="View">
-        <IconButton size="small" onClick={onViewAccount} data-row={params.row}>
-          <VisibilityOutlinedIcon sx={actionIconSx} />
-        </IconButton>
-      </Tooltip>
-    ),
+    renderCell: renderActionCell(onViewAccount),
   },
 ];
 

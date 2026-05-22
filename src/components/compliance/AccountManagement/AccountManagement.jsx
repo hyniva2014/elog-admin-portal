@@ -9,7 +9,7 @@ import AddAccountDialog from "./AddAccountDialog";
 import { useServices } from "../../../services/services";
 // import { useFilters } from "../../../common/FilterContext";
 import { useSelector } from "react-redux";
-import { defaultPageSize } from "../DeviceManagement/Constants";
+import { defaultPageSize } from "./Constants";
 import {
   AccountManagementColumnsData,
   AccountManagementRowData,
@@ -26,7 +26,6 @@ const AccountManagement = () => {
     severity: "success",
   });
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [dialogMode, setDialogMode] = useState("add");
   const [selectedCompany, setSelectedCompany] = useState(null);
 
@@ -116,7 +115,6 @@ const AccountManagement = () => {
 
   const handleCreateAccount = useCallback(
     async (account) => {
-      setIsSubmitting(true);
       setLoading(true);
 
       try {
@@ -173,7 +171,6 @@ const AccountManagement = () => {
         console.error("Error creating/updating account:", err);
         handleSnackbar(`Failed to ${dialogMode === "edit" ? "update" : "add"} account. Please try again.`, "error");
       } finally {
-        setIsSubmitting(false);
         setLoading(false);
       }
     },
@@ -314,7 +311,7 @@ const AccountManagement = () => {
         open={isAddAccountOpen}
         onClose={handleCloseAddAccount}
         onSubmit={handleCreateAccount}
-        loading={isSubmitting}
+        loading={false}
         mode={dialogMode}
         initialData={selectedCompany ? transformCompanyToFormData(selectedCompany) : null}
         onEditClick={handleEditClick}
