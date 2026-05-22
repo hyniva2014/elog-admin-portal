@@ -15,6 +15,7 @@ import {
   AccountManagementRowData,
 } from "./CommonRowColumnUtils";
 import { STATUS_OPTIONS } from "./Constants";
+import { useAccountManagement } from "./useAccountManagement";
 
 const AccountManagement = () => {
   const { fetchApi, createApi } = useServices();
@@ -92,123 +93,6 @@ const AccountManagement = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   }, []);
 
-  const fetchData = useCallback(async () => {
-    setData((prev) => ({ ...prev, isLoading: true }));
-
-    try {
-      const endUrl = `/masteradmin/get-companies?company_id=${companyId}&primaryContactName=${primaryContactName || ""}&secondaryContactName=${secondaryContactName || ""}&startDate=${fromDate ? fromDate.format("YYYY-MM-DD") : ""}&endDate=${toDate ? toDate.format("YYYY-MM-DD") : ""}&search=${encodeURIComponent(search)}&status_id=${status || ""}&page=${page}&limit=${pageSize}`;
-      const response = await fetchApi(endUrl);
-      
-      const rowData = AccountManagementRowData(response?.body?.data || []);
-
-      setData((prev) => ({
-        ...prev,
-        isLoading: false,
-        rows: rowData,
-        total: response?.body?.total_records || 0,
-      }));
-    } catch (err) {
-      console.error("Error fetching companies:", err);
-      setData((prev) => ({ ...prev, isLoading: false }));
-    }
-  }, [companyId, primaryContactName, secondaryContactName, fromDate, toDate, search, status, page, pageSize, setData]);
-
-  const handleCreateAccount = useCallback(
-    async (account) => {
-      setLoading(true);
-
-      try {
-        const isUpdate = dialogMode === "edit";
-        const payload = {
-          companyName: account.carrierName,
-          dotNumber: account.usdot,
-          mcNumber: account.mcNumber || null,
-          ein: account.taxId || null,
-          company_code: account.carrierName.substring(0, 4).toUpperCase(),
-          maxDevices: account.maxDevices,
-          website: account.website || null,
-          tollFree: account.tollFree || null,
-          fax: account.fax || null,
-          status_id: account.status,
-          address: {
-            street: account.carrierAddress,
-            city: "",
-            state: "",
-            zip: "",
-            country: "US"
-          },
-          contact: {
-            name: account.primaryContactName,
-            email: account.primaryContactEmail,
-            phone: account.primaryContactNumber,
-            alternatePhone: ""
-          },
-          secondaryContact: {
-            name: account.secondaryContactName,
-            email: account.secondaryContactEmail,
-            phone: account.secondaryContactNumber,
-            alternatePhone: ""
-          }
-        };
-
-        if (isUpdate) {
-          payload.company_id = account.companyId;
-        }
-
-        const endUrl = `/masteradmin/onboard-company`;
-        const response = await createApi(payload, endUrl);
-
-        if (response?.statusCode === 200 || response?.statusCode === 201) {
-          setIsAddAccountOpen(false);
-          setDialogMode("add");
-          setSelectedCompany(null);
-          handleSnackbar(response?.body?.message || `${account.carrierName} account ${isUpdate ? "updated" : "added"} successfully.`, "success");
-          fetchData();
-        } else {
-          handleSnackbar(response?.body?.message || `Failed to ${isUpdate ? "update" : "add"} account.`, "error");
-        }
-      } catch (err) {
-        console.error("Error creating/updating account:", err);
-        handleSnackbar(`Failed to ${dialogMode === "edit" ? "update" : "add"} account. Please try again.`, "error");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [handleSnackbar, fetchData, setLoading, dialogMode],
-  );
-
-  const handleViewAccount = useCallback(
-    async (event) => {
-      const row = event.currentTarget.dataset.row;
-      setLoading(true);
-
-      try {
-        const endUrl = `/masteradmin/get-companies?company_id=${companyId}`;
-        const response = await fetchApi(endUrl);
-        
-        if (response?.statusCode === 200 && response?.body?.data) {
-          const companyData = response?.body?.data;
-          const companyArray = Array.isArray(companyData) ? companyData : (companyData ? [companyData] : []);
-          const company = companyArray[0];
-
-          if (company) {
-            setSelectedCompany(company);
-            setDialogMode("view");
-            setIsAddAccountOpen(true);
-          }
-        } else {
-          handleSnackbar("Failed to fetch company details.", "error");
-        }
-      } catch (err) {
-        console.error("Error fetching company details:", err);
-        handleSnackbar("Failed to fetch company details. Please try again.", "error");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [companyId, fetchApi, handleSnackbar],
-  );
-
   const handleEditClick = useCallback(() => {
     setDialogMode("edit");
   }, []);
@@ -217,29 +101,66 @@ const AccountManagement = () => {
     setDialogMode("view");
   }, []);
 
+  const { buildFetchUrl, fetchData, handleCreateAccount, handleViewAccount } = useAccountManagement(
+    companyId,
+    primaryContactName,
+    secondaryContactName,
+    fromDate,
+    toDate,
+    search,
+    status,
+    page,
+    pageSize,
+    setData,
+    setLoading,
+    handleSnackbar,
+    dialogMode,
+    setIsAddAccountOpen,
+    setDialogMode,
+    setSelectedCompany,
+    fetchApi,
+    createApi
+  );
+
   const transformCompanyToFormData = useCallback((company) => {
-    const address = company.address || {};
-    const contact = company.contact || {};
-    const secondaryContact = company.secondaryContact || {};
+    const {
+      companyName,
+      dotNumber,
+      ein,
+      mcNumber,
+      maxDevices,
+      website,
+      tollFree,
+      fax,
+      status_id,
+      company_id,
+      address = {},
+      contact = {},
+      secondaryContact = {},
+    } = company;
+
+    const { street } = address;
+    const { name: primaryContactName, phone: primaryContactNumber, email: primaryContactEmail } = contact;
+    const { name: secondaryContactName, phone: secondaryContactNumber, email: secondaryContactEmail } = secondaryContact;
 
     return {
-      carrierName: company.companyName || "",
-      usdot: company.dotNumber || "",
-      taxId: company.ein || "",
-      mcNumber: company.mcNumber || "",
-      maxDevices: company.maxDevices || "",
-      website: company.website || "",
-      tollFree: company.tollFree || "",
-      fax: company.fax || "",
-      carrierAddress: address.street || "",
-      primaryContactName: contact.name || "",
-      primaryContactNumber: contact.phone || "",
-      primaryContactEmail: contact.email || "",
-      secondaryContactName: secondaryContact.name || "",
-      secondaryContactNumber: secondaryContact.phone || "",
-      secondaryContactEmail: secondaryContact.email || "",
-      status: company.status_id || 1,
-      companyId: company.company_id,
+      carrierName: companyName || "",
+      usdot: dotNumber || "",
+      taxId: ein || "",
+      mcNumber: mcNumber || "",
+      maxDevices: maxDevices || "",
+      website: website || "",
+      tollFree: tollFree || "",
+      fax: fax || "",
+      carrierAddress: street || "",
+      primaryContactName: primaryContactName || "",
+      primaryContactNumber: primaryContactNumber || "",
+      primaryContactEmail: primaryContactEmail || "",
+      secondaryContactName: secondaryContactName || "",
+      secondaryContactNumber: secondaryContactNumber || "",
+      secondaryContactEmail: secondaryContactEmail || "",
+      status: status_id || 1,
+      companyId: company_id,
     };
   }, []);
 
@@ -247,6 +168,8 @@ const AccountManagement = () => {
     () => AccountManagementColumnsData(handleViewAccount),
     [handleViewAccount],
   );
+
+  const initialFormData = selectedCompany ? transformCompanyToFormData(selectedCompany) : null;
 
   useEffect(() => {
     setLoading(isLoading);
@@ -313,7 +236,7 @@ const AccountManagement = () => {
         onSubmit={handleCreateAccount}
         loading={false}
         mode={dialogMode}
-        initialData={selectedCompany ? transformCompanyToFormData(selectedCompany) : null}
+        initialData={initialFormData}
         onEditClick={handleEditClick}
         onCancelEdit={handleCancelEdit}
       />

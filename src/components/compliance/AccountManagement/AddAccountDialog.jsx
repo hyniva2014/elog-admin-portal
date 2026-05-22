@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
-import { Divider, Grid, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
-import { Controller, useForm } from "react-hook-form";
+import { Divider, Grid } from "@mui/material";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 import CommonDialogForm from "../../../common/CommonDialogForm";
-import CommonTextField from "../../../common/CommonTextField";
 import { DialogFormContainer, PrimarySectionHeader, SecondarySectionHeader, EditButton, CancelEditButton } from "./AccountManagement.styled";
 
-import { formatTaxId, formatPhoneNumber } from "./utils";
-import { STATUS_OPTIONS } from "./Constants";
+import { STATUS_OPTIONS, ACCOUNT_FORM_FIELDS, PRIMARY_CONTACT_FIELDS, SECONDARY_CONTACT_FIELDS } from "./Constants";
+import FormTextField from "./FormTextField";
+import FormSelect from "./FormSelect";
 
 const ADD_ACCOUNT_FORM_ID = "add-account-form";
 
@@ -129,13 +129,10 @@ const defaultValues = {
   status: 1,
 };
 
-const createFormatChangeHandler = (field, formatter) => (event) => {
-  field.onChange(formatter(event.target.value));
-};
-
 const AddAccountDialog = ({ open, onClose, onSubmit, loading = false, mode = "add", initialData = null, onEditClick, onCancelEdit }) => {
   const isEditMode = mode === "edit";
   const isViewMode = mode === "view";
+  const isFieldDisabled = loading || isViewMode;
 
   const {
     control,
@@ -175,6 +172,38 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false, mode = "ad
     }
   }, [open, isViewMode]);
 
+  const getDialogTitle = () => {
+    if (isViewMode) return "View Account";
+    if (isEditMode) return "Edit Account";
+    return "Add New Account";
+  };
+
+  const renderHeaderActions = () => {
+    if (isViewMode && onEditClick) {
+      return (
+        <EditButton
+          variant="contained"
+          onClick={onEditClick}
+          disabled={loading}
+        >
+          Edit
+        </EditButton>
+      );
+    }
+    if (isEditMode && onCancelEdit) {
+      return (
+        <CancelEditButton
+          variant="outlined"
+          onClick={onCancelEdit}
+          disabled={loading}
+        >
+          Cancel Edit
+        </CancelEditButton>
+      );
+    }
+    return null;
+  };
+
   const handleCancel = () => {
     if (isViewMode) {
       onClose();
@@ -198,341 +227,61 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false, mode = "ad
     <form id={ADD_ACCOUNT_FORM_ID} onSubmit={handleSubmit(submitHandler)}>
       <DialogFormContainer>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="carrierName"
+          {ACCOUNT_FORM_FIELDS.map((fieldConfig) => (
+            <FormTextField
+              key={fieldConfig.name}
+              {...fieldConfig}
               control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Carrier Name"
-                  required
-                  disabled={loading || isViewMode}
-                  error={!!errors.carrierName}
-                  helperText={errors.carrierName?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
+              errors={errors}
+              disabled={isFieldDisabled}
             />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="carrierAddress"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Carrier Address"
-                  required
-                  disabled={loading || isViewMode}
-                  error={!!errors.carrierAddress}
-                  helperText={errors.carrierAddress?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="usdot"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="USDOT Number"
-                  required
-    disabled={loading || isViewMode}
-                  error={!!errors.usdot}
-                  helperText={errors.usdot?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="taxId"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Tax ID (EIN)"
-                  required
-    disabled={loading || isViewMode}
-                  error={!!errors.taxId}
-                  helperText={errors.taxId?.message}
-                  fullWidth
-                  size="small"
-                  placeholder="XX-XXXXXXX"
-                  onChange={createFormatChangeHandler(field, formatTaxId)}
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="mcNumber"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="MC Number"
-                  required
-    disabled={loading || isViewMode}
-                  error={!!errors.mcNumber}
-                  helperText={errors.mcNumber?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="maxDevices"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Max Devices"
-                  type="number"
-                  required
-    disabled={loading || isViewMode}
-                  error={!!errors.maxDevices}
-                  helperText={errors.maxDevices?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="website"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Website"
-    disabled={loading || isViewMode}
-                  error={!!errors.website}
-                  helperText={errors.website?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="tollFree"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Toll Free"
-                  required
-    disabled={loading || isViewMode}
-                  error={!!errors.tollFree}
-                  helperText={errors.tollFree?.message}
-                  fullWidth
-                  size="small"
-                  placeholder="(XXX) XXX-XXXX"
-                  onChange={createFormatChangeHandler(field, formatPhoneNumber)}
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="fax"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Fax"
-                  required
-    disabled={loading || isViewMode}
-                  error={!!errors.fax}
-                  helperText={errors.fax?.message}
-                  fullWidth
-                  size="small"
-                  placeholder="(XXX) XXX-XXXX"
-                  onChange={createFormatChangeHandler(field, formatPhoneNumber)}
-                />
-              )}
-            />
-          </Grid>
+          ))}
 
           {mode !== "add" && (
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="status"
-                control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth size="small" error={!!errors.status}>
-                    <InputLabel>Status</InputLabel>
-                    <Select
-                      {...field}
-                      label="Status"
-                      disabled={loading || isViewMode}
-                    >
-                      {STATUS_OPTIONS.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                )}
-              />
-            </Grid>
+            <FormSelect
+              name="status"
+              label="Status"
+              control={control}
+              errors={errors}
+              disabled={isFieldDisabled}
+              required
+              options={STATUS_OPTIONS}
+            />
           )}
 
           <Grid item xs={12}>
             <PrimarySectionHeader>
               PRIMARY DETAILS
             </PrimarySectionHeader>
-
             <Divider />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="primaryContactName"
+          {PRIMARY_CONTACT_FIELDS.map((fieldConfig) => (
+            <FormTextField
+              key={fieldConfig.name}
+              {...fieldConfig}
               control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Primary Contact Name"
-                  required
-    disabled={loading || isViewMode}
-                  error={!!errors.primaryContactName}
-                  helperText={errors.primaryContactName?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
+              errors={errors}
+              disabled={isFieldDisabled}
             />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="primaryContactNumber"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Primary Contact Number"
-                  required
-    disabled={loading || isViewMode}
-                  error={!!errors.primaryContactNumber}
-                  helperText={errors.primaryContactNumber?.message}
-                  fullWidth
-                  size="small"
-                  placeholder="(XXX) XXX-XXXX"
-                  onChange={createFormatChangeHandler(field, formatPhoneNumber)}
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="primaryContactEmail"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Primary Contact Email"
-                  required
-    disabled={loading || isViewMode}
-                  error={!!errors.primaryContactEmail}
-                  helperText={errors.primaryContactEmail?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-          </Grid>
+          ))}
 
           <Grid item xs={12}>
             <SecondarySectionHeader>
               SECONDARY DETAILS
             </SecondarySectionHeader>
-
             <Divider />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="secondaryContactName"
+          {SECONDARY_CONTACT_FIELDS.map((fieldConfig) => (
+            <FormTextField
+              key={fieldConfig.name}
+              {...fieldConfig}
               control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Secondary Contact Name"
-    disabled={loading || isViewMode}
-                  required
-                  error={!!errors.secondaryContactName}
-                  helperText={errors.secondaryContactName?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
+              errors={errors}
+              disabled={isFieldDisabled}
             />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="secondaryContactNumber"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Secondary Contact Number"
-    disabled={loading || isViewMode}
-                  required
-                  error={!!errors.secondaryContactNumber}
-                  helperText={errors.secondaryContactNumber?.message}
-                  fullWidth
-                  size="small"
-                  placeholder="(XXX) XXX-XXXX"
-                  onChange={createFormatChangeHandler(field, formatPhoneNumber)}
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="secondaryContactEmail"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Secondary Contact Email"
-    disabled={loading || isViewMode}
-                  required
-                  error={!!errors.secondaryContactEmail}
-                  helperText={errors.secondaryContactEmail?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-          </Grid>
+          ))}
         </Grid>
       </DialogFormContainer>
     </form>
@@ -541,32 +290,14 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false, mode = "ad
   return (
     <CommonDialogForm
       open={open}
-      title={isViewMode ? "View Account" : isEditMode ? "Edit Account" : "Add New Account"}
+      title={getDialogTitle()}
       content={formContent}
       formId={ADD_ACCOUNT_FORM_ID}
       onCancel={handleCancel}
       loading={loading}
       submitButtonText={isViewMode ? "" : "Save"}
       maxWidth="md"
-      headerActions={
-        isViewMode && onEditClick ? (
-          <EditButton
-            variant="contained"
-            onClick={onEditClick}
-            disabled={loading}
-          >
-            Edit
-          </EditButton>
-        ) : isEditMode && onCancelEdit ? (
-          <CancelEditButton
-            variant="outlined"
-            onClick={onCancelEdit}
-            disabled={loading}
-          >
-            Cancel Edit
-          </CancelEditButton>
-        ) : null
-      }
+      headerActions={renderHeaderActions()}
     />
   );
 };

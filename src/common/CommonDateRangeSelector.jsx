@@ -140,6 +140,42 @@ const CommonDateRangeSelector = (props) => {
     setShowInlineError(false);
   };
 
+  const renderPresetButtons = () => PRESET_DAYS.map((days) => (
+    <Button
+      key={days}
+      variant={activePreset === days ? "contained" : "filled"}
+      onClick={handlePresetButtonClick(days)}
+    >
+      Last {days} days
+    </Button>
+  ));
+
+  const getDaySx = (day) => {
+    const start = tempDateRange?.start;
+    const end = tempDateRange?.end;
+    const isEnd = end && day.isSame(end, "day");
+    const inRange =
+      start &&
+      end &&
+      day.isAfter(start, "day") &&
+      day.isBefore(end, "day");
+
+    const sx = {};
+
+    if (inRange) {
+      sx.backgroundColor = "lightblue !important";
+      sx["&:hover"] = { backgroundColor: "lightblue !important" };
+    }
+
+    if (isEnd) {
+      sx.backgroundColor = "rgb(40,62,138) !important";
+      sx.color = "white";
+      sx["&:hover"] = { backgroundColor: "rgb(40,62,138) !important" };
+    }
+
+    return sx;
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box>
@@ -200,15 +236,7 @@ const CommonDateRangeSelector = (props) => {
                   Today
                 </Button>
 
-                {PRESET_DAYS.map((days) => (
-                  <Button
-                    key={days}
-                    variant={activePreset === days ? "contained" : "filled"}
-                    onClick={handlePresetButtonClick(days)}
-                  >
-                    Last {days} days
-                  </Button>
-                ))}
+                {renderPresetButtons()}
                 <Button
                   variant={activePreset === "custom" ? "contained" : "filled"}
                   onClick={handleCustomSelection}
@@ -277,34 +305,9 @@ const CommonDateRangeSelector = (props) => {
                 maxDate={today}
                 slotProps={{
                   actionBar: { actions: [] },
-                  day: ({ day }) => {
-                    const start = tempDateRange?.start;
-                    const end = tempDateRange?.end;
-                    const isEnd = end && day.isSame(end, "day");
-                    const inRange =
-                      start &&
-                      end &&
-                      day.isAfter(start, "day") &&
-                      day.isBefore(end, "day");
-
-                    return {
-                      sx: {
-                        ...(inRange && {
-                          backgroundColor: "lightblue !important",
-                          "&:hover": {
-                            backgroundColor: "lightblue !important",
-                          },
-                        }),
-                        ...(isEnd && {
-                          backgroundColor: "rgb(40,62,138) !important",
-                          color: "white",
-                          "&:hover": {
-                            backgroundColor: "rgb(40,62,138) !important",
-                          },
-                        }),
-                      },
-                    };
-                  },
+                  day: ({ day }) => ({
+                    sx: getDaySx(day),
+                  }),
                 }}
                 sx={StaticDatePickerSx}
               />
