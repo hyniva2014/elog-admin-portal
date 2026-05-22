@@ -1,6 +1,6 @@
 export const DEVICE_ASSET_STATUS_FILTER_OPTIONS = [
-  { value: "Active", label: "Active" },
-  { value: "In Active", label: "In Active" },
+  { value: "1", label: "Active" },
+  { value: "0", label: "Inactive" },
 ];
 
 export const DEVICE_ASSET_IGNITION_FILTER_OPTIONS = [

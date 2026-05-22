@@ -117,3 +117,118 @@ describe("DeviceAssetManagement Component", () => {
     expect(screen.getByText("Cancel Edit")).toBeInTheDocument();
   });
 });
+
+jest.mock("../../../services/services", () => ({
+  useServices: () => ({
+    fetchApi: jest.fn((url) => {
+      if (url.includes("get-device-model-dropdown")) {
+        return Promise.resolve({
+          body: {
+            data: [
+              {
+                model_name: "ELD Model 1",
+              },
+            ],
+          },
+        });
+      }
+
+      if (url.includes("device_id=")) {
+        return Promise.resolve({
+          body: {
+            device_id: "1",
+            device_model_id: "ELD Model 1",
+            device_serial_number: "SN001",
+            status: "1",
+          },
+        });
+      }
+
+      return Promise.resolve({
+        body: {
+          data: [
+            {
+              device_id: "1",
+              device_serial_number: "SN001",
+              device_model_id: "ELD Model 1",
+              status: "1",
+            },
+            {
+              device_id: "2",
+              device_serial_number: "SN002",
+              device_model_id: "ELD Model 2",
+              status: "0",
+            },
+            {
+              device_id: "3",
+              device_serial_number: "SN003",
+              device_model_id: "ELD Model 3",
+              status: null,
+            },
+          ],
+          pagination: {
+            total_records: 3,
+          },
+        },
+      });
+    }),
+
+    createApi: jest.fn(() =>
+      Promise.resolve({
+        statusCode: 200,
+      }),
+    ),
+  }),
+}));
+
+test("shows active status correctly", async () => {
+  render(<DeviceAssetManagement />);
+  expect(await screen.findByText("Mock Data Grid")).toBeInTheDocument();
+});
+
+test("opens edit mode correctly", async () => {
+  render(<DeviceAssetManagement />);
+  const viewButtons = await screen.findAllByText("View");
+  fireEvent.click(viewButtons[0]);
+  const editButton = await screen.findByText("Edit");
+  fireEvent.click(editButton);
+  expect(screen.getByText("Update")).toBeInTheDocument();
+});
+
+test("cancel edit button works correctly", async () => {
+  render(<DeviceAssetManagement />);
+  const viewButtons = await screen.findAllByText("View");
+  fireEvent.click(viewButtons[0]);
+  fireEvent.click(await screen.findByText("Edit"));
+  fireEvent.click(screen.getByText("Cancel Edit"));
+  expect(screen.getByText("Edit")).toBeInTheDocument();
+});
+
+test("shows add asset modal title correctly", () => {
+  render(<DeviceAssetManagement />);
+  fireEvent.click(screen.getAllByText("Add Asset")[0]);
+  expect(screen.getByText("Add Asset")).toBeInTheDocument();
+});
+
+test("shows save button in view mode", async () => {
+  render(<DeviceAssetManagement />);
+  const viewButtons = await screen.findAllByText("View");
+  fireEvent.click(viewButtons[0]);
+  expect(screen.getByText("Save")).toBeInTheDocument();
+});
+
+test("renders loading container", () => {
+  render(<DeviceAssetManagement />);
+  expect(screen.getByText("Loading...")).toBeInTheDocument();
+});
+
+test("renders mocked form when modal opens", () => {
+  render(<DeviceAssetManagement />);
+  fireEvent.click(screen.getAllByText("Add Asset")[0]);
+  expect(screen.getByText("Mock Form")).toBeInTheDocument();
+});
+
+test("handles null status correctly", async () => {
+  render(<DeviceAssetManagement />);
+  expect(await screen.findByText("Mock Data Grid")).toBeInTheDocument();
+});

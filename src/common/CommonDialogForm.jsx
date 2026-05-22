@@ -24,6 +24,7 @@ const CommonDialogForm = ({
   submitButtonText,
   maxWidth = "sm",
   headerActions,
+  isEditing,
 }) => {
   const isEdit = mode === "edit";
 
@@ -110,58 +111,60 @@ const CommonDialogForm = ({
         )}
       </DialogContent>
 
-      <DialogActions
-        sx={{
-          justifyContent: "center",
-          gap: 2,
-          px: 6,
-          pb: 3,
-        }}
-      >
-        <Button
-          variant="outlined"
-          onClick={loading ? undefined : onCancel}
-          fullWidth
-          disabled={loading}
+      {(mode !== "edit" || isEditing) && (
+        <DialogActions
           sx={{
-            fontSize: 16,
-            fontWeight: 400,
-            color: "#284495",
-            border: 1,
-            borderRadius: 2,
-            borderColor: "#284495",
-            backgroundColor: "#FFFFFF",
+            justifyContent: "center",
+            gap: 2,
+            px: 6,
+            pb: 3,
           }}
         >
-          Cancel
-        </Button>
+          <Button
+            variant="outlined"
+            onClick={loading ? undefined : onCancel}
+            fullWidth
+            disabled={loading}
+            sx={{
+              fontSize: 16,
+              fontWeight: 400,
+              color: "#284495",
+              border: 1,
+              borderRadius: 2,
+              borderColor: "#284495",
+              backgroundColor: "#FFFFFF",
+            }}
+          >
+            Cancel
+          </Button>
 
-        <Button
-          type="submit"
-          variant="contained"
-          fullWidth
-          form={formId}
-          onClick={onSubmit}
-          disabled={loading}
-          sx={{
-            fontSize: 16,
-            fontWeight: 400,
-            color: "#FFFFFF",
-            backgroundColor: "#284495",
-            border: 1,
-            borderRadius: 2,
-            borderColor: "#284495",
-          }}
-        >
-          {submitButtonText
-            ? submitButtonText
-            : loading
-              ? "Saving..."
-              : isEdit
-                ? "Update"
-                : "Save"}
-        </Button>
-      </DialogActions>
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            form={formId}
+            onClick={onSubmit}
+            disabled={loading}
+            sx={{
+              fontSize: 16,
+              fontWeight: 400,
+              color: "#FFFFFF",
+              backgroundColor: "#284495",
+              border: 1,
+              borderRadius: 2,
+              borderColor: "#284495",
+            }}
+          >
+            {submitButtonText
+              ? submitButtonText
+              : loading
+                ? "Saving..."
+                : isEdit
+                  ? "Update"
+                  : "Save"}
+          </Button>
+        </DialogActions>
+      )}
     </Dialog>
   );
 };
