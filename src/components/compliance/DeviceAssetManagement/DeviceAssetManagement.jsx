@@ -62,12 +62,9 @@ const DeviceAssetManagement = () => {
   });
   const [isEditMode, setIsEditMode] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-<<<<<<< Updated upstream
-=======
   const [selectedRows, setSelectedRows] = useState([]);
 
   // ── Snackbar ────────────────────────────────────────────────────────────────
->>>>>>> Stashed changes
   const handleSnackbar = useCallback((message, severity = "info") => {
     setSnackbar({
       open: true,
@@ -344,14 +341,11 @@ const DeviceAssetManagement = () => {
           mode=""
           setMode={handleSetMode}
           handleClick={handleClick}
-<<<<<<< Updated upstream
           modelOptions={deviceModelOptions}
           statusOptions={DEVICE_ASSET_STATUS_FILTER_OPTIONS}
-=======
-          modelOptions={getOptions(allRows, "deviceModel")}
-          statusOptions={getOptions(allRows, "status")}
-          isAssetAllocationEnabled={selectedRows.length > 0}
->>>>>>> Stashed changes
+          isAssetAllocationEnabled={
+            selectedRows.length > 0
+          }
         />
         <GridContainer>
           <CommonDataGrid
@@ -378,17 +372,11 @@ const DeviceAssetManagement = () => {
       <CommonDialogForm
         open={isAddModalOpen}
         onCancel={handleAddCancel}
-<<<<<<< Updated upstream
         mode={dialogMode}
         title={dialogTitle}
         formId="addAssetForm"
         loading={false}
         isEditing={isEditing}
-=======
-        submitButtonText={
-          isEditMode ? (isEditing ? "Update" : "Save") : "Add Asset"
-        }
->>>>>>> Stashed changes
         headerActions={headerActionsElement}
         submitButtonText={submitButtonLabel}
         content={
