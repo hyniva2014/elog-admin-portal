@@ -34,7 +34,7 @@ export default function useDeviceLifecycle(year) {
     return () => {
       active = false;
     };
-  }, [year, fetchApi]);
+  }, [year]);
 
   return { deviceLifecycle, loading };
 }

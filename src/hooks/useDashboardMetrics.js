@@ -33,7 +33,7 @@ export default function useDashboardMetrics(selectedRange) {
     return () => {
       active = false;
     };
-  }, [selectedRange, fetchApi]);
+  }, [selectedRange]);
 
   return { dashboardMetrics, loading };
 }

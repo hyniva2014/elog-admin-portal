@@ -33,7 +33,7 @@ export default function useCarrierGrowthTrend(selectedYear) {
     return () => {
       active = false;
     };
-  }, [selectedYear, fetchApi]);
+  }, [selectedYear]);
 
   return { carrierGrowthTrend, loading };
 }
