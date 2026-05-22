@@ -1,11 +1,6 @@
-import React from "react";
-import { IconButton, Tooltip } from "@mui/material";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import dayjs from "dayjs";
-import {
-  StatusTypography,
-  actionIconSx,
-} from "./DeviceAssetManagement.styles";
+import { StatusTypography } from "./DeviceAssetManagement.styles";
+import DeviceAssetManagementActionButton from "./DeviceAssetManagementActionButton";
 
 export const formatDate = (value) =>
   value ? dayjs(value).format("MMM DD, YYYY") : "-";
@@ -18,23 +13,9 @@ const StatusCell = (params) => (
   </StatusTypography>
 );
 
-const ActionButton = ({ row, onView }) => {
-  const handleClick = () => {
-    onView(row);
-  };
-
-  return (
-    <Tooltip title="View">
-      <IconButton size="small" onClick={handleClick}>
-        <VisibilityOutlinedIcon sx={actionIconSx} />
-      </IconButton>
-    </Tooltip>
-  );
-};
-
 const ActionCell = (onView) => {
   return (params) => (
-    <ActionButton row={params.row} onView={onView} />
+    <DeviceAssetManagementActionButton row={params.row} onView={onView} />
   );
 };
 
