@@ -62,3 +62,19 @@ export const PrimarySectionHeader = styled(SectionHeaderText)(() => ({
 export const SecondarySectionHeader = styled(SectionHeaderText)(() => ({
   marginTop: 1,
 }));
+
+export const EditButton = styled(Button)(({ theme }) => ({
+  fontSize: 14,
+  fontWeight: 500,
+  backgroundColor: theme.palette.primary.main || "#284495",
+  "&:hover": {
+    backgroundColor: theme.palette.primary.dark || "#1e3675",
+  },
+}));
+
+export const CancelEditButton = styled(Button)(({ theme }) => ({
+  fontSize: 14,
+  fontWeight: 500,
+  borderColor: theme.palette.primary.main || "#284495",
+  color: theme.palette.primary.main || "#284495",
+}));

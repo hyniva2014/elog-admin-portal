@@ -283,3 +283,5 @@ export const STATE_OPTIONS = [
 ];
 
 export const ADD_DEVICE_FORM_ID = "add-device-form";
+
+export const defaultPageSize = 25;

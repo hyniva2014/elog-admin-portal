@@ -1,241 +1,73 @@
-import { useCallback, useMemo, useState } from "react";
-import { IconButton, Tooltip } from "@mui/material";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import dayjs from "dayjs";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import CommonDataGrid from "@src/common/CommonDataGrid";
 import { PageContainer } from "../../../common/PageContainer";
 import AccountManagementHeader from "./AccountMangementHeader";
 import CommonSnackbar from "../../../common/CommonSnackbar";
-import {
-  StatusText,
-  GridContainer,
-  AddressCellText,
-  actionIconSx,
-} from "./AccountManagement.styled";
+import CommonLoading from "../../../common/CommonLoading";
+import { GridContainer } from "./AccountManagement.styled";
 import AddAccountDialog from "./AddAccountDialog";
-
-const accountSeedData = [
-  {
-    carrierName: "Swift Transportation",
-    taxId: "12-3456789",
-    usdot: "DOT-12345",
-    mcNumber: "MC-67890",
-    carrierAddress: "2200 S 75th Ave, Phoenix, AZ 85043",
-    primaryContactName: "John Smith",
-    primaryContactNumber: "+1 (602) 555-0100",
-    primaryContactEmail: "john.smith@swift.com",
-    secondaryContactName: "Sarah Johnson",
-    secondaryContactNumber: "+1 (602) 555-0100",
-    secondaryContactEmail: "sarah@swift.com",
-    website: "www.swift.com",
-    tollFree: "1-800-SWIFT-1",
-    fax: "+1 (602) 555-0101",
-    maxDevices: 250,
-    createdOn: "2026-05-05",
-    lastSync: "2026-05-05",
-    status: "Active",
-    assetType: "Truck",
-    truck: "Truck 101",
-  },
-];
-
-const buildAccountRows = () =>
-  accountSeedData.map((seed, index) => ({
-    ...seed,
-    id: index + 1,
-  }));
-
-const formatDate = (value) => dayjs(value).format("MM DD YYYY");
-
-const getOptions = (rows, key) =>
-  Array.from(new Set(rows.map((row) => row[key]).filter(Boolean))).map(
-    (value) => ({
-      value,
-      label: value,
-    }),
-  );
-
-const getAccountColumns = (onViewAccount) => [
-  {
-    field: "carrierName",
-    headerName: "Carrier Name",
-    width: 180,
-    minWidth: 120,
-    maxWidth: 180,
-    headerTooltip: true,
-    cellClassName: "sticky-col-left-1",
-    headerClassName: "sticky-col-left-1",
-  },
-  {
-    field: "taxId",
-    headerName: "Tax ID(EIN)",
-    width: 180,
-    minWidth: 150,
-    maxWidth: 220,
-    headerTooltip: true,
-    cellClassName: "sticky-col-left-2",
-    headerClassName: "sticky-col-left-2",
-  },
-  {
-    field: "usdot",
-    headerName: "USDOT#",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-  },
-  {
-    field: "mcNumber",
-    headerName: "MC Number",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-  },
-  {
-    field: "carrierAddress",
-    headerName: "Carrier Address",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-    renderCell: (params) => <AddressCellText>{params.value}</AddressCellText>,
-  },
-  {
-    field: "primaryContactName",
-    headerName: "Primary Contact Name",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-  },
-  {
-    field: "primaryContactNumber",
-    headerName: "Primary Contact Number",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-  },
-  {
-    field: "primaryContactEmail",
-    headerName: "Primary Contact Email",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-  },
-  {
-    field: "secondaryContactName",
-    headerName: "Secondary Contact Name",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-  },
-  {
-    field: "secondaryContactNumber",
-    headerName: "Secondary Contact Number",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-  },
-  {
-    field: "secondaryContactEmail",
-    headerName: "Secondary Contact Email",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-  },
-  {
-    field: "website",
-    headerName: "Website",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-  },
-  {
-    field: "tollFree",
-    headerName: "Toll Free",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-  },
-  {
-    field: "fax",
-    headerName: "Fax",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-  },
-  {
-    field: "maxDevices",
-    headerName: "Max Devices",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-  },
-  {
-    field: "createdOn",
-    headerName: "Created On",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-    renderCell: (params) => formatDate(params.value),
-  },
-  {
-    field: "lastSync",
-    headerName: "Last Sync",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-    renderCell: (params) => formatDate(params.value),
-  },
-  {
-    field: "status",
-    headerName: "Status",
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-    renderCell: (params) => (
-      <StatusText accountStatus={params.value}>{params.value}</StatusText>
-    ),
-  },
-  {
-    field: "action",
-    headerName: "Action",
-    minWidth: 180,
-    maxWidth: 250,
-    sortable: false,
-    headerTooltip: true,
-    renderCell: (params) => (
-      <Tooltip title="View">
-        <IconButton size="small" onClick={onViewAccount} data-row={params.row}>
-          <VisibilityOutlinedIcon sx={actionIconSx} />
-        </IconButton>
-      </Tooltip>
-    ),
-  },
-];
+import { useServices } from "../../../services/services";
+// import { useFilters } from "../../../common/FilterContext";
+import { useSelector } from "react-redux";
+import { defaultPageSize } from "../DeviceManagement/Constants";
+import {
+  AccountManagementColumnsData,
+  AccountManagementRowData,
+} from "./CommonRowColumnUtils";
+import { STATUS_OPTIONS } from "./Constants";
 
 const AccountManagement = () => {
-  const [data, setData] = useState({
-    isLoading: false,
-    rows: [],
-    columns: [],
-    total: 0,
-    page: 1,
-    pageSize: 10,
-    search: "",
-    sortModel: [],
-    fromDate: null,
-    toDate: null,
-    assetType: "",
-    truck: "",
-    carrier: "",
-    status: "",
-  });
+  const { fetchApi, createApi } = useServices();
+  const { setLoading, LoadingContainer } = CommonLoading();
+  const [searchKey, setSearchKey] = useState(0);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dialogMode, setDialogMode] = useState("add");
+  const [selectedCompany, setSelectedCompany] = useState(null);
 
-  const [allAccounts, setAllAccounts] = useState(() => buildAccountRows());
+  const getDefaultFilters = () => {
+    return {
+      isLoading: false,
+      rows: [],
+      total: 0,
+      page: 1,
+      pageSize: defaultPageSize,
+      search: "",
+      sortModel: [],
+      fromDate: null,
+      toDate: null,
+      primaryContactName: "",
+      secondaryContactName: "",
+      status: "",
+    };
+  };
+
+  const [data, setData] = useState(getDefaultFilters());
+
+  const {
+    rows,
+    total,
+    page,
+    pageSize,
+    search,
+    sortModel,
+    fromDate,
+    toDate,
+    primaryContactName,
+    secondaryContactName,
+    status,
+    isLoading,
+  } = data;
+
+  const companyId = useSelector(
+    (state) =>
+      state.loginSlice.loginDetails?.body?.data?.userdetails?.company_id,
+  );
 
   const handleSnackbar = useCallback((message, severity = "info") => {
     setSnackbar({
@@ -246,137 +78,228 @@ const AccountManagement = () => {
   }, []);
 
   const handleAddAccount = useCallback(() => {
+    setDialogMode("add");
+    setSelectedCompany(null);
     setIsAddAccountOpen(true);
   }, []);
 
   const handleCloseAddAccount = useCallback(() => {
     setIsAddAccountOpen(false);
+    setDialogMode("add");
+    setSelectedCompany(null);
   }, []);
 
   const handleSnackbarClose = useCallback(() => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   }, []);
 
-  const handleCreateAccount = useCallback(
-    (account) => {
-      const today = dayjs().format("YYYY-MM-DD");
+  const fetchData = useCallback(async () => {
+    setData((prev) => ({ ...prev, isLoading: true }));
 
-      setAllAccounts((prev) => {
-        const nextId = Math.max(...prev.map((row) => row.id)) + 1;
-
-        return [
-          {
-            ...account,
-            id: nextId,
-            carrierAddress: "-",
-            createdOn: today,
-            lastSync: today,
-            status: "Active",
-            assetType: "Truck",
-            truck: `Truck ${nextId}`,
-          },
-          ...prev,
-        ];
-      });
+    try {
+      const endUrl = `/masteradmin/get-companies?company_id=${companyId}&primaryContactName=${primaryContactName || ""}&secondaryContactName=${secondaryContactName || ""}&startDate=${fromDate ? fromDate.format("YYYY-MM-DD") : ""}&endDate=${toDate ? toDate.format("YYYY-MM-DD") : ""}&search=${encodeURIComponent(search)}&status_id=${status || ""}&page=${page}&limit=${pageSize}`;
+      const response = await fetchApi(endUrl);
+      
+      const rowData = AccountManagementRowData(response?.body?.data || []);
 
       setData((prev) => ({
         ...prev,
-        page: 1,
+        isLoading: false,
+        rows: rowData,
+        total: response?.body?.total_records || 0,
       }));
-      setIsAddAccountOpen(false);
-      handleSnackbar(`${account.carrierName} account added.`, "success");
+    } catch (err) {
+      console.error("Error fetching companies:", err);
+      setData((prev) => ({ ...prev, isLoading: false }));
+    }
+  }, [companyId, primaryContactName, secondaryContactName, fromDate, toDate, search, status, page, pageSize, setData]);
+
+  const handleCreateAccount = useCallback(
+    async (account) => {
+      setIsSubmitting(true);
+      setLoading(true);
+
+      try {
+        const isUpdate = dialogMode === "edit";
+        const payload = {
+          companyName: account.carrierName,
+          dotNumber: account.usdot,
+          mcNumber: account.mcNumber || null,
+          ein: account.taxId || null,
+          company_code: account.carrierName.substring(0, 4).toUpperCase(),
+          maxDevices: account.maxDevices,
+          website: account.website || null,
+          tollFree: account.tollFree || null,
+          fax: account.fax || null,
+          status_id: account.status,
+          address: {
+            street: account.carrierAddress,
+            city: "",
+            state: "",
+            zip: "",
+            country: "US"
+          },
+          contact: {
+            name: account.primaryContactName,
+            email: account.primaryContactEmail,
+            phone: account.primaryContactNumber,
+            alternatePhone: ""
+          },
+          secondaryContact: {
+            name: account.secondaryContactName,
+            email: account.secondaryContactEmail,
+            phone: account.secondaryContactNumber,
+            alternatePhone: ""
+          }
+        };
+
+        if (isUpdate) {
+          payload.company_id = account.companyId;
+        }
+
+        const endUrl = `/masteradmin/onboard-company`;
+        const response = await createApi(payload, endUrl);
+
+        if (response?.statusCode === 200 || response?.statusCode === 201) {
+          setIsAddAccountOpen(false);
+          setDialogMode("add");
+          setSelectedCompany(null);
+          handleSnackbar(response?.body?.message || `${account.carrierName} account ${isUpdate ? "updated" : "added"} successfully.`, "success");
+          fetchData();
+        } else {
+          handleSnackbar(response?.body?.message || `Failed to ${isUpdate ? "update" : "add"} account.`, "error");
+        }
+      } catch (err) {
+        console.error("Error creating/updating account:", err);
+        handleSnackbar(`Failed to ${dialogMode === "edit" ? "update" : "add"} account. Please try again.`, "error");
+      } finally {
+        setIsSubmitting(false);
+        setLoading(false);
+      }
     },
-    [handleSnackbar],
+    [handleSnackbar, fetchData, setLoading, dialogMode],
   );
 
   const handleViewAccount = useCallback(
-    (event) => {
+    async (event) => {
       const row = event.currentTarget.dataset.row;
-      handleSnackbar(`${row.carrierName} account selected.`);
+      setLoading(true);
+
+      try {
+        const endUrl = `/masteradmin/get-companies?company_id=${companyId}`;
+        const response = await fetchApi(endUrl);
+        
+        if (response?.statusCode === 200 && response?.body?.data) {
+          const companyData = response?.body?.data;
+          const companyArray = Array.isArray(companyData) ? companyData : (companyData ? [companyData] : []);
+          const company = companyArray[0];
+
+          if (company) {
+            setSelectedCompany(company);
+            setDialogMode("view");
+            setIsAddAccountOpen(true);
+          }
+        } else {
+          handleSnackbar("Failed to fetch company details.", "error");
+        }
+      } catch (err) {
+        console.error("Error fetching company details:", err);
+        handleSnackbar("Failed to fetch company details. Please try again.", "error");
+      } finally {
+        setLoading(false);
+      }
     },
-    [handleSnackbar],
+    [companyId, fetchApi, handleSnackbar],
   );
 
+  const handleEditClick = useCallback(() => {
+    setDialogMode("edit");
+  }, []);
+
+  const handleCancelEdit = useCallback(() => {
+    setDialogMode("view");
+  }, []);
+
+  const transformCompanyToFormData = useCallback((company) => {
+    const address = company.address || {};
+    const contact = company.contact || {};
+    const secondaryContact = company.secondaryContact || {};
+
+    return {
+      carrierName: company.companyName || "",
+      usdot: company.dotNumber || "",
+      taxId: company.ein || "",
+      mcNumber: company.mcNumber || "",
+      maxDevices: company.maxDevices || "",
+      website: company.website || "",
+      tollFree: company.tollFree || "",
+      fax: company.fax || "",
+      carrierAddress: address.street || "",
+      primaryContactName: contact.name || "",
+      primaryContactNumber: contact.phone || "",
+      primaryContactEmail: contact.email || "",
+      secondaryContactName: secondaryContact.name || "",
+      secondaryContactNumber: secondaryContact.phone || "",
+      secondaryContactEmail: secondaryContact.email || "",
+      status: company.status_id || 1,
+      companyId: company.company_id,
+    };
+  }, []);
+
   const columns = useMemo(
-    () => getAccountColumns(handleViewAccount),
+    () => AccountManagementColumnsData(handleViewAccount),
     [handleViewAccount],
   );
 
-  const filteredRows = useMemo(() => {
-    const searchValue = data.search.trim().toLowerCase();
+  useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading, setLoading]);
 
-    return allAccounts.filter((account) => {
-      const matchesSearch =
-        !searchValue ||
-        [
-          account.carrierName,
-          account.usdot,
-          account.carrierAddress,
-          account.primaryContactName,
-          account.primaryContactNumber,
-          account.primaryContactEmail,
-          account.secondaryContactName,
-          account.secondaryContactNumber,
-          account.secondaryContactEmail,
-          account.status,
-        ]
-          .join(" ")
-          .toLowerCase()
-          .includes(searchValue);
-
-      const accountDate = dayjs(account.createdOn);
-      const matchesDate =
-        (!data.fromDate ||
-          accountDate.isSame(data.fromDate, "day") ||
-          accountDate.isAfter(data.fromDate, "day")) &&
-        (!data.toDate ||
-          accountDate.isSame(data.toDate, "day") ||
-          accountDate.isBefore(data.toDate, "day"));
-
-      return (
-        matchesSearch &&
-        matchesDate &&
-        (!data.assetType || account.assetType === data.assetType) &&
-        (!data.truck || account.truck === data.truck) &&
-        (!data.carrier || account.carrierName === data.carrier) &&
-        (!data.status || account.status === data.status)
-      );
-    });
-  }, [allAccounts, data]);
-
-  const paginatedRows = useMemo(() => {
-    const startIndex = (data.page - 1) * data.pageSize;
-    return filteredRows.slice(startIndex, startIndex + data.pageSize);
-  }, [filteredRows, data.page, data.pageSize]);
+  useEffect(() => {
+    fetchData();
+  }, [
+    page,
+    pageSize,
+    search,
+    sortModel,
+    primaryContactName,
+    secondaryContactName,
+    fromDate,
+    toDate,
+    status,
+    companyId,
+    fetchData,
+  ]);
 
   const gridData = {
     ...data,
-    rows: paginatedRows,
+    rows,
     columns,
-    total: filteredRows.length,
+    total,
+    isLoading: false,
   };
 
   return (
     <PageContainer>
+      <LoadingContainer />
       <AccountManagementHeader
         data={gridData}
         setData={setData}
-        searchKey={0}
+        searchKey={searchKey}
         handleClick={handleAddAccount}
-        assetTypeOptions={getOptions(allAccounts, "assetType")}
-        truckOptions={getOptions(allAccounts, "truck")}
-        carrierOptions={getOptions(allAccounts, "carrierName")}
-        statusOptions={getOptions(allAccounts, "status")}
+        carrierOptions={[]}
+        statusOptions={STATUS_OPTIONS}
       />
 
       <GridContainer>
         <CommonDataGrid
           columnsData={columns}
-          rowData={paginatedRows}
+          rowData={rows}
           data={gridData}
           setData={setData}
           paginationMode="server"
           getRowHeight={() => "auto"}
+          loading={false}
         />
       </GridContainer>
 
@@ -391,6 +314,11 @@ const AccountManagement = () => {
         open={isAddAccountOpen}
         onClose={handleCloseAddAccount}
         onSubmit={handleCreateAccount}
+        loading={isSubmitting}
+        mode={dialogMode}
+        initialData={selectedCompany ? transformCompanyToFormData(selectedCompany) : null}
+        onEditClick={handleEditClick}
+        onCancelEdit={handleCancelEdit}
       />
     </PageContainer>
   );

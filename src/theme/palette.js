@@ -50,6 +50,10 @@ const paletteTheme = themeMode => {
     light: getColorVariants("#eef2f7", "#6c757d"),
     dark: getColorVariants("#313a46", "#fff"),
     brand: getColorVariants("#284495", "#fff"),
+    custom: {
+      blue: "#2563EB",
+      errorRed: "#d32f2f",
+    },
     background: {
       paper: "#fff",
       default: "#f2f4f7"
@@ -92,6 +96,10 @@ const paletteTheme = themeMode => {
       light: getColorVariants("#464f5b", "#f1f1f1"),
       dark: getColorVariants("#f1f1f1", "#000"),
       brand: getColorVariants("#284495", "#fff"),
+      custom: {
+        blue: "#2563EB",
+        errorRed: "#d32f2f",
+      },
       background: {
         paper: "#1e2328",
         default: "#171c21"

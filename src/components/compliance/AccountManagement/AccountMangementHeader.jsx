@@ -7,8 +7,6 @@ const AccountManagementHeader = ({
   setData,
   searchKey,
   handleClick,
-  assetTypeOptions,
-  truckOptions,
   carrierOptions,
   statusOptions,
 }) => {
@@ -34,14 +32,14 @@ const AccountManagementHeader = ({
         allowDateClear={true}
         filters={[
           {
-            label: "Asset Type",
-            dataKey: "assetType",
-            options: assetTypeOptions,
+            label: "Primary Contact Name",
+            dataKey: "primaryContactName",
+            options: [],
           },
           {
-            label: "All Truck",
-            dataKey: "truck",
-            options: truckOptions,
+            label: "Secondary Contact Name",
+            dataKey: "secondaryContactName",
+            options: [],
           },
           {
             label: "All Carrier",

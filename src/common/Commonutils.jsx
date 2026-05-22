@@ -1,3 +1,9 @@
+import dayjs from "dayjs";
+
+const formatDisplayDate = (date) => {
+  return dayjs(date).format("MM-DD-YYYY");
+};
+
 export const formatDateRange = (start, end, variant = "single-or-range") => {
   if (!start || !end) return "";
 
