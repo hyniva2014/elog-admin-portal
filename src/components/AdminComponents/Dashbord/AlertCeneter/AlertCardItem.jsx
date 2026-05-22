@@ -22,32 +22,43 @@ import TimeIcon from "../../../../assets/images/active/ti.png";
 import { AlertAccentBar } from "../AlertCenter.styles";
 
 const AlertCardItem = ({ item, isSelected, onSelect }) => {
+  const {
+    role,
+    color,
+    title,
+    severity,
+    company,
+    truck,
+    serial,
+    location1,
+    location2,
+    city,
+    time,
+  } = item;
+
   const handleClick = useCallback(() => {
     onSelect(item);
   }, [item, onSelect]);
 
-  const isSystem = item.role === "System";
-  const showStatusLabel = item.role !== "Admin";
+  const isSystem = role === "System";
+  const showStatusLabel = role !== "Admin";
+
+  const secondaryIcon = time ? TimeIcon : LocationIcon;
+  const statusText = isSystem ? "in-progress" : "Open";
 
   return (
-    <AlertCard
-      accentcolor={item.color}
-      active={isSelected}
-      onClick={handleClick}
-    >
-      <AlertAccentBar accentcolor={item.color} />
+    <AlertCard accentcolor={color} active={isSelected} onClick={handleClick}>
+      <AlertAccentBar accentcolor={color} />
 
       <AlertContent>
         <AlertTopRow>
-          <AlertCardTitle>{item.title}</AlertCardTitle>
+          <AlertCardTitle>{title}</AlertCardTitle>
 
           <AlertRight>
-            <AlertStatus>{item.severity}</AlertStatus>
+            <AlertStatus>{severity}</AlertStatus>
 
             {showStatusLabel && (
-              <AlertOpen inProgress={isSystem}>
-                {isSystem ? "in-progress" : "Open"}
-              </AlertOpen>
+              <AlertOpen inProgress={isSystem}>{statusText}</AlertOpen>
             )}
           </AlertRight>
         </AlertTopRow>
@@ -55,34 +66,31 @@ const AlertCardItem = ({ item, isSelected, onSelect }) => {
         <AlertDetailRow>
           <AlertDetailItem>
             <AlertIcon src={CarrierIcon} alt="Carrier" />
-            {item.company}
+            {company}
           </AlertDetailItem>
 
           <AlertDetailItem>
             <AlertIcon src={TruckIcon} alt="Truck" />
-            {item.truck}
+            {truck}
           </AlertDetailItem>
 
           <AlertDetailItem>
             <AlertIcon src={DeviceIcon} alt="Device" />
-            {item.serial}
+            {serial}
           </AlertDetailItem>
 
-          <ELDTag>{item.role}</ELDTag>
+          <ELDTag>{role}</ELDTag>
         </AlertDetailRow>
 
         <LocationRow>
           <AlertDetailItem>
             <AlertIcon src={LocationIcon} alt="Location" />
-            {item.location1 || item.city}
+            {location1 || city}
           </AlertDetailItem>
 
           <AlertDetailItem>
-            <AlertIcon
-              src={item.time ? TimeIcon : LocationIcon}
-              alt="Time or Location"
-            />
-            {item.location2 || item.time}
+            <AlertIcon src={secondaryIcon} alt="Time or Location" />
+            {location2 || time}
           </AlertDetailItem>
         </LocationRow>
       </AlertContent>

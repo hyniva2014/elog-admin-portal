@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTheme, MenuItem } from "@mui/material";
 
 import {
@@ -20,26 +20,60 @@ import {
 } from "./CarrierGrowthTrend.styled";
 
 import ChartCustomTooltip from "./ChartCustomTooltip";
-import { chartData, TooltipKeys } from "./AdminConstant";
+import { TooltipKeys } from "./AdminConstant";
 import { TitleBox } from "./IncidentDistribution.styles";
+import { useServices } from "../../../services/services";
 
-const AVAILABLE_YEARS = ["2024", "2025", "2026"];
-
-const CHART_TITLE = "Carrier Growth Trend";
-const CHART_SUBTITLE = "Jan.26 - Jun 26";
-const DATA_KEY = "value";
-const X_AXIS_KEY = "month";
-const CHART_HEIGHT = 360;
-
-const getFilteredData = (year) =>
-  chartData.filter((item) => !item.year || item.year === year);
+import {
+  CURRENT_YEAR,
+  AVAILABLE_YEARS,
+  CHART_TITLE,
+  DATA_KEY,
+  X_AXIS_KEY,
+  CHART_HEIGHT,
+  // defaultTrendData,
+  getTrendArray,
+  getVisibleTrendData,
+  formatSubtitle,
+} from "./CarrierGrowthTrend.utils";
 
 const CarrierGrowthTrend = () => {
-  const [selectedYear, setSelectedYear] = useState("2026");
+  const [selectedYear, setSelectedYear] = useState(CURRENT_YEAR);
+
+  const [trendData, setTrendData] = useState([]);
+
+  const { fetchApi } = useServices();
 
   const theme = useTheme();
+
   const chartLineColor = theme.palette.primary.main;
-  const filteredData = getFilteredData(selectedYear);
+
+  const subtitle = useMemo(
+    () => formatSubtitle(trendData, selectedYear),
+    [trendData, selectedYear],
+  );
+
+  const fetchTrend = async () => {
+    try {
+      const endURL = `/masteradmin/dashboard-metrics?year=${selectedYear}`;
+
+      const response = await fetchApi(endURL);
+
+      const trend = response?.body?.carrier_growth_trend;
+
+      if (trend && Object.keys(trend).length) {
+        const parsedTrend = getTrendArray(trend);
+
+        setTrendData(getVisibleTrendData(parsedTrend, selectedYear));
+      }
+    } catch (error) {
+      console.error("Error fetching carrier growth trend:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTrend();
+  }, [selectedYear]);
 
   const handleYearChange = (e) => {
     setSelectedYear(e.target.value);
@@ -52,7 +86,8 @@ const CarrierGrowthTrend = () => {
           <ChartTitle variant="h6" component="h2">
             {CHART_TITLE}
           </ChartTitle>
-          <ChartSubtitle variant="body2">{CHART_SUBTITLE}</ChartSubtitle>
+
+          <ChartSubtitle variant="body2">{subtitle}</ChartSubtitle>
         </TitleBox>
 
         <YearSelect
@@ -70,9 +105,11 @@ const CarrierGrowthTrend = () => {
       </ChartHeader>
 
       <ResponsiveContainer width="100%" height={260}>
-        <LineChart data={filteredData}>
+        <LineChart data={trendData}>
           <CartesianGrid strokeDasharray="3 3" />
+
           <XAxis dataKey={X_AXIS_KEY} />
+
           <YAxis />
 
           <Tooltip content={<ChartCustomTooltip tooltipKeys={TooltipKeys} />} />

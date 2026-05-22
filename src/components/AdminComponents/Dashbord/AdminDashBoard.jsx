@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { PageContainer } from "../component.styled";
@@ -20,8 +20,10 @@ import {
   DateRangeText,
   HeaderSubtitle,
 } from "./AlertCenter.styles";
-import { alerts, summaryCards } from "./AdminConstant";
+import { alerts, Device_Metrics_Cards } from "./AdminConstant";
 import DateRangeSelector from "./DateRangeSelector";
+import { useServices } from "../../../services/services";
+import { buildSummaryCards } from "../../../common/Commonutils";
 
 const getTodayRange = () => {
   const today = new Date();
@@ -43,10 +45,28 @@ const getTodayRange = () => {
 
 const AdminDashboard = () => {
   const [selectedRange, setSelectedRange] = useState(getTodayRange());
+  const { fetchApi } = useServices();
+  const [summaryCards, setSummaryCards] = useState([]);
 
   const handleDateChange = (data) => {
     setSelectedRange(data);
   };
+
+  const LoadDevicesMetrices = async () => {
+    try {
+      const endURL = `/masteradmin/dashboard-metrics`;
+      const response = await fetchApi(endURL);
+      const metrices = response?.body?.dashboard_metrics;
+      setSummaryCards(buildSummaryCards(metrices, Device_Metrics_Cards));
+      console.log("Device Metrics:", response);
+    } catch (error) {
+      console.error("Error fetching device metrics:", error);
+    }
+  };
+
+  useEffect(() => {
+    LoadDevicesMetrices();
+  }, [selectedRange]);
 
   const dateLabel =
     selectedRange.period === "Today"
@@ -80,10 +100,7 @@ const AdminDashboard = () => {
         </ChartGrid>
 
         <AlertGrid item xs={12} md={5}>
-          <CommonAlertCenter
-            title="Alert Center"
-            alerts={alerts}
-          />
+          <CommonAlertCenter title="Alert Center" alerts={alerts} />
         </AlertGrid>
 
         <IncidentGrid item xs={12} md={6}>
