@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { StatusText } from "./DeviceModelManagement.styled.jsx";
+import { StatusTypography } from "./DeviceModelManagement.styled.jsx";
 import DeviceModelManagementActionButton from "./DeviceModelManagementActionButton";
 
 export const formatDate = (value) =>
@@ -8,9 +8,9 @@ export const formatDate = (value) =>
 export const getRowHeight = () => "auto";
 
 const StatusCell = (params) => (
-  <StatusText variant="body2" status={params.value}>
+  <StatusTypography variant="body2" value={params.value}>
     {params.value}
-  </StatusText>
+  </StatusTypography>
 );
 
 const ActionCell = (onView) => {

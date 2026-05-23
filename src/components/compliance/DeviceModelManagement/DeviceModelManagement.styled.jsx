@@ -1,24 +1,31 @@
-import { Box, Button, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { Box, Button, Typography } from "@mui/material";
+
+export const COLORS = {
+  primary: "#284495",
+  white: "#FFFFFF",
+  lightBlue: "#F3F8FF",
+  success: "#2e7d32",
+  error: "#c62828",
+  grey: "#6B7280",
+};
 
 export const EditButton = styled(Button)(({ theme }) => ({
   fontSize: 14,
   fontWeight: 400,
-  color: theme.palette.common.white,
-  backgroundColor: theme.palette.brand.main,
-  border: 1,
-  borderRadius: 2,
-  borderColor: theme.palette.brand.main,
+  color: COLORS.white,
+  backgroundColor: COLORS.primary,
+  border: `1px solid ${COLORS.primary}`,
+  borderRadius: "8px",
 }));
 
 export const CancelEditButton = styled(Button)(({ theme }) => ({
   fontSize: 14,
   fontWeight: 400,
-  color: theme.palette.brand.main,
-  border: 1,
-  borderRadius: 2,
-  borderColor: theme.palette.brand.main,
-  backgroundColor: theme.palette.brand.lighter,
+  color: COLORS.primary,
+  border: `1px solid ${COLORS.primary}`,
+  borderRadius: "8px",
+  backgroundColor: COLORS.lightBlue,
 }));
 
 export const HeaderContainer = styled(Box)(({ theme }) => ({
@@ -30,15 +37,11 @@ export const SummaryCardBox = styled(Box)(({ theme }) => ({
 }));
 
 export const AddButton = styled(Button)(({ theme }) => ({
-  color: theme.palette.primary.contrastText,
-  backgroundColor: theme.palette.primary.main,
-  textTransform: "none",
-  fontWeight: 600,
-  minWidth: 102,
-  height: 36,
-  "&:hover": {
-    backgroundColor: theme.palette.primary.dark,
-  },
+  color: COLORS.white,
+  backgroundColor: COLORS.primary,
+  fontSize: 14,
+  fontWeight: 400,
+  borderRadius: "8px",
 }));
 
 export const GridContainer = styled(Box)(() => ({
@@ -46,12 +49,12 @@ export const GridContainer = styled(Box)(() => ({
   minHeight: 0,
 }));
 
-export const StatusText = styled(Typography, {
-  shouldForwardProp: (prop) => prop !== "status",
-})(({ status, theme }) => ({
-  color: status === "Active" ? theme.palette.success.main : theme.palette.error.main,
-  fontSize: 13,
-  fontWeight: 400,
+export const StatusText = styled(Typography)(({ value }) => ({
+  color: value === "Active" ? COLORS.success : COLORS.error,
+}));
+
+export const StatusTypography = styled(Typography)(({ value }) => ({
+  color: value === "Active" ? COLORS.success : COLORS.error,
 }));
 
 export const DialogFormContainer = styled(Box)(({ theme }) => ({
@@ -71,5 +74,5 @@ export const StyledForm = styled("form")(() => ({
 
 export const actionIconSx = {
   fontSize: 20,
-  color: "#6B7280",
+  color: COLORS.grey,
 };
