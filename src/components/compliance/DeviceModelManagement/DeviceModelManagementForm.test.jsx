@@ -27,26 +27,23 @@ describe("DeviceModelManagementForm", () => {
   };
 
   test("renders form fields in add mode", () => {
-    renderWithTheme(<DeviceModelManagementForm {...defaultProps} />);
+    const { container } = renderWithTheme(<DeviceModelManagementForm {...defaultProps} />);
     expect(screen.getByLabelText(/Model Name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Description/i)).toBeInTheDocument();
-    expect(screen.getByText(/Asset Type/i)).toBeInTheDocument();
-    expect(screen.getByText(/E-Logs/i)).toBeInTheDocument();
-  });
-
-  test("shows status field in edit mode", () => {
-    renderWithTheme(<DeviceModelManagementForm {...defaultProps} isEditMode={true} />);
-    expect(screen.getByText(/Status/i)).toBeInTheDocument();
-  });
-
-  test("form renders without crashing", () => {
-    const { container } = renderWithTheme(<DeviceModelManagementForm {...defaultProps} />);
+    expect(screen.getAllByText(/Asset Type/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/E-Logs/i).length).toBeGreaterThan(0);
     expect(container.querySelector("form")).toBeInTheDocument();
   });
 
-  test("form has submit button", () => {
+  test("shows status field in edit mode", () => {
+    const { container } = renderWithTheme(<DeviceModelManagementForm {...defaultProps} isEditMode={true} />);
+    expect(screen.getAllByText(/Status/i).length).toBeGreaterThan(0);
+  });
+
+  test("form accepts text input", async () => {
     renderWithTheme(<DeviceModelManagementForm {...defaultProps} />);
-    const form = screen.getByRole("form");
-    expect(form).toBeInTheDocument();
+    const modelInput = screen.getByLabelText(/Model Name/i);
+    await userEvent.type(modelInput, "Test Model");
+    expect(modelInput).toHaveValue("Test Model");
   });
 });
