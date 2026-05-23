@@ -11,10 +11,10 @@ const AddDeviceModelDialog = ({
   isEditing = false,
   defaultValues,
   headerActions,
+  title,
+  mode,
+  submitButtonText,
 }) => {
-  const title = isEditMode ? "View Device Model" : "Add Device Model";
-  const submitButtonText = isEditMode ? (isEditing ? "Update" : "Save") : "Add Device";
-  const dialogMode = isEditMode ? "edit" : "add";
   const formKey = defaultValues ? `${defaultValues.modelName}|${defaultValues.assetType}` : "new";
 
   return (
@@ -27,7 +27,7 @@ const AddDeviceModelDialog = ({
       submitButtonText={submitButtonText}
       maxWidth="sm"
       headerActions={headerActions}
-      mode={dialogMode}
+      mode={mode}
       isEditing={isEditing}
       content={
         <AddDeviceModelForm

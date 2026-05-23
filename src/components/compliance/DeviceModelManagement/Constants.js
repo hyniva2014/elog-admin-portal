@@ -93,24 +93,3 @@ export const buildUpdatePayload = (selectedDeviceModel, deviceModel, userId) => 
   status: STATUS_REVERSE_MAP[deviceModel.status] || 2,
   updated_by: userId,
 });
-
-export const DEVICE_MODEL_SEED_DATA = [
-  {
-    model: "Geotab GO9",
-    assetType: "Truck",
-    description: "HSPA",
-    eLogs: "Yes",
-    createdOn: "05 05 2026",
-    updatedOn: "05 05 2026",
-    status: "Active",
-  },
-  {
-    model: "Samsara VG34",
-    assetType: "Truck",
-    description: "HSPA",
-    eLogs: "Yes",
-    createdOn: "05 05 2026",
-    updatedOn: "05 05 2026",
-    status: "Active",
-  },
-];

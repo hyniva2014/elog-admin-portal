@@ -1,6 +1,5 @@
-import { Box, Button, Typography, IconButton } from "@mui/material";
-import styled from "@emotion/styled";
-import eyeIcon from "../../../assets/images/svg/eyeicon.png";
+import { Box, Button, Typography } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
 export const EditButton = styled(Button)(({ theme }) => ({
   fontSize: 14,
@@ -24,6 +23,10 @@ export const CancelEditButton = styled(Button)(({ theme }) => ({
 
 export const HeaderContainer = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
+}));
+
+export const SummaryCardBox = styled(Box)(({ theme }) => ({
+  marginTop: theme.spacing(2),
 }));
 
 export const AddButton = styled(Button)(({ theme }) => ({
@@ -51,24 +54,22 @@ export const StatusText = styled(Typography, {
   fontWeight: 400,
 }));
 
-export const ActionIcon = styled("img")({
-  width: 18,
-  height: 18,
-  cursor: "pointer",
-});
-
-export const ActionCell = ({ row, onView }) => {
-  const handleClick = () => onView(row);
-  return (
-    <IconButton size="small" onClick={handleClick}>
-      <ActionIcon src={eyeIcon} alt="view" />
-    </IconButton>
-  );
-};
-
 export const DialogFormContainer = styled(Box)(({ theme }) => ({
   paddingLeft: theme.spacing(2),
   paddingRight: theme.spacing(2),
   paddingTop: theme.spacing(1.5),
   paddingBottom: theme.spacing(1),
 }));
+
+export const FormBox = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
+}));
+
+export const StyledForm = styled("form")(() => ({
+  paddingTop: 15,
+}));
+
+export const actionIconSx = {
+  fontSize: 20,
+  color: "#6B7280",
+};
