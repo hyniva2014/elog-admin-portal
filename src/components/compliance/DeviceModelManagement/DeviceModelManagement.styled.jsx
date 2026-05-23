@@ -76,3 +76,18 @@ export const actionIconSx = {
   fontSize: 20,
   color: COLORS.grey,
 };
+
+export const requiredSelectSx = {
+  "& .MuiInputLabel-asterisk": {
+    color: "#d32f2f !important",
+  },
+  "& .MuiFormLabel-asterisk": {
+    color: "#d32f2f !important",
+  },
+  "& label .MuiFormLabel-asterisk": {
+    color: "#d32f2f !important",
+  },
+  "& .MuiInputLabel-root[data-shrink='false'] .MuiFormLabel-asterisk": {
+    color: "#d32f2f !important",
+  },
+};

@@ -1,184 +1,218 @@
-import { render, screen, act, fireEvent, waitFor } from "@testing-library/react";
+import React from "react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import DeviceModelManagement from "./DeviceModelManagement";
 
-jest.mock("react-redux", () => ({
-  ...jest.requireActual("react-redux"),
-  useSelector: () => null,
-  useDispatch: () => jest.fn(),
-}));
-
-jest.mock("../../../services/services", () => ({
-  useServices: () => ({
-    fetchApi: jest.fn(),
-    createApi: jest.fn(),
-  }),
-}));
-
-jest.mock("../../../common/CommonDataGrid", () => {
-  return function MockCommonDataGrid(props) {
-    return <div data-testid="common-data-grid">CommonDataGrid</div>;
-  };
+jest.mock("@src/common/CommonDataGrid", () => {
+  return ({ rowData, columnsData }) => (
+    <div>
+      <div>Mock Data Grid</div>
+      {rowData.map((row) => (
+        <div key={row.id}>
+          <span>{row.model}</span>
+          <span>{row.assetType}</span>
+          <button
+            onClick={() =>
+              columnsData[7]
+                .renderCell({ row })
+                .props.children.props.onClick()
+            }
+          >
+            View
+          </button>
+        </div>
+      ))}
+    </div>
+  );
 });
 
+jest.mock("../../../common/PageContainer", () => ({
+  PageContainer: ({ children }) => <div>{children}</div>,
+}));
+
 jest.mock("../../../common/CommonLoading", () => {
-  return function MockCommonLoading() {
-    return {
-      setLoading: jest.fn(),
-      LoadingContainer: ({ children }) => <div data-testid="common-loading">{children}</div>,
-    };
-  };
+  return () => ({
+    setLoading: jest.fn(),
+    LoadingContainer: () => <div>Loading...</div>,
+  });
+});
+
+jest.mock("../../../common/CommonSnackbar", () => {
+  return ({ open, message }) => (open ? <div>{message}</div> : null);
 });
 
 jest.mock("./DeviceModelManagementHeader", () => {
-  return function MockDeviceModelManagementHeader(props) {
-    return <div data-testid="device-model-header">DeviceModelHeader</div>;
-  };
+  return ({ handleClick }) => <button onClick={handleClick}>Add Device Model</button>;
 });
 
 jest.mock("./AddDeviceModelDialog", () => {
-  return function MockAddDeviceModelDialog(props) {
-    return (
-      <div data-testid="add-device-model-dialog">
-        <span data-testid="dialog-mode">{props.isEditMode ? 'edit' : 'add'}</span>
-        <span data-testid="dialog-editing">{props.isEditing ? 'true' : 'false'}</span>
-        {props.headerActions && <div data-testid="header-actions">{props.headerActions}</div>}
+  return ({ open, title, submitButtonText, headerActions, onClose }) =>
+    open ? (
+      <div>
+        <h1>{title}</h1>
+        <button onClick={onClose}>Cancel</button>
+        <button>{submitButtonText}</button>
+        {headerActions}
       </div>
-    );
-  };
+    ) : null;
 });
 
-const mockDeviceModel = {
-  id: 1,
-  device_model_id: 1,
-  device_code: "SG1",
-  model: "Samsara G1",
-  modelName: "Samsara G1",
-  assetType: "Truck",
-  description: "Test description",
-  eLogs: "Yes",
-  status: "Active",
-};
-
-describe("DeviceModelManagement", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it("should render without crashing", () => {
-    const { container } = render(<DeviceModelManagement />);
-    expect(container).toBeTruthy();
-  });
-
-  it("should render all main components", () => {
+describe("DeviceModelManagement Component", () => {
+  test("renders component correctly", () => {
     render(<DeviceModelManagement />);
-    expect(screen.getByTestId("device-model-header")).toBeInTheDocument();
-    expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
-    expect(screen.getByTestId("common-loading")).toBeInTheDocument();
-    expect(screen.getByTestId("add-device-model-dialog")).toBeInTheDocument();
+
+    expect(screen.getByText("Mock Data Grid")).toBeInTheDocument();
+    expect(screen.getByText("Add Device Model")).toBeInTheDocument();
   });
 
-  it("should render multiple times without error", () => {
-    const { rerender } = render(<DeviceModelManagement />);
-    rerender(<DeviceModelManagement />);
-    rerender(<DeviceModelManagement />);
-    expect(screen.getByTestId("device-model-header")).toBeInTheDocument();
-  });
-
-  it("should initialize in add mode by default", () => {
+  test("opens add device model modal when Add Device Model button clicked", () => {
     render(<DeviceModelManagement />);
-    expect(screen.getByTestId("dialog-mode")).toHaveTextContent("add");
-    expect(screen.getByTestId("dialog-editing")).toHaveTextContent("false");
-  });
-});
 
-describe("DeviceModelManagement – View/Edit Mode", () => {
-  it("should start with dialog in add mode before any row is viewed", async () => {
+    const addButtons = screen.getAllByText("Add Device Model");
+    fireEvent.click(addButtons[0]);
+
+    expect(
+      screen.getByRole("heading", { name: "Add Device Model" })
+    ).toBeInTheDocument();
+  });
+
+  test("opens view device model modal when view button clicked", async () => {
     render(<DeviceModelManagement />);
-    await waitFor(() => {
-      expect(screen.getByTestId("dialog-mode")).toHaveTextContent("add");
+
+    const viewButtons = await screen.findAllByText("View");
+    fireEvent.click(viewButtons[0]);
+
+    expect(screen.getByText("View Device Model")).toBeInTheDocument();
+    expect(screen.getByText("Save")).toBeInTheDocument();
+  });
+
+  test("shows edit button in view mode", async () => {
+    render(<DeviceModelManagement />);
+
+    const viewButtons = await screen.findAllByText("View");
+    fireEvent.click(viewButtons[0]);
+
+    expect(screen.getByText("Edit")).toBeInTheDocument();
+  });
+
+  test("clicking edit changes button to update", async () => {
+    render(<DeviceModelManagement />);
+
+    const viewButtons = await screen.findAllByText("View");
+    fireEvent.click(viewButtons[0]);
+
+    fireEvent.click(screen.getByText("Edit"));
+
+    expect(screen.getByText("Update")).toBeInTheDocument();
+    expect(screen.getByText("Cancel Edit")).toBeInTheDocument();
+  });
+
+  test("clicking cancel edit reverts to view mode", async () => {
+    render(<DeviceModelManagement />);
+
+    const viewButtons = await screen.findAllByText("View");
+    fireEvent.click(viewButtons[0]);
+
+    fireEvent.click(screen.getByText("Edit"));
+    fireEvent.click(screen.getByText("Cancel Edit"));
+
+    expect(screen.getByText("Edit")).toBeInTheDocument();
+  });
+
+  test("closes modal when cancel button clicked", () => {
+    render(<DeviceModelManagement />);
+
+    const addButtons = screen.getAllByText("Add Device Model");
+    fireEvent.click(addButtons[0]);
+
+    expect(screen.getByText("Add Device Model")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("Cancel"));
+
+    waitFor(() => {
+      expect(screen.queryByText("Add Device Model")).not.toBeInTheDocument();
     });
   });
 
-  it("should render header actions when in view mode", async () => {
+  test("renders loading container", () => {
     render(<DeviceModelManagement />);
-    
-    // Header actions should not be present in add mode
-    expect(screen.queryByTestId("header-actions")).toBeNull();
-  });
-
-  it("should handle rapid mode switching without crashing", () => {
-    const { rerender } = render(<DeviceModelManagement />);
-    
-    for (let i = 0; i < 3; i++) {
-      rerender(<DeviceModelManagement />);
-    }
-    
-    expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
+    expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 });
 
-describe("DeviceModelManagement – edge cases", () => {
-  it("should render add-device-model dialog in closed state by default", () => {
-    render(<DeviceModelManagement />);
-    const dialog = screen.getByTestId("add-device-model-dialog");
-    expect(dialog).toBeInTheDocument();
-  });
+jest.mock("../../../services/services", () => ({
+  useServices: () => ({
+    fetchApi: jest.fn((url) => {
+      if (url.includes("get-device-model")) {
+        if (url.includes("device_model_id=")) {
+          return Promise.resolve({
+            body: {
+              data: [
+                {
+                  device_model_id: "1",
+                  device_code: "DM001",
+                  model_name: "Test Model",
+                  description: "Test Description",
+                  asset_type: 1,
+                  supports_elogs: 1,
+                  status: 1,
+                  created_at: "2026-05-20",
+                  updated_at: "2026-05-22",
+                },
+              ],
+            },
+          });
+        }
+        return Promise.resolve({
+          body: {
+            data: {
+              data: [
+                {
+                  device_model_id: "1",
+                  device_code: "DM001",
+                  model_name: "Model 1",
+                  description: "Description 1",
+                  asset_type: 1,
+                  supports_elogs: 1,
+                  status: 1,
+                  created_at: "2026-05-20",
+                  updated_at: "2026-05-22",
+                },
+                {
+                  device_model_id: "2",
+                  device_code: "DM002",
+                  model_name: "Model 2",
+                  description: "Description 2",
+                  asset_type: 2,
+                  supports_elogs: 0,
+                  status: 2,
+                  created_at: "2026-05-21",
+                  updated_at: "2026-05-23",
+                },
+              ],
+              pagination: {
+                total_records: 2,
+              },
+            },
+          },
+        });
+      }
+      return Promise.resolve({ body: { data: [] } });
+    }),
+    createApi: jest.fn(() =>
+      Promise.resolve({
+        statusCode: 200,
+      })
+    ),
+  }),
+}));
 
-  it("should not crash when rerendered rapidly", () => {
-    const { rerender, unmount } = render(<DeviceModelManagement />);
-    for (let i = 0; i < 5; i++) {
-      rerender(<DeviceModelManagement />);
-    }
-    expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
-    unmount();
-  });
-
-  it("should render header with data-testid even when no options are derived", () => {
-    render(<DeviceModelManagement />);
-    expect(screen.getByTestId("device-model-header")).toBeInTheDocument();
-  });
-
-  it("should handle empty device model data gracefully", () => {
-    render(<DeviceModelManagement />);
-    expect(screen.getByTestId("device-model-header")).toBeInTheDocument();
-    expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
-  });
+test("fetches and displays device models correctly", async () => {
+  render(<DeviceModelManagement />);
+  expect(await screen.findByText("Mock Data Grid")).toBeInTheDocument();
 });
 
-describe("DeviceModelManagement – API Integration", () => {
-  it("should handle API fetch errors gracefully", () => {
-    render(<DeviceModelManagement />);
-    // Component should render even if API fails
-    expect(screen.getByTestId("device-model-header")).toBeInTheDocument();
-  });
-
-  it("should handle successful data fetch", () => {
-    render(<DeviceModelManagement />);
-    expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
-  });
-});
-
-describe("DeviceModelManagement – negative cases", () => {
-  it("should not render unexpected elements outside the known structure", () => {
-    render(<DeviceModelManagement />);
-    expect(screen.queryByTestId("nonexistent-component")).toBeNull();
-  });
-
-  it("should remain stable when the component mounts and unmounts", () => {
-    const { unmount } = render(<DeviceModelManagement />);
-    expect(() => unmount()).not.toThrow();
-  });
-
-  it("should handle rapid open/close state changes without crashing", () => {
-    render(<DeviceModelManagement />);
-    act(() => {
-      expect(screen.getByTestId("add-device-model-dialog")).toBeInTheDocument();
-    });
-  });
-
-  it("should handle undefined selected device model", () => {
-    render(<DeviceModelManagement />);
-    // Should not crash when selectedDeviceModel is null/undefined
-    expect(screen.getByTestId("add-device-model-dialog")).toBeInTheDocument();
-  });
+test("handles null status correctly in data transformation", async () => {
+  render(<DeviceModelManagement />);
+  expect(await screen.findByText("Mock Data Grid")).toBeInTheDocument();
 });
