@@ -19,6 +19,8 @@ const ActionCell = (onView) => {
   );
 };
 
+const renderDateCell = (params) => formatDate(params.value);
+
 export const getColumns = (onView) => [
   {
     field: "model",
@@ -60,7 +62,7 @@ export const getColumns = (onView) => [
     minWidth: 180,
     maxWidth: 250,
     headerTooltip: true,
-    renderCell: (params) => formatDate(params.value),
+    renderCell: renderDateCell,
   },
   {
     field: "updatedOn",
@@ -68,7 +70,7 @@ export const getColumns = (onView) => [
     minWidth: 180,
     maxWidth: 250,
     headerTooltip: true,
-    renderCell: (params) => formatDate(params.value),
+    renderCell: renderDateCell,
   },
   {
     field: "status",

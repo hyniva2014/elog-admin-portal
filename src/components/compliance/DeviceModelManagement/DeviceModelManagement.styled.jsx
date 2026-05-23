@@ -1,31 +1,22 @@
 import { styled } from "@mui/material/styles";
 import { Box, Button, Typography } from "@mui/material";
 
-export const COLORS = {
-  primary: "#284495",
-  white: "#FFFFFF",
-  lightBlue: "#F3F8FF",
-  success: "#2e7d32",
-  error: "#c62828",
-  grey: "#6B7280",
-};
-
 export const EditButton = styled(Button)(({ theme }) => ({
   fontSize: 14,
   fontWeight: 400,
-  color: COLORS.white,
-  backgroundColor: COLORS.primary,
-  border: `1px solid ${COLORS.primary}`,
+  color: theme.palette.common.white,
+  backgroundColor: theme.palette.brand.main,
+  border: `1px solid ${theme.palette.brand.main}`,
   borderRadius: "8px",
 }));
 
 export const CancelEditButton = styled(Button)(({ theme }) => ({
   fontSize: 14,
   fontWeight: 400,
-  color: COLORS.primary,
-  border: `1px solid ${COLORS.primary}`,
+  color: theme.palette.brand.main,
+  border: `1px solid ${theme.palette.brand.main}`,
   borderRadius: "8px",
-  backgroundColor: COLORS.lightBlue,
+  backgroundColor: theme.palette.brand.lighter,
 }));
 
 export const HeaderContainer = styled(Box)(({ theme }) => ({
@@ -37,8 +28,8 @@ export const SummaryCardBox = styled(Box)(({ theme }) => ({
 }));
 
 export const AddButton = styled(Button)(({ theme }) => ({
-  color: COLORS.white,
-  backgroundColor: COLORS.primary,
+  color: theme.palette.common.white,
+  backgroundColor: theme.palette.brand.main,
   fontSize: 14,
   fontWeight: 400,
   borderRadius: "8px",
@@ -49,12 +40,16 @@ export const GridContainer = styled(Box)(() => ({
   minHeight: 0,
 }));
 
-export const StatusText = styled(Typography)(({ value }) => ({
-  color: value === "Active" ? COLORS.success : COLORS.error,
+export const StatusText = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== "value",
+})(({ value, theme }) => ({
+  color: value === "Active" ? theme.palette.success.main : theme.palette.error.main,
 }));
 
-export const StatusTypography = styled(Typography)(({ value }) => ({
-  color: value === "Active" ? COLORS.success : COLORS.error,
+export const StatusTypography = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== "value",
+})(({ value, theme }) => ({
+  color: value === "Active" ? theme.palette.success.main : theme.palette.error.main,
 }));
 
 export const DialogFormContainer = styled(Box)(({ theme }) => ({
@@ -72,22 +67,22 @@ export const StyledForm = styled("form")(() => ({
   paddingTop: 15,
 }));
 
-export const actionIconSx = {
+export const actionIconSx = (theme) => ({
   fontSize: 20,
-  color: COLORS.grey,
-};
+  color: theme.palette.grey[600],
+});
 
-export const requiredSelectSx = {
+export const requiredSelectSx = (theme) => ({
   "& .MuiInputLabel-asterisk": {
-    color: "#d32f2f !important",
+    color: `${theme.palette.error.main} !important`,
   },
   "& .MuiFormLabel-asterisk": {
-    color: "#d32f2f !important",
+    color: `${theme.palette.error.main} !important`,
   },
   "& label .MuiFormLabel-asterisk": {
-    color: "#d32f2f !important",
+    color: `${theme.palette.error.main} !important`,
   },
   "& .MuiInputLabel-root[data-shrink='false'] .MuiFormLabel-asterisk": {
-    color: "#d32f2f !important",
+    color: `${theme.palette.error.main} !important`,
   },
-};
+});

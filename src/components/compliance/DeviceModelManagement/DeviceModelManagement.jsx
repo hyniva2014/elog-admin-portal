@@ -12,8 +12,12 @@ import {
   GridContainer,
 } from "./DeviceModelManagement.styled.jsx";
 import {
+  ASSET_TYPE_MAP,
+  ELOGS_MAP,
+  STATUS_MAP,
   ASSET_TYPE_REVERSE_MAP,
   STATUS_REVERSE_MAP,
+  mapApiDataToComponent,
   mapComponentDataToApi,
   buildUpdatePayload,
 } from "./Constants";
@@ -21,7 +25,6 @@ import { useServices } from "@src/services/services";
 import {
   getColumns,
   getRowHeight,
-  transformDeviceModelData,
 } from "./DeviceModelManagementTable.utils";
 
 const getOptions = (rows, key) =>
@@ -126,7 +129,7 @@ const DeviceModelManagement = () => {
       const apiData = response?.body?.data?.data || response?.body?.data || [];
       const pagination = response?.body?.data?.pagination;
 
-      const rows = transformDeviceModelData(apiData);
+      const rows = mapApiDataToComponent(apiData);
       setAllDeviceModels(rows);
       setData((prev) => ({
         ...prev,
@@ -158,13 +161,7 @@ const DeviceModelManagement = () => {
     setIsAddDeviceModelOpen(true);
   }, []);
 
-  const handleViewClick = useCallback(async (row) => {
-    setIsEditMode(true);
-    setIsEditing(false);
-    await fetchDeviceModelById(row.device_model_id);
-  }, []);
-
-  const fetchDeviceModelById = async (deviceModelId) => {
+  const fetchDeviceModelById = useCallback(async (deviceModelId) => {
     try {
       setLoading(true);
 
@@ -183,9 +180,9 @@ const DeviceModelManagement = () => {
         setDefaultValues({
           modelName: deviceData.model_name || "",
           description: deviceData.description || "",
-          assetType: deviceData.asset_type === 1 ? "Truck" : deviceData.asset_type === 2 ? "Trailer" : "",
-          eLogs: deviceData.supports_elogs === 1 ? "Yes" : deviceData.supports_elogs === 0 ? "No" : "",
-          status: deviceData.status === 1 ? "Active" : deviceData.status === 2 ? "Inactive" : "",
+          assetType: ASSET_TYPE_MAP[deviceData.asset_type] ?? "",
+          eLogs: ELOGS_MAP[deviceData.supports_elogs] ?? "",
+          status: STATUS_MAP[deviceData.status] ?? "",
         });
         setIsAddDeviceModelOpen(true);
       } else {
@@ -198,7 +195,13 @@ const DeviceModelManagement = () => {
       setLoading(false);
       handleSnackbar("Failed to fetch device model details", "error");
     }
-  };
+  }, [fetchApi, handleSnackbar, setLoading]);
+
+  const handleViewClick = useCallback(async (row) => {
+    setIsEditMode(true);
+    setIsEditing(false);
+    await fetchDeviceModelById(row.device_model_id);
+  }, [fetchDeviceModelById]);
 
   const handleEditClick = useCallback(() => {
     setIsEditing(true);
@@ -207,6 +210,8 @@ const DeviceModelManagement = () => {
   const handleCancelEdit = useCallback(() => {
     setIsEditing(false);
   }, []);
+
+  const noOp = useCallback(() => {}, []);
 
   const handleCloseDialog = useCallback(() => {
     setIsAddDeviceModelOpen(false);
@@ -325,7 +330,7 @@ const DeviceModelManagement = () => {
           searchKey={0}
           summaryCards={[]}
           mode=""
-          setMode={() => {}}
+          setMode={noOp}
           handleClick={handleAddClick}
           assetTypeOptions={assetTypeOptions}
           modelOptions={modelOptions}

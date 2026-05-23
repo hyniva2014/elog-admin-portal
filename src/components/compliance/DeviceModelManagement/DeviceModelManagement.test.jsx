@@ -57,6 +57,73 @@ jest.mock("./AddDeviceModelDialog", () => {
     ) : null;
 });
 
+jest.mock("../../../services/services", () => ({
+  useServices: () => ({
+    fetchApi: jest.fn((url) => {
+      if (url.includes("get-device-model")) {
+        if (url.includes("device_model_id=")) {
+          return Promise.resolve({
+            body: {
+              data: [
+                {
+                  device_model_id: "1",
+                  device_code: "DM001",
+                  model_name: "Test Model",
+                  description: "Test Description",
+                  asset_type: 1,
+                  supports_elogs: 1,
+                  status: 1,
+                  created_at: "2026-05-20",
+                  updated_at: "2026-05-22",
+                },
+              ],
+            },
+          });
+        }
+        return Promise.resolve({
+          body: {
+            data: {
+              data: [
+                {
+                  device_model_id: "1",
+                  device_code: "DM001",
+                  model_name: "Model 1",
+                  description: "Description 1",
+                  asset_type: 1,
+                  supports_elogs: 1,
+                  status: 1,
+                  created_at: "2026-05-20",
+                  updated_at: "2026-05-22",
+                },
+                {
+                  device_model_id: "2",
+                  device_code: "DM002",
+                  model_name: "Model 2",
+                  description: "Description 2",
+                  asset_type: 2,
+                  supports_elogs: 0,
+                  status: 2,
+                  created_at: "2026-05-21",
+                  updated_at: "2026-05-23",
+                },
+              ],
+              pagination: {
+                total_records: 2,
+              },
+            },
+          },
+        });
+      }
+      return Promise.resolve({ body: { data: [] } });
+    }),
+    createApi: jest.fn(() =>
+      Promise.resolve({
+        statusCode: 200,
+      })
+    ),
+  }),
+}));
+
 describe("DeviceModelManagement Component", () => {
   test("renders component correctly", () => {
     render(<DeviceModelManagement />);
@@ -139,73 +206,6 @@ describe("DeviceModelManagement Component", () => {
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 });
-
-jest.mock("../../../services/services", () => ({
-  useServices: () => ({
-    fetchApi: jest.fn((url) => {
-      if (url.includes("get-device-model")) {
-        if (url.includes("device_model_id=")) {
-          return Promise.resolve({
-            body: {
-              data: [
-                {
-                  device_model_id: "1",
-                  device_code: "DM001",
-                  model_name: "Test Model",
-                  description: "Test Description",
-                  asset_type: 1,
-                  supports_elogs: 1,
-                  status: 1,
-                  created_at: "2026-05-20",
-                  updated_at: "2026-05-22",
-                },
-              ],
-            },
-          });
-        }
-        return Promise.resolve({
-          body: {
-            data: {
-              data: [
-                {
-                  device_model_id: "1",
-                  device_code: "DM001",
-                  model_name: "Model 1",
-                  description: "Description 1",
-                  asset_type: 1,
-                  supports_elogs: 1,
-                  status: 1,
-                  created_at: "2026-05-20",
-                  updated_at: "2026-05-22",
-                },
-                {
-                  device_model_id: "2",
-                  device_code: "DM002",
-                  model_name: "Model 2",
-                  description: "Description 2",
-                  asset_type: 2,
-                  supports_elogs: 0,
-                  status: 2,
-                  created_at: "2026-05-21",
-                  updated_at: "2026-05-23",
-                },
-              ],
-              pagination: {
-                total_records: 2,
-              },
-            },
-          },
-        });
-      }
-      return Promise.resolve({ body: { data: [] } });
-    }),
-    createApi: jest.fn(() =>
-      Promise.resolve({
-        statusCode: 200,
-      })
-    ),
-  }),
-}));
 
 test("fetches and displays device models correctly", async () => {
   render(<DeviceModelManagement />);
