@@ -104,7 +104,7 @@ const DeviceModelManagement = () => {
       }
 
       const formattedOptions = dropdownData.map((item) => ({
-        value: item.model_name,
+        value: item.device_model_id,
         label: item.model_name,
       }));
 
@@ -123,7 +123,7 @@ const DeviceModelManagement = () => {
         endUrl += `&search=${data.search}`;
       }
       if (data.model) {
-        endUrl += `&model_name=${data.model}`;
+        endUrl += `&device_model_id=${data.model}`;
       }
       if (data.assetType) {
         endUrl += `&asset_type=${data.assetType}`;
@@ -151,12 +151,18 @@ const DeviceModelManagement = () => {
       console.log("List API response.body:", response?.body);
       console.log("List API response.body.data:", response?.body?.data);
 
-      // Handle both response structures
+      // Handle all response structures (array, single object, nested, or directly on body)
       let apiData = [];
       if (response?.body?.data?.data && Array.isArray(response.body.data.data)) {
         apiData = response.body.data.data;
       } else if (response?.body?.data && Array.isArray(response.body.data)) {
         apiData = response.body.data;
+      } else if (response?.body?.data && typeof response.body.data === 'object' && response.body.data !== null) {
+        // Single object in body.data (when filtering by specific ID)
+        apiData = [response.body.data];
+      } else if (response?.body?.device_model_id) {
+        // Data is directly on body (when filtering by specific ID)
+        apiData = [response.body];
       }
       console.log("List API Data extracted:", apiData);
 
@@ -208,13 +214,26 @@ const DeviceModelManagement = () => {
     try {
       setLoading(true);
 
+      // Generate device_code from model_name if not provided (e.g., "Samsara G2" → "SG2")
+      const generateDeviceCode = (name) => {
+        const words = name.split(/\s+/);
+        const initials = words.map(word => word[0]?.toUpperCase()).join('');
+        // Extract number from last word if present
+        const lastWord = words[words.length - 1];
+        const number = lastWord?.match(/\d+/)?.[0] || "";
+        return initials + number || `DM${Date.now().toString().slice(-3)}`;
+      };
+      const deviceCode = formValues.deviceCode || generateDeviceCode(formValues.modelName);
+
       const payload = {
-        device_code: formValues.deviceCode,
+        device_code: deviceCode,
         model_name: formValues.modelName,
         description: formValues.description,
         asset_type: formValues.assetType,
         supports_elogs: formValues.supportsElogs,
         status: formValues.status ?? 1,
+        created_by: 9,
+        updated_by: 9,
       };
 
       let response;
@@ -223,11 +242,11 @@ const DeviceModelManagement = () => {
       }
       response = await createApi(payload, "/masteradmin/device-model");
 
-      if (response?.statusCode === 200) {
+      if (response?.statusCode >= 200 && response?.statusCode < 300) {
         handleSnackbar(
           formValues.deviceModelId
-            ? "Device model updated successfully"
-            : "Device model created successfully",
+            ? "Asset updated successfully"
+            : "Asset created successfully",
           "success",
         );
         setIsAddModalOpen(false);

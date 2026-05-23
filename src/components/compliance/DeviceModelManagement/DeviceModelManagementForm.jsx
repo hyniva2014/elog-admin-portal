@@ -11,8 +11,14 @@ import { ASSET_TYPE_FILTER_OPTIONS, ELOGS_FILTER_OPTIONS, DEVICE_MODEL_STATUS_FI
 const validationSchema = yup.object({
   modelName: yup.string().required("Model Name is required"),
   description: yup.string().required("Description is required"),
-  assetType: yup.number().required("Asset Type is required"),
-  supportsElogs: yup.number().required("E-Logs is required"),
+  assetType: yup
+    .number()
+    .transform((value) => (isNaN(value) ? undefined : value))
+    .required("Asset Type is required"),
+  supportsElogs: yup
+    .number()
+    .transform((value) => (isNaN(value) ? undefined : value))
+    .required("E-Logs is required"),
   status: yup.number().nullable(),
 });
 
