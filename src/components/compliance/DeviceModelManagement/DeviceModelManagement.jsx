@@ -22,6 +22,18 @@ import {
   transformDeviceModelData,
 } from "./DeviceModelManagementTable.utils";
 
+// Generate device_code from model_name (e.g., "Samsara G2" → "SG2")
+const generateDeviceCode = (name) => {
+  if (!name || typeof name !== "string") {
+    return `DM${Date.now().toString().slice(-3)}`;
+  }
+  const words = name.split(/\s+/);
+  const initials = words.map((word) => word[0]?.toUpperCase()).join("");
+  const lastWord = words[words.length - 1];
+  const number = lastWord?.match(/\d+/)?.[0] || "";
+  return initials + number || `DM${Date.now().toString().slice(-3)}`;
+};
+
 const DeviceModelManagement = () => {
   const { fetchApi, createApi, updateApi } = useServices();
   const { setLoading, LoadingContainer } = CommonLoading();
@@ -93,7 +105,6 @@ const DeviceModelManagement = () => {
   const fetchModelDropdown = async () => {
     try {
       const response = await fetchApi("/masteradmin/get-device-model");
-      console.log("Dropdown API Response:", response);
 
       // Handle response structure: response.body.data is directly the array
       let dropdownData = [];
@@ -108,7 +119,6 @@ const DeviceModelManagement = () => {
         label: item.model_name,
       }));
 
-      console.log("Formatted Options:", formattedOptions);
       setModelOptions(formattedOptions);
     } catch (error) {
       console.error("Device Model Dropdown Error:", error);
@@ -147,9 +157,6 @@ const DeviceModelManagement = () => {
       }
 
       const response = await fetchApi(endUrl);
-      console.log("List API Response:", response);
-      console.log("List API response.body:", response?.body);
-      console.log("List API response.body.data:", response?.body?.data);
 
       // Handle all response structures (array, single object, nested, or directly on body)
       let apiData = [];
@@ -164,8 +171,6 @@ const DeviceModelManagement = () => {
         // Data is directly on body (when filtering by specific ID)
         apiData = [response.body];
       }
-      console.log("List API Data extracted:", apiData);
-
       const rows = transformDeviceModelData(apiData);
       setAllRows(rows);
       setData((prev) => ({
@@ -215,14 +220,6 @@ const DeviceModelManagement = () => {
       setLoading(true);
 
       // Generate device_code from model_name if not provided (e.g., "Samsara G2" → "SG2")
-      const generateDeviceCode = (name) => {
-        const words = name.split(/\s+/);
-        const initials = words.map(word => word[0]?.toUpperCase()).join('');
-        // Extract number from last word if present
-        const lastWord = words[words.length - 1];
-        const number = lastWord?.match(/\d+/)?.[0] || "";
-        return initials + number || `DM${Date.now().toString().slice(-3)}`;
-      };
       const deviceCode = formValues.deviceCode || generateDeviceCode(formValues.modelName);
 
       const payload = {

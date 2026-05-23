@@ -1,22 +1,13 @@
 import { styled } from "@mui/material/styles";
 import { Box, Button, Typography } from "@mui/material";
 
-export const COLORS = {
-  primary: "#284495",
-  white: "#FFFFFF",
-  lightBlue: "#F3F8FF",
-  success: "#2e7d32",
-  error: "#c62828",
-  grey: "#6B7280",
-};
-
 export const HeaderContainer = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
 export const AddButton = styled(Button)(({ theme }) => ({
-  color: COLORS.white,
-  backgroundColor: COLORS.primary,
+  color: theme.palette.common.white,
+  backgroundColor: theme.palette.sidebar.main,
   fontSize: 14,
   fontWeight: 400,
   borderRadius: "8px",
@@ -37,30 +28,30 @@ export const StyledForm = styled("form")(() => ({
 export const EditButton = styled(Button)(({ theme }) => ({
   fontSize: 14,
   fontWeight: 400,
-  color: COLORS.white,
-  backgroundColor: COLORS.primary,
-  border: `1px solid ${COLORS.primary}`,
+  color: theme.palette.common.white,
+  backgroundColor: theme.palette.sidebar.main,
+  border: `1px solid ${theme.palette.sidebar.main}`,
   borderRadius: "8px",
 }));
 
 export const CancelEditButton = styled(Button)(({ theme }) => ({
   fontSize: 14,
   fontWeight: 400,
-  color: COLORS.primary,
-  border: `1px solid ${COLORS.primary}`,
+  color: theme.palette.sidebar.main,
+  border: `1px solid ${theme.palette.sidebar.main}`,
   borderRadius: "8px",
-  backgroundColor: COLORS.lightBlue,
+  backgroundColor: theme.palette.light.main,
 }));
 
-export const StatusTypography = styled(Typography)(({ value }) => ({
-  color: value === "Active" ? COLORS.success : COLORS.error,
+export const StatusTypography = styled(Typography)(({ value, theme }) => ({
+  color: value === "Active" ? theme.palette.success.main : theme.palette.error.main,
 }));
 
-export const ELogsTypography = styled(Typography)(({ value }) => ({
-  color: value === "Yes" ? COLORS.success : COLORS.grey,
+export const ELogsTypography = styled(Typography)(({ value, theme }) => ({
+  color: value === "Yes" ? theme.palette.success.main : theme.palette.grey[600],
 }));
 
 export const actionIconSx = {
   fontSize: 20,
-  color: COLORS.grey,
+  color: "text.secondary",
 };
