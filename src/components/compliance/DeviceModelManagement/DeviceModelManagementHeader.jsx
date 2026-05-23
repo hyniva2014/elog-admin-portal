@@ -1,36 +1,39 @@
 import { Typography } from "@mui/material";
-import CommonPageHeader from "@src/common/CommonPageHeader";
-import CommonFilters from "@src/common/CommonFilters";
-import CommonSummaryCardGroup from "@src/common/CommonSummaryCardGroup";
+import CommonPageHeader from "../../../common/CommonPageHeader";
+import CommonFilters from "../../../common/CommonFilters";
 import {
-  DEVICE_MODEL_ASSET_OPTIONS,
-  DEVICE_MODEL_STATUS_OPTIONS,
+  DEVICE_MODEL_STATUS_FILTER_OPTIONS,
+  ASSET_TYPE_FILTER_OPTIONS,
 } from "./Constants";
-import { HeaderContainer, AddButton, SummaryCardBox } from "./DeviceModelManagement.styled.jsx";
+import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
+import { HeaderContainer, AddButton, SummaryCardBox } from "./DeviceModelManagement.styles";
 
 const DeviceModelManagementHeader = (props) => {
   const {
     data = [],
     setData,
-    searchKey = 0,
+    searchKey = {},
     summaryCards = [],
     mode,
     setMode,
     handleClick,
-    assetTypeOptions = [],
     modelOptions = [],
     statusOptions = [],
+    assetTypeOptions = [],
   } = props;
 
-  const resolvedAssetTypeOptions =
-    assetTypeOptions.length > 0 ? assetTypeOptions : DEVICE_MODEL_ASSET_OPTIONS;
-
   const resolvedStatusOptions =
-    statusOptions.length > 0 ? statusOptions : DEVICE_MODEL_STATUS_OPTIONS;
+    statusOptions.length > 0 ? statusOptions : DEVICE_MODEL_STATUS_FILTER_OPTIONS;
+
+  const resolvedAssetTypeOptions =
+    assetTypeOptions.length > 0 ? assetTypeOptions : ASSET_TYPE_FILTER_OPTIONS;
+
+  const resolvedModelOptions =
+    modelOptions.length > 0 ? modelOptions : [];
 
   const filters = [
     { label: "Asset Type", dataKey: "assetType", options: resolvedAssetTypeOptions },
-    { label: "All Model", dataKey: "model", options: modelOptions },
+    { label: "All Model", dataKey: "model", options: resolvedModelOptions },
     { label: "All Status", dataKey: "status", options: resolvedStatusOptions },
   ];
 
@@ -42,7 +45,7 @@ const DeviceModelManagementHeader = (props) => {
         addButton={true}
         rightContent={
           <AddButton variant="contained" onClick={handleClick}>
-            Add Device
+            Add Asset
           </AddButton>
         }
       />

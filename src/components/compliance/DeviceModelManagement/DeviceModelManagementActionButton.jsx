@@ -1,7 +1,8 @@
 import React, { useCallback } from "react";
 import { IconButton, Tooltip } from "@mui/material";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import { actionIconSx } from "./DeviceModelManagement.styled.jsx";
+
+import { actionIconSx } from "./DeviceModelManagement.styles";
 
 const DeviceModelManagementActionButton = React.memo(
   ({ row, onView }) => {

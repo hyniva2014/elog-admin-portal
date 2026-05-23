@@ -1,86 +1,62 @@
-import React, { useCallback, useMemo, useState, useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
+import dayjs from "dayjs";
 import CommonDataGrid from "@src/common/CommonDataGrid";
-import { PageContainer } from "@src/common/PageContainer";
-import CommonLoading from "@src/common/CommonLoading";
-import CommonSnackbar from "@src/common/CommonSnackbar";
+import { PageContainer } from "../../../common/PageContainer";
+import CommonLoading from "../../../common/CommonLoading";
+import CommonDialogForm from "../../../common/CommonDialogForm";
+import CommonSnackbar from "../../../common/CommonSnackbar";
 import DeviceModelManagementHeader from "./DeviceModelManagementHeader";
-import AddDeviceModelDialog from "./AddDeviceModelDialog";
+import DeviceModelManagementForm from "./DeviceModelManagementForm";
 import {
   EditButton,
   CancelEditButton,
-  GridContainer,
-} from "./DeviceModelManagement.styled.jsx";
+} from "./DeviceModelManagement.styles";
 import {
-  ASSET_TYPE_MAP,
-  ELOGS_MAP,
-  STATUS_MAP,
-  ASSET_TYPE_REVERSE_MAP,
-  STATUS_REVERSE_MAP,
-  mapApiDataToComponent,
-  mapComponentDataToApi,
-  buildUpdatePayload,
-} from "./Constants";
-import { useServices } from "@src/services/services";
+  GridContainer,
+} from "../AccountManagement/AccountManagement.styled";
+import { useServices } from "../../../services/services";
+import { DEVICE_MODEL_STATUS_FILTER_OPTIONS, ASSET_TYPE_FILTER_OPTIONS } from "./Constants";
 import {
   getColumns,
   getRowHeight,
+  transformDeviceModelData,
 } from "./DeviceModelManagementTable.utils";
 
-const getOptions = (rows, key) =>
-  Array.from(new Set(rows.map((row) => row[key]).filter(Boolean))).map(
-    (value) => ({
-      value,
-      label: value,
-    }),
-  );
-
-const isApiSuccess = (response) =>
-  response?.statusCode === 200 ||
-  response?.statusCode === 201 ||
-  response?.body?.statusCode === 200 ||
-  response?.body?.statusCode === 201;
-
 const DeviceModelManagement = () => {
-  const { fetchApi, createApi } = useServices();
+  const { fetchApi, createApi, updateApi } = useServices();
   const { setLoading, LoadingContainer } = CommonLoading();
-  const userId = useSelector(
-    (state) => state.loginSlice.loginDetails?.body?.data?.userdetails?.user_id ?? null,
-  );
-
-  const [allDeviceModels, setAllDeviceModels] = useState([]);
+  const [allRows, setAllRows] = useState([]);
+  const [modelOptions, setModelOptions] = useState([]);
   const [data, setData] = useState({
     total: 0,
     page: 1,
     pageSize: 10,
     search: "",
+    model: "",
     sortModel: [],
     fromDate: null,
     toDate: null,
     assetType: "",
-    model: "",
+    supportsElogs: "",
     status: "",
   });
-
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
-
-  const [isAddDeviceModelOpen, setIsAddDeviceModelOpen] = useState(false);
-  const [isCreateLoading, setIsCreateLoading] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [selectedDeviceModel, setSelectedDeviceModel] = useState(null);
-
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [defaultValues, setDefaultValues] = useState({
+    deviceModelId: "",
+    deviceCode: "",
     modelName: "",
     description: "",
     assetType: "",
-    eLogs: "",
-    status: "",
+    supportsElogs: "",
+    status: 1,
   });
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleSnackbar = useCallback((message, severity = "info") => {
     setSnackbar({
@@ -97,111 +73,128 @@ const DeviceModelManagement = () => {
     }));
   }, []);
 
-  const fetchApiRef = useRef(fetchApi);
-  fetchApiRef.current = fetchApi;
-
-  const setLoadingRef = useRef(setLoading);
-  setLoadingRef.current = setLoading;
-
-  const handleSnackbarRef = useRef(handleSnackbar);
-  handleSnackbarRef.current = handleSnackbar;
-
-  const filterKey = useMemo(
-    () => `${data.page}|${data.pageSize}|${data.search}|${data.assetType}|${data.status}|${data.model}`,
-    [data.page, data.pageSize, data.search, data.assetType, data.status, data.model],
-  );
-
-  const fetchDeviceModels = useCallback(async () => {
-    const [page, pageSize, search, assetType, status, model] = filterKey.split("|");
-    try {
-      setLoadingRef.current(true);
-      const queryParams = new URLSearchParams({
-        page: page || "1",
-        limit: pageSize || "10",
-        ...(search && { search }),
-        ...(model && { search: model }),
-        ...(assetType && { asset_type: ASSET_TYPE_REVERSE_MAP[assetType] }),
-        ...(status && { status: STATUS_REVERSE_MAP[status] }),
-      });
-
-      const response = await fetchApiRef.current(`/masteradmin/get-device-model?${queryParams.toString()}`);
-
-      const apiData = response?.body?.data?.data || response?.body?.data || [];
-      const pagination = response?.body?.data?.pagination;
-
-      const rows = mapApiDataToComponent(apiData);
-      setAllDeviceModels(rows);
-      setData((prev) => ({
-        ...prev,
-        total: pagination?.total_records || rows.length,
-      }));
-      setLoadingRef.current(false);
-    } catch (error) {
-      console.error("Fetch Device Models Error:", error);
-      setLoadingRef.current(false);
-      handleSnackbarRef.current("Failed to fetch device models", "error");
-    }
-  }, [filterKey]);
-
   useEffect(() => {
     fetchDeviceModels();
-  }, [filterKey, fetchDeviceModels]);
+  }, [
+    data.page,
+    data.pageSize,
+    data.search,
+    data.model,
+    data.assetType,
+    data.supportsElogs,
+    data.status,
+    data.fromDate,
+  ]);
 
-  const handleAddClick = useCallback(() => {
+  useEffect(() => {
+    fetchModelDropdown();
+  }, []);
+
+  const fetchModelDropdown = async () => {
+    try {
+      const response = await fetchApi("/masteradmin/get-device-model");
+      console.log("Dropdown API Response:", response);
+
+      // Handle response structure: response.body.data is directly the array
+      let dropdownData = [];
+      if (response?.body?.data && Array.isArray(response.body.data)) {
+        dropdownData = response.body.data;
+      } else if (response?.body?.data?.data && Array.isArray(response.body.data.data)) {
+        dropdownData = response.body.data.data;
+      }
+
+      const formattedOptions = dropdownData.map((item) => ({
+        value: item.model_name,
+        label: item.model_name,
+      }));
+
+      console.log("Formatted Options:", formattedOptions);
+      setModelOptions(formattedOptions);
+    } catch (error) {
+      console.error("Device Model Dropdown Error:", error);
+    }
+  };
+
+  const fetchDeviceModels = async () => {
+    try {
+      setLoading(true);
+      let endUrl = `/masteradmin/get-device-model?page=${data.page}&limit=${data.pageSize}`;
+      if (data.search) {
+        endUrl += `&search=${data.search}`;
+      }
+      if (data.model) {
+        endUrl += `&model_name=${data.model}`;
+      }
+      if (data.assetType) {
+        endUrl += `&asset_type=${data.assetType}`;
+      }
+      if (
+        data.supportsElogs !== null &&
+        data.supportsElogs !== undefined &&
+        data.supportsElogs !== ""
+      ) {
+        endUrl += `&supports_elogs=${String(data.supportsElogs)}`;
+      }
+      if (
+        data.status !== null &&
+        data.status !== undefined &&
+        data.status !== ""
+      ) {
+        endUrl += `&status=${String(data.status)}`;
+      }
+      if (data.fromDate) {
+        endUrl += `&created_at=${dayjs(data.fromDate).format("YYYY-MM-DD")}`;
+      }
+
+      const response = await fetchApi(endUrl);
+      console.log("List API Response:", response);
+      console.log("List API response.body:", response?.body);
+      console.log("List API response.body.data:", response?.body?.data);
+
+      // Handle both response structures
+      let apiData = [];
+      if (response?.body?.data?.data && Array.isArray(response.body.data.data)) {
+        apiData = response.body.data.data;
+      } else if (response?.body?.data && Array.isArray(response.body.data)) {
+        apiData = response.body.data;
+      }
+      console.log("List API Data extracted:", apiData);
+
+      const rows = transformDeviceModelData(apiData);
+      setAllRows(rows);
+      setData((prev) => ({
+        ...prev,
+        total: response?.body?.data?.pagination?.total_records || 0,
+      }));
+      setLoading(false);
+    } catch (error) {
+      console.error("Fetch Device Models Error:", error);
+      setLoading(false);
+      handleSnackbar("Failed to fetch device models", "error");
+    }
+  };
+
+  const handleClick = useCallback(() => {
     setIsEditMode(false);
-    setIsEditing(false);
-    setSelectedDeviceModel(null);
+
     setDefaultValues({
+      deviceModelId: "",
+      deviceCode: "",
       modelName: "",
       description: "",
       assetType: "",
-      eLogs: "",
-      status: "Active",
+      supportsElogs: "",
+      status: 1,
     });
-    setIsAddDeviceModelOpen(true);
+
+    setIsAddModalOpen(true);
   }, []);
-
-  const fetchDeviceModelById = useCallback(async (deviceModelId) => {
-    try {
-      setLoading(true);
-
-      const response = await fetchApi(
-        `/masteradmin/get-device-model?device_model_id=${deviceModelId}`,
-      );
-
-      const body = response?.body;
-      const deviceData = body?.data?.[0] || body?.[0] || (body?.device_model_id ? body : null);
-
-      if (deviceData) {
-        setSelectedDeviceModel({
-          device_model_id: deviceData.device_model_id,
-          device_code: deviceData.device_code,
-        });
-        setDefaultValues({
-          modelName: deviceData.model_name || "",
-          description: deviceData.description || "",
-          assetType: ASSET_TYPE_MAP[deviceData.asset_type] ?? "",
-          eLogs: ELOGS_MAP[deviceData.supports_elogs] ?? "",
-          status: STATUS_MAP[deviceData.status] ?? "",
-        });
-        setIsAddDeviceModelOpen(true);
-      } else {
-        handleSnackbar("Failed to fetch device model details", "error");
-      }
-
-      setLoading(false);
-    } catch (error) {
-      console.error("Fetch Device Model By Id Error:", error);
-      setLoading(false);
-      handleSnackbar("Failed to fetch device model details", "error");
-    }
-  }, [fetchApi, handleSnackbar, setLoading]);
 
   const handleViewClick = useCallback(async (row) => {
     setIsEditMode(true);
     setIsEditing(false);
-    await fetchDeviceModelById(row.device_model_id);
-  }, [fetchDeviceModelById]);
+    await fetchDeviceModelById(row.id);
+  }, []);
 
   const handleEditClick = useCallback(() => {
     setIsEditing(true);
@@ -211,81 +204,100 @@ const DeviceModelManagement = () => {
     setIsEditing(false);
   }, []);
 
-  const noOp = useCallback(() => {}, []);
+  const handleAddSubmit = async (formValues) => {
+    try {
+      setLoading(true);
 
-  const handleCloseDialog = useCallback(() => {
-    setIsAddDeviceModelOpen(false);
-    setIsEditMode(false);
-    setIsEditing(false);
-    setSelectedDeviceModel(null);
+      const payload = {
+        device_code: formValues.deviceCode,
+        model_name: formValues.modelName,
+        description: formValues.description,
+        asset_type: formValues.assetType,
+        supports_elogs: formValues.supportsElogs,
+        status: formValues.status ?? 1,
+      };
+
+      let response;
+      if (formValues.deviceModelId) {
+        payload.device_model_id = formValues.deviceModelId;
+      }
+      response = await createApi(payload, "/masteradmin/device-model");
+
+      if (response?.statusCode === 200) {
+        handleSnackbar(
+          formValues.deviceModelId
+            ? "Device model updated successfully"
+            : "Device model created successfully",
+          "success",
+        );
+        setIsAddModalOpen(false);
+        fetchDeviceModels();
+      } else {
+        handleSnackbar(
+          response?.body?.message || "Something went wrong",
+          "warning",
+        );
+      }
+    } catch (error) {
+      console.error("Create/Update Device Model Error:", error);
+      handleSnackbar("Unexpected error occurred", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchDeviceModelById = async (deviceModelId) => {
+    try {
+      setLoading(true);
+
+      const response = await fetchApi(
+        `/masteradmin/get-device-model?device_model_id=${deviceModelId}`,
+      );
+
+      const modelData = response?.body;
+      setDefaultValues({
+        deviceModelId: modelData?.device_model_id || "",
+        deviceCode: modelData?.device_code || "",
+        modelName: modelData?.model_name || "",
+        description: modelData?.description || "",
+        assetType: modelData?.asset_type ?? "",
+        supportsElogs: modelData?.supports_elogs ?? "",
+        status: modelData?.status ?? 1,
+      });
+
+      setIsAddModalOpen(true);
+      setLoading(false);
+    } catch (error) {
+      console.error("Fetch Device Model By Id Error:", error);
+      setLoading(false);
+      handleSnackbar("Failed to fetch device model details", "error");
+    }
+  };
+
+  const handleAddCancel = useCallback(() => {
+    setIsAddModalOpen(false);
+
     setDefaultValues({
+      deviceModelId: "",
+      deviceCode: "",
       modelName: "",
       description: "",
       assetType: "",
-      eLogs: "",
-      status: "",
+      supportsElogs: "",
+      status: 1,
     });
+
+    setIsEditMode(false);
+    setIsEditing(false);
   }, []);
 
-  const handleSubmit = useCallback(
-    async (formValues) => {
-      try {
-        setIsCreateLoading(true);
-
-        let payload;
-        if (isEditMode && selectedDeviceModel) {
-          payload = buildUpdatePayload(selectedDeviceModel, formValues, userId);
-        } else {
-          payload = mapComponentDataToApi(formValues, userId);
-        }
-
-        const response = await createApi(payload, "/masteradmin/device-model");
-
-        if (isApiSuccess(response)) {
-          handleSnackbar(
-            isEditMode ? "Device model updated successfully" : "Device model created successfully",
-            "success",
-          );
-          setIsAddDeviceModelOpen(false);
-          fetchDeviceModels();
-          setIsEditing(false);
-          setSelectedDeviceModel(null);
-        } else {
-          handleSnackbar(
-            response?.body?.message || "Something went wrong",
-            "warning",
-          );
-        }
-      } catch (error) {
-        console.error("Create/Update Device Model Error:", error);
-        handleSnackbar("Unexpected error occurred", "error");
-      } finally {
-        setIsCreateLoading(false);
-      }
-    },
-    [createApi, fetchDeviceModels, handleSnackbar, isEditMode, selectedDeviceModel, userId],
-  );
+  const handleSetMode = useCallback(() => {}, []);
 
   const columns = useMemo(() => getColumns(handleViewClick), [handleViewClick]);
 
-  const assetTypeOptions = useMemo(
-    () => getOptions(allDeviceModels, "assetType"),
-    [allDeviceModels],
-  );
-
-  const modelOptions = useMemo(
-    () => getOptions(allDeviceModels, "model"),
-    [allDeviceModels],
-  );
-
-  const statusOptions = useMemo(
-    () => getOptions(allDeviceModels, "status"),
-    [allDeviceModels],
-  );
-
   const gridData = {
     ...data,
-    rows: allDeviceModels,
+    rows: allRows,
     columns,
     total: data.total,
   };
@@ -330,16 +342,16 @@ const DeviceModelManagement = () => {
           searchKey={0}
           summaryCards={[]}
           mode=""
-          setMode={noOp}
-          handleClick={handleAddClick}
-          assetTypeOptions={assetTypeOptions}
+          setMode={handleSetMode}
+          handleClick={handleClick}
           modelOptions={modelOptions}
-          statusOptions={statusOptions}
+          statusOptions={DEVICE_MODEL_STATUS_FILTER_OPTIONS}
+          assetTypeOptions={ASSET_TYPE_FILTER_OPTIONS}
         />
         <GridContainer>
           <CommonDataGrid
             columnsData={columns}
-            rowData={allDeviceModels}
+            rowData={allRows}
             data={gridData}
             setData={setData}
             paginationMode="server"
@@ -355,18 +367,25 @@ const DeviceModelManagement = () => {
         onClose={handleSnackbarClose}
       />
 
-      <AddDeviceModelDialog
-        open={isAddDeviceModelOpen}
-        onClose={handleCloseDialog}
+      <CommonDialogForm
+        open={isAddModalOpen}
+        onCancel={handleAddCancel}
         mode={dialogMode}
         title={dialogTitle}
-        submitButtonText={submitButtonLabel}
-        loading={isCreateLoading}
-        isEditMode={isEditMode}
+        formId="addDeviceModelForm"
+        loading={false}
         isEditing={isEditing}
-        defaultValues={defaultValues}
         headerActions={headerActionsElement}
-        onSubmit={handleSubmit}
+        submitButtonText={submitButtonLabel}
+        content={
+          <DeviceModelManagementForm
+            formId="addDeviceModelForm"
+            defaultValues={defaultValues}
+            isEditing={isEditing}
+            isEditMode={isEditMode}
+            onSubmit={handleAddSubmit}
+          />
+        }
       />
     </>
   );
