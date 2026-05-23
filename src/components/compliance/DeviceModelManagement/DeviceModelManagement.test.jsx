@@ -4,9 +4,20 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 const theme = createTheme();
 
-// Mock services before importing component
+// Mock services and helpers before importing component
 jest.mock("../../../services/services", () => ({
   useServices: jest.fn(),
+}));
+
+jest.mock("../../../helpers/deviceModelHelpers", () => ({
+  generateDeviceCode: jest.fn((name) => {
+    if (!name || typeof name !== "string") return "DM001";
+    const words = name.split(/\s+/);
+    const initials = words.map((word) => word[0]?.toUpperCase()).join("");
+    const lastWord = words[words.length - 1];
+    const number = lastWord?.match(/\d+/)?.[0] || "";
+    return initials + number || "DM001";
+  }),
 }));
 
 jest.mock("../../../common/CommonLoading", () => ({

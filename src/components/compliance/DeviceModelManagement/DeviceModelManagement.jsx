@@ -21,18 +21,7 @@ import {
   getRowHeight,
   transformDeviceModelData,
 } from "./DeviceModelManagementTable.utils";
-
-// Generate device_code from model_name (e.g., "Samsara G2" → "SG2")
-const generateDeviceCode = (name) => {
-  if (!name || typeof name !== "string") {
-    return `DM${Date.now().toString().slice(-3)}`;
-  }
-  const words = name.split(/\s+/);
-  const initials = words.map((word) => word[0]?.toUpperCase()).join("");
-  const lastWord = words[words.length - 1];
-  const number = lastWord?.match(/\d+/)?.[0] || "";
-  return initials + number || `DM${Date.now().toString().slice(-3)}`;
-};
+import { generateDeviceCode } from "../../../helpers/deviceModelHelpers";
 
 const DeviceModelManagement = () => {
   const { fetchApi, createApi, updateApi } = useServices();
