@@ -87,10 +87,10 @@ const useDeviceModelManagement = () => {
       if (current.search) endUrl += `&search=${current.search}`;
       if (current.model) endUrl += `&device_model_id=${current.model}`;
       if (current.assetType) endUrl += `&asset_type=${current.assetType}`;
-      if (current.supportsElogs !== null && current.supportsElogs !== undefined && current.supportsElogs !== "") {
+      if (current.supportsElogs != null && current.supportsElogs !== "") {
         endUrl += `&supports_elogs=${String(current.supportsElogs)}`;
       }
-      if (current.status !== null && current.status !== undefined && current.status !== "") {
+      if (current.status != null && current.status !== "") {
         endUrl += `&status=${String(current.status)}`;
       }
       if (current.fromDate) {

@@ -7,8 +7,8 @@ export const formatDate = (value) =>
 
 export const getRowHeight = () => "auto";
 
-const StatusCell = (params) => {
-  const displayValue = params.row.statusLabel || (params.value === 1 ? "Active" : "Inactive");
+const StatusCellComponent = ({ value, row }) => {
+  const displayValue = row.statusLabel || (value === 1 ? "Active" : "Inactive");
   return (
     <StatusTypography variant="body2" value={displayValue}>
       {displayValue}
@@ -16,8 +16,8 @@ const StatusCell = (params) => {
   );
 };
 
-const ELogsCell = (params) => {
-  const displayValue = params.value === 1 || params.value === "Yes" ? "Yes" : "No";
+const ELogsCellComponent = ({ value }) => {
+  const displayValue = value === 1 || value === "Yes" ? "Yes" : "No";
   return (
     <ELogsTypography variant="body2" value={displayValue}>
       {displayValue}
@@ -25,11 +25,16 @@ const ELogsCell = (params) => {
   );
 };
 
-const ActionCell = (onView) => {
-  return (params) => (
-    <DeviceModelManagementActionButton row={params.row} onView={onView} />
-  );
-};
+const StatusCell = (params) => <StatusCellComponent value={params.value} row={params.row} />;
+const ELogsCell = (params) => <ELogsCellComponent value={params.value} />;
+
+const ActionCell = ({ row, onView }) => (
+  <DeviceModelManagementActionButton row={row} onView={onView} />
+);
+
+const createActionCellRenderer = (onView) => (params) => (
+  <ActionCell row={params.row} onView={onView} />
+);
 
 const renderDateCell = (params) => formatDate(params.value);
 
@@ -102,6 +107,6 @@ export const getColumns = (onView) => [
     maxWidth: 150,
     sortable: false,
     headerTooltip: true,
-    renderCell: ActionCell(onView),
+    renderCell: createActionCellRenderer(onView),
   },
 ];

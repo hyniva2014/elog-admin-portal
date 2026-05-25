@@ -9,9 +9,9 @@ export const HeaderContainer = styled(Box)(({ theme }) => ({
 export const AddButton = styled(Button)(({ theme }) => ({
   color: theme.palette.common.white,
   backgroundColor: theme.palette.sidebar.main,
-  fontSize: 14,
+  fontSize: theme.typography.pxToRem(14),
   fontWeight: 400,
-  borderRadius: "8px",
+  borderRadius: theme.shape.borderRadius * 2,
 }));
 
 export const SummaryCardBox = styled(Box)(({ theme }) => ({
@@ -28,20 +28,20 @@ export const GridContainer = styled(Box)(() => ({
 }));
 
 export const EditButton = styled(Button)(({ theme }) => ({
-  fontSize: 14,
+  fontSize: theme.typography.pxToRem(14),
   fontWeight: 400,
   color: theme.palette.common.white,
   backgroundColor: theme.palette.sidebar.main,
   border: `1px solid ${theme.palette.sidebar.main}`,
-  borderRadius: "8px",
+  borderRadius: theme.shape.borderRadius * 2,
 }));
 
 export const CancelEditButton = styled(Button)(({ theme }) => ({
-  fontSize: 14,
+  fontSize: theme.typography.pxToRem(14),
   fontWeight: 400,
   color: theme.palette.sidebar.main,
   border: `1px solid ${theme.palette.sidebar.main}`,
-  borderRadius: "8px",
+  borderRadius: theme.shape.borderRadius * 2,
   backgroundColor: theme.palette.light.main,
 }));
 

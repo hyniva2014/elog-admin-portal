@@ -25,6 +25,18 @@ const getSubmitButtonLabel = (isEditMode, isEditing) => {
   return isEditing ? "Update" : "Save";
 };
 
+const HeaderEditButton = ({ onClick }) => (
+  <EditButton variant="contained" onClick={onClick}>
+    Edit
+  </EditButton>
+);
+
+const HeaderCancelEditButton = ({ onClick }) => (
+  <CancelEditButton variant="outlined" onClick={onClick}>
+    Cancel Edit
+  </CancelEditButton>
+);
+
 const DeviceModelManagement = () => {
   const { setLoading, LoadingContainer } = CommonLoading();
 
@@ -63,17 +75,9 @@ const DeviceModelManagement = () => {
 
   let headerActionsElement = null;
   if (isEditMode && !isEditing) {
-    headerActionsElement = (
-      <EditButton variant="contained" onClick={handleEditClick}>
-        Edit
-      </EditButton>
-    );
+    headerActionsElement = <HeaderEditButton onClick={handleEditClick} />;
   } else if (isEditMode && isEditing) {
-    headerActionsElement = (
-      <CancelEditButton variant="outlined" onClick={handleCancelEdit}>
-        Cancel Edit
-      </CancelEditButton>
-    );
+    headerActionsElement = <HeaderCancelEditButton onClick={handleCancelEdit} />;
   }
 
   const dialogMode = isEditMode ? "edit" : "add";

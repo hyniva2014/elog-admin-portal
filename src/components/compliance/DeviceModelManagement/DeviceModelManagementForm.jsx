@@ -32,17 +32,16 @@ const initialValues = {
   status: 1,
 };
 
-const assetTypeOptions = ASSET_TYPE_FILTER_OPTIONS.map((option) => (
-  <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-));
+const createMenuItems = (options) =>
+  options.map((option) => (
+    <MenuItem key={option.value} value={option.value}>
+      {option.label}
+    </MenuItem>
+  ));
 
-const elogsOptions = ELOGS_FILTER_OPTIONS.map((option) => (
-  <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-));
-
-const statusOptions = DEVICE_MODEL_STATUS_FILTER_OPTIONS.map((option) => (
-  <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-));
+const assetTypeOptions = createMenuItems(ASSET_TYPE_FILTER_OPTIONS);
+const elogsOptions = createMenuItems(ELOGS_FILTER_OPTIONS);
+const statusOptions = createMenuItems(DEVICE_MODEL_STATUS_FILTER_OPTIONS);
 
 const DeviceModelManagementForm = ({
   formId,

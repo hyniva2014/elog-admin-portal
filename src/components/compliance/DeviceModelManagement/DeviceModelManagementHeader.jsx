@@ -3,6 +3,12 @@ import CommonFilters from "@src/common/CommonFilters";
 import CommonSummaryCardGroup from "@src/common/CommonSummaryCardGroup";
 import { HeaderContainer, AddButton, SummaryCardBox, SubtitleTypography } from "./DeviceModelManagement.styled";
 
+const HeaderAddButton = ({ onClick }) => (
+  <AddButton variant="contained" onClick={onClick}>
+    Add Asset
+  </AddButton>
+);
+
 const DeviceModelManagementHeader = (props) => {
   const {
     data = [],
@@ -27,11 +33,7 @@ const DeviceModelManagementHeader = (props) => {
         title="Device Model Management"
         handleClick={handleClick}
         addButton={true}
-        rightContent={
-          <AddButton variant="contained" onClick={handleClick}>
-            Add Asset
-          </AddButton>
-        }
+        rightContent={<HeaderAddButton onClick={handleClick} />}
       />
       <SubtitleTypography variant="h6">
         Manage device models and specifications
