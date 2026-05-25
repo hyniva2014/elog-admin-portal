@@ -1,15 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Divider, Grid } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 import CommonDialogForm from "../../../common/CommonDialogForm";
-import { DialogFormContainer, PrimarySectionHeader, SecondarySectionHeader, EditButton, CancelEditButton } from "./AccountManagement.styled";
+import {
+  DialogFormContainer,
+  PrimarySectionHeader,
+  SecondarySectionHeader,
+  EditButton,
+  CancelEditButton,
+  DialogFormActionsContainer,
+  DialogCancelButton,
+  DialogSubmitButton,
+} from "./AccountManagement.styled";
 
 import { STATUS_OPTIONS, ACCOUNT_FORM_FIELDS, PRIMARY_CONTACT_FIELDS, SECONDARY_CONTACT_FIELDS } from "./Constants";
-import FormTextField from "./FormTextField";
 import FormSelect from "./FormSelect";
+import FormFieldsSection from "./FormFieldsSection";
 
 const ADD_ACCOUNT_FORM_ID = "add-account-form";
 
@@ -105,9 +114,9 @@ const validationSchema = yup.object({
     .required("Secondary Contact Email is required")
     .email("Please enter a valid email address (e.g., user@example.com)"),
   status: yup
-    .number()
+    .string()
     .required("Status is required")
-    .oneOf([1, 2], "Status must be Active or Inactive"),
+    .oneOf(["1", "2"], "Status must be Active or Inactive"),
 });
 
 const defaultValues = {
@@ -126,8 +135,36 @@ const defaultValues = {
   secondaryContactName: "",
   secondaryContactNumber: "",
   secondaryContactEmail: "",
-  status: 1,
+  status: "1",
 };
+
+const DIALOG_TITLES = {
+  view: "View Account",
+  edit: "Edit Account",
+  add: "Add New Account",
+};
+
+const FormActions = ({ onCancel, loading, submitButtonText }) => (
+  <DialogFormActionsContainer>
+    <DialogCancelButton
+      variant="outlined"
+      onClick={loading ? undefined : onCancel}
+      fullWidth
+      disabled={loading}
+    >
+      Cancel
+    </DialogCancelButton>
+    <DialogSubmitButton
+      type="submit"
+      variant="contained"
+      fullWidth
+      form={ADD_ACCOUNT_FORM_ID}
+      disabled={loading}
+    >
+      {submitButtonText}
+    </DialogSubmitButton>
+  </DialogFormActionsContainer>
+);
 
 const AddAccountDialog = ({ open, onClose, onSubmit, loading = false, mode = "add", initialData = null, onEditClick, onCancelEdit }) => {
   const isEditMode = mode === "edit";
@@ -141,7 +178,7 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false, mode = "ad
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
-    defaultValues: initialData || defaultValues,
+    defaultValues,
   });
 
   useEffect(() => {
@@ -152,152 +189,121 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false, mode = "ad
     }
   }, [open, reset, initialData]);
 
-  useEffect(() => {
-    const hideButtons = () => {
-      const dialogActions = document.querySelector('.MuiDialogActions-root');
-      if (dialogActions) {
-        if (isViewMode) {
-          dialogActions.style.display = 'none';
-        } else {
-          dialogActions.style.display = 'flex';
-        }
-      }
-    };
+  const shouldShowStatusField = mode !== "add";
+  const submitButtonText = isEditMode ? "Update" : "Save";
+  const dialogTitle = DIALOG_TITLES[mode] ?? DIALOG_TITLES.add;
 
-    if (open) {
-      hideButtons();
-      const observer = new MutationObserver(hideButtons);
-      observer.observe(document.body, { childList: true, subtree: true });
-      return () => observer.disconnect();
-    }
-  }, [open, isViewMode]);
+  const handleCancel = useCallback(() => {
+    reset(defaultValues);
+    onClose();
+  }, [reset, onClose]);
 
-  const getDialogTitle = () => {
-    if (isViewMode) return "View Account";
-    if (isEditMode) return "Edit Account";
-    return "Add New Account";
-  };
+  const submitHandler = useCallback(
+    (data) => {
+      onSubmit({
+        ...data,
+        maxDevices: Number(data.maxDevices),
+        companyId: initialData?.companyId,
+      });
+      reset(defaultValues);
+    },
+    [onSubmit, initialData, reset]
+  );
 
-  const renderHeaderActions = () => {
+  const headerActions = useMemo(() => {
     if (isViewMode && onEditClick) {
       return (
-        <EditButton
-          variant="contained"
-          onClick={onEditClick}
-          disabled={loading}
-        >
+        <EditButton variant="contained" onClick={onEditClick} disabled={loading}>
           Edit
         </EditButton>
       );
     }
     if (isEditMode && onCancelEdit) {
       return (
-        <CancelEditButton
-          variant="outlined"
-          onClick={onCancelEdit}
-          disabled={loading}
-        >
+        <CancelEditButton variant="outlined" onClick={onCancelEdit} disabled={loading}>
           Cancel Edit
         </CancelEditButton>
       );
     }
     return null;
-  };
+  }, [isViewMode, isEditMode, onEditClick, onCancelEdit, loading]);
 
-  const handleCancel = () => {
-    if (isViewMode) {
-      onClose();
-    } else {
-      reset(defaultValues);
-      onClose();
-    }
-  };
+  const contentWithActions = useMemo(
+    () => (
+      <>
+        <form id={ADD_ACCOUNT_FORM_ID} onSubmit={handleSubmit(submitHandler)}>
+          <DialogFormContainer>
+            <Grid container spacing={2}>
+              <FormFieldsSection
+                fields={ACCOUNT_FORM_FIELDS}
+                control={control}
+                errors={errors}
+                disabled={isFieldDisabled}
+              />
 
-  const submitHandler = (data) => {
-    onSubmit({
-      ...data,
-      maxDevices: Number(data.maxDevices),
-      companyId: initialData?.companyId,
-    });
+              {shouldShowStatusField && (
+                <FormSelect
+                  name="status"
+                  label="Status"
+                  control={control}
+                  errors={errors}
+                  disabled={isFieldDisabled}
+                  required
+                  options={STATUS_OPTIONS}
+                />
+              )}
 
-    reset(defaultValues);
-  };
+              <Grid item xs={12}>
+                <PrimarySectionHeader>PRIMARY DETAILS</PrimarySectionHeader>
+                <Divider />
+              </Grid>
 
-  const formContent = (
-    <form id={ADD_ACCOUNT_FORM_ID} onSubmit={handleSubmit(submitHandler)}>
-      <DialogFormContainer>
-        <Grid container spacing={2}>
-          {ACCOUNT_FORM_FIELDS.map((fieldConfig) => (
-            <FormTextField
-              key={fieldConfig.name}
-              {...fieldConfig}
-              control={control}
-              errors={errors}
-              disabled={isFieldDisabled}
-            />
-          ))}
+              <FormFieldsSection
+                fields={PRIMARY_CONTACT_FIELDS}
+                control={control}
+                errors={errors}
+                disabled={isFieldDisabled}
+              />
 
-          {mode !== "add" && (
-            <FormSelect
-              name="status"
-              label="Status"
-              control={control}
-              errors={errors}
-              disabled={isFieldDisabled}
-              required
-              options={STATUS_OPTIONS}
-            />
-          )}
+              <Grid item xs={12}>
+                <SecondarySectionHeader>SECONDARY DETAILS</SecondarySectionHeader>
+                <Divider />
+              </Grid>
 
-          <Grid item xs={12}>
-            <PrimarySectionHeader>
-              PRIMARY DETAILS
-            </PrimarySectionHeader>
-            <Divider />
-          </Grid>
+              <FormFieldsSection
+                fields={SECONDARY_CONTACT_FIELDS}
+                control={control}
+                errors={errors}
+                disabled={isFieldDisabled}
+              />
+            </Grid>
+          </DialogFormContainer>
+        </form>
 
-          {PRIMARY_CONTACT_FIELDS.map((fieldConfig) => (
-            <FormTextField
-              key={fieldConfig.name}
-              {...fieldConfig}
-              control={control}
-              errors={errors}
-              disabled={isFieldDisabled}
-            />
-          ))}
-
-          <Grid item xs={12}>
-            <SecondarySectionHeader>
-              SECONDARY DETAILS
-            </SecondarySectionHeader>
-            <Divider />
-          </Grid>
-
-          {SECONDARY_CONTACT_FIELDS.map((fieldConfig) => (
-            <FormTextField
-              key={fieldConfig.name}
-              {...fieldConfig}
-              control={control}
-              errors={errors}
-              disabled={isFieldDisabled}
-            />
-          ))}
-        </Grid>
-      </DialogFormContainer>
-    </form>
+        {!isViewMode && (
+          <FormActions
+            onCancel={handleCancel}
+            loading={loading}
+            submitButtonText={submitButtonText}
+          />
+        )}
+      </>
+    ),
+    [control, errors, isFieldDisabled, shouldShowStatusField, isViewMode, handleCancel, loading, submitButtonText, handleSubmit, submitHandler]
   );
 
   return (
     <CommonDialogForm
       open={open}
-      title={getDialogTitle()}
-      content={formContent}
+      title={dialogTitle}
+      content={contentWithActions}
       formId={ADD_ACCOUNT_FORM_ID}
       onCancel={handleCancel}
       loading={loading}
-      submitButtonText={isViewMode ? "" : "Save"}
       maxWidth="md"
-      headerActions={renderHeaderActions()}
+      headerActions={headerActions}
+      mode="edit"
+      key={mode}
     />
   );
 };

@@ -44,6 +44,7 @@ const AccountManagement = () => {
       primaryContactName: "",
       secondaryContactName: "",
       status: "",
+      companyId: "",
     };
   };
 
@@ -61,13 +62,9 @@ const AccountManagement = () => {
     primaryContactName,
     secondaryContactName,
     status,
+    companyId,
     isLoading,
   } = data;
-
-  const companyId = useSelector(
-    (state) =>
-      state.loginSlice.loginDetails?.body?.data?.userdetails?.company_id,
-  );
 
   const handleSnackbar = useCallback((message, severity = "info") => {
     setSnackbar({
@@ -159,7 +156,7 @@ const AccountManagement = () => {
       secondaryContactName: secondaryContactName || "",
       secondaryContactNumber: secondaryContactNumber || "",
       secondaryContactEmail: secondaryContactEmail || "",
-      status: status_id || 1,
+      status: String(status_id || 1),
       companyId: company_id,
     };
   }, []);
@@ -219,7 +216,6 @@ const AccountManagement = () => {
           setData={setData}
           paginationMode="server"
           getRowHeight={() => "auto"}
-          loading={false}
         />
       </GridContainer>
 

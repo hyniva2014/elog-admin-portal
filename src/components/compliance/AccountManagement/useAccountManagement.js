@@ -22,17 +22,19 @@ export const useAccountManagement = (
   createApi
 ) => {
   const buildFetchUrl = useCallback(() => {
-    const params = new URLSearchParams({
-      company_id: companyId,
-      primaryContactName: primaryContactName || "",
-      secondaryContactName: secondaryContactName || "",
-      startDate: fromDate ? fromDate.format("YYYY-MM-DD") : "",
-      endDate: toDate ? toDate.format("YYYY-MM-DD") : "",
-      search: encodeURIComponent(search),
-      status_id: status || "",
+    const queryParams = {
       page,
       limit: pageSize,
-    });
+      ...(companyId && { company_id: companyId }),
+      ...(primaryContactName && { primaryContactName }),
+      ...(secondaryContactName && { secondaryContactName }),
+      ...(fromDate && { startDate: fromDate.format("YYYY-MM-DD") }),
+      ...(toDate && { endDate: toDate.format("YYYY-MM-DD") }),
+      ...(search && { search: encodeURIComponent(search) }),
+      ...(status && { status_id: status }),
+    };
+
+    const params = new URLSearchParams(queryParams);
     return `/masteradmin/get-companies?${params.toString()}`;
   }, [companyId, primaryContactName, secondaryContactName, fromDate, toDate, search, status, page, pageSize]);
 
@@ -42,14 +44,14 @@ export const useAccountManagement = (
     try {
       const endUrl = buildFetchUrl();
       const response = await fetchApi(endUrl);
-      
-      const rowData = AccountManagementRowData(response?.body?.data || []);
+
+      const rowData = AccountManagementRowData(response?.body?.data?.data || []);
 
       setData((prev) => ({
         ...prev,
         isLoading: false,
         rows: rowData,
-        total: response?.body?.total_records || 0,
+        total: response?.body?.data?.pagination?.total_records || 0,
       }));
     } catch (err) {
       console.error("Error fetching companies:", err);
@@ -122,12 +124,11 @@ export const useAccountManagement = (
   );
 
   const handleViewAccount = useCallback(
-    async (event) => {
-      const row = event.currentTarget.dataset.row;
+    async (row) => {
       setLoading(true);
 
       try {
-        const endUrl = `/masteradmin/get-companies?company_id=${companyId}`;
+        const endUrl = `/masteradmin/get-companies?company_id=${row.id}`;
         const response = await fetchApi(endUrl);
         
         if (response?.statusCode === 200 && response?.body?.data) {

@@ -163,14 +163,14 @@ const CommonDateRangeSelector = (props) => {
     const sx = {};
 
     if (inRange) {
-      sx.backgroundColor = "lightblue !important";
-      sx["&:hover"] = { backgroundColor: "lightblue !important" };
+      sx.backgroundColor = `${theme.palette.info.light} !important`;
+      sx["&:hover"] = { backgroundColor: `${theme.palette.info.light} !important` };
     }
 
     if (isEnd) {
-      sx.backgroundColor = "rgb(40,62,138) !important";
-      sx.color = "white";
-      sx["&:hover"] = { backgroundColor: "rgb(40,62,138) !important" };
+      sx.backgroundColor = `${theme.palette.brand.main} !important`;
+      sx.color = theme.palette.brand.contrastText;
+      sx["&:hover"] = { backgroundColor: `${theme.palette.brand.main} !important` };
     }
 
     return sx;

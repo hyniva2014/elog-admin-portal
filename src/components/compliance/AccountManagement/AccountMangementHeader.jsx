@@ -43,7 +43,7 @@ const AccountManagementHeader = ({
           },
           {
             label: "All Carrier",
-            dataKey: "carrier",
+            dataKey: "companyId",
             options: carrierOptions,
           },
           {

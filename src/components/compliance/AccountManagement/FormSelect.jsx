@@ -1,17 +1,17 @@
 import React from "react";
-import { Grid, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import { Grid, MenuItem, Select, FormControl, InputLabel, FormHelperText } from "@mui/material";
 import { Controller } from "react-hook-form";
 
-const FormSelect = ({ 
-  name, 
-  label, 
-  control, 
-  errors, 
-  disabled, 
-  required, 
+const FormSelect = ({
+  name,
+  label,
+  control,
+  errors,
+  disabled,
+  required,
   options,
   xs = 12,
-  sm = 6 
+  sm = 6
 }) => {
   const renderOptions = () => options.map((option) => (
     <MenuItem key={option.value} value={option.value}>
@@ -26,10 +26,16 @@ const FormSelect = ({
         control={control}
         render={({ field }) => (
           <FormControl fullWidth size="small" error={!!errors[name]}>
-            <InputLabel>{label}</InputLabel>
-            <Select {...field} label={label} disabled={disabled}>
+            <InputLabel id={`${name}-label`}>{label}</InputLabel>
+            <Select
+              labelId={`${name}-label`}
+              {...field}
+              label={label}
+              disabled={disabled}
+            >
               {renderOptions()}
             </Select>
+            {errors[name] && <FormHelperText>{errors[name].message}</FormHelperText>}
           </FormControl>
         )}
       />

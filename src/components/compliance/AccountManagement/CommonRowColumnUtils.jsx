@@ -21,13 +21,17 @@ const renderStatusCell = (params) => (
   <StatusText accountStatus={params.value}>{params.value}</StatusText>
 );
 
-const renderActionCell = (onViewAccount) => (params) => (
-  <Tooltip title="View">
-    <IconButton size="small" onClick={onViewAccount} data-row={params.row}>
-      <VisibilityOutlinedIcon sx={actionIconSx} />
-    </IconButton>
-  </Tooltip>
-);
+const renderActionCell = (onViewAccount) => (params) => {
+  const handleClick = () => onViewAccount(params.row);
+
+  return (
+    <Tooltip title="View">
+      <IconButton size="small" onClick={handleClick}>
+        <VisibilityOutlinedIcon sx={actionIconSx} />
+      </IconButton>
+    </Tooltip>
+  );
+};
 
 export const AccountManagementColumnsData = (onViewAccount) => [
   {
@@ -157,7 +161,7 @@ export const AccountManagementRowData = (response = []) => {
 
     const { street } = address;
     const { name: primaryContactName, phone: primaryContactNumber, email: primaryContactEmail } = contact;
-    const { name: secondaryContactName, phone: secondaryContactNumber, email: secondaryContactEmail } = secondaryContact;
+    const { name: secondaryContactName, phone: secondaryContactNumber, email: secondaryContactEmail } = secondaryContact || {};
 
     return {
       id: company_id,
