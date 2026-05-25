@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, DialogActions, Typography } from "@mui/material";
 import styled from "@emotion/styled";
 
 export const HeaderContainer = styled(Box)(() => ({
@@ -61,4 +61,52 @@ export const PrimarySectionHeader = styled(SectionHeaderText)(() => ({
 
 export const SecondarySectionHeader = styled(SectionHeaderText)(() => ({
   marginTop: 1,
+}));
+
+export const EditButton = styled(Button)(({ theme }) => ({
+  fontSize: 14,
+  fontWeight: 500,
+  backgroundColor: theme.palette.primary.main,
+  "&:hover": {
+    backgroundColor: theme.palette.primary.dark,
+  },
+}));
+
+export const CancelEditButton = styled(Button)(({ theme }) => ({
+  fontSize: 14,
+  fontWeight: 500,
+  borderColor: theme.palette.primary.main,
+  color: theme.palette.primary.main,
+}));
+
+export const DialogFormActionsContainer = styled(DialogActions)({
+  justifyContent: "center",
+  gap: 16,
+  paddingLeft: 48,
+  paddingRight: 48,
+  paddingBottom: 24,
+});
+
+export const DialogCancelButton = styled(Button)(({ theme }) => ({
+  fontSize: 16,
+  fontWeight: 400,
+  color: theme.palette.primary.main,
+  border: `1px solid ${theme.palette.primary.main}`,
+  borderRadius: 8,
+  backgroundColor: theme.palette.common.white,
+  "&:hover": {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
+
+export const DialogSubmitButton = styled(Button)(({ theme }) => ({
+  fontSize: 16,
+  fontWeight: 400,
+  color: theme.palette.primary.contrastText,
+  backgroundColor: theme.palette.primary.main,
+  border: `1px solid ${theme.palette.primary.main}`,
+  borderRadius: 8,
+  "&:hover": {
+    backgroundColor: theme.palette.primary.dark,
+  },
 }));

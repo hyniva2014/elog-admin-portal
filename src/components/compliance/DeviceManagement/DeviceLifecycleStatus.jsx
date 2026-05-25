@@ -146,10 +146,7 @@ const DeviceLifecycleStatus = ({
     [displayedSegments],
   );
 
-  const total = useMemo(
-    () => displayedSegments.reduce((acc, s) => acc + s.count, 0),
-    [displayedSegments],
-  );
+  const total = deviceLifecycle?.total_device || 0;
 
   const chartOptions = useMemo(
     () => getChartOptions(displayedSegments, colors),
@@ -184,7 +181,7 @@ const DeviceLifecycleStatus = ({
               </ChartCenterSubText>
 
               <ChartCenterTotal fontsize={totalFontSize}>
-                {total.toLocaleString()}
+                {total}
               </ChartCenterTotal>
             </ChartCenterLabel>
           </ChartBox>

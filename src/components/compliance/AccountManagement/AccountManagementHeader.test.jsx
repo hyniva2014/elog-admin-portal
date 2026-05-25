@@ -25,8 +25,6 @@ const defaultProps = {
   setData: mockSetData,
   searchKey: 0,
   handleClick: mockHandleClick,
-  assetTypeOptions: [],
-  truckOptions: [],
   carrierOptions: [],
   statusOptions: [],
 };
@@ -56,8 +54,8 @@ describe("AccountManagementHeader", () => {
 
   it("should render filter dropdowns with correct labels", () => {
     render(<AccountManagementHeader {...defaultProps} />);
-    expect(screen.getAllByText("Asset Type").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("All Truck").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Primary Contact Name").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Secondary Contact Name").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("All Carrier").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("All Status").length).toBeGreaterThanOrEqual(1);
   });
@@ -65,8 +63,6 @@ describe("AccountManagementHeader", () => {
   it("should render with custom options", () => {
     const propsWithOptions = {
       ...defaultProps,
-      assetTypeOptions: [{ value: "truck", label: "Truck" }],
-      truckOptions: [{ value: "truck1", label: "Truck 1" }],
       carrierOptions: [{ value: "carrier1", label: "Carrier 1" }],
       statusOptions: [{ value: "active", label: "Active" }],
     };

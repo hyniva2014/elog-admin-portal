@@ -36,27 +36,26 @@ import {
   formatSubtitle,
 } from "./CarrierGrowthTrend.utils";
 
-const YearSelectItem = ({ year }) => (
-  <MenuItem value={year}>
-    {year}
-  </MenuItem>
-);
 
 const CarrierGrowthTrend = () => {
-  const [selectedYear, setSelectedYear] = useState(CURRENT_YEAR);
+  const DEFAULT_OPTION = "Last 6 months";
 
-  const { carrierGrowthTrend } = useCarrierGrowthTrend(selectedYear);
+  const [selectedYear, setSelectedYear] = useState(DEFAULT_OPTION);
+
+  const apiYear =
+    selectedYear === "Last 6 months" ? CURRENT_YEAR : selectedYear;
+
+  const { carrierGrowthTrend } = useCarrierGrowthTrend(apiYear);
+
 
   const theme = useTheme();
 
   const chartLineColor = theme.palette.primary.main;
 
   const trendData = useMemo(() => {
-    if (carrierGrowthTrend) {
-      const parsedTrend = getTrendArray(carrierGrowthTrend);
-      return getVisibleTrendData(parsedTrend, selectedYear);
-    }
-    return [];
+    const parsedTrend = getTrendArray(carrierGrowthTrend || {});
+
+    return getVisibleTrendData(parsedTrend, selectedYear);
   }, [carrierGrowthTrend, selectedYear]);
 
   const subtitle = useMemo(
@@ -64,8 +63,8 @@ const CarrierGrowthTrend = () => {
     [trendData, selectedYear],
   );
 
-  const handleYearChange = (e) => {
-    setSelectedYear(e.target.value);
+  const handleYearChange = (event) => {
+    setSelectedYear(event.target.value);
   };
 
   return (
@@ -86,7 +85,9 @@ const CarrierGrowthTrend = () => {
           onChange={handleYearChange}
         >
           {AVAILABLE_YEARS.map((year) => (
-            <YearSelectItem key={year} year={year} />
+            <MenuItem key={year} value={year}>
+              {year}
+            </MenuItem>
           ))}
         </YearSelect>
       </ChartHeader>

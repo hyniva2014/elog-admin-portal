@@ -1,14 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Divider, Grid } from "@mui/material";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 import CommonDialogForm from "../../../common/CommonDialogForm";
-import CommonTextField from "../../../common/CommonTextField";
-import { DialogFormContainer, PrimarySectionHeader, SecondarySectionHeader } from "./AccountManagement.styled";
+import {
+  DialogFormContainer,
+  PrimarySectionHeader,
+  SecondarySectionHeader,
+  EditButton,
+  CancelEditButton,
+  DialogFormActionsContainer,
+  DialogCancelButton,
+  DialogSubmitButton,
+} from "./AccountManagement.styled";
 
-import { formatTaxId, formatPhoneNumber } from "./utils";
+import { STATUS_OPTIONS, ACCOUNT_FORM_FIELDS, PRIMARY_CONTACT_FIELDS, SECONDARY_CONTACT_FIELDS } from "./Constants";
+import FormSelect from "./FormSelect";
+import FormFieldsSection from "./FormFieldsSection";
 
 const ADD_ACCOUNT_FORM_ID = "add-account-form";
 
@@ -24,12 +34,12 @@ const validationSchema = yup.object({
     .matches(/^\d{6,8}$/, "USDOT Number must be 6-8 digits"),
   taxId: yup
     .string()
-    .matches(/^\d{2}-\d{7}$/, "Tax ID (EIN) must be in format XX-XXXXXXX")
-    .nullable(),
+    .required("Tax ID (EIN) is required")
+    .matches(/^\d{2}-\d{7}$/, "Tax ID (EIN) must be in format XX-XXXXXXX"),
   mcNumber: yup
     .string()
-    .matches(/^\d{6,8}$/, "MC Number must be 6-8 digits")
-    .nullable(),
+    .required("MC Number is required")
+    .matches(/^(MC-?\d{6,8}|\d{6,8})$/, "MC Number must be 6-8 digits (e.g., 123456, MC123456, or MC-123456)"),
   maxDevices: yup
     .number()
     .typeError("Max Devices must be a number")
@@ -38,22 +48,37 @@ const validationSchema = yup.object({
     .integer("Max Devices must be a whole number"),
   website: yup
     .string()
-    .url("Please enter a valid website URL (e.g., https://example.com)")
+    .test(
+      "website",
+      "Please enter a valid website URL (e.g., example.com, www.example.com, https://example.com)",
+      (value) => {
+        if (!value) return true;
+        try {
+          const urlToTest = value.startsWith('http://') || value.startsWith('https://') 
+            ? value 
+            : `http://${value}`;
+          const url = new URL(urlToTest);
+          return url.hostname && url.hostname.includes('.');
+        } catch {
+          return false;
+        }
+      }
+    )
     .nullable(),
   tollFree: yup
     .string()
+    .required("Toll Free is required")
     .matches(
       /^(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/,
       "Please enter a valid phone number",
-    )
-    .nullable(),
+    ),
   fax: yup
     .string()
+    .required("Fax is required")
     .matches(
       /^(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/,
       "Please enter a valid fax number",
-    )
-    .nullable(),
+    ),
   carrierAddress: yup
     .string()
     .required("Carrier Address is required")
@@ -88,6 +113,10 @@ const validationSchema = yup.object({
     .string()
     .required("Secondary Contact Email is required")
     .email("Please enter a valid email address (e.g., user@example.com)"),
+  status: yup
+    .string()
+    .required("Status is required")
+    .oneOf(["1", "2"], "Status must be Active or Inactive"),
 });
 
 const defaultValues = {
@@ -106,13 +135,42 @@ const defaultValues = {
   secondaryContactName: "",
   secondaryContactNumber: "",
   secondaryContactEmail: "",
+  status: "1",
 };
 
-const createFormatChangeHandler = (field, formatter) => (event) => {
-  field.onChange(formatter(event.target.value));
+const DIALOG_TITLES = {
+  view: "View Account",
+  edit: "Edit Account",
+  add: "Add New Account",
 };
 
-const AddAccountDialog = ({ open, onClose, onSubmit, loading = false }) => {
+const FormActions = ({ onCancel, loading, submitButtonText }) => (
+  <DialogFormActionsContainer>
+    <DialogCancelButton
+      variant="outlined"
+      onClick={loading ? undefined : onCancel}
+      fullWidth
+      disabled={loading}
+    >
+      Cancel
+    </DialogCancelButton>
+    <DialogSubmitButton
+      type="submit"
+      variant="contained"
+      fullWidth
+      form={ADD_ACCOUNT_FORM_ID}
+      disabled={loading}
+    >
+      {submitButtonText}
+    </DialogSubmitButton>
+  </DialogFormActionsContainer>
+);
+
+const AddAccountDialog = ({ open, onClose, onSubmit, loading = false, mode = "add", initialData = null, onEditClick, onCancelEdit }) => {
+  const isEditMode = mode === "edit";
+  const isViewMode = mode === "view";
+  const isFieldDisabled = loading || isViewMode;
+
   const {
     control,
     handleSubmit,
@@ -126,352 +184,126 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false }) => {
   useEffect(() => {
     if (!open) {
       reset(defaultValues);
+    } else if (initialData) {
+      reset(initialData);
     }
-  }, [open, reset]);
+  }, [open, reset, initialData]);
 
-  const handleCancel = () => {
+  const shouldShowStatusField = mode !== "add";
+  const submitButtonText = isEditMode ? "Update" : "Save";
+  const dialogTitle = DIALOG_TITLES[mode] ?? DIALOG_TITLES.add;
+
+  const handleCancel = useCallback(() => {
     reset(defaultValues);
     onClose();
-  };
+  }, [reset, onClose]);
 
-  const submitHandler = (data) => {
-    onSubmit({
-      ...data,
-      maxDevices: Number(data.maxDevices),
-    });
+  const submitHandler = useCallback(
+    (data) => {
+      onSubmit({
+        ...data,
+        maxDevices: Number(data.maxDevices),
+        companyId: initialData?.companyId,
+      });
+      reset(defaultValues);
+    },
+    [onSubmit, initialData, reset]
+  );
 
-    reset(defaultValues);
-  };
+  const headerActions = useMemo(() => {
+    if (isViewMode && onEditClick) {
+      return (
+        <EditButton variant="contained" onClick={onEditClick} disabled={loading}>
+          Edit
+        </EditButton>
+      );
+    }
+    if (isEditMode && onCancelEdit) {
+      return (
+        <CancelEditButton variant="outlined" onClick={onCancelEdit} disabled={loading}>
+          Cancel Edit
+        </CancelEditButton>
+      );
+    }
+    return null;
+  }, [isViewMode, isEditMode, onEditClick, onCancelEdit, loading]);
 
-  const formContent = (
-    <form id={ADD_ACCOUNT_FORM_ID} onSubmit={handleSubmit(submitHandler)}>
-      <DialogFormContainer>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="carrierName"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Carrier Name"
+  const contentWithActions = useMemo(
+    () => (
+      <>
+        <form id={ADD_ACCOUNT_FORM_ID} onSubmit={handleSubmit(submitHandler)}>
+          <DialogFormContainer>
+            <Grid container spacing={2}>
+              <FormFieldsSection
+                fields={ACCOUNT_FORM_FIELDS}
+                control={control}
+                errors={errors}
+                disabled={isFieldDisabled}
+              />
+
+              {shouldShowStatusField && (
+                <FormSelect
+                  name="status"
+                  label="Status"
+                  control={control}
+                  errors={errors}
+                  disabled={isFieldDisabled}
                   required
-                  disabled={loading}
-                  error={!!errors.carrierName}
-                  helperText={errors.carrierName?.message}
-                  fullWidth
-                  size="small"
+                  options={STATUS_OPTIONS}
                 />
               )}
-            />
-          </Grid>
 
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="carrierAddress"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Carrier Address"
-                  required
-                  disabled={loading}
-                  error={!!errors.carrierAddress}
-                  helperText={errors.carrierAddress?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-          </Grid>
+              <Grid item xs={12}>
+                <PrimarySectionHeader>PRIMARY DETAILS</PrimarySectionHeader>
+                <Divider />
+              </Grid>
 
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="usdot"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="USDOT Number"
-                  required
-                  disabled={loading}
-                  error={!!errors.usdot}
-                  helperText={errors.usdot?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-          </Grid>
+              <FormFieldsSection
+                fields={PRIMARY_CONTACT_FIELDS}
+                control={control}
+                errors={errors}
+                disabled={isFieldDisabled}
+              />
 
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="taxId"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Tax ID (EIN)"
-                  required
-                  disabled={loading}
-                  error={!!errors.taxId}
-                  helperText={errors.taxId?.message}
-                  fullWidth
-                  size="small"
-                  placeholder="XX-XXXXXXX"
-                  onChange={createFormatChangeHandler(field, formatTaxId)}
-                />
-              )}
-            />
-          </Grid>
+              <Grid item xs={12}>
+                <SecondarySectionHeader>SECONDARY DETAILS</SecondarySectionHeader>
+                <Divider />
+              </Grid>
 
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="mcNumber"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="MC Number"
-                  required
-                  disabled={loading}
-                  error={!!errors.mcNumber}
-                  helperText={errors.mcNumber?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-          </Grid>
+              <FormFieldsSection
+                fields={SECONDARY_CONTACT_FIELDS}
+                control={control}
+                errors={errors}
+                disabled={isFieldDisabled}
+              />
+            </Grid>
+          </DialogFormContainer>
+        </form>
 
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="maxDevices"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Max Devices"
-                  type="number"
-                  required
-                  disabled={loading}
-                  error={!!errors.maxDevices}
-                  helperText={errors.maxDevices?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="website"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Website"
-                  disabled={loading}
-                  error={!!errors.website}
-                  helperText={errors.website?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="tollFree"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Toll Free"
-                  required
-                  disabled={loading}
-                  error={!!errors.tollFree}
-                  helperText={errors.tollFree?.message}
-                  fullWidth
-                  size="small"
-                  placeholder="(XXX) XXX-XXXX"
-                  onChange={createFormatChangeHandler(field, formatPhoneNumber)}
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="fax"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Fax"
-                  required
-                  disabled={loading}
-                  error={!!errors.fax}
-                  helperText={errors.fax?.message}
-                  fullWidth
-                  size="small"
-                  placeholder="(XXX) XXX-XXXX"
-                  onChange={createFormatChangeHandler(field, formatPhoneNumber)}
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <PrimarySectionHeader>
-              PRIMARY DETAILS
-            </PrimarySectionHeader>
-
-            <Divider />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="primaryContactName"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Primary Contact Name"
-                  required
-                  disabled={loading}
-                  error={!!errors.primaryContactName}
-                  helperText={errors.primaryContactName?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="primaryContactNumber"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Primary Contact Number"
-                  required
-                  disabled={loading}
-                  error={!!errors.primaryContactNumber}
-                  helperText={errors.primaryContactNumber?.message}
-                  fullWidth
-                  size="small"
-                  placeholder="(XXX) XXX-XXXX"
-                  onChange={createFormatChangeHandler(field, formatPhoneNumber)}
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="primaryContactEmail"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Primary Contact Email"
-                  required
-                  disabled={loading}
-                  error={!!errors.primaryContactEmail}
-                  helperText={errors.primaryContactEmail?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <SecondarySectionHeader>
-              SECONDARY DETAILS
-            </SecondarySectionHeader>
-
-            <Divider />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="secondaryContactName"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Secondary Contact Name"
-                  disabled={loading}
-                  required
-                  error={!!errors.secondaryContactName}
-                  helperText={errors.secondaryContactName?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="secondaryContactNumber"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Secondary Contact Number"
-                  disabled={loading}
-                  required
-                  error={!!errors.secondaryContactNumber}
-                  helperText={errors.secondaryContactNumber?.message}
-                  fullWidth
-                  size="small"
-                  placeholder="(XXX) XXX-XXXX"
-                  onChange={createFormatChangeHandler(field, formatPhoneNumber)}
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="secondaryContactEmail"
-              control={control}
-              render={({ field }) => (
-                <CommonTextField
-                  {...field}
-                  label="Secondary Contact Email"
-                  disabled={loading}
-                  required
-                  error={!!errors.secondaryContactEmail}
-                  helperText={errors.secondaryContactEmail?.message}
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-          </Grid>
-        </Grid>
-      </DialogFormContainer>
-    </form>
+        {!isViewMode && (
+          <FormActions
+            onCancel={handleCancel}
+            loading={loading}
+            submitButtonText={submitButtonText}
+          />
+        )}
+      </>
+    ),
+    [control, errors, isFieldDisabled, shouldShowStatusField, isViewMode, handleCancel, loading, submitButtonText, handleSubmit, submitHandler]
   );
 
   return (
     <CommonDialogForm
       open={open}
-      title="Add New Account"
-      content={formContent}
+      title={dialogTitle}
+      content={contentWithActions}
       formId={ADD_ACCOUNT_FORM_ID}
       onCancel={handleCancel}
       loading={loading}
-      submitButtonText="Save"
       maxWidth="md"
+      headerActions={headerActions}
+      mode="edit"
+      key={mode}
     />
   );
 };

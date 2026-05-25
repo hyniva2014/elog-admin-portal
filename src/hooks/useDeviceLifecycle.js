@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useServices } from "../services/services";
+import CommonLoading from "../common/CommonLoading";
 
 export default function useDeviceLifecycle(year) {
   const { fetchApi } = useServices();
   const [deviceLifecycle, setDeviceLifecycle] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const { loading, setLoading, LoadingContainer } = CommonLoading();
+
 
   useEffect(() => {
     let active = true;
