@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { StatusTypography, ELogsTypography } from "./DeviceModelManagement.styles";
+import { StatusTypography, ELogsTypography } from "./DeviceModelManagement.styled";
 import DeviceModelManagementActionButton from "./DeviceModelManagementActionButton";
 
 export const formatDate = (value) =>

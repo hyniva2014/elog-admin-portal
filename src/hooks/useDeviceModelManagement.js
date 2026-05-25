@@ -2,7 +2,7 @@ import { useCallback, useState, useEffect, useRef } from "react";
 import dayjs from "dayjs";
 import { useServices } from "@src/services/services";
 import { useAuthContext } from "@src/states/useAuthContext";
-import { transformDeviceModelData } from "./DeviceModelManagementTable.utils";
+import { transformDeviceModelData } from "@src/components/compliance/DeviceModelManagement/DeviceModelManagementTable.utils";
 import { generateDeviceCode } from "@src/helpers/deviceModelHelpers";
 
 const EMPTY_FORM_VALUES = {

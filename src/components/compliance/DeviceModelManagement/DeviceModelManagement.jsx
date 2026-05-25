@@ -10,13 +10,23 @@ import {
   EditButton,
   CancelEditButton,
   GridContainer,
-} from "./DeviceModelManagement.styles";
+} from "./DeviceModelManagement.styled";
 import { DEVICE_MODEL_STATUS_FILTER_OPTIONS, ASSET_TYPE_FILTER_OPTIONS } from "./Constants";
 import { getColumns, getRowHeight } from "./DeviceModelManagementTable.utils";
-import useDeviceModelManagement from "./useDeviceModelManagement";
+import useDeviceModelManagement from "@src/hooks/useDeviceModelManagement";
+
+const getDialogTitle = (isEditMode, isEditing) => {
+  if (!isEditMode) return "Add Device Model";
+  return isEditing ? "Edit Device Model" : "View Device Model";
+};
+
+const getSubmitButtonLabel = (isEditMode, isEditing) => {
+  if (!isEditMode) return "Add Device";
+  return isEditing ? "Update" : "Save";
+};
 
 const DeviceModelManagement = () => {
-  const { setLoading, LoadingContainer } = CommonLoading();
+  const { LoadingContainer } = CommonLoading();
 
   const {
     allRows,
@@ -63,14 +73,8 @@ const DeviceModelManagement = () => {
   }
 
   const dialogMode = isEditMode ? "edit" : "add";
-
-  const dialogTitle = isEditMode
-    ? isEditing
-      ? "Edit Device Model"
-      : "View Device Model"
-    : "Add Device Model";
-
-  const submitButtonLabel = isEditMode ? (isEditing ? "Update" : "Save") : "Add Device";
+  const dialogTitle = getDialogTitle(isEditMode, isEditing);
+  const submitButtonLabel = getSubmitButtonLabel(isEditMode, isEditing);
 
   const dialogContent = (
     <DeviceModelManagementForm

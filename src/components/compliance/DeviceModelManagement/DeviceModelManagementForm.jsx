@@ -4,7 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import MenuItem from "@mui/material/MenuItem";
-import { StyledForm } from "./DeviceModelManagement.styles";
+import { StyledForm } from "./DeviceModelManagement.styled";
 import CommonTextField from "@src/common/CommonTextField";
 import CommonTextFieldStyled from "@src/common/CommonTextField.styles";
 import { ASSET_TYPE_FILTER_OPTIONS, ELOGS_FILTER_OPTIONS, DEVICE_MODEL_STATUS_FILTER_OPTIONS } from "./Constants";
@@ -50,29 +50,96 @@ const DeviceModelManagementForm = ({
     defaultValues: defaultValues || initialValues,
   });
 
-  const submitHandler = (data) => {
-    onSubmit(data);
-  };
+  const renderModelNameField = ({ field }) => (
+    <CommonTextField
+      {...field}
+      label="Model Name"
+      required
+      disabled={isDisabled}
+      error={!!errors.modelName}
+      helperText={errors.modelName?.message}
+      fullWidth
+      size="small"
+    />
+  );
+
+  const renderDescriptionField = ({ field }) => (
+    <CommonTextField
+      {...field}
+      label="Description"
+      required
+      disabled={isDisabled}
+      error={!!errors.description}
+      helperText={errors.description?.message}
+      fullWidth
+      size="small"
+      multiline
+      rows={3}
+    />
+  );
+
+  const renderAssetTypeField = ({ field }) => (
+    <CommonTextFieldStyled
+      {...field}
+      size="small"
+      label="Asset Type"
+      select
+      required
+      disabled={isDisabled}
+      error={!!errors.assetType}
+      helperText={errors.assetType?.message}
+      fullWidth
+      InputLabelProps={{ shrink: Boolean(field.value) || isDisabled }}
+    >
+      {ASSET_TYPE_FILTER_OPTIONS.map((option) => (
+        <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+      ))}
+    </CommonTextFieldStyled>
+  );
+
+  const renderSupportsElogsField = ({ field }) => (
+    <CommonTextFieldStyled
+      {...field}
+      size="small"
+      label="E-Logs"
+      select
+      required
+      disabled={isDisabled}
+      error={!!errors.supportsElogs}
+      helperText={errors.supportsElogs?.message}
+      fullWidth
+      InputLabelProps={{ shrink: Boolean(field.value !== "") || isDisabled }}
+    >
+      {ELOGS_FILTER_OPTIONS.map((option) => (
+        <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+      ))}
+    </CommonTextFieldStyled>
+  );
+
+  const renderStatusField = ({ field }) => (
+    <CommonTextFieldStyled
+      {...field}
+      size="small"
+      label="Status"
+      select
+      disabled={isDisabled}
+      fullWidth
+      InputLabelProps={{ shrink: Boolean(field.value !== "") || isDisabled }}
+    >
+      {DEVICE_MODEL_STATUS_FILTER_OPTIONS.map((option) => (
+        <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+      ))}
+    </CommonTextFieldStyled>
+  );
 
   return (
-    <StyledForm id={formId} onSubmit={handleSubmit(submitHandler)}>
+    <StyledForm id={formId} onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Controller
             name="modelName"
             control={control}
-            render={({ field }) => (
-              <CommonTextField
-                {...field}
-                label="Model Name"
-                required
-                disabled={isDisabled}
-                error={!!errors.modelName}
-                helperText={errors.modelName?.message}
-                fullWidth
-                size="small"
-              />
-            )}
+            render={renderModelNameField}
           />
         </Grid>
 
@@ -80,20 +147,7 @@ const DeviceModelManagementForm = ({
           <Controller
             name="description"
             control={control}
-            render={({ field }) => (
-              <CommonTextField
-                {...field}
-                label="Description"
-                required
-                disabled={isDisabled}
-                error={!!errors.description}
-                helperText={errors.description?.message}
-                fullWidth
-                size="small"
-                multiline
-                rows={3}
-              />
-            )}
+            render={renderDescriptionField}
           />
         </Grid>
 
@@ -101,24 +155,7 @@ const DeviceModelManagementForm = ({
           <Controller
             name="assetType"
             control={control}
-            render={({ field }) => (
-              <CommonTextFieldStyled
-                {...field}
-                size="small"
-                label="Asset Type"
-                select
-                required
-                disabled={isDisabled}
-                error={!!errors.assetType}
-                helperText={errors.assetType?.message}
-                fullWidth
-                InputLabelProps={{ shrink: Boolean(field.value) || isDisabled }}
-              >
-                {ASSET_TYPE_FILTER_OPTIONS.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-                ))}
-              </CommonTextFieldStyled>
-            )}
+            render={renderAssetTypeField}
           />
         </Grid>
 
@@ -126,24 +163,7 @@ const DeviceModelManagementForm = ({
           <Controller
             name="supportsElogs"
             control={control}
-            render={({ field }) => (
-              <CommonTextFieldStyled
-                {...field}
-                size="small"
-                label="E-Logs"
-                select
-                required
-                disabled={isDisabled}
-                error={!!errors.supportsElogs}
-                helperText={errors.supportsElogs?.message}
-                fullWidth
-                InputLabelProps={{ shrink: Boolean(field.value !== "") || isDisabled }}
-              >
-                {ELOGS_FILTER_OPTIONS.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-                ))}
-              </CommonTextFieldStyled>
-            )}
+            render={renderSupportsElogsField}
           />
         </Grid>
 
@@ -152,21 +172,7 @@ const DeviceModelManagementForm = ({
             <Controller
               name="status"
               control={control}
-              render={({ field }) => (
-                <CommonTextFieldStyled
-                  {...field}
-                  size="small"
-                  label="Status"
-                  select
-                  disabled={isDisabled}
-                  fullWidth
-                  InputLabelProps={{ shrink: Boolean(field.value !== "") || isDisabled }}
-                >
-                  {DEVICE_MODEL_STATUS_FILTER_OPTIONS.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-                  ))}
-                </CommonTextFieldStyled>
-              )}
+              render={renderStatusField}
             />
           </Grid>
         )}

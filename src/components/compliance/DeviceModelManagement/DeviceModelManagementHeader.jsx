@@ -6,7 +6,7 @@ import {
   ASSET_TYPE_FILTER_OPTIONS,
 } from "./Constants";
 import CommonSummaryCardGroup from "@src/common/CommonSummaryCardGroup";
-import { HeaderContainer, AddButton, SummaryCardBox } from "./DeviceModelManagement.styles";
+import { HeaderContainer, AddButton, SummaryCardBox } from "./DeviceModelManagement.styled";
 
 const DeviceModelManagementHeader = (props) => {
   const {

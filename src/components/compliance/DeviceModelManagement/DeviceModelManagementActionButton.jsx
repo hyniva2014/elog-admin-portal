@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { IconButton, Tooltip } from "@mui/material";
-import { StyledActionIcon } from "./DeviceModelManagement.styles";
+import { StyledActionIcon } from "./DeviceModelManagement.styled";
 
 const DeviceModelManagementActionButton = React.memo(
   ({ row, onView }) => {
