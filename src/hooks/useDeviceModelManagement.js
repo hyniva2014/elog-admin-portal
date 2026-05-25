@@ -203,6 +203,7 @@ const useDeviceModelManagement = () => {
   useEffect(() => {
     fetchDeviceModelsRef.current();
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Using ref pattern to avoid infinite loops caused by unstable fetchApi and handleSnackbar references from service layer
   }, [data.page, data.pageSize, data.search, data.model, data.assetType, data.supportsElogs, data.status, data.fromDate]);
 
   useEffect(() => {
