@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useServices } from "../services/services";
+import CommonLoading from "../common/CommonLoading";
 
 export default function useCarrierGrowthTrend(selectedYear) {
   const { fetchApi } = useServices();
   const [carrierGrowthTrend, setCarrierGrowthTrend] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const { loading, setLoading, LoadingContainer } = CommonLoading();
+
 
   useEffect(() => {
     let active = true;
