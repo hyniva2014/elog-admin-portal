@@ -108,7 +108,7 @@ jest.mock(
 
 // Mock utils
 jest.mock(
-  "../../../common/CommonRowColumnUtils",
+  "./CommonRowColumnUtils",
   () => ({
     UserManagementColumnData: [],
     mapUserToRow: (user) => ({
@@ -127,7 +127,7 @@ jest.mock(
 );
 
 jest.mock(
-  "../../../common/Constants",
+  "./Constants",
   () => ({
     USER_SUMMARY_CARDS: [],
   })

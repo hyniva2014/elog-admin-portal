@@ -87,9 +87,9 @@ jest.mock(
   })
 );
 
-// Mock constants
+// Mock feature constants
 jest.mock(
-  "../../../common/Constants",
+  "./Constants",
   () => ({
     USER_MANAGEMENT_FILTERS: [
       {

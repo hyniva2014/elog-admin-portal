@@ -93,8 +93,8 @@ jest.mock(
   )
 );
 
-// Mock constants
-jest.mock("../../../common/Constants", () => ({
+// Mock feature constants
+jest.mock("./Constants", () => ({
   ACCOUNT_OPTIONS: [
     {
       label: "Account 1",
