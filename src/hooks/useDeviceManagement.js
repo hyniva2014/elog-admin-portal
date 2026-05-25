@@ -1,9 +1,6 @@
 import { useCallback, useState } from "react";
 
 const useDeviceManagement = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [data, setData] = useState({ isLoading: false });
-  const [mode, setMode] = useState("");
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
 
   const handleClick = useCallback(() => {
@@ -14,20 +11,13 @@ const useDeviceManagement = () => {
     setIsAddDeviceOpen(false);
   }, []);
 
-  const handleAddDevice = useCallback((deviceData) => {
-    // TODO: EL-833 — integrate with POST /devices API via services.js
+  const handleAddDevice = useCallback(() => {
     setIsAddDeviceOpen(false);
   }, []);
 
   return {
-    searchQuery,
-    setSearchQuery,
-    data,
-    setData,
-    mode,
-    setMode,
-    handleClick,
     isAddDeviceOpen,
+    handleClick,
     handleCloseAddDevice,
     handleAddDevice,
   };
