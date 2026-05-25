@@ -1,156 +1,380 @@
-// UserManagement.test.jsx
+import React from "react";
 
-import { render, screen, fireEvent } from "@testing-library/react";
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+  act,
+} from "@testing-library/react";
+
 import "@testing-library/jest-dom";
+
 import UserManagement from "./UserManagement";
 
-// Mock CommonDataGrid
-jest.mock("@src/common/CommonDataGrid", () => (props) => (
-  <div data-testid="common-data-grid">
-    CommonDataGrid
-    <div>Rows Count: {props.data.rows.length}</div>
-  </div>
-));
+// Mock APIs
+const mockFetchApi = jest.fn();
+const mockCreateApi = jest.fn();
 
-// Mock UserManagementHeader
-jest.mock("./UserManagementHeader", () => (props) => (
-  <div data-testid="user-management-header">
-    UserManagementHeader
-    <button onClick={props.handleClick}>Open Form</button>
-  </div>
-));
-
-// Mock PageContainer
-jest.mock("../../../common/PageContainer", () => ({
-  PageContainer: ({ children }) => (
-    <div data-testid="page-container">{children}</div>
-  ),
+// Mock services
+jest.mock("../../../services/services", () => ({
+  useServices: () => ({
+    fetchApi: mockFetchApi,
+    createApi: mockCreateApi,
+  }),
 }));
 
-// Mock CommonLoading
+// Mock Loading
 jest.mock("../../../common/CommonLoading", () => () => ({
-  setLoading: jest.fn(),
   LoadingContainer: () => (
-    <div data-testid="loading-container">LoadingContainer</div>
+    <div>Loading...</div>
   ),
 }));
 
-// Mock UserManagementForm
+// Mock DataGrid
+jest.mock(
+  "@src/common/CommonDataGrid",
+  () => (props) => (
+    <div data-testid="datagrid">
+      {props.rowData?.map((row) => (
+        <div key={row.user_id}>
+          {row.user_name}
+        </div>
+      ))}
+    </div>
+  )
+);
+
+// Mock Header
+jest.mock(
+  "./UserManagementHeader",
+  () => (props) => (
+    <div>
+      <button onClick={props.handleClick}>
+        Add User
+      </button>
+    </div>
+  )
+);
+
+// Mock Form
 jest.mock(
   "./UserManagementForm",
   () => (props) =>
     props.open ? (
-      <div data-testid="user-management-form">
-        UserManagementForm
-        <button onClick={props.onClose}>Close Form</button>
+      <div data-testid="user-form">
+        <button
+          onClick={() =>
+            props.onSubmitForm({
+              firstName: "John",
+              lastName: "Doe",
+              email: "john@test.com",
+              company_id: "1",
+              role_id: "1",
+              status_id: "1",
+            })
+          }
+        >
+          Submit
+        </button>
+
+        <button onClick={props.onClose}>
+          Close
+        </button>
       </div>
-    ) : null,
+    ) : null
 );
 
-// Mock Row & Column Data
-jest.mock("./CommonRowColumnUtils", () => ({
-  UserManagementColumnData: [
-    { field: "id", headerName: "ID" },
-    { field: "name", headerName: "Name" },
-  ],
-  UserManagementRowData: [
-    { id: 1, name: "John" },
-    { id: 2, name: "Doe" },
-  ],
-}));
+// Mock Snackbar
+jest.mock(
+  "../../../common/CommonSnackbar",
+  () => (props) =>
+    props.open ? (
+      <div data-testid="snackbar">
+        {props.message}
+      </div>
+    ) : null
+);
+
+// Mock PageContainer
+jest.mock(
+  "../../../common/PageContainer",
+  () => ({
+    PageContainer: ({
+      children,
+    }) => <div>{children}</div>,
+  })
+);
+
+// Mock utils
+jest.mock(
+  "../../../common/CommonRowColumnUtils",
+  () => ({
+    UserManagementColumnData: [],
+    mapUserToRow: (user) => ({
+      ...user,
+    }),
+  })
+);
+
+jest.mock(
+  "../../../common/CommonUtils",
+  () => ({
+    buildSummaryCards: jest.fn(
+      () => []
+    ),
+  })
+);
+
+jest.mock(
+  "../../../common/Constants",
+  () => ({
+    USER_SUMMARY_CARDS: [],
+  })
+);
 
 describe("UserManagement Component", () => {
-  test("renders loading container", () => {
-    render(<UserManagement />);
-
-    expect(screen.getByTestId("loading-container")).toBeInTheDocument();
-  });
-
-  test("renders page container", () => {
-    render(<UserManagement />);
-
-    expect(screen.getByTestId("page-container")).toBeInTheDocument();
-  });
-
-  test("renders UserManagementHeader component", () => {
-    render(<UserManagement />);
-
-    expect(screen.getByTestId("user-management-header")).toBeInTheDocument();
-  });
-
-  test("renders CommonDataGrid component", () => {
-    render(<UserManagement />);
-
-    expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
-  });
-
-  test("passes row data correctly to CommonDataGrid", () => {
-    render(<UserManagement />);
-
-    expect(screen.getByText("Rows Count: 2")).toBeInTheDocument();
-  });
-
-  test("UserManagementForm should not render initially", () => {
-    render(<UserManagement />);
-
-    expect(
-      screen.queryByTestId("user-management-form"),
-    ).not.toBeInTheDocument();
-  });
-
-  test("opens UserManagementForm when handleClick is triggered", () => {
-    render(<UserManagement />);
-
-    const openButton = screen.getByText("Open Form");
-    fireEvent.click(openButton);
-
-    expect(screen.getByTestId("user-management-form")).toBeInTheDocument();
-  });
-
-  test("closes UserManagementForm when onClose is triggered", () => {
-    render(<UserManagement />);
-
-    // Open form
-    fireEvent.click(screen.getByText("Open Form"));
-
-    expect(screen.getByTestId("user-management-form")).toBeInTheDocument();
-
-    // Close form
-    fireEvent.click(screen.getByText("Close Form"));
-
-    expect(
-      screen.queryByTestId("user-management-form"),
-    ).not.toBeInTheDocument();
-  });
-
-  test("renders UserManagementForm with mode='add'", () => {
-    render(<UserManagement />);
-
-    fireEvent.click(screen.getByText("Open Form"));
-
-    expect(screen.getByTestId("user-management-form")).toBeInTheDocument();
-  });
-});
-
-describe("Edge Cases & Data Integrity", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test("renders gracefully with empty row data", () => {
-    // Mock CommonRowColumnUtils to return empty rows for this test
-    jest.mock("./CommonRowColumnUtils", () => ({
-      ...jest.requireActual("./CommonRowColumnUtils"),
-      UserManagementRowData: [],
-    }));
+  test("renders component and fetches users", async () => {
+    mockFetchApi.mockResolvedValueOnce({
+      body: {
+        data: [
+          {
+            user_id: 1,
+            user_name: "Test User",
+          },
+        ],
+        pagination: {
+          total_records: 1,
+        },
+      },
+    });
 
-    // We just render and make sure it doesn't crash
-    const { container } = render(<UserManagement />);
-    expect(container).toBeInTheDocument();
+    await act(async () => {
+      render(<UserManagement />);
+    });
+
+    await waitFor(() => {
+      expect(
+        mockFetchApi
+      ).toHaveBeenCalled();
+    });
+
+    expect(
+      screen.getByText("Test User")
+    ).toBeInTheDocument();
   });
 
-  test("handles undefined data state gracefully", () => {
-    const { container } = render(<UserManagement />);
-    expect(container).toBeInTheDocument();
+  test("shows error snackbar when fetch fails", async () => {
+    mockFetchApi.mockRejectedValueOnce(
+      new Error("API Error")
+    );
+
+    await act(async () => {
+      render(<UserManagement />);
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          "Failed to fetch users."
+        )
+      ).toBeInTheDocument();
+    });
+  });
+
+  test("opens form when Add User clicked", async () => {
+    mockFetchApi.mockResolvedValueOnce({
+      body: {
+        data: [],
+        pagination: {},
+      },
+    });
+
+    await act(async () => {
+      render(<UserManagement />);
+    });
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Add User",
+      })
+    );
+
+    expect(
+      screen.getByTestId("user-form")
+    ).toBeInTheDocument();
+  });
+
+  test("closes form correctly", async () => {
+    mockFetchApi.mockResolvedValueOnce({
+      body: {
+        data: [],
+        pagination: {},
+      },
+    });
+
+    await act(async () => {
+      render(<UserManagement />);
+    });
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Add User",
+      })
+    );
+
+    expect(
+      screen.getByTestId("user-form")
+    ).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Close",
+      })
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.queryByTestId(
+          "user-form"
+        )
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  test("creates user successfully", async () => {
+    mockFetchApi.mockResolvedValue({
+      body: {
+        data: [],
+        pagination: {},
+      },
+    });
+
+    mockCreateApi.mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        message:
+          "User created successfully",
+      },
+    });
+
+    await act(async () => {
+      render(<UserManagement />);
+    });
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Add User",
+      })
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Submit",
+      })
+    );
+
+    await waitFor(() => {
+      expect(
+        mockCreateApi
+      ).toHaveBeenCalled();
+    });
+
+    expect(
+      screen.getByText(
+        "User created successfully"
+      )
+    ).toBeInTheDocument();
+  });
+
+  test("shows error when create user fails", async () => {
+    mockFetchApi.mockResolvedValue({
+      body: {
+        data: [],
+        pagination: {},
+      },
+    });
+
+    mockCreateApi.mockRejectedValueOnce({
+      response: {
+        data: {
+          body: {
+            message:
+              "User creation failed",
+          },
+        },
+      },
+    });
+
+    await act(async () => {
+      render(<UserManagement />);
+    });
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Add User",
+      })
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Submit",
+      })
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          "User creation failed"
+        )
+      ).toBeInTheDocument();
+    });
+  });
+
+  test("handles empty users list", async () => {
+    mockFetchApi.mockResolvedValueOnce({
+      body: {
+        data: [],
+        pagination: {
+          total_records: 0,
+        },
+      },
+    });
+
+    await act(async () => {
+      render(<UserManagement />);
+    });
+
+    await waitFor(() => {
+      expect(
+        mockFetchApi
+      ).toHaveBeenCalled();
+    });
+
+    expect(
+      screen.getByTestId("datagrid")
+    ).toBeInTheDocument();
+  });
+
+  test("shows fallback error message", async () => {
+    mockFetchApi.mockRejectedValueOnce(
+      new Error()
+    );
+
+    await act(async () => {
+      render(<UserManagement />);
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          "Failed to fetch users."
+        )
+      ).toBeInTheDocument();
+    });
   });
 });

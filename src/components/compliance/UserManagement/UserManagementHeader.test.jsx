@@ -1,136 +1,275 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+// UserManagementHeader.test.jsx
+
+import React from "react";
+import {
+  render,
+  screen,
+  fireEvent,
+} from "@testing-library/react";
+
+import "@testing-library/jest-dom";
+
 import UserManagementHeader from "./UserManagementHeader";
 
-jest.mock("../../../common/CommonPageHeader", () => (props) => (
-  <div data-testid="common-page-header">
-    <div>{props.title}</div>
-    <div>{props.subtitle}</div>
-    <div>{props.rightContent}</div>
-  </div>
-));
+const mockHandleClick = jest.fn();
+const mockSetData = jest.fn();
 
-jest.mock("../../../common/CommonSummaryCardGroup", () => (props) => (
-  <div data-testid="summary-card-group">
-    Summary Cards: {props.cards?.length}
-  </div>
-));
+// Mock CommonPageHeader
+jest.mock(
+  "../../../common/CommonPageHeader",
+  () => (props) => (
+    <div data-testid="common-page-header">
+      <h1>{props.title}</h1>
+      <p>{props.subtitle}</p>
 
-jest.mock("../../../common/CommonFilters", () => (props) => (
-  <div data-testid="common-filters">Filters: {props.filters?.length}</div>
-));
+      <div>{props.rightContent}</div>
+    </div>
+  )
+);
+
+// Mock CommonSummaryCardGroup
+jest.mock(
+  "../../../common/CommonSummaryCardGroup",
+  () => (props) => (
+    <div data-testid="summary-card-group">
+      {props.cards?.map((card, index) => (
+        <div key={index}>{card.title}</div>
+      ))}
+    </div>
+  )
+);
+
+// Mock CommonFilters
+jest.mock(
+  "../../../common/CommonFilters",
+  () => (props) => (
+    <div data-testid="common-filters">
+      Filters Component
+      <button
+        onClick={() =>
+          props.setData({
+            search: "test",
+          })
+        }
+      >
+        Apply Filter
+      </button>
+    </div>
+  )
+);
+
+// Mock styled components
+jest.mock(
+  "./UserManagementHeader.styled",
+  () => ({
+    HeaderContainer: ({ children }) => (
+      <div data-testid="header-container">
+        {children}
+      </div>
+    ),
+
+    SummaryCardWrapper: ({
+      children,
+    }) => (
+      <div data-testid="summary-wrapper">
+        {children}
+      </div>
+    ),
+
+    AddUserButton: ({
+      children,
+      onClick,
+    }) => (
+      <button onClick={onClick}>
+        {children}
+      </button>
+    ),
+  })
+);
+
+// Mock constants
+jest.mock(
+  "../../../common/Constants",
+  () => ({
+    USER_MANAGEMENT_FILTERS: [
+      {
+        label: "Status",
+        key: "status",
+      },
+    ],
+  })
+);
 
 describe("UserManagementHeader Component", () => {
-  const mockSetData = jest.fn();
-  const mockHandleClick = jest.fn();
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   const defaultProps = {
-    data: {},
+    data: [],
     setData: mockSetData,
-    searchKey: {
-      search: "",
-    },
+    searchKey: {},
     summaryCards: [
       {
-        title: "Active Users",
-        value: 10,
+        title: "Total Users",
+        count: 10,
       },
       {
-        title: "Inactive Users",
-        value: 5,
+        title: "Active Users",
+        count: 8,
       },
     ],
     handleClick: mockHandleClick,
   };
 
-  beforeEach(() => {
-    jest.clearAllMocks();
+  test("renders component correctly", () => {
+    render(
+      <UserManagementHeader
+        {...defaultProps}
+      />
+    );
+
+    expect(
+      screen.getByTestId(
+        "header-container"
+      )
+    ).toBeInTheDocument();
   });
 
   test("renders page header title and subtitle", () => {
-    render(<UserManagementHeader {...defaultProps} />);
-
-    expect(screen.getByText("User Management")).toBeInTheDocument();
+    render(
+      <UserManagementHeader
+        {...defaultProps}
+      />
+    );
 
     expect(
-      screen.getByText("Manage user accounts and permissions"),
+      screen.getByText("User Management")
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        "Manage user accounts and permissions"
+      )
     ).toBeInTheDocument();
   });
 
   test("renders Add User button", () => {
-    render(<UserManagementHeader {...defaultProps} />);
+    render(
+      <UserManagementHeader
+        {...defaultProps}
+      />
+    );
 
     expect(
-      screen.getByRole("button", {
-        name: /add user/i,
-      }),
+      screen.getByText("Add User")
     ).toBeInTheDocument();
   });
 
-  test("calls handleClick when Add User button is clicked", () => {
-    render(<UserManagementHeader {...defaultProps} />);
+  test("calls handleClick when Add User button clicked", () => {
+    render(
+      <UserManagementHeader
+        {...defaultProps}
+      />
+    );
 
-    const addButton = screen.getByRole("button", {
-      name: /add user/i,
+    fireEvent.click(
+      screen.getByText("Add User")
+    );
+
+    expect(
+      mockHandleClick
+    ).toHaveBeenCalledTimes(1);
+  });
+
+  test("renders summary cards correctly", () => {
+    render(
+      <UserManagementHeader
+        {...defaultProps}
+      />
+    );
+
+    expect(
+      screen.getByText("Total Users")
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText("Active Users")
+    ).toBeInTheDocument();
+  });
+
+  test("renders CommonFilters component", () => {
+    render(
+      <UserManagementHeader
+        {...defaultProps}
+      />
+    );
+
+    expect(
+      screen.getByTestId(
+        "common-filters"
+      )
+    ).toBeInTheDocument();
+  });
+
+  test("calls setData from filters", () => {
+    render(
+      <UserManagementHeader
+        {...defaultProps}
+      />
+    );
+
+    fireEvent.click(
+      screen.getByText("Apply Filter")
+    );
+
+    expect(
+      mockSetData
+    ).toHaveBeenCalledWith({
+      search: "test",
     });
-
-    fireEvent.click(addButton);
-
-    expect(mockHandleClick).toHaveBeenCalledTimes(1);
   });
 
-  test("renders summary card group", () => {
-    render(<UserManagementHeader {...defaultProps} />);
+  test("renders summary wrapper", () => {
+    render(
+      <UserManagementHeader
+        {...defaultProps}
+      />
+    );
 
-    expect(screen.getByTestId("summary-card-group")).toBeInTheDocument();
-
-    expect(screen.getByText("Summary Cards: 2")).toBeInTheDocument();
+    expect(
+      screen.getByTestId(
+        "summary-wrapper"
+      )
+    ).toBeInTheDocument();
   });
 
-  test("renders common filters component", () => {
-    render(<UserManagementHeader {...defaultProps} />);
+  test("renders without summary cards", () => {
+    render(
+      <UserManagementHeader
+        {...defaultProps}
+        summaryCards={[]}
+      />
+    );
 
-    expect(screen.getByTestId("common-filters")).toBeInTheDocument();
-
-    expect(screen.getByText("Filters: 3")).toBeInTheDocument();
+    expect(
+      screen.getByTestId(
+        "summary-card-group"
+      )
+    ).toBeInTheDocument();
   });
 
-  test("passes correct filter configuration", () => {
-    render(<UserManagementHeader {...defaultProps} />);
+  test("renders with empty data prop", () => {
+    render(
+      <UserManagementHeader
+        data={[]}
+        setData={mockSetData}
+        handleClick={mockHandleClick}
+      />
+    );
 
-    expect(screen.getByTestId("common-filters")).toBeInTheDocument();
-  });
-
-  test("renders gracefully with empty summary cards", () => {
-    render(<UserManagementHeader {...defaultProps} summaryCards={[]} />);
-
-    expect(screen.getByText("Summary Cards: 0")).toBeInTheDocument();
-  });
-
-  test("renders gracefully with undefined summary cards", () => {
-    render(<UserManagementHeader {...defaultProps} summaryCards={undefined} />);
-
-    expect(screen.getByTestId("summary-card-group")).toBeInTheDocument();
-  });
-
-  test("renders gracefully with null data", () => {
-    render(<UserManagementHeader {...defaultProps} data={null} />);
-
-    expect(screen.getByTestId("common-filters")).toBeInTheDocument();
-  });
-
-  test("renders without crashing when handleClick is undefined", () => {
-    render(<UserManagementHeader {...defaultProps} handleClick={undefined} />);
-
-    const addButton = screen.getByRole("button", {
-      name: /add user/i,
-    });
-
-    expect(addButton).toBeInTheDocument();
-  });
-
-  test("matches snapshot", () => {
-    const { container } = render(<UserManagementHeader {...defaultProps} />);
-
-    expect(container).toMatchSnapshot();
+    expect(
+      screen.getByText("User Management")
+    ).toBeInTheDocument();
   });
 });

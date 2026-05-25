@@ -19,6 +19,7 @@ const CommonDialogForm = ({
   formId,
   onSubmit,
   onCancel,
+  onClose,
   mode = "add",
   loading = false,
   submitButtonText,
@@ -26,6 +27,7 @@ const CommonDialogForm = ({
   headerActions,
 }) => {
   const isEdit = mode === "edit";
+  const handleClose = onClose ?? onCancel;
 
   return (
     <Dialog
@@ -33,7 +35,7 @@ const CommonDialogForm = ({
       disableEscapeKeyDown
       onClose={(event, reason) => {
         if (reason !== "backdropClick") {
-          onCancel();
+          handleClose();
         }
       }}
       maxWidth={maxWidth}
@@ -92,7 +94,7 @@ const CommonDialogForm = ({
         >
           {headerActions}
           <IconButton
-            onClick={loading ? undefined : onCancel}
+            onClick={loading ? undefined : handleClose}
             sx={{
               color: "#343741",
             }}
@@ -118,49 +120,53 @@ const CommonDialogForm = ({
           pb: 3,
         }}
       >
-        <Button
-          variant="outlined"
-          onClick={loading ? undefined : onCancel}
-          fullWidth
-          disabled={loading}
-          sx={{
-            fontSize: 16,
-            fontWeight: 400,
-            color: "#284495",
-            border: 1,
-            borderRadius: 2,
-            borderColor: "#284495",
-            backgroundColor: "#FFFFFF",
-          }}
-        >
-          Cancel
-        </Button>
+        {submitButtonText !== null && (
+          <>
+            <Button
+              variant="outlined"
+              onClick={loading ? undefined : onCancel}
+              fullWidth
+              disabled={loading}
+              sx={{
+                fontSize: 16,
+                fontWeight: 400,
+                color: "#284495",
+                border: 1,
+                borderRadius: 2,
+                borderColor: "#284495",
+                backgroundColor: "#FFFFFF",
+              }}
+            >
+              Cancel
+            </Button>
 
-        <Button
-          type="submit"
-          variant="contained"
-          fullWidth
-          form={formId}
-          onClick={onSubmit}
-          disabled={loading}
-          sx={{
-            fontSize: 16,
-            fontWeight: 400,
-            color: "#FFFFFF",
-            backgroundColor: "#284495",
-            border: 1,
-            borderRadius: 2,
-            borderColor: "#284495",
-          }}
-        >
-          {submitButtonText
-            ? submitButtonText
-            : loading
-              ? "Saving..."
-              : isEdit
-                ? "Update"
-                : "Save"}
-        </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              form={formId}
+              onClick={onSubmit}
+              disabled={loading}
+              sx={{
+                fontSize: 16,
+                fontWeight: 400,
+                color: "#FFFFFF",
+                backgroundColor: "#284495",
+                border: 1,
+                borderRadius: 2,
+                borderColor: "#284495",
+              }}
+            >
+              {submitButtonText
+                ? submitButtonText
+                : loading
+                  ? "Saving..."
+                  : isEdit
+                    ? "Update"
+                    : "Save"}
+            </Button>
+          </>
+        )}
       </DialogActions>
     </Dialog>
   );

@@ -2,7 +2,7 @@ import CommonFilters from "../../../common/CommonFilters";
 import CommonPageHeader from "../../../common/CommonPageHeader";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { AddUserButton, HeaderContainer, SummaryCardWrapper } from "./UserManagementHeader.styled";
-import { USER_MANAGEMENT_FILTERS } from "./Constants";
+import { USER_MANAGEMENT_FILTERS } from "../../../common/Constants";
 
 const UserManagementHeader = (props) => {
   const {
@@ -28,6 +28,7 @@ const UserManagementHeader = (props) => {
         <CommonSummaryCardGroup
           cards={summaryCards}
           showAccentBar={true}
+          layout="dashboard"
         />
       </SummaryCardWrapper>
 

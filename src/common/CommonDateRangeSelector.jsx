@@ -13,7 +13,7 @@ import { StaticDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import CloseIcon from "@mui/icons-material/Close";
-import { formatDateRange } from "./Commonutils";
+import { formatDateRange } from "./CommonUtils";
 
 const DATE_FORMAT = "MM-DD-YYYY";
 const PRESET_DAYS = [7, 14, 30];
