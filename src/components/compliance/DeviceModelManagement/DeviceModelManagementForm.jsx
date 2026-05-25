@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Grid } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -32,6 +32,18 @@ const initialValues = {
   status: 1,
 };
 
+const assetTypeOptions = ASSET_TYPE_FILTER_OPTIONS.map((option) => (
+  <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+));
+
+const elogsOptions = ELOGS_FILTER_OPTIONS.map((option) => (
+  <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+));
+
+const statusOptions = DEVICE_MODEL_STATUS_FILTER_OPTIONS.map((option) => (
+  <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+));
+
 const DeviceModelManagementForm = ({
   formId,
   defaultValues,
@@ -50,86 +62,95 @@ const DeviceModelManagementForm = ({
     defaultValues: defaultValues || initialValues,
   });
 
-  const renderModelNameField = ({ field }) => (
-    <CommonTextField
-      {...field}
-      label="Model Name"
-      required
-      disabled={isDisabled}
-      error={!!errors.modelName}
-      helperText={errors.modelName?.message}
-      fullWidth
-      size="small"
-    />
+  const renderModelNameField = useCallback(
+    ({ field }) => (
+      <CommonTextField
+        {...field}
+        label="Model Name"
+        required
+        disabled={isDisabled}
+        error={!!errors.modelName}
+        helperText={errors.modelName?.message}
+        fullWidth
+        size="small"
+      />
+    ),
+    [isDisabled, errors.modelName],
   );
 
-  const renderDescriptionField = ({ field }) => (
-    <CommonTextField
-      {...field}
-      label="Description"
-      required
-      disabled={isDisabled}
-      error={!!errors.description}
-      helperText={errors.description?.message}
-      fullWidth
-      size="small"
-      multiline
-      rows={3}
-    />
+  const renderDescriptionField = useCallback(
+    ({ field }) => (
+      <CommonTextField
+        {...field}
+        label="Description"
+        required
+        disabled={isDisabled}
+        error={!!errors.description}
+        helperText={errors.description?.message}
+        fullWidth
+        size="small"
+        multiline
+        rows={3}
+      />
+    ),
+    [isDisabled, errors.description],
   );
 
-  const renderAssetTypeField = ({ field }) => (
-    <CommonTextFieldStyled
-      {...field}
-      size="small"
-      label="Asset Type"
-      select
-      required
-      disabled={isDisabled}
-      error={!!errors.assetType}
-      helperText={errors.assetType?.message}
-      fullWidth
-      InputLabelProps={{ shrink: Boolean(field.value) || isDisabled }}
-    >
-      {ASSET_TYPE_FILTER_OPTIONS.map((option) => (
-        <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-      ))}
-    </CommonTextFieldStyled>
+  const renderAssetTypeField = useCallback(
+    ({ field }) => (
+      <CommonTextFieldStyled
+        {...field}
+        size="small"
+        label="Asset Type"
+        select
+        required
+        disabled={isDisabled}
+        error={!!errors.assetType}
+        helperText={errors.assetType?.message}
+        fullWidth
+        InputLabelProps={{ shrink: Boolean(field.value) || isDisabled }}
+      >
+        {assetTypeOptions}
+      </CommonTextFieldStyled>
+    ),
+    [isDisabled, errors.assetType],
   );
 
-  const renderSupportsElogsField = ({ field }) => (
-    <CommonTextFieldStyled
-      {...field}
-      size="small"
-      label="E-Logs"
-      select
-      required
-      disabled={isDisabled}
-      error={!!errors.supportsElogs}
-      helperText={errors.supportsElogs?.message}
-      fullWidth
-      InputLabelProps={{ shrink: Boolean(field.value !== "") || isDisabled }}
-    >
-      {ELOGS_FILTER_OPTIONS.map((option) => (
-        <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-      ))}
-    </CommonTextFieldStyled>
+  const renderSupportsElogsField = useCallback(
+    ({ field }) => (
+      <CommonTextFieldStyled
+        {...field}
+        size="small"
+        label="E-Logs"
+        select
+        required
+        disabled={isDisabled}
+        error={!!errors.supportsElogs}
+        helperText={errors.supportsElogs?.message}
+        fullWidth
+        InputLabelProps={{ shrink: Boolean(field.value !== "") || isDisabled }}
+      >
+        {elogsOptions}
+      </CommonTextFieldStyled>
+    ),
+    [isDisabled, errors.supportsElogs],
   );
 
-  const renderStatusField = ({ field }) => (
-    <CommonTextFieldStyled
-      {...field}
-      size="small"
-      label="Status"
-      select
-      disabled={isDisabled}
-      fullWidth
-      InputLabelProps={{ shrink: Boolean(field.value !== "") || isDisabled }}
-    >
-      {DEVICE_MODEL_STATUS_FILTER_OPTIONS.map((option) => (
-        <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-      ))}
-    </CommonTextFieldStyled>
+  const renderStatusField = useCallback(
+    ({ field }) => (
+      <CommonTextFieldStyled
+        {...field}
+        size="small"
+        label="Status"
+        select
+        disabled={isDisabled}
+        fullWidth
+        InputLabelProps={{ shrink: Boolean(field.value !== "") || isDisabled }}
+      >
+        {statusOptions}
+      </CommonTextFieldStyled>
+    ),
+    [isDisabled],
   );
 
   return (

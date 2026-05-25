@@ -18,10 +18,6 @@ export const SummaryCardBox = styled(Box)(({ theme }) => ({
   marginTop: theme.spacing(2),
 }));
 
-export const FormBox = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(2),
-}));
-
 export const StyledForm = styled("form")(({ theme }) => ({
   paddingTop: theme.spacing(2),
 }));

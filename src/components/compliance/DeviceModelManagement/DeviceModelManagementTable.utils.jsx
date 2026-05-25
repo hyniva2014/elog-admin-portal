@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import { StatusTypography, ELogsTypography } from "./DeviceModelManagement.styled";
 import DeviceModelManagementActionButton from "./DeviceModelManagementActionButton";
+import { getAssetTypeLabel, getStatusLabel, transformDeviceModelData } from "@src/helpers/deviceModelHelpers";
 
 export const formatDate = (value) =>
   value ? dayjs(value).format("MMM DD, YYYY") : "-";
@@ -106,45 +107,4 @@ export const getColumns = (onView) => [
   },
 ];
 
-const getAssetTypeLabel = (value) => {
-  switch (value) {
-    case 1:
-    case "1":
-      return "Truck";
-    case 2:
-    case "2":
-      return "Trailer";
-    default:
-      return "-";
-  }
-};
-
-const getStatusLabel = (value) => {
-  switch (value) {
-    case 1:
-    case "1":
-      return "Active";
-    case 0:
-    case "0":
-      return "Inactive";
-    default:
-      return "Active";
-  }
-};
-
-export const transformDeviceModelData = (apiData) => {
-  return apiData.map((item) => ({
-    id: item.device_model_id,
-    deviceModelId: item.device_model_id,
-    deviceCode: item.device_code || "",
-    model: item.model_name || "-",
-    assetType: getAssetTypeLabel(item.asset_type),
-    assetTypeValue: item.asset_type,
-    description: item.description || "-",
-    supportsElogs: item.supports_elogs === 1 || item.supports_elogs === "1" ? 1 : 0,
-    createdOn: item.created_at || null,
-    updatedOn: item.updated_at || null,
-    status: item.status ?? 1,
-    statusLabel: getStatusLabel(item.status),
-  }));
-};
+export { getAssetTypeLabel, getStatusLabel, transformDeviceModelData };

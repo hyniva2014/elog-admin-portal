@@ -14,8 +14,6 @@ const DeviceModelManagementHeader = (props) => {
     setData,
     searchKey = {},
     summaryCards = [],
-    mode,
-    setMode,
     handleClick,
     modelOptions = [],
     statusOptions = [],

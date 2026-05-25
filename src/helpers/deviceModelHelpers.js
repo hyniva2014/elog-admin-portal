@@ -19,3 +19,45 @@ export const generateDeviceCode = (name) => {
 };
 
 export default generateDeviceCode;
+
+export const getAssetTypeLabel = (value) => {
+  switch (value) {
+    case 1:
+    case "1":
+      return "Truck";
+    case 2:
+    case "2":
+      return "Trailer";
+    default:
+      return "-";
+  }
+};
+
+export const getStatusLabel = (value) => {
+  switch (value) {
+    case 1:
+    case "1":
+      return "Active";
+    case 0:
+    case "0":
+      return "Inactive";
+    default:
+      return "-";
+  }
+};
+
+export const transformDeviceModelData = (apiData) =>
+  apiData.map((item) => ({
+    id: item.device_model_id,
+    deviceModelId: item.device_model_id,
+    deviceCode: item.device_code || "",
+    model: item.model_name || "-",
+    assetType: getAssetTypeLabel(item.asset_type),
+    assetTypeValue: item.asset_type,
+    description: item.description || "-",
+    supportsElogs: item.supports_elogs === 1 || item.supports_elogs === "1" ? 1 : 0,
+    createdOn: item.created_at || null,
+    updatedOn: item.updated_at || null,
+    status: item.status ?? 1,
+    statusLabel: getStatusLabel(item.status),
+  }));
