@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import eyeIcon from "../../../assets/images/svg/eyeicon.png";
 import DevicesIcon from "@mui/icons-material/Devices";
 import WifiIcon from "@mui/icons-material/Wifi";
@@ -6,9 +7,12 @@ import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import { IconButton } from "@mui/material";
 import { StatusTypography } from "./DeviceManagement.styles";
 
+const formatDate = (value) =>
+  value ? dayjs(value).format("MMM DD, YYYY") : "-";
+
 export const DEVICE_STATUS_FILTER_OPTIONS = [
-  { value: "Active", label: "Active" },
-  { value: "Warning", label: "Warning" },
+  { value: "1", label: "Active" },
+  { value: "0", label: "Inactive" },
 ];
 
 export const DEVICE_IGNITION_FILTER_OPTIONS = [
@@ -48,77 +52,6 @@ export const DEVICE_TRUCK_FILTER_OPTIONS = [
   { value: "TRK-088", label: "TRK-088" },
 ];
 
-
-
-export const mockData = [
-  {
-    id: 1,
-    deviceId: "DEV-1001",
-    carrierId: "C-01",
-    carrierName: "Swift Transportation",
-    deviceModel: "Geotab GO9",
-    serialNumber: "SN-ABC12345",
-    truckNumber: "TRK-089",
-    latitude: "30.250661",
-    longitude: "-97.735925",
-    ignition: "ON",
-    speed: "80",
-    createdOn: "05 05 2026",
-    lastSync: "05 05 2026",
-    status: "Active",
-  },
-  {
-    id: 2,
-    deviceId: "DEV-1002",
-    carrierId: "C-03",
-    carrierName: "J.B. Hunt",
-    deviceModel: "Samsara VG34",
-    serialNumber: "SN-ABC12346",
-    truckNumber: "TRK-045",
-    latitude: "31.924816",
-    longitude: "-97.102912",
-    ignition: "ON",
-    speed: "60",
-    createdOn: "05 05 2026",
-    lastSync: "05 05 2026",
-    status: "Active",
-  },
-  {
-    id: 3,
-    deviceId: "DEV-1003",
-    carrierId: "C-03",
-    carrierName: "Schneider National",
-    deviceModel: "KeepTruckin K5",
-    serialNumber: "HSN-ABC12347",
-    truckNumber: "TRK-102",
-    latitude: "27.490996",
-    longitude: "-99.460743",
-    ignition: "OFF",
-    speed: "0",
-    createdOn: "05 05 2026",
-    lastSync: "05 05 2026",
-    status: "Warning",
-  },
-  {
-    id: 4,
-    deviceId: "DEV-1004",
-    carrierId: "C-04",
-    carrierName: "Werner Enterprises",
-    deviceModel: "Omnitracs IVG",
-    serialNumber: "SN-ABC12348",
-    truckNumber: "TRK-067",
-    latitude: "30.250661",
-    longitude: "-97.102912",
-    ignition: "ON",
-    speed: "30",
-    createdOn: "05 05 2026",
-    lastSync: "05 05 2026",
-    status: "Active",
-  },
-];
-
-
-
 const StatusCell = ({ value }) => (
   <StatusTypography variant="body2" value={value}>
     {value}
@@ -130,8 +63,6 @@ const ActionCell = () => (
     <img src={eyeIcon} alt="view" width={16} height={16} />
   </IconButton>
 );
-
-
 
 export const columns = [
   {
@@ -202,13 +133,15 @@ export const columns = [
     field: "createdOn",
     headerName: "Created On",
     flex: 1,
-    minWidth: 90,
+    minWidth: 120,
+    renderCell: (params) => formatDate(params.value),
   },
   {
     field: "updatedOn",
     headerName: "Updated On",
     flex: 1,
-    minWidth: 90,
+    minWidth: 120,
+    renderCell: (params) => formatDate(params.value),
   },
   {
     field: "status",
@@ -225,8 +158,6 @@ export const columns = [
     renderCell: () => <ActionCell />,
   },
 ];
-
-
 
 export const summaryCards = [
   {
@@ -258,6 +189,56 @@ export const summaryCards = [
     icon: <Inventory2OutlinedIcon sx={{ fontSize: 28 }} color="warning" />,
   },
 ];
+
+export const transformDeviceData = (data = []) =>
+  data.map((item) => ({
+    id: item.device_id,
+    deviceId: item.device_id,
+    carrierId: item.carrier_id ?? "-",
+    carrierName: item.carrier_name ?? "-",
+    deviceModel: item.device_model_name ?? "-",
+    serialNumber: item.serial_number ?? "-",
+    truckNumber: item.truck_number ?? "-",
+    latitude: item.latitude ?? "-",
+    longitude: item.longitude ?? "-",
+    ignition: item.ignition ?? "-",
+    speed: item.speed ?? 0,
+    createdOn: item.created_at,
+    updatedOn: item.updated_at,
+    status: item.status === "1" || item.status === 1 ? "Active" : "Inactive",
+  }));
+
+export const buildSummaryCards = (counts = {}) => [
+  {
+    id: "total_devices",
+    title: "Total Devices",
+    value: String(counts.totalDevices ?? 0),
+    accentcolor: "brand",
+    icon: <DevicesIcon sx={{ fontSize: 28 }} color="brand" />,
+  },
+  {
+    id: "online_devices",
+    title: "Online Devices",
+    value: String(counts.onlineDevices ?? 0),
+    accentcolor: "success",
+    icon: <WifiIcon sx={{ fontSize: 28 }} color="success" />,
+  },
+  {
+    id: "offline_devices",
+    title: "Offline Devices",
+    value: String(counts.offlineDevices ?? 0),
+    accentcolor: "error",
+    icon: <WifiOffIcon sx={{ fontSize: 28 }} color="error" />,
+  },
+  {
+    id: "unassigned_devices",
+    title: "Unassigned Devices",
+    value: String(counts.unassignedDevices ?? 0),
+    accentcolor: "warning",
+    icon: <Inventory2OutlinedIcon sx={{ fontSize: 28 }} color="warning" />,
+  },
+];
+
 export const GVWR_OPTIONS = [
   { value: "26,001 lbs", label: "26,001 lbs" },
   { value: "33,001 lbs", label: "33,001 lbs" },

@@ -41,6 +41,8 @@ const CommonDataGrid = ({
   hideFooter = false,
   getRowHeight = false,
   checkboxSelection = false,
+  rowSelectionModel = [],
+  onRowSelectionModelChange = () => {},
 }) => {
   const pagePaginationModel = {
     page: (data.page || 1) - 1,
@@ -214,6 +216,8 @@ const CommonDataGrid = ({
         hideFooter={hideFooter}
         getRowHeight={getRowHeight}
         checkboxSelection={checkboxSelection}
+        rowSelectionModel={rowSelectionModel}
+        onRowSelectionModelChange={onRowSelectionModelChange}
         onPaginationModelChange={(model) =>
           setData((prev) => ({
             ...prev,

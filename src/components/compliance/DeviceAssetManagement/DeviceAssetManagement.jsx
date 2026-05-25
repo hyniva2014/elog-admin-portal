@@ -62,6 +62,9 @@ const DeviceAssetManagement = () => {
   });
   const [isEditMode, setIsEditMode] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
+
+  // ── Snackbar ────────────────────────────────────────────────────────────────
   const handleSnackbar = useCallback((message, severity = "info") => {
     setSnackbar({
       open: true,
@@ -340,6 +343,9 @@ const DeviceAssetManagement = () => {
           handleClick={handleClick}
           modelOptions={deviceModelOptions}
           statusOptions={DEVICE_ASSET_STATUS_FILTER_OPTIONS}
+          isAssetAllocationEnabled={
+            selectedRows.length > 0
+          }
         />
         <GridContainer>
           <CommonDataGrid
@@ -349,6 +355,9 @@ const DeviceAssetManagement = () => {
             setData={setData}
             paginationMode="server"
             getRowHeight={getRowHeight}
+            checkboxSelection
+            rowSelectionModel={selectedRows}
+            onRowSelectionModelChange = {setSelectedRows}
           />
         </GridContainer>
       </PageContainer>
