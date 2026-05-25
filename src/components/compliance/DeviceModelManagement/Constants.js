@@ -1,30 +1,14 @@
-export const DEVICE_MODEL_ASSET_OPTIONS = [
-  { value: "Truck", label: "Truck" },
-  { value: "Trailer", label: "Trailer" },
+export const DEVICE_MODEL_STATUS_FILTER_OPTIONS = [
+  { value: 1, label: "Active" },
+  { value: 0, label: "Inactive" },
 ];
 
-export const DEVICE_MODEL_ELOG_OPTIONS = [
-  { value: "Yes", label: "Yes" },
-  { value: "No", label: "No" },
+export const ASSET_TYPE_FILTER_OPTIONS = [
+  { value: 1, label: "Truck" },
+  { value: 2, label: "Trailer" },
 ];
 
-export const DEVICE_MODEL_SEED_DATA = [
-  {
-    model: "Geotab GO9",
-    assetType: "Truck",
-    description: "HSPA",
-    eLogs: "Yes",
-    createdOn: "05 05 2026",
-    updatedOn: "05 05 2026",
-    status: "Active",
-  },
-  {
-    model: "Samsara VG34",
-    assetType: "Truck",
-    description: "HSPA",
-    eLogs: "Yes",
-    createdOn: "05 05 2026",
-    updatedOn: "05 05 2026",
-    status: "Active",
-  },
+export const ELOGS_FILTER_OPTIONS = [
+  { value: 1, label: "Yes" },
+  { value: 0, label: "No" },
 ];

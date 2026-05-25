@@ -1,220 +1,79 @@
-import { useCallback, useMemo, useState } from "react";
+import React, { useMemo, useEffect } from "react";
 import CommonDataGrid from "@src/common/CommonDataGrid";
 import { PageContainer } from "@src/common/PageContainer";
-import DeviceModelManagementHeader from "./DeviceModelManagementHeader";
 import CommonLoading from "@src/common/CommonLoading";
-import AddDeviceModelDialog from "./AddDeviceModelDialog";
-import {
-  StatusText,
-  GridContainer,
-  ActionCell,
-} from "./DeviceModelManagement.styled.jsx";
-import {
-  DEVICE_MODEL_SEED_DATA,
-} from "./Constants";
+import CommonDialogForm from "@src/common/CommonDialogForm";
+import CommonSnackbar from "@src/common/CommonSnackbar";
+import DeviceModelManagementHeader from "./DeviceModelManagementHeader";
+import DeviceModelManagementForm from "./DeviceModelManagementForm";
+import { GridContainer } from "./DeviceModelManagement.styled";
+import { HeaderEditButton, HeaderCancelEditButton } from "./DeviceModelManagementButtons";
+import { DEVICE_MODEL_STATUS_FILTER_OPTIONS, ASSET_TYPE_FILTER_OPTIONS } from "./Constants";
+import { getColumns, getRowHeight } from "./DeviceModelManagementTable.utils";
+import useDeviceModelManagement from "@src/hooks/useDeviceModelManagement";
 
-const buildDeviceModelRows = () =>
-  DEVICE_MODEL_SEED_DATA.map((seed, index) => ({
-    ...seed,
-    id: index + 1,
-  }));
+const getDialogTitle = (isEditMode, isEditing) => {
+  if (!isEditMode) return "Add Device Model";
+  return isEditing ? "Edit Device Model" : "View Device Model";
+};
 
-const getOptions = (rows, key) =>
-  Array.from(new Set(rows.map((row) => row[key]).filter(Boolean))).map(
-    (value) => ({
-      value,
-      label: value,
-    }),
-  );
+const getSubmitButtonLabel = (isEditMode, isEditing) => {
+  if (!isEditMode) return "Add Device";
+  return isEditing ? "Update" : "Save";
+};
 
-const getRowHeight = () => "auto";
+const getFormKey = (deviceModelId) => {
+  return deviceModelId || "new";
+};
 
-const getDeviceModelColumns = (onViewDeviceModel) => [
-  {
-    field: "model",
-    headerName: "Model",
-    flex: 1,
-    minWidth: 150,
-  },
-  {
-    field: "assetType",
-    headerName: "Asset Type",
-    flex: 1,
-    minWidth: 150,
-  },
-  {
-    field: "description",
-    headerName: "Description",
-    flex: 1,
-    minWidth: 200,
-  },
-  {
-    field: "eLogs",
-    headerName: "E-Logs",
-    flex: 1,
-    minWidth: 120,
-  },
-  {
-    field: "createdOn",
-    headerName: "Created On",
-    flex: 1,
-    minWidth: 150,
-  },
-  {
-    field: "updatedOn",
-    headerName: "Updated On",
-    flex: 1,
-    minWidth: 150,
-  },
-  {
-    field: "status",
-    headerName: "Status",
-    flex: 1,
-    minWidth: 120,
-    renderCell: (params) => (
-      <StatusText variant="body2" status={params.value}>
-        {params.value}
-      </StatusText>
-    ),
-  },
-  {
-    field: "action",
-    headerName: "Action",
-    flex: 1,
-    minWidth: 100,
-    sortable: false,
-    renderCell: (params) => (
-      <ActionCell row={params.row} onView={onViewDeviceModel} />
-    ),
-  },
-];
+const getHeaderActionsElement = (isEditMode, isEditing, handleEditClick, handleCancelEdit) => {
+  if (!isEditMode) return null;
+  if (!isEditing) return <HeaderEditButton onClick={handleEditClick} />;
+  return <HeaderCancelEditButton onClick={handleCancelEdit} />;
+};
 
 const DeviceModelManagement = () => {
-  const [data, setData] = useState({
-    isLoading: false,
-    rows: [],
-    columns: [],
-    total: 0,
-    page: 1,
-    pageSize: 10,
-    search: "",
-    sortModel: [],
-    fromDate: null,
-    toDate: null,
-    assetType: "",
-    model: "",
-    status: "",
-  });
-  const [isAddDeviceModelOpen, setIsAddDeviceModelOpen] = useState(false);
+  const { setLoading, LoadingContainer } = CommonLoading();
 
-  const [allDeviceModels, setAllDeviceModels] = useState(() => buildDeviceModelRows());
+  const {
+    allRows,
+    modelOptions,
+    isLoading,
+    data,
+    setData,
+    snackbar,
+    isAddModalOpen,
+    formDefaultValues,
+    isEditMode,
+    isEditing,
+    handleSnackbarClose,
+    handleClick,
+    handleViewClick,
+    handleEditClick,
+    handleCancelEdit,
+    handleAddSubmit,
+    handleAddCancel,
+  } = useDeviceModelManagement();
 
-  const handleAddDeviceModel = useCallback(() => {
-    setIsAddDeviceModelOpen(true);
-  }, []);
+  useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading]);
 
-  const handleCloseAddDeviceModel = useCallback(() => {
-    setIsAddDeviceModelOpen(false);
-  }, []);
-
-  const handleCreateDeviceModel = useCallback(
-    (deviceModel) => {
-      const today = new Date().toLocaleDateString('en-US', {
-        month: '2-digit',
-        day: '2-digit',
-        year: 'numeric'
-      }).replace(/\//g, ' ');
-
-      setAllDeviceModels((prev) => {
-        const nextId = Math.max(...prev.map((row) => row.id)) + 1;
-
-        return [
-          {
-            ...deviceModel,
-            id: nextId,
-            model: deviceModel.modelName,
-            createdOn: today,
-            updatedOn: today,
-            status: "Active",
-          },
-          ...prev,
-        ];
-      });
-
-      setData((prev) => ({
-        ...prev,
-        page: 1,
-      }));
-      setIsAddDeviceModelOpen(false);
-    },
-    [],
-  );
-
-  const handleViewDeviceModel = useCallback(
-    (row) => {
-      console.log("View device model:", row);
-    },
-    [],
-  );
-
-  const columns = useMemo(
-    () => getDeviceModelColumns(handleViewDeviceModel),
-    [handleViewDeviceModel],
-  );
-
-  const filteredRows = useMemo(() => {
-    const searchValue = data.search.trim().toLowerCase();
-
-    return allDeviceModels.filter((deviceModel) => {
-      const matchesSearch =
-        !searchValue ||
-        [
-          deviceModel.model,
-          deviceModel.assetType,
-          deviceModel.description,
-          deviceModel.status,
-        ]
-          .join(" ")
-          .toLowerCase()
-          .includes(searchValue);
-
-      return (
-        matchesSearch &&
-        (!data.assetType || deviceModel.assetType === data.assetType) &&
-        (!data.model || deviceModel.model === data.model) &&
-        (!data.status || deviceModel.status === data.status)
-      );
-    });
-  }, [allDeviceModels, data]);
-
-  const paginatedRows = useMemo(() => {
-    const startIndex = (data.page - 1) * data.pageSize;
-    return filteredRows.slice(startIndex, startIndex + data.pageSize);
-  }, [filteredRows, data.page, data.pageSize]);
+  const columns = useMemo(() => getColumns(handleViewClick), [handleViewClick]);
 
   const gridData = {
     ...data,
-    rows: paginatedRows,
+    rows: allRows,
     columns,
-    total: filteredRows.length,
+    total: data.total,
   };
 
-  const assetTypeOptions = useMemo(
-    () => getOptions(allDeviceModels, "assetType"),
-    [allDeviceModels],
-  );
+  const headerActionsElement = getHeaderActionsElement(isEditMode, isEditing, handleEditClick, handleCancelEdit);
 
-  const modelOptions = useMemo(
-    () => getOptions(allDeviceModels, "model"),
-    [allDeviceModels],
-  );
-
-  const statusOptions = useMemo(
-    () => getOptions(allDeviceModels, "status"),
-    [allDeviceModels],
-  );
-
-  const { setLoading, LoadingContainer } = CommonLoading();
+  const dialogMode = isEditMode ? "edit" : "add";
+  const dialogTitle = getDialogTitle(isEditMode, isEditing);
+  const submitButtonLabel = getSubmitButtonLabel(isEditMode, isEditing);
+  const formKey = getFormKey(formDefaultValues.deviceModelId);
 
   return (
     <>
@@ -224,29 +83,52 @@ const DeviceModelManagement = () => {
           data={gridData}
           setData={setData}
           searchKey={0}
-          handleClick={handleAddDeviceModel}
-          assetTypeOptions={assetTypeOptions}
+          summaryCards={[]}
+          handleClick={handleClick}
           modelOptions={modelOptions}
-          statusOptions={statusOptions}
+          statusOptions={DEVICE_MODEL_STATUS_FILTER_OPTIONS}
+          assetTypeOptions={ASSET_TYPE_FILTER_OPTIONS}
         />
-
         <GridContainer>
           <CommonDataGrid
             columnsData={columns}
-            rowData={paginatedRows}
+            rowData={allRows}
             data={gridData}
             setData={setData}
             paginationMode="server"
             getRowHeight={getRowHeight}
           />
         </GridContainer>
-
-        <AddDeviceModelDialog
-          open={isAddDeviceModelOpen}
-          onClose={handleCloseAddDeviceModel}
-          onSubmit={handleCreateDeviceModel}
-        />
       </PageContainer>
+
+      <CommonSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={handleSnackbarClose}
+      />
+
+      <CommonDialogForm
+        open={isAddModalOpen}
+        onCancel={handleAddCancel}
+        mode={dialogMode}
+        title={dialogTitle}
+        formId="addDeviceModelForm"
+        loading={isLoading}
+        isEditing={isEditing}
+        headerActions={headerActionsElement}
+        submitButtonText={submitButtonLabel}
+        content={
+          <DeviceModelManagementForm
+            key={formKey}
+            formId="addDeviceModelForm"
+            defaultValues={formDefaultValues}
+            isEditing={isEditing}
+            isEditMode={isEditMode}
+            onSubmit={handleAddSubmit}
+          />
+        }
+      />
     </>
   );
 };
