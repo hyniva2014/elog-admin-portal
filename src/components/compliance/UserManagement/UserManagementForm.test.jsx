@@ -1,5 +1,3 @@
-// UserManagementForm.test.jsx
-
 import React from "react";
 
 import {
@@ -27,21 +25,14 @@ jest.mock("../../../common/CommonDialogForm", () => (props) => (
     {props.content}
 
     {props.submitButtonText && (
-      <button
-        type="submit"
-        form={props.formId}
-      >
+      <button type="submit" form={props.formId}>
         {props.submitButtonText}
       </button>
     )}
 
-    <button onClick={props.onCancel}>
-      Cancel
-    </button>
+    <button onClick={props.onCancel}>Cancel</button>
 
-    <button onClick={props.onClose}>
-      Close
-    </button>
+    <button onClick={props.onClose}>Close</button>
   </div>
 ));
 
@@ -55,43 +46,31 @@ jest.mock("../../../common/CommonTextField", () => (props) => (
       {...props.register(props.name)}
     />
 
-    {props.helperText && (
-      <span>{props.helperText}</span>
-    )}
+    {props.helperText && <span>{props.helperText}</span>}
   </div>
 ));
 
 // Mock CommonAutocompleteDropdown
-jest.mock(
-  "../../../common/CommonAutocompleteDropdown",
-  () => (props) => (
-    <div>
-      <select
-        data-testid={props.name}
-        value={props.value}
-        disabled={props.disabled}
-        onChange={(e) =>
-          props.onChange(e.target.value)
-        }
-      >
-        <option value="">Select</option>
+jest.mock("../../../common/CommonAutocompleteDropdown", () => (props) => (
+  <div>
+    <select
+      data-testid={props.name}
+      value={props.value}
+      disabled={props.disabled}
+      onChange={(e) => props.onChange(e.target.value)}
+    >
+      <option value="">Select</option>
 
-        {props.options.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-          >
-            {option.label}
-          </option>
-        ))}
-      </select>
+      {props.options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
 
-      {props.helperText && (
-        <span>{props.helperText}</span>
-      )}
-    </div>
-  )
-);
+    {props.helperText && <span>{props.helperText}</span>}
+  </div>
+));
 
 // Mock feature constants
 jest.mock("./Constants", () => ({
@@ -112,10 +91,11 @@ jest.mock("./Constants", () => ({
 
 // Mock styled component
 jest.mock("./UserManagementForm.styled", () => ({
-  FormContainer: ({
-    children,
-    ...props
-  }) => <form {...props}>{children}</form>,
+  FormContainer: ({ children, ...props }) => <form {...props}>{children}</form>,
+
+  EditHeaderButton: ({ children, ...props }) => (
+    <button {...props}>{children}</button>
+  ),
 }));
 
 describe("UserManagementForm Component", () => {
@@ -131,25 +111,19 @@ describe("UserManagementForm Component", () => {
           mode="add"
           onClose={mockOnClose}
           onSubmitForm={mockOnSubmitForm}
-        />
+        />,
       );
     });
 
     expect(
       screen.getByRole("button", {
         name: "Add User",
-      })
+      }),
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByTestId("password")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("password")).toBeInTheDocument();
 
-    expect(
-      screen.getByTestId(
-        "confirmPassword"
-      )
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("confirmPassword")).toBeInTheDocument();
   });
 
   test("renders view mode correctly", async () => {
@@ -160,17 +134,13 @@ describe("UserManagementForm Component", () => {
           mode="view"
           onClose={mockOnClose}
           onSubmitForm={mockOnSubmitForm}
-        />
+        />,
       );
     });
 
-    expect(
-      screen.getByText("View User")
-    ).toBeInTheDocument();
+    expect(screen.getByText("View User")).toBeInTheDocument();
 
-    expect(
-      screen.queryByTestId("password")
-    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId("password")).not.toBeInTheDocument();
   });
 
   test("shows edit button in view mode", async () => {
@@ -181,14 +151,14 @@ describe("UserManagementForm Component", () => {
           mode="view"
           onClose={mockOnClose}
           onSubmitForm={mockOnSubmitForm}
-        />
+        />,
       );
     });
 
     expect(
       screen.getByRole("button", {
         name: "Edit",
-      })
+      }),
     ).toBeInTheDocument();
   });
 
@@ -200,24 +170,22 @@ describe("UserManagementForm Component", () => {
           mode="view"
           onClose={mockOnClose}
           onSubmitForm={mockOnSubmitForm}
-        />
+        />,
       );
     });
 
     fireEvent.click(
       screen.getByRole("button", {
         name: "Edit",
-      })
+      }),
     );
 
-    expect(
-      screen.getByText("Edit User")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Edit User")).toBeInTheDocument();
 
     expect(
       screen.getByRole("button", {
         name: "Update User",
-      })
+      }),
     ).toBeInTheDocument();
   });
 
@@ -237,21 +205,15 @@ describe("UserManagementForm Component", () => {
           }}
           onClose={mockOnClose}
           onSubmitForm={mockOnSubmitForm}
-        />
+        />,
       );
     });
 
-    expect(
-      screen.getByTestId("firstName")
-    ).toHaveValue("John");
+    expect(screen.getByTestId("firstName")).toHaveValue("John");
 
-    expect(
-      screen.getByTestId("lastName")
-    ).toHaveValue("Doe");
+    expect(screen.getByTestId("lastName")).toHaveValue("Doe");
 
-    expect(
-      screen.getByTestId("email")
-    ).toHaveValue("john@test.com");
+    expect(screen.getByTestId("email")).toHaveValue("john@test.com");
   });
 
   test("submits add user form successfully", async () => {
@@ -262,77 +224,52 @@ describe("UserManagementForm Component", () => {
           mode="add"
           onClose={mockOnClose}
           onSubmitForm={mockOnSubmitForm}
-        />
+        />,
       );
     });
 
-    fireEvent.change(
-      screen.getByTestId("company_id"),
-      {
-        target: { value: "1" },
-      }
-    );
+    fireEvent.change(screen.getByTestId("company_id"), {
+      target: { value: "1" },
+    });
 
-    fireEvent.change(
-      screen.getByTestId("role_id"),
-      {
-        target: { value: "1" },
-      }
-    );
+    fireEvent.change(screen.getByTestId("role_id"), {
+      target: { value: "1" },
+    });
 
-    fireEvent.change(
-      screen.getByTestId("firstName"),
-      {
-        target: { value: "John" },
-      }
-    );
+    fireEvent.change(screen.getByTestId("firstName"), {
+      target: { value: "John" },
+    });
 
-    fireEvent.change(
-      screen.getByTestId("lastName"),
-      {
-        target: { value: "Doe" },
-      }
-    );
+    fireEvent.change(screen.getByTestId("lastName"), {
+      target: { value: "Doe" },
+    });
 
-    fireEvent.change(
-      screen.getByTestId("email"),
-      {
-        target: {
-          value: "john@test.com",
-        },
-      }
-    );
+    fireEvent.change(screen.getByTestId("email"), {
+      target: {
+        value: "john@test.com",
+      },
+    });
 
-    fireEvent.change(
-      screen.getByTestId("password"),
-      {
-        target: {
-          value: "Password123",
-        },
-      }
-    );
+    fireEvent.change(screen.getByTestId("password"), {
+      target: {
+        value: "Password123",
+      },
+    });
 
-    fireEvent.change(
-      screen.getByTestId(
-        "confirmPassword"
-      ),
-      {
-        target: {
-          value: "Password123",
-        },
-      }
-    );
+    fireEvent.change(screen.getByTestId("confirmPassword"), {
+      target: {
+        value: "Password123",
+      },
+    });
 
     fireEvent.click(
       screen.getByRole("button", {
         name: "Add User",
-      })
+      }),
     );
 
     await waitFor(() => {
-      expect(
-        mockOnSubmitForm
-      ).toHaveBeenCalled();
+      expect(mockOnSubmitForm).toHaveBeenCalled();
     });
   });
 
@@ -344,34 +281,22 @@ describe("UserManagementForm Component", () => {
           mode="add"
           onClose={mockOnClose}
           onSubmitForm={mockOnSubmitForm}
-        />
+        />,
       );
     });
 
     fireEvent.click(
       screen.getByRole("button", {
         name: "Add User",
-      })
+      }),
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText(
-          "Account is required"
-        )
-      ).toBeInTheDocument();
+      expect(screen.getByText("Account is required")).toBeInTheDocument();
 
-      expect(
-        screen.getByText(
-          "First Name is required"
-        )
-      ).toBeInTheDocument();
+      expect(screen.getByText("First Name is required")).toBeInTheDocument();
 
-      expect(
-        screen.getByText(
-          "Email is required"
-        )
-      ).toBeInTheDocument();
+      expect(screen.getByText("Email is required")).toBeInTheDocument();
     });
   });
 
@@ -383,42 +308,30 @@ describe("UserManagementForm Component", () => {
           mode="add"
           onClose={mockOnClose}
           onSubmitForm={mockOnSubmitForm}
-        />
+        />,
       );
     });
 
-    fireEvent.change(
-      screen.getByTestId("password"),
-      {
-        target: {
-          value: "Password123",
-        },
-      }
-    );
+    fireEvent.change(screen.getByTestId("password"), {
+      target: {
+        value: "Password123",
+      },
+    });
 
-    fireEvent.change(
-      screen.getByTestId(
-        "confirmPassword"
-      ),
-      {
-        target: {
-          value: "WrongPassword",
-        },
-      }
-    );
+    fireEvent.change(screen.getByTestId("confirmPassword"), {
+      target: {
+        value: "WrongPassword",
+      },
+    });
 
     fireEvent.click(
       screen.getByRole("button", {
         name: "Add User",
-      })
+      }),
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText(
-          "Passwords must match"
-        )
-      ).toBeInTheDocument();
+      expect(screen.getByText("Passwords must match")).toBeInTheDocument();
     });
   });
 
@@ -430,14 +343,14 @@ describe("UserManagementForm Component", () => {
           mode="add"
           onClose={mockOnClose}
           onSubmitForm={mockOnSubmitForm}
-        />
+        />,
       );
     });
 
     fireEvent.click(
       screen.getByRole("button", {
         name: "Close",
-      })
+      }),
     );
 
     expect(mockOnClose).toHaveBeenCalled();
@@ -451,14 +364,14 @@ describe("UserManagementForm Component", () => {
           mode="add"
           onClose={mockOnClose}
           onSubmitForm={mockOnSubmitForm}
-        />
+        />,
       );
     });
 
     fireEvent.click(
       screen.getByRole("button", {
         name: "Cancel",
-      })
+      }),
     );
 
     expect(mockOnClose).toHaveBeenCalled();
@@ -472,13 +385,11 @@ describe("UserManagementForm Component", () => {
           mode="view"
           onClose={mockOnClose}
           onSubmitForm={mockOnSubmitForm}
-        />
+        />,
       );
     });
 
-    expect(
-      screen.getByTestId("status_id")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("status_id")).toBeInTheDocument();
   });
 
   test("fields are disabled in readonly mode", async () => {
@@ -489,17 +400,13 @@ describe("UserManagementForm Component", () => {
           mode="view"
           onClose={mockOnClose}
           onSubmitForm={mockOnSubmitForm}
-        />
+        />,
       );
     });
 
-    expect(
-      screen.getByTestId("firstName")
-    ).toBeDisabled();
+    expect(screen.getByTestId("firstName")).toBeDisabled();
 
-    expect(
-      screen.getByTestId("email")
-    ).toBeDisabled();
+    expect(screen.getByTestId("email")).toBeDisabled();
   });
 
   test("fields are enabled after edit button click", async () => {
@@ -510,19 +417,17 @@ describe("UserManagementForm Component", () => {
           mode="view"
           onClose={mockOnClose}
           onSubmitForm={mockOnSubmitForm}
-        />
+        />,
       );
     });
 
     fireEvent.click(
       screen.getByRole("button", {
         name: "Edit",
-      })
+      }),
     );
 
-    expect(
-      screen.getByTestId("firstName")
-    ).not.toBeDisabled();
+    expect(screen.getByTestId("firstName")).not.toBeDisabled();
   });
 
   test("cancel edit restores readonly mode", async () => {
@@ -536,24 +441,22 @@ describe("UserManagementForm Component", () => {
           }}
           onClose={mockOnClose}
           onSubmitForm={mockOnSubmitForm}
-        />
+        />,
       );
     });
 
     fireEvent.click(
       screen.getByRole("button", {
         name: "Edit",
-      })
+      }),
     );
 
     fireEvent.click(
       screen.getByRole("button", {
         name: "Cancel",
-      })
+      }),
     );
 
-    expect(
-      screen.getByText("View User")
-    ).toBeInTheDocument();
+    expect(screen.getByText("View User")).toBeInTheDocument();
   });
 });

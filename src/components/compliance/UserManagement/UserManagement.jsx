@@ -197,31 +197,25 @@ const UserManagement = () => {
       const payload = buildFormData(formValues);
 
       const response = await onboardUser(createApi, payload);
+
       console.log("CREATE RESPONSE =>", response);
 
-      const apiResponse = response;
-      if (Number(apiResponse?.statusCode) === 200) {
-        setSnackbar({
-          open: true,
-          message: apiResponse?.body?.message || "User created successfully",
-          severity: "success",
-        });
+      setSnackbar({
+        open: true,
+        message:
+          response?.body?.message ||
+          response?.message ||
+          "User created successfully",
+        severity: "success",
+      });
 
-        await fetchUsers();
+      await fetchUsers();
 
-        setOpenForm(false);
-      } else {
-        throw new Error(
-          apiResponse?.body?.message ||
-            apiResponse?.message ||
-            "Failed to create user",
-        );
-      }
+      setOpenForm(false);
     } catch (error) {
       setSnackbar({
         open: true,
         message:
-          error?.response?.data?.body?.message ||
           error?.response?.data?.message ||
           error?.message ||
           "Failed to create user",
@@ -231,7 +225,6 @@ const UserManagement = () => {
       setFormLoading(false);
     }
   };
-
   const handleSubmitForm = async (formValues, submitMode = mode) => {
     if (submitMode === "edit" || mode === "view") {
       return handleUpdateUser(formValues);
@@ -245,33 +238,29 @@ const UserManagement = () => {
       setFormLoading(true);
 
       const payload = buildFormData(formValues, true);
+
       payload.append("user_id", String(selectedUser?.user_id || ""));
 
       const response = await onboardUser(createApi, payload);
-      console.log("UPDATE RESPONSE =>", response);
-      const apiResponse = response;
-      if (Number(apiResponse?.statusCode) === 200) {
-        setSnackbar({
-          open: true,
-          message: apiResponse?.body?.message || "User updated successfully",
-          severity: "success",
-        });
 
-        await fetchUsers();
-
-        setOpenForm(false);
-      } else {
-        throw new Error(
-          apiResponse?.body?.message ||
-            apiResponse?.message ||
-            "Failed to update user",
-        );
-      }
-    } catch (error) {
       setSnackbar({
         open: true,
         message:
-          error?.response?.data?.body?.message ||
+          response?.body?.message ||
+          response?.message ||
+          "User updated successfully",
+        severity: "success",
+      });
+
+      await fetchUsers();
+
+      setOpenForm(false);
+    } catch (error) {
+      console.log("UPDATE ERROR =>", error);
+
+      setSnackbar({
+        open: true,
+        message:
           error?.response?.data?.message ||
           error?.message ||
           "Failed to update user",
