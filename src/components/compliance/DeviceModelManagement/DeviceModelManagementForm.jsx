@@ -1,11 +1,12 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Grid } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import MenuItem from "@mui/material/MenuItem";
 import { StyledForm } from "./DeviceModelManagement.styles";
-import CommonTextField from "../../../common/CommonTextField";
+import CommonTextField from "@src/common/CommonTextField";
+import CommonTextFieldStyled from "@src/common/CommonTextField.styles";
 import { ASSET_TYPE_FILTER_OPTIONS, ELOGS_FILTER_OPTIONS, DEVICE_MODEL_STATUS_FILTER_OPTIONS } from "./Constants";
 
 const validationSchema = yup.object({
@@ -43,16 +44,11 @@ const DeviceModelManagementForm = ({
   const {
     control,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: defaultValues || initialValues,
   });
-
-  useEffect(() => {
-    reset(defaultValues || initialValues);
-  }, [defaultValues, reset]);
 
   const submitHandler = (data) => {
     onSubmit(data);
@@ -106,24 +102,22 @@ const DeviceModelManagementForm = ({
             name="assetType"
             control={control}
             render={({ field }) => (
-              <CommonTextField
+              <CommonTextFieldStyled
                 {...field}
-                name="assetType"
-                control={control}
+                size="small"
                 label="Asset Type"
+                select
                 required
                 disabled={isDisabled}
                 error={!!errors.assetType}
                 helperText={errors.assetType?.message}
                 fullWidth
-                select
+                InputLabelProps={{ shrink: Boolean(field.value) || isDisabled }}
               >
                 {ASSET_TYPE_FILTER_OPTIONS.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
+                  <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
                 ))}
-              </CommonTextField>
+              </CommonTextFieldStyled>
             )}
           />
         </Grid>
@@ -133,24 +127,22 @@ const DeviceModelManagementForm = ({
             name="supportsElogs"
             control={control}
             render={({ field }) => (
-              <CommonTextField
+              <CommonTextFieldStyled
                 {...field}
-                name="supportsElogs"
-                control={control}
+                size="small"
                 label="E-Logs"
+                select
                 required
                 disabled={isDisabled}
                 error={!!errors.supportsElogs}
                 helperText={errors.supportsElogs?.message}
                 fullWidth
-                select
+                InputLabelProps={{ shrink: Boolean(field.value !== "") || isDisabled }}
               >
                 {ELOGS_FILTER_OPTIONS.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
+                  <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
                 ))}
-              </CommonTextField>
+              </CommonTextFieldStyled>
             )}
           />
         </Grid>
@@ -161,22 +153,19 @@ const DeviceModelManagementForm = ({
               name="status"
               control={control}
               render={({ field }) => (
-                <CommonTextField
+                <CommonTextFieldStyled
                   {...field}
-                  name="status"
-                  control={control}
+                  size="small"
                   label="Status"
+                  select
                   disabled={isDisabled}
                   fullWidth
-                  size="small"
-                  select
+                  InputLabelProps={{ shrink: Boolean(field.value !== "") || isDisabled }}
                 >
                   {DEVICE_MODEL_STATUS_FILTER_OPTIONS.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
+                    <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
                   ))}
-                </CommonTextField>
+                </CommonTextFieldStyled>
               )}
             />
           </Grid>

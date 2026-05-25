@@ -1,5 +1,6 @@
 import { styled } from "@mui/material/styles";
 import { Box, Button, Typography } from "@mui/material";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 export const HeaderContainer = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
@@ -21,8 +22,13 @@ export const FormBox = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
 }));
 
-export const StyledForm = styled("form")(() => ({
-  paddingTop: 15,
+export const StyledForm = styled("form")(({ theme }) => ({
+  paddingTop: theme.spacing(2),
+}));
+
+export const GridContainer = styled(Box)(() => ({
+  flex: 1,
+  minHeight: 0,
 }));
 
 export const EditButton = styled(Button)(({ theme }) => ({
@@ -51,7 +57,7 @@ export const ELogsTypography = styled(Typography)(({ value, theme }) => ({
   color: value === "Yes" ? theme.palette.success.main : theme.palette.grey[600],
 }));
 
-export const actionIconSx = {
+export const StyledActionIcon = styled(VisibilityOutlinedIcon)(({ theme }) => ({
   fontSize: 20,
-  color: "text.secondary",
-};
+  color: theme.palette.text.secondary,
+}));

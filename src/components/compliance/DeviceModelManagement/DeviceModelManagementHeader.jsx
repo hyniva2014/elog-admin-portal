@@ -1,11 +1,11 @@
 import { Typography } from "@mui/material";
-import CommonPageHeader from "../../../common/CommonPageHeader";
-import CommonFilters from "../../../common/CommonFilters";
+import CommonPageHeader from "@src/common/CommonPageHeader";
+import CommonFilters from "@src/common/CommonFilters";
 import {
   DEVICE_MODEL_STATUS_FILTER_OPTIONS,
   ASSET_TYPE_FILTER_OPTIONS,
 } from "./Constants";
-import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
+import CommonSummaryCardGroup from "@src/common/CommonSummaryCardGroup";
 import { HeaderContainer, AddButton, SummaryCardBox } from "./DeviceModelManagement.styles";
 
 const DeviceModelManagementHeader = (props) => {

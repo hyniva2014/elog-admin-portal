@@ -9,6 +9,10 @@ jest.mock("../../../services/services", () => ({
   useServices: jest.fn(),
 }));
 
+jest.mock("../../../states/useAuthContext", () => ({
+  useAuthContext: jest.fn(() => ({ user: { id: 1 } })),
+}));
+
 jest.mock("../../../helpers/deviceModelHelpers", () => ({
   generateDeviceCode: jest.fn((name) => {
     if (!name || typeof name !== "string") return "DM001";
