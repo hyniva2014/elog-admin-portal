@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import CommonDataGrid from "@src/common/CommonDataGrid";
 import { PageContainer } from "@src/common/PageContainer";
 import CommonLoading from "@src/common/CommonLoading";
@@ -26,7 +26,7 @@ const getSubmitButtonLabel = (isEditMode, isEditing) => {
 };
 
 const DeviceModelManagement = () => {
-  const { LoadingContainer } = CommonLoading();
+  const { setLoading, LoadingContainer } = CommonLoading();
 
   const {
     allRows,
@@ -47,6 +47,10 @@ const DeviceModelManagement = () => {
     handleAddSubmit,
     handleAddCancel,
   } = useDeviceModelManagement();
+
+  useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading]);
 
   const columns = useMemo(() => getColumns(handleViewClick), [handleViewClick]);
 
@@ -75,17 +79,6 @@ const DeviceModelManagement = () => {
   const dialogMode = isEditMode ? "edit" : "add";
   const dialogTitle = getDialogTitle(isEditMode, isEditing);
   const submitButtonLabel = getSubmitButtonLabel(isEditMode, isEditing);
-
-  const dialogContent = (
-    <DeviceModelManagementForm
-      key={formDefaultValues.deviceModelId || "new"}
-      formId="addDeviceModelForm"
-      defaultValues={formDefaultValues}
-      isEditing={isEditing}
-      isEditMode={isEditMode}
-      onSubmit={handleAddSubmit}
-    />
-  );
 
   return (
     <>
@@ -130,7 +123,16 @@ const DeviceModelManagement = () => {
         isEditing={isEditing}
         headerActions={headerActionsElement}
         submitButtonText={submitButtonLabel}
-        content={dialogContent}
+        content={
+          <DeviceModelManagementForm
+            key={formDefaultValues.deviceModelId || "new"}
+            formId="addDeviceModelForm"
+            defaultValues={formDefaultValues}
+            isEditing={isEditing}
+            isEditMode={isEditMode}
+            onSubmit={handleAddSubmit}
+          />
+        }
       />
     </>
   );

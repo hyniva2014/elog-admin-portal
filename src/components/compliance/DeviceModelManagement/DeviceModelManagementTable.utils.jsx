@@ -1,7 +1,6 @@
 import dayjs from "dayjs";
 import { StatusTypography, ELogsTypography } from "./DeviceModelManagement.styled";
 import DeviceModelManagementActionButton from "./DeviceModelManagementActionButton";
-import { getAssetTypeLabel, getStatusLabel, transformDeviceModelData } from "@src/helpers/deviceModelHelpers";
 
 export const formatDate = (value) =>
   value ? dayjs(value).format("MMM DD, YYYY") : "-";
@@ -106,5 +105,3 @@ export const getColumns = (onView) => [
     renderCell: ActionCell(onView),
   },
 ];
-
-export { getAssetTypeLabel, getStatusLabel, transformDeviceModelData };

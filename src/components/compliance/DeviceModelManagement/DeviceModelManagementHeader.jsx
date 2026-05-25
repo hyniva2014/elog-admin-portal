@@ -1,12 +1,7 @@
-import { Typography } from "@mui/material";
 import CommonPageHeader from "@src/common/CommonPageHeader";
 import CommonFilters from "@src/common/CommonFilters";
-import {
-  DEVICE_MODEL_STATUS_FILTER_OPTIONS,
-  ASSET_TYPE_FILTER_OPTIONS,
-} from "./Constants";
 import CommonSummaryCardGroup from "@src/common/CommonSummaryCardGroup";
-import { HeaderContainer, AddButton, SummaryCardBox } from "./DeviceModelManagement.styled";
+import { HeaderContainer, AddButton, SummaryCardBox, SubtitleTypography } from "./DeviceModelManagement.styled";
 
 const DeviceModelManagementHeader = (props) => {
   const {
@@ -20,19 +15,10 @@ const DeviceModelManagementHeader = (props) => {
     assetTypeOptions = [],
   } = props;
 
-  const resolvedStatusOptions =
-    statusOptions.length > 0 ? statusOptions : DEVICE_MODEL_STATUS_FILTER_OPTIONS;
-
-  const resolvedAssetTypeOptions =
-    assetTypeOptions.length > 0 ? assetTypeOptions : ASSET_TYPE_FILTER_OPTIONS;
-
-  const resolvedModelOptions =
-    modelOptions.length > 0 ? modelOptions : [];
-
   const filters = [
-    { label: "Asset Type", dataKey: "assetType", options: resolvedAssetTypeOptions },
-    { label: "All Model", dataKey: "model", options: resolvedModelOptions },
-    { label: "All Status", dataKey: "status", options: resolvedStatusOptions },
+    { label: "Asset Type", dataKey: "assetType", options: assetTypeOptions },
+    { label: "All Model", dataKey: "model", options: modelOptions },
+    { label: "All Status", dataKey: "status", options: statusOptions },
   ];
 
   return (
@@ -47,9 +33,9 @@ const DeviceModelManagementHeader = (props) => {
           </AddButton>
         }
       />
-      <Typography variant="h6" fontWeight="300">
+      <SubtitleTypography variant="h6">
         Manage device models and specifications
-      </Typography>
+      </SubtitleTypography>
       <SummaryCardBox>
         <CommonSummaryCardGroup cards={summaryCards} />
       </SummaryCardBox>

@@ -2,8 +2,8 @@ import {
   formatDate,
   getRowHeight,
   getColumns,
-  transformDeviceModelData,
 } from "./DeviceModelManagementTable.utils";
+import { transformDeviceModelData } from "@src/helpers/deviceModelHelpers";
 
 describe("DeviceModelManagementTable.utils", () => {
   describe("formatDate", () => {

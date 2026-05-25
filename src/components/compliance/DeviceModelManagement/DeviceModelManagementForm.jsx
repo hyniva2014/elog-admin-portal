@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Grid } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -56,11 +56,16 @@ const DeviceModelManagementForm = ({
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: defaultValues || initialValues,
   });
+
+  useEffect(() => {
+    reset(defaultValues || initialValues);
+  }, [defaultValues, reset]);
 
   const renderModelNameField = useCallback(
     ({ field }) => (
@@ -108,7 +113,7 @@ const DeviceModelManagementForm = ({
         error={!!errors.assetType}
         helperText={errors.assetType?.message}
         fullWidth
-        InputLabelProps={{ shrink: Boolean(field.value) || isDisabled }}
+        InputLabelProps={{ shrink: (field.value !== "" && field.value != null) || isDisabled }}
       >
         {assetTypeOptions}
       </CommonTextFieldStyled>

@@ -18,4 +18,6 @@ const DeviceModelManagementActionButton = React.memo(
   },
 );
 
+DeviceModelManagementActionButton.displayName = "DeviceModelManagementActionButton";
+
 export default DeviceModelManagementActionButton;
