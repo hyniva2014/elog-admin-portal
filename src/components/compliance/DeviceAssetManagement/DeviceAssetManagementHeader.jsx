@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import CommonPageHeader from "../../../common/CommonPageHeader";
 import CommonFilters from "../../../common/CommonFilters";
 import {
@@ -18,8 +18,11 @@ const DeviceAssetManagementHeader = (props) => {
     mode,
     setMode,
     handleClick,
+    handleAsset,
+    handleAddAsset,
     modelOptions = [],
     statusOptions = [],
+    isAssetAllocationEnabled,
   } = props;
 
   const resolvedModelOptions =
@@ -40,9 +43,21 @@ const DeviceAssetManagementHeader = (props) => {
         handleClick={handleClick}
         addButton={true}
         rightContent={
-          <AddButton variant="contained" onClick={handleClick}>
-            Add Asset
-          </AddButton>
+          <Box display="flex" gap={2}>
+            <AddButton
+              variant="contained"
+              onClick={handleAsset}
+              disabled={!isAssetAllocationEnabled}
+            >
+              Asset Allocation
+            </AddButton>
+            <AddButton variant="contained" onClick={handleAddAsset}>
+              Add Bulk Asset
+            </AddButton>
+            <AddButton variant="contained" onClick={handleClick}>
+              Add Asset
+            </AddButton>
+          </Box>
         }
       />
       <Typography variant="h6" fontWeight="300">
