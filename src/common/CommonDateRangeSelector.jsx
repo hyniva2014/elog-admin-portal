@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   Box,
   Button,
@@ -7,6 +7,7 @@ import {
   Stack,
   TextField,
   Typography,
+  useTheme,
 } from "@mui/material";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { StaticDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -14,6 +15,15 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import CloseIcon from "@mui/icons-material/Close";
 import { formatDateRange } from "./Commonutils";
+import {
+  CloseIconSx,
+  CalendarIconSx,
+  CalendarIconHideBorderSx,
+  TextFieldSx,
+  StackSx,
+  StaticDatePickerSx,
+  ErrorTypographySx,
+} from "./CommonDateRangeSelector.styled";
 
 const DATE_FORMAT = "MM-DD-YYYY";
 const PRESET_DAYS = [7, 14, 30];
@@ -35,6 +45,7 @@ const detectPreset = (start, end) => {
 };
 
 const CommonDateRangeSelector = (props) => {
+  const theme = useTheme();
   const {
     value,
     onChange,
@@ -56,6 +67,8 @@ const CommonDateRangeSelector = (props) => {
     const end = dayjs().endOf("day");
     setActivePreset("today");
     setTempDateRange({ start, end });
+    onChange({ start, end });
+    closePopover();
     return {
       start: start.format(DATE_FORMAT),
     };
@@ -72,12 +85,21 @@ const CommonDateRangeSelector = (props) => {
 
     setActivePreset(days);
     setTempDateRange({ start, end });
+    onChange({ start, end });
+    closePopover();
 
     return {
       start: start.format(DATE_FORMAT),
       end: end.format(DATE_FORMAT),
     };
   };
+
+  const handlePresetButtonClick = useCallback(
+    (days) => () => {
+      handlePresetClick(days);
+    },
+    [handlePresetClick],
+  );
 
   const openPopover = (event) => {
     setAnchorEl(event.currentTarget);
@@ -118,6 +140,42 @@ const CommonDateRangeSelector = (props) => {
     setShowInlineError(false);
   };
 
+  const renderPresetButtons = () => PRESET_DAYS.map((days) => (
+    <Button
+      key={days}
+      variant={activePreset === days ? "contained" : "filled"}
+      onClick={handlePresetButtonClick(days)}
+    >
+      Last {days} days
+    </Button>
+  ));
+
+  const getDaySx = (day) => {
+    const start = tempDateRange?.start;
+    const end = tempDateRange?.end;
+    const isEnd = end && day.isSame(end, "day");
+    const inRange =
+      start &&
+      end &&
+      day.isAfter(start, "day") &&
+      day.isBefore(end, "day");
+
+    const sx = {};
+
+    if (inRange) {
+      sx.backgroundColor = `${theme.palette.info.light} !important`;
+      sx["&:hover"] = { backgroundColor: `${theme.palette.info.light} !important` };
+    }
+
+    if (isEnd) {
+      sx.backgroundColor = `${theme.palette.brand.main} !important`;
+      sx.color = theme.palette.brand.contrastText;
+      sx["&:hover"] = { backgroundColor: `${theme.palette.brand.main} !important` };
+    }
+
+    return sx;
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box>
@@ -133,52 +191,24 @@ const CommonDateRangeSelector = (props) => {
               <Box display="flex" alignItems="center">
                 {allowClear && value?.start && (
                   <IconButton size="small" onClick={handleClear}>
-                    <CloseIcon sx={{ fontSize: 18 }} />
+                    <CloseIcon sx={CloseIconSx} />
                   </IconButton>
                 )}
 
                 <IconButton size="small" onClick={openPopover}>
                   <CalendarMonthIcon
                     sx={{
-                      fontSize: 22,
-                      ...(hideBorder && {
-                        color: "#2563EB",
-                      }),
+                      ...CalendarIconSx,
+                      ...(hideBorder && CalendarIconHideBorderSx(theme)),
                     }}
                   />
                 </IconButton>
               </Box>
             ),
-            disableUnderline: true,
           }}
           onClick={openPopover}
           variant={hideBorder ? "standard" : "outlined"}
-          sx={{
-            minWidth: 270,
-            "& .MuiInput-underline:before": {
-              borderBottom: "none",
-            },
-            "& .MuiInput-underline:hover:before": {
-              borderBottom: "none",
-            },
-            "& .MuiInput-underline:after": {
-              borderBottom: "none",
-            },
-            "& .MuiInputBase-root": {
-              height: 36,
-              display: "flex",
-              alignItems: "center",
-            },
-
-            "& .MuiInputBase-input": {
-              fontSize: 13,
-              fontWeight: 500,
-              cursor: "pointer",
-              paddingLeft: "8px",
-              paddingTop: "5px",
-              textAlign: "center",
-            },
-          }}
+          sx={TextFieldSx}
         />
 
         <Popover
@@ -198,7 +228,7 @@ const CommonDateRangeSelector = (props) => {
         >
           <Box p={2} display="flex" gap={2}>
             {!hideButtons && (
-              <Stack spacing={1} sx={{ minWidth: 140 }}>
+              <Stack spacing={1} sx={StackSx}>
                 <Button
                   variant={activePreset === "today" ? "contained" : "filled"}
                   onClick={handleToday}
@@ -206,15 +236,7 @@ const CommonDateRangeSelector = (props) => {
                   Today
                 </Button>
 
-                {PRESET_DAYS.map((days) => (
-                  <Button
-                    key={days}
-                    variant={activePreset === days ? "contained" : "filled"}
-                    onClick={() => handlePresetClick(days)}
-                  >
-                    Last {days} days
-                  </Button>
-                ))}
+                {renderPresetButtons()}
                 <Button
                   variant={activePreset === "custom" ? "contained" : "filled"}
                   onClick={handleCustomSelection}
@@ -283,36 +305,11 @@ const CommonDateRangeSelector = (props) => {
                 maxDate={today}
                 slotProps={{
                   actionBar: { actions: [] },
-                  day: ({ day }) => {
-                    const start = tempDateRange?.start;
-                    const end = tempDateRange?.end;
-                    const isEnd = end && day.isSame(end, "day");
-                    const inRange =
-                      start &&
-                      end &&
-                      day.isAfter(start, "day") &&
-                      day.isBefore(end, "day");
-
-                    return {
-                      sx: {
-                        ...(inRange && {
-                          backgroundColor: "lightblue !important",
-                          "&:hover": {
-                            backgroundColor: "lightblue !important",
-                          },
-                        }),
-                        ...(isEnd && {
-                          backgroundColor: "rgb(40,62,138) !important",
-                          color: "white",
-                          "&:hover": {
-                            backgroundColor: "rgb(40,62,138) !important",
-                          },
-                        }),
-                      },
-                    };
-                  },
+                  day: ({ day }) => ({
+                    sx: getDaySx(day),
+                  }),
                 }}
-                sx={{ flex: 1 }}
+                sx={StaticDatePickerSx}
               />
               <Box
                 display="flex"
@@ -323,13 +320,7 @@ const CommonDateRangeSelector = (props) => {
               >
                 <Box>
                   {showInlineError && (
-                    <Typography
-                      sx={{
-                        fontSize: 14,
-                        fontWeight: 500,
-                        color: "#d32f2f",
-                      }}
-                    >
+                    <Typography sx={ErrorTypographySx(theme)}>
                       Please select custom date range
                     </Typography>
                   )}
