@@ -26,6 +26,12 @@ const getFormKey = (deviceModelId) => {
   return deviceModelId || "new";
 };
 
+const getHeaderActionsElement = (isEditMode, isEditing, handleEditClick, handleCancelEdit) => {
+  if (!isEditMode) return null;
+  if (!isEditing) return <HeaderEditButton onClick={handleEditClick} />;
+  return <HeaderCancelEditButton onClick={handleCancelEdit} />;
+};
+
 const DeviceModelManagement = () => {
   const { setLoading, LoadingContainer } = CommonLoading();
 
@@ -62,12 +68,7 @@ const DeviceModelManagement = () => {
     total: data.total,
   };
 
-  let headerActionsElement = null;
-  if (isEditMode && !isEditing) {
-    headerActionsElement = <HeaderEditButton onClick={handleEditClick} />;
-  } else if (isEditMode && isEditing) {
-    headerActionsElement = <HeaderCancelEditButton onClick={handleCancelEdit} />;
-  }
+  const headerActionsElement = getHeaderActionsElement(isEditMode, isEditing, handleEditClick, handleCancelEdit);
 
   const dialogMode = isEditMode ? "edit" : "add";
   const dialogTitle = getDialogTitle(isEditMode, isEditing);
