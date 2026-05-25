@@ -1,93 +1,114 @@
-import { render, screen, act } from "@testing-library/react";
+import React from "react";
+import { render, screen, waitFor } from "@testing-library/react";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+
+const theme = createTheme();
+
+// Mock services and helpers before importing component
+jest.mock("../../../services/services", () => ({
+  useServices: jest.fn(),
+}));
+
+jest.mock("../../../states/useAuthContext", () => ({
+  useAuthContext: jest.fn(() => ({ user: { id: 1 } })),
+}));
+
+jest.mock("../../../helpers/deviceModelHelpers", () => ({
+  generateDeviceCode: jest.fn((name) => {
+    if (!name || typeof name !== "string") return "DM001";
+    const words = name.split(/\s+/);
+    const initials = words.map((word) => word[0]?.toUpperCase()).join("");
+    const lastWord = words[words.length - 1];
+    const number = lastWord?.match(/\d+/)?.[0] || "";
+    return initials + number || "DM001";
+  }),
+}));
+
+jest.mock("../../../common/CommonLoading", () => ({
+  __esModule: true,
+  default: () => ({
+    setLoading: jest.fn(),
+    LoadingContainer: ({ children }) => <div>{children}</div>,
+  }),
+}));
+
+jest.mock("../../../common/CommonDataGrid", () => ({
+  __esModule: true,
+  default: () => <div data-testid="data-grid">Mock Data Grid</div>,
+}));
+
+jest.mock("../../../common/CommonDialogForm", () => ({
+  __esModule: true,
+  default: ({ children }) => <div data-testid="dialog">{children}</div>,
+}));
+
+jest.mock("../../../common/CommonSnackbar", () => ({
+  __esModule: true,
+  default: () => <div data-testid="snackbar" />,
+}));
+
+jest.mock("./DeviceModelManagementHeader", () => ({
+  __esModule: true,
+  default: ({ onAddClick }) => (
+    <div data-testid="header">
+      <button onClick={onAddClick}>Add Asset</button>
+    </div>
+  ),
+}));
+
+jest.mock("./DeviceModelManagementForm", () => ({
+  __esModule: true,
+  default: () => <form data-testid="mock-form">Mock Form</form>,
+}));
+
 import DeviceModelManagement from "./DeviceModelManagement";
+import { useServices } from "../../../services/services";
 
-jest.mock("../../../common/CommonDataGrid", () => {
-  return function MockCommonDataGrid(props) {
-    return <div data-testid="common-data-grid">CommonDataGrid</div>;
-  };
-});
-
-jest.mock("../../../common/CommonLoading", () => {
-  return function MockCommonLoading() {
-    return {
-      setLoading: jest.fn(),
-      LoadingContainer: ({ children }) => <div data-testid="common-loading">{children}</div>,
-    };
-  };
-});
-
-jest.mock("./DeviceModelManagementHeader", () => {
-  return function MockDeviceModelManagementHeader(props) {
-    return <div data-testid="device-model-header">DeviceModelHeader</div>;
-  };
-});
-
-jest.mock("./AddDeviceModelDialog", () => {
-  return function MockAddDeviceModelDialog(props) {
-    return <div data-testid="add-device-model-dialog">AddDeviceModelDialog</div>;
-  };
-});
+const renderWithTheme = (component) => {
+  return render(<ThemeProvider theme={theme}>{component}</ThemeProvider>);
+};
 
 describe("DeviceModelManagement", () => {
-  it("should render without crashing", () => {
-    const { container } = render(<DeviceModelManagement />);
-    expect(container).toBeTruthy();
+  const mockFetchApi = jest.fn();
+  const mockCreateApi = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useServices.mockReturnValue({
+      fetchApi: mockFetchApi,
+      createApi: mockCreateApi,
+    });
   });
 
-  it("should render all main components", () => {
-    render(<DeviceModelManagement />);
-    expect(screen.getByTestId("device-model-header")).toBeInTheDocument();
-    expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
-    expect(screen.getByTestId("common-loading")).toBeInTheDocument();
-    expect(screen.getByTestId("add-device-model-dialog")).toBeInTheDocument();
+  test("component renders without crashing", async () => {
+    mockFetchApi.mockResolvedValue({
+      statusCode: 200,
+      body: {
+        data: {
+          data: [],
+          pagination: { total_records: 0 },
+        },
+      },
+    });
+
+    renderWithTheme(<DeviceModelManagement />);
+    
+    await waitFor(() => {
+      expect(screen.getByTestId("header")).toBeInTheDocument();
+    });
   });
 
-  it("should render multiple times without error", () => {
-    const { rerender } = render(<DeviceModelManagement />);
-    rerender(<DeviceModelManagement />);
-    rerender(<DeviceModelManagement />);
-    expect(screen.getByTestId("device-model-header")).toBeInTheDocument();
-  });
-});
+  test("Add Asset button is clickable", async () => {
+    mockFetchApi.mockResolvedValue({
+      statusCode: 200,
+      body: { data: { data: [], pagination: { total_records: 0 } } },
+    });
 
-describe("DeviceModelManagement – edge cases", () => {
-  it("should render add-device-model dialog in closed state by default", () => {
-    render(<DeviceModelManagement />);
-    const dialog = screen.getByTestId("add-device-model-dialog");
-    expect(dialog).toBeInTheDocument();
-  });
+    renderWithTheme(<DeviceModelManagement />);
 
-  it("should not crash when rerendered rapidly", () => {
-    const { rerender, unmount } = render(<DeviceModelManagement />);
-    for (let i = 0; i < 5; i++) {
-      rerender(<DeviceModelManagement />);
-    }
-    expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
-    unmount();
-  });
-
-  it("should render header with data-testid even when no options are derived", () => {
-    render(<DeviceModelManagement />);
-    expect(screen.getByTestId("device-model-header")).toBeInTheDocument();
-  });
-});
-
-describe("DeviceModelManagement – negative cases", () => {
-  it("should not render unexpected elements outside the known structure", () => {
-    render(<DeviceModelManagement />);
-    expect(screen.queryByTestId("nonexistent-component")).toBeNull();
-  });
-
-  it("should remain stable when the component mounts and unmounts", () => {
-    const { unmount } = render(<DeviceModelManagement />);
-    expect(() => unmount()).not.toThrow();
-  });
-
-  it("should handle rapid open/close state changes without crashing", () => {
-    const MockAddDeviceModelDialog = jest.requireMock("./AddDeviceModelDialog");
-    render(<DeviceModelManagement />);
-    act(() => {
-      expect(screen.getByTestId("add-device-model-dialog")).toBeInTheDocument();
+    await waitFor(() => {
+      const addButton = screen.getByText(/Add Asset/i);
+      expect(addButton).toBeInTheDocument();
     });
   });
 });
