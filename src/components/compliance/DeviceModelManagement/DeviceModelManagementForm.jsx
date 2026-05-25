@@ -11,6 +11,7 @@ import { ASSET_TYPE_FILTER_OPTIONS, ELOGS_FILTER_OPTIONS, DEVICE_MODEL_STATUS_FI
 
 const validationSchema = yup.object({
   modelName: yup.string().required("Model Name is required"),
+  deviceCode: yup.string().required("Model Code is required"),
   description: yup.string().required("Description is required"),
   assetType: yup
     .number()
@@ -84,6 +85,22 @@ const DeviceModelManagementForm = ({
       />
     ),
     [isDisabled, errors.modelName],
+  );
+
+  const renderModelCodeField = useCallback(
+    ({ field }) => (
+      <CommonTextField
+        {...field}
+        label="Model Code"
+        required
+        disabled={isDisabled}
+        error={!!errors.deviceCode}
+        helperText={errors.deviceCode?.message}
+        fullWidth
+        size="small"
+      />
+    ),
+    [isDisabled, errors.deviceCode],
   );
 
   const renderDescriptionField = useCallback(
@@ -169,6 +186,14 @@ const DeviceModelManagementForm = ({
             name="modelName"
             control={control}
             render={renderModelNameField}
+          />
+        </Grid>
+
+        <Grid item xs={12}>
+          <Controller
+            name="deviceCode"
+            control={control}
+            render={renderModelCodeField}
           />
         </Grid>
 
