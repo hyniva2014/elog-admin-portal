@@ -46,8 +46,9 @@ const getTodayRange = () => {
 
 const AdminDashboard = () => {
   const [selectedRange, setSelectedRange] = useState(getTodayRange());
-  const { dashboardMetrics } = useDashboardMetrics(selectedRange);
-  const { loading, setLoading, LoadingContainer } = CommonLoading();
+  const { setLoading, LoadingContainer } = CommonLoading();
+
+  const { dashboardMetrics } = useDashboardMetrics(selectedRange, setLoading);
 
   const handleDateChange = (data) => {
     setSelectedRange(data);

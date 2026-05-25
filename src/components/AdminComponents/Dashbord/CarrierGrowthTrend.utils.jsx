@@ -2,9 +2,10 @@
 
 export const CURRENT_YEAR = new Date().getFullYear().toString();
 
-export const AVAILABLE_YEARS = Array.from({ length: 5 }, (_, index) =>
-  String(CURRENT_YEAR - index),
-);
+export const AVAILABLE_YEARS = [
+  "Last 6 months",
+  ...Array.from({ length: 5 }, (_, index) => String(CURRENT_YEAR - index)),
+];
 
 export const CHART_TITLE = "Carrier Growth Trend";
 export const DATA_KEY = "value";
@@ -75,34 +76,56 @@ export const getLast6MonthsKeys = () => {
 };
 
 export const getVisibleTrendData = (trendEntries, selectedYear) => {
-  const yearEntries = trendEntries.filter(
-    (entry) => entry.year === selectedYear,
-  );
+  if (selectedYear === "Last 6 months") {
+    const today = new Date();
 
-  if (selectedYear !== CURRENT_YEAR) {
-    return yearEntries;
+    return Array.from({ length: 6 }, (_, index) => {
+      const date = new Date(
+        today.getFullYear(),
+        today.getMonth() - (5 - index),
+        1,
+      );
+
+      const monthKey = `${date.getFullYear()}-${String(
+        date.getMonth() + 1,
+      ).padStart(2, "0")}`;
+
+      return (
+        trendEntries.find((item) => item.monthKey === monthKey) || {
+          monthKey,
+          year: String(date.getFullYear()),
+          monthName: MONTH_NAMES[date.getMonth()],
+          value: 0,
+          Total: 0,
+          newAddition: 0,
+          loss: 0,
+        }
+      );
+    });
   }
 
-  const last6Months = getLast6MonthsKeys();
+  return MONTH_NAMES.map((monthName, index) => {
+    const monthKey = `${selectedYear}-${String(index + 1).padStart(2, "0")}`;
 
-  return yearEntries.filter((entry) => last6Months.has(entry.monthKey));
+    return (
+      trendEntries.find((item) => item.monthKey === monthKey) || {
+        monthKey,
+        year: selectedYear,
+        monthName,
+        value: 0,
+        Total: 0,
+        newAddition: 0,
+        loss: 0,
+      }
+    );
+  });
 };
 
 export const formatSubtitle = (trendEntries, selectedYear) => {
   if (!trendEntries.length) return "";
 
-  const range = getVisibleTrendData(trendEntries, selectedYear);
+  const first = trendEntries[0];
+  const last = trendEntries[trendEntries.length - 1];
 
-  if (!range.length) return "";
-
-  if (selectedYear === CURRENT_YEAR) {
-    const first = range[0];
-    const last = range[range.length - 1];
-
-    return `${first.monthName}.${first.year.slice(
-      2,
-    )} - ${last.monthName}.${last.year.slice(2)}`;
-  }
-
-  return `Jan.${selectedYear.slice(2)} - Dec.${selectedYear.slice(2)}`;
+  return `${first.monthName}.${first.year} - ${last.monthName}.${last.year}`;
 };
