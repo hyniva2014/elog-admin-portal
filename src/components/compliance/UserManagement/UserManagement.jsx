@@ -3,19 +3,16 @@ import CommonDataGrid from "@src/common/CommonDataGrid";
 import UserManagementHeader from "./UserManagementHeader";
 import { PageContainer } from "../../../common/PageContainer";
 import CommonLoading from "../../../common/CommonLoading";
-import {
-  UserManagementColumnData,
-  mapUserToRow,
-} from "../../../common/CommonRowColumnUtils";
+import { UserManagementColumnData, mapUserToRow } from "./CommonRowColumnUtils";
 import UserManagementForm from "./UserManagementForm";
-import { USER_SUMMARY_CARDS } from "../../../common/Constants";
+import { USER_SUMMARY_CARDS } from "./Constants";
 import { buildSummaryCards } from "../../../common/CommonUtils";
 import { useServices } from "../../../services/services";
 import CommonSnackbar from "../../../common/CommonSnackbar";
 import dayjs from "dayjs";
+import { getUsers, getUserDetails, onboardUser } from "./userManagementService";
 
-const USER_ONBOARD_ENDPOINT = "/masteradmin/onboard-admin";
-const USER_LIST_ENDPOINT = "/masteradmin/get-admin-users";
+// API endpoints moved to src/services/userManagementService.js
 
 /** Format ISO date string to DD-MM-YYYY */
 const formatDate = (iso) => (iso ? dayjs(iso).format("DD-MM-YYYY") : "-");
@@ -60,20 +57,25 @@ const UserManagement = () => {
 
   const { fetchApi, createApi } = useServices();
 
+  const handleSnackbarClose = useCallback(() => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  }, []);
+
   const fetchUsers = useCallback(async () => {
     setData((prev) => ({ ...prev, isLoading: true }));
     try {
-      const endpoint =
-        `${USER_LIST_ENDPOINT}?page=${page}` +
-        `&limit=${pageSize}` +
-        `&company_id=${company_id || ""}` +
-        `&from_date=${from_date || ""}` +
-        `&to_date=${to_date || ""}` +
-        `&role_id=${role_id || ""}` +
-        `&status_id=${status_id || ""}` +
-        `&search=${encodeURIComponent(search || "")}`;
+      const params = {
+        page,
+        limit: pageSize,
+        company_id: company_id || "",
+        from_date: from_date || "",
+        to_date: to_date || "",
+        role_id: role_id || "",
+        status_id: status_id || "",
+        search: search || "",
+      };
 
-      const response = await fetchApi(endpoint);
+      const response = await getUsers(fetchApi, params);
 
       const users = response?.body?.data ?? [];
       const pagination = response?.body?.pagination ?? {};
@@ -86,7 +88,15 @@ const UserManagement = () => {
       }));
 
       // Update summary cards with live counts from the API
-      setSummaryCards(buildSummaryCards(response?.body, USER_SUMMARY_CARDS));
+      const built = buildSummaryCards(response?.body, USER_SUMMARY_CARDS).map(
+        (c) => ({
+          ...c,
+          icon: c.iconPath ? (
+            <img src={c.iconPath} alt={c.title} width={36} height={36} />
+          ) : null,
+        }),
+      );
+      setSummaryCards(built);
     } catch {
       setData((prev) => ({ ...prev, isLoading: false }));
       setSnackbar({
@@ -115,9 +125,7 @@ const UserManagement = () => {
       try {
         setFormLoading(true);
 
-        const response = await fetchApi(
-          `${USER_GET_USER_ENDPOINT}?user_id=${row.user_id}`,
-        );
+        const response = await getUserDetails(fetchApi, row.user_id);
 
         let user = response?.body?.data;
 
@@ -190,7 +198,7 @@ const UserManagement = () => {
 
       const payload = buildFormData(formValues);
 
-      const response = await createApi(payload, USER_ONBOARD_ENDPOINT);
+      const response = await onboardUser(createApi, payload);
       console.log("CREATE RESPONSE =>", response);
 
       const apiResponse = response;
@@ -226,8 +234,6 @@ const UserManagement = () => {
     }
   };
 
-  const USER_GET_USER_ENDPOINT = "/masteradmin/get-admin-users";
-
   const handleSubmitForm = async (formValues, submitMode = mode) => {
     if (submitMode === "edit" || mode === "view") {
       return handleUpdateUser(formValues);
@@ -243,7 +249,7 @@ const UserManagement = () => {
       const payload = buildFormData(formValues, true);
       payload.append("user_id", String(selectedUser?.user_id || ""));
 
-      const response = await createApi(payload, USER_ONBOARD_ENDPOINT);
+      const response = await onboardUser(createApi, payload);
       console.log("UPDATE RESPONSE =>", response);
       const apiResponse = response;
       if (Number(apiResponse?.statusCode) === 200) {
@@ -314,7 +320,7 @@ const UserManagement = () => {
         message={snackbar.message}
         severity={snackbar.severity}
         autoHideDuration={3000}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+        onClose={handleSnackbarClose}
       />
     </>
   );

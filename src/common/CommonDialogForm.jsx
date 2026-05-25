@@ -45,7 +45,7 @@ const CommonDialogForm = ({
         sx: {
           borderRadius: 3,
           width: "100%",
-          color: "#FFFFFF",
+          color: "common.white",
           position: "relative",
         },
       }}
@@ -66,19 +66,19 @@ const CommonDialogForm = ({
             borderRadius: 3,
           }}
         >
-          <CircularProgress size={40} sx={{ color: "#284495" }} />
+          <CircularProgress size={40} sx={{ color: "primary.main" }} />
         </Box>
       )}
       <DialogTitle
         sx={{
-          backgroundColor: "#F3F8FF",
+          backgroundColor: "brand.lighter",
         }}
       >
         <Typography
           variant="inherit"
           fontSize={20}
           fontWeight={500}
-          color="#2C2D33"
+          color="text.primary"
         >
           {title || (isEdit ? "Edit Item" : "Add Item")}
         </Typography>
@@ -97,7 +97,7 @@ const CommonDialogForm = ({
           <IconButton
             onClick={loading ? undefined : handleClose}
             sx={{
-              color: "#343741",
+              color: "text.primary",
             }}
           >
             <CloseIcon />
@@ -131,11 +131,11 @@ const CommonDialogForm = ({
               sx={{
                 fontSize: 16,
                 fontWeight: 400,
-                color: "#284495",
+                color: "primary.main",
                 border: 1,
                 borderRadius: 2,
-                borderColor: "#284495",
-                backgroundColor: "#FFFFFF",
+                borderColor: "primary.main",
+                backgroundColor: "common.white",
               }}
             >
               Cancel
@@ -151,11 +151,11 @@ const CommonDialogForm = ({
               sx={{
                 fontSize: 16,
                 fontWeight: 400,
-                color: "#FFFFFF",
-                backgroundColor: "#284495",
+                color: "common.white",
+                backgroundColor: "primary.main",
                 border: 1,
                 borderRadius: 2,
-                borderColor: "#284495",
+                borderColor: "primary.main",
               }}
             >
               {submitButtonText

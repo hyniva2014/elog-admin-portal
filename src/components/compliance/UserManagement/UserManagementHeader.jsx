@@ -1,8 +1,12 @@
 import CommonFilters from "../../../common/CommonFilters";
 import CommonPageHeader from "../../../common/CommonPageHeader";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
-import { AddUserButton, HeaderContainer, SummaryCardWrapper } from "./UserManagementHeader.styled";
-import { USER_MANAGEMENT_FILTERS } from "../../../common/Constants";
+import {
+  AddUserButton,
+  HeaderContainer,
+  SummaryCardWrapper,
+} from "./UserManagementHeader.styled";
+import { USER_MANAGEMENT_FILTERS } from "./Constants";
 
 const UserManagementHeader = (props) => {
   const {

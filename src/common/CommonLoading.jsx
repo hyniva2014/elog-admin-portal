@@ -26,7 +26,7 @@ const CommonLoading = () => {
     loading ? (
       <LoadingOverlay>
         <SpinnerWrapper>
-          <CircularProgress size={80} thickness={2} sx={{ color: "#284495" }} />
+          <CircularProgress size={80} thickness={2} sx={{ color: "primary.main" }} />
           <Box
             component="img"
             src={image}

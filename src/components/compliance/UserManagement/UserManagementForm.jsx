@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Grid, Button } from "@mui/material";
+import { useEffect, useState, useCallback } from "react";
+import { Grid } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -8,7 +8,8 @@ import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonTextField from "../../../common/CommonTextField";
 import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdown";
 import { FormContainer } from "./UserManagementForm.styled";
-import { ACCOUNT_OPTIONS, USER_PROFILE_OPTIONS } from "../../../common/Constants";
+import { ACCOUNT_OPTIONS, USER_PROFILE_OPTIONS } from "./Constants";
+import { EditHeaderButton } from "./UserManagementForm.styled";
 
 const STATUS_OPTIONS = [
   { label: "Active", value: "1" },
@@ -18,7 +19,7 @@ const STATUS_OPTIONS = [
 const addSchema = yup.object().shape({
   company_id: yup.string().required("Account is required"),
   role_id: yup.string().required("User Profile is required"),
-  
+
   firstName: yup.string().required("First Name is required"),
   lastName: yup.string().required("Last Name is required"),
   email: yup.string().email("Enter valid email").required("Email is required"),
@@ -65,36 +66,21 @@ const EMPTY_DEFAULTS = {
 //   confirmPassword: "",
 // });
 const rowToFormValues = (row) => ({
-  company_id:
-    row?.company_id
-      ? String(row.company_id)
-      : "",
+  company_id: row?.company_id ? String(row.company_id) : "",
 
-  role_id:
-    row?.role_id
-      ? String(row.role_id)
-      : "",
+  role_id: row?.role_id ? String(row.role_id) : "",
 
-  status_id:
-    row?.status_id
-      ? String(row.status_id)
-      : "1",
+  status_id: row?.status_id ? String(row.status_id) : "1",
 
-  firstName:
-    row?.firstName || "",
+  firstName: row?.firstName || "",
 
-  lastName:
-    row?.lastName || "",
+  lastName: row?.lastName || "",
 
-  email:
-    row?.primaryContactEmail ||
-    row?.email ||
-    "",
+  email: row?.primaryContactEmail || row?.email || "",
 
   password: "",
   confirmPassword: "",
 });
-
 
 const UserManagementForm = ({
   open,
@@ -163,27 +149,17 @@ const UserManagementForm = ({
   const handleStatusChange = (value) =>
     setValue("status_id", value, { shouldValidate: true });
 
+  const handleEditClick = useCallback(() => setIsEditing(true), []);
+
   // Edit button shown in the dialog header (next to close icon)
   const editHeaderButton = isViewMode && !isEditing && (
-    <Button
+    <EditHeaderButton
       size="small"
       variant="contained"
-      onClick={() => setIsEditing(true)}
-      sx={{
-        fontSize: 14,
-        fontWeight: 400,
-        color: "#FFFFFF",
-        backgroundColor: "#284495",
-        borderRadius: 2,
-        textTransform: "none",
-        px: 2,
-        "&:hover": {
-          backgroundColor: "#1e3370",
-        },
-      }}
+      onClick={handleEditClick}
     >
       Edit
-    </Button>
+    </EditHeaderButton>
   );
 
   const formContent = (
@@ -220,24 +196,22 @@ const UserManagementForm = ({
             disabled={isReadOnly}
           />
         </Grid>
-        
-{isViewMode && (
-  <Grid item xs={12}>
-    <CommonAutocompleteDropdown
-      name="status_id"
-      label="Status"
-      value={watch("status_id")}
-      options={STATUS_OPTIONS}
-      onChange={handleStatusChange}
-      error={!!errors.status_id}
-      helperText={errors.status_id?.message}
-      required={!isReadOnly}
-      disabled={isReadOnly}
-    />
-  </Grid>
-)}
 
-
+        {isViewMode && (
+          <Grid item xs={12}>
+            <CommonAutocompleteDropdown
+              name="status_id"
+              label="Status"
+              value={watch("status_id")}
+              options={STATUS_OPTIONS}
+              onChange={handleStatusChange}
+              error={!!errors.status_id}
+              helperText={errors.status_id?.message}
+              required={!isReadOnly}
+              disabled={isReadOnly}
+            />
+          </Grid>
+        )}
 
         <Grid item xs={12}>
           <CommonTextField

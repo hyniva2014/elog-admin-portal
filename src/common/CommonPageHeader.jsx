@@ -41,17 +41,16 @@ const CommonPageHeader = ({
       <Box>
         <Typography
           variant="inherit"
-          color={theme.palette.mode === "dark" ? "#fff" : "#202027"}
+          color={theme.palette.text.primary}
           fontSize={20}
           fontWeight={600}
-          // mb={0.5}
         >
           {title}
         </Typography>
 
         <Typography
           fontSize={13}
-          color="#787C85"
+          color={theme.palette.text.secondary}
           fontWeight={400}
           sx={{
             visibility: subtitle ? "visible" : "hidden",
@@ -70,7 +69,7 @@ const CommonPageHeader = ({
           <Grid sx={{ display: "flex", gap: 2 }}>
             {addButton && (
               <Button
-                sx={{ color: "#FFFFFF", backgroundColor: "#284495" }}
+                sx={{ color: "common.white", backgroundColor: "primary.main" }}
                 variant="contained"
                 onClick={handleClick}
               >
@@ -79,7 +78,7 @@ const CommonPageHeader = ({
             )}
 
             <Button
-              sx={{ color: "#FFFFFF", backgroundColor: "#284495" }}
+              sx={{ color: "common.white", backgroundColor: "primary.main" }}
               variant="contained"
               endIcon={<KeyboardArrowDownIcon />}
               onClick={handleOpen}
