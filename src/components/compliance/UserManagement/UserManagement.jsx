@@ -10,7 +10,7 @@ import { buildSummaryCards } from "../../../common/CommonUtils";
 import { useServices } from "../../../services/services";
 import CommonSnackbar from "../../../common/CommonSnackbar";
 import dayjs from "dayjs";
-import { getUsers, getUserDetails, onboardUser } from "../../../services/userManagementService";
+import { getUsers, getUserDetails, onboardUser } from "./userManagementService";
 
 /** Format ISO date string to DD-MM-YYYY */
 const formatDate = (iso) => (iso ? dayjs(iso).format("DD-MM-YYYY") : "-");
