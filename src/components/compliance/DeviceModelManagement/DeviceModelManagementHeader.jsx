@@ -1,13 +1,8 @@
 import CommonPageHeader from "@src/common/CommonPageHeader";
 import CommonFilters from "@src/common/CommonFilters";
 import CommonSummaryCardGroup from "@src/common/CommonSummaryCardGroup";
-import { HeaderContainer, AddButton, SummaryCardBox, SubtitleTypography } from "./DeviceModelManagement.styled";
-
-const HeaderAddButton = ({ onClick }) => (
-  <AddButton variant="contained" onClick={onClick}>
-    Add Asset
-  </AddButton>
-);
+import { HeaderContainer, SummaryCardBox, SubtitleTypography } from "./DeviceModelManagement.styled";
+import { HeaderAddButton } from "./DeviceModelManagementButtons";
 
 const DeviceModelManagementHeader = (props) => {
   const {

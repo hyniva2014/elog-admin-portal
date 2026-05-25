@@ -39,6 +39,10 @@ const createMenuItems = (options) =>
     </MenuItem>
   ));
 
+const getShrinkValue = (fieldValue, isDisabled) => {
+  return (fieldValue !== "" && fieldValue != null) || isDisabled;
+};
+
 const assetTypeOptions = createMenuItems(ASSET_TYPE_FILTER_OPTIONS);
 const elogsOptions = createMenuItems(ELOGS_FILTER_OPTIONS);
 const statusOptions = createMenuItems(DEVICE_MODEL_STATUS_FILTER_OPTIONS);
@@ -112,7 +116,7 @@ const DeviceModelManagementForm = ({
         error={!!errors.assetType}
         helperText={errors.assetType?.message}
         fullWidth
-        InputLabelProps={{ shrink: (field.value !== "" && field.value != null) || isDisabled }}
+        InputLabelProps={{ shrink: getShrinkValue(field.value, isDisabled) }}
       >
         {assetTypeOptions}
       </CommonTextFieldStyled>
@@ -132,7 +136,7 @@ const DeviceModelManagementForm = ({
         error={!!errors.supportsElogs}
         helperText={errors.supportsElogs?.message}
         fullWidth
-        InputLabelProps={{ shrink: Boolean(field.value !== "") || isDisabled }}
+        InputLabelProps={{ shrink: getShrinkValue(field.value, isDisabled) }}
       >
         {elogsOptions}
       </CommonTextFieldStyled>
@@ -149,7 +153,7 @@ const DeviceModelManagementForm = ({
         select
         disabled={isDisabled}
         fullWidth
-        InputLabelProps={{ shrink: Boolean(field.value !== "") || isDisabled }}
+        InputLabelProps={{ shrink: getShrinkValue(field.value, isDisabled) }}
       >
         {statusOptions}
       </CommonTextFieldStyled>

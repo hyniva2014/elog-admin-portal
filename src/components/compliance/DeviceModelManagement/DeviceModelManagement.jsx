@@ -6,11 +6,8 @@ import CommonDialogForm from "@src/common/CommonDialogForm";
 import CommonSnackbar from "@src/common/CommonSnackbar";
 import DeviceModelManagementHeader from "./DeviceModelManagementHeader";
 import DeviceModelManagementForm from "./DeviceModelManagementForm";
-import {
-  EditButton,
-  CancelEditButton,
-  GridContainer,
-} from "./DeviceModelManagement.styled";
+import { GridContainer } from "./DeviceModelManagement.styled";
+import { HeaderEditButton, HeaderCancelEditButton } from "./DeviceModelManagementButtons";
 import { DEVICE_MODEL_STATUS_FILTER_OPTIONS, ASSET_TYPE_FILTER_OPTIONS } from "./Constants";
 import { getColumns, getRowHeight } from "./DeviceModelManagementTable.utils";
 import useDeviceModelManagement from "@src/hooks/useDeviceModelManagement";
@@ -25,17 +22,9 @@ const getSubmitButtonLabel = (isEditMode, isEditing) => {
   return isEditing ? "Update" : "Save";
 };
 
-const HeaderEditButton = ({ onClick }) => (
-  <EditButton variant="contained" onClick={onClick}>
-    Edit
-  </EditButton>
-);
-
-const HeaderCancelEditButton = ({ onClick }) => (
-  <CancelEditButton variant="outlined" onClick={onClick}>
-    Cancel Edit
-  </CancelEditButton>
-);
+const getFormKey = (deviceModelId) => {
+  return deviceModelId || "new";
+};
 
 const DeviceModelManagement = () => {
   const { setLoading, LoadingContainer } = CommonLoading();
@@ -83,6 +72,7 @@ const DeviceModelManagement = () => {
   const dialogMode = isEditMode ? "edit" : "add";
   const dialogTitle = getDialogTitle(isEditMode, isEditing);
   const submitButtonLabel = getSubmitButtonLabel(isEditMode, isEditing);
+  const formKey = getFormKey(formDefaultValues.deviceModelId);
 
   return (
     <>
@@ -129,7 +119,7 @@ const DeviceModelManagement = () => {
         submitButtonText={submitButtonLabel}
         content={
           <DeviceModelManagementForm
-            key={formDefaultValues.deviceModelId || "new"}
+            key={formKey}
             formId="addDeviceModelForm"
             defaultValues={formDefaultValues}
             isEditing={isEditing}
