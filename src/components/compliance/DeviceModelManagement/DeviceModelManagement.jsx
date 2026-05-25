@@ -114,7 +114,6 @@ const DeviceModelManagement = () => {
         mode={dialogMode}
         title={dialogTitle}
         formId="addDeviceModelForm"
-        loading={isLoading}
         isEditing={isEditing}
         headerActions={headerActionsElement}
         submitButtonText={submitButtonLabel}

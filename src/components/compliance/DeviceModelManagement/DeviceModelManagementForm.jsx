@@ -129,7 +129,7 @@ const DeviceModelManagementForm = ({
       <CommonTextFieldStyled
         {...field}
         size="small"
-        label="E-Logs"
+        label="Select E-Log"
         select
         required
         disabled={isDisabled}
