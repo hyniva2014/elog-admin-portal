@@ -16,7 +16,7 @@ describe("DeviceAssetManagementForm Component", () => {
         formId="testForm"
         defaultValues={{
           modelName: "",
-          imeiNumber: "",
+          serialNumber: "",
         }}
         isEditing={false}
         isEditMode={false}
@@ -25,7 +25,8 @@ describe("DeviceAssetManagementForm Component", () => {
     );
 
     expect(screen.getByLabelText("Model Name")).toBeInTheDocument();
-    expect(screen.getByLabelText("IMEI Number")).toBeInTheDocument();
+
+    expect(screen.getByLabelText("Serial Number")).toBeInTheDocument();
   });
 
   test("shows validation errors when fields are empty", async () => {
@@ -34,7 +35,7 @@ describe("DeviceAssetManagementForm Component", () => {
         formId="testForm"
         defaultValues={{
           modelName: "",
-          imeiNumber: "",
+          serialNumber: "",
         }}
         isEditing={false}
         isEditMode={false}
@@ -52,40 +53,7 @@ describe("DeviceAssetManagementForm Component", () => {
       ).toBeInTheDocument();
 
       expect(
-        screen.getByText("IMEI Number is required")
-      ).toBeInTheDocument();
-    });
-  });
-
-  test("shows validation error for invalid IMEI number", async () => {
-    render(
-      <DeviceAssetManagementForm
-        formId="testForm"
-        defaultValues={{
-          modelName: "",
-          imeiNumber: "",
-        }}
-        isEditing={false}
-        isEditMode={false}
-        onSubmit={mockSubmit}
-      />
-    );
-
-    fireEvent.change(screen.getByLabelText("Model Name"), {
-      target: { value: "Geotab GO9" },
-    });
-
-    fireEvent.change(screen.getByLabelText("IMEI Number"), {
-      target: { value: "12345" },
-    });
-
-    const form = document.getElementById("testForm");
-
-    fireEvent.submit(form);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText("IMEI Number must be 15 digits")
+        screen.getByText("Serial Number is required")
       ).toBeInTheDocument();
     });
   });
@@ -96,7 +64,7 @@ describe("DeviceAssetManagementForm Component", () => {
         formId="testForm"
         defaultValues={{
           modelName: "",
-          imeiNumber: "",
+          serialNumber: "",
         }}
         isEditing={false}
         isEditMode={false}
@@ -105,11 +73,11 @@ describe("DeviceAssetManagementForm Component", () => {
     );
 
     fireEvent.change(screen.getByLabelText("Model Name"), {
-      target: { value: "Geotab GO9" },
+      target: { value: "ELD Model 1" },
     });
 
-    fireEvent.change(screen.getByLabelText("IMEI Number"), {
-      target: { value: "356938090123456" },
+    fireEvent.change(screen.getByLabelText("Serial Number"), {
+      target: { value: "SN001" },
     });
 
     const form = document.getElementById("testForm");
@@ -117,7 +85,11 @@ describe("DeviceAssetManagementForm Component", () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(mockSubmit).toHaveBeenCalled();
+      expect(mockSubmit).toHaveBeenCalledWith({
+        modelName: "ELD Model 1",
+        serialNumber: "SN001",
+        status: "1",
+      });
     });
   });
 
@@ -126,8 +98,9 @@ describe("DeviceAssetManagementForm Component", () => {
       <DeviceAssetManagementForm
         formId="testForm"
         defaultValues={{
-          modelName: "Geotab GO9",
-          imeiNumber: "356938090123456",
+          modelName: "ELD Model 1",
+          serialNumber: "SN001",
+          status: "1",
         }}
         isEditing={false}
         isEditMode={true}
@@ -137,7 +110,9 @@ describe("DeviceAssetManagementForm Component", () => {
 
     expect(screen.getByLabelText("Model Name")).toBeDisabled();
 
-    expect(screen.getByLabelText("IMEI Number")).toBeDisabled();
+    expect(screen.getByLabelText("Serial Number")).toBeDisabled();
+
+    expect(screen.getByLabelText("Status")).toBeDisabled();
   });
 
   test("fields are enabled in edit mode", () => {
@@ -145,8 +120,9 @@ describe("DeviceAssetManagementForm Component", () => {
       <DeviceAssetManagementForm
         formId="testForm"
         defaultValues={{
-          modelName: "Geotab GO9",
-          imeiNumber: "356938090123456",
+          modelName: "ELD Model 1",
+          serialNumber: "SN001",
+          status: "1",
         }}
         isEditing={true}
         isEditMode={true}
@@ -156,6 +132,106 @@ describe("DeviceAssetManagementForm Component", () => {
 
     expect(screen.getByLabelText("Model Name")).not.toBeDisabled();
 
-    expect(screen.getByLabelText("IMEI Number")).not.toBeDisabled();
+    expect(screen.getByLabelText("Serial Number")).not.toBeDisabled();
+
+    expect(screen.getByLabelText("Status")).not.toBeDisabled();
+  });
+
+  test("renders status dropdown only in edit mode", () => {
+    render(
+      <DeviceAssetManagementForm
+        formId="testForm"
+        defaultValues={{
+          modelName: "",
+          serialNumber: "",
+        }}
+        isEditing={false}
+        isEditMode={true}
+        onSubmit={mockSubmit}
+      />
+    );
+
+    expect(screen.getByLabelText("Status")).toBeInTheDocument();
+  });
+
+  test("does not render status dropdown in add mode", () => {
+    render(
+      <DeviceAssetManagementForm
+        formId="testForm"
+        defaultValues={{
+          modelName: "",
+          serialNumber: "",
+        }}
+        isEditing={false}
+        isEditMode={false}
+        onSubmit={mockSubmit}
+      />
+    );
+
+    expect(screen.queryByLabelText("Status")).not.toBeInTheDocument();
+  });
+
+  test("updates status dropdown value", async () => {
+    render(
+      <DeviceAssetManagementForm
+        formId="testForm"
+        defaultValues={{
+          modelName: "ELD Model 1",
+          serialNumber: "SN001",
+          status: "1",
+        }}
+        isEditing={true}
+        isEditMode={true}
+        onSubmit={mockSubmit}
+      />
+    );
+
+    const statusDropdown = screen.getByLabelText("Status");
+
+    fireEvent.mouseDown(statusDropdown);
+
+    const inactiveOption = await screen.findByText("Inactive");
+
+    fireEvent.click(inactiveOption);
+
+    expect(inactiveOption).toBeInTheDocument();
+  });
+
+  test("resets form values when defaultValues change", async () => {
+    const { rerender } = render(
+      <DeviceAssetManagementForm
+        formId="testForm"
+        defaultValues={{
+          modelName: "Model 1",
+          serialNumber: "SN001",
+          status: "1",
+        }}
+        isEditing={true}
+        isEditMode={true}
+        onSubmit={mockSubmit}
+      />
+    );
+
+    expect(screen.getByDisplayValue("Model 1")).toBeInTheDocument();
+
+    rerender(
+      <DeviceAssetManagementForm
+        formId="testForm"
+        defaultValues={{
+          modelName: "Model 2",
+          serialNumber: "SN002",
+          status: "0",
+        }}
+        isEditing={true}
+        isEditMode={true}
+        onSubmit={mockSubmit}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("Model 2")).toBeInTheDocument();
+
+      expect(screen.getByDisplayValue("SN002")).toBeInTheDocument();
+    });
   });
 });

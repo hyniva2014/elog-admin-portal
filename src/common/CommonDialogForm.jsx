@@ -25,6 +25,7 @@ const CommonDialogForm = ({
   submitButtonText,
   maxWidth = "sm",
   headerActions,
+  isEditing,
 }) => {
   const isEdit = mode === "edit";
   const handleClose = onClose ?? onCancel;

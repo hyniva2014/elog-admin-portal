@@ -123,3 +123,12 @@ export const gridSx = (theme) => ({
     overflowX: "auto",
   },
 });
+
+export const getContainerSx = (hasRows) => ({
+  display: "flex",
+  flexDirection: "column",
+  flex: 1,
+  minHeight: 0,
+  width: "100%",
+  height: hasRows ? "auto" : 600,
+});

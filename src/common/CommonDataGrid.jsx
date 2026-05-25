@@ -8,6 +8,7 @@ import {
   headerLabelSx,
   containerSx,
   gridSx,
+  getContainerSx,
 } from "./CommonDataGrid.styles";
 
 const withHeaderTooltip = (columns) =>
@@ -40,6 +41,8 @@ const CommonDataGrid = ({
   hideFooter = false,
   getRowHeight = false,
   checkboxSelection = false,
+  rowSelectionModel = [],
+  onRowSelectionModelChange = () => {},
 }) => {
   const pagePaginationModel = {
     page: (data.page || 1) - 1,
@@ -197,10 +200,7 @@ const CommonDataGrid = ({
   });
 
   return (
-    <Box
-      ref={containerRef}
-      sx={containerSx}
-    >
+    <Box ref={containerRef} sx={getContainerSx(localRows.length > 0)}>
       <DataGrid
         rows={localRows}
         columns={withHeaderTooltip(enhancedColumns)}
@@ -216,6 +216,8 @@ const CommonDataGrid = ({
         hideFooter={hideFooter}
         getRowHeight={getRowHeight}
         checkboxSelection={checkboxSelection}
+        rowSelectionModel={rowSelectionModel}
+        onRowSelectionModelChange={onRowSelectionModelChange}
         onPaginationModelChange={(model) =>
           setData((prev) => ({
             ...prev,
@@ -226,7 +228,9 @@ const CommonDataGrid = ({
         slots={{
           pagination: CustomPagination,
         }}
-        sx={(theme) => gridSx(theme)}
+        sx={(theme) => ({
+          ...gridSx(theme),
+        })}
       />
     </Box>
   );

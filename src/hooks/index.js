@@ -7,3 +7,6 @@ export { default as useTabsChange } from "./useTabsChange";
 export { default as useToggle } from "./useToggle";
 export { default as useViewPort } from "./useViewPort";
 export { default as useTask } from "./useTask";
+export { default as useDeviceLifecycle } from "./useDeviceLifecycle";
+export { default as useDashboardMetrics } from "./useDashboardMetrics";
+export { default as useCarrierGrowthTrend } from "./useCarrierGrowthTrend";

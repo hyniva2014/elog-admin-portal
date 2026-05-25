@@ -2,7 +2,7 @@ import { LuMoon, LuShoppingCart, LuSunMedium } from "react-icons/lu";
 import { Box, Button, IconButton, Link, styled } from "@mui/material";
 import { useScrollEvent } from "@src/hooks";
 import { alpha } from "@mui/material/styles";
-import LogoBox from "@src/layouts/LeftSideBar/LogoBox.tsx";
+import LogoBox from "@src/layouts/LeftSideBar/LogoBox";
 import { useLayoutContext } from "@src/states";
 export const ContainerBox = styled("div")(({ theme, sx }) => {
   return {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { PageContainer } from "../component.styled";
@@ -20,8 +20,11 @@ import {
   DateRangeText,
   HeaderSubtitle,
 } from "./AlertCenter.styles";
-import { alerts, summaryCards } from "./AdminConstant";
+import { alerts, Device_Metrics_Cards } from "./AdminConstant";
 import DateRangeSelector from "./DateRangeSelector";
+import { useDashboardMetrics } from "../../../hooks";
+import { buildSummaryCards } from "../../../common/Commonutils";
+import CommonLoading from "../../../common/CommonLoading";
 
 const getTodayRange = () => {
   const today = new Date();
@@ -43,14 +46,16 @@ const getTodayRange = () => {
 
 const AdminDashboard = () => {
   const [selectedRange, setSelectedRange] = useState(getTodayRange());
+  const { dashboardMetrics } = useDashboardMetrics(selectedRange);
+  const { loading, setLoading, LoadingContainer } = CommonLoading();
 
   const handleDateChange = (data) => {
     setSelectedRange(data);
   };
 
-  const handleViewAll = () => {
-    // TODO: implement navigation to full alert list
-  };
+  const summaryCards = useMemo(() => {
+    return buildSummaryCards(dashboardMetrics || {}, Device_Metrics_Cards);
+  }, [dashboardMetrics]);
 
   const dateLabel =
     selectedRange.period === "Today"
@@ -59,6 +64,7 @@ const AdminDashboard = () => {
 
   return (
     <PageContainer>
+      <LoadingContainer/>
       {/* Header */}
       <HeaderContainer>
         <HeaderLeft>
@@ -75,7 +81,7 @@ const AdminDashboard = () => {
       <CommonSummaryCardGroup
         cards={summaryCards}
         showAccentBar={false}
-        layout="default"
+        layout="dashboard"
       />
 
       <StretchGridContainer container spacing={2}>
@@ -84,11 +90,7 @@ const AdminDashboard = () => {
         </ChartGrid>
 
         <AlertGrid item xs={12} md={5}>
-          <CommonAlertCenter
-            title="Alert Center"
-            alerts={alerts}
-            onViewAll={handleViewAll}
-          />
+          <CommonAlertCenter title="Alert Center" alerts={alerts} />
         </AlertGrid>
 
         <IncidentGrid item xs={12} md={6}>

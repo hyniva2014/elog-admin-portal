@@ -5,6 +5,9 @@ import { defineConfig } from "vite";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  build: {
+    chunkSizeWarningLimit: 2500,
+  },
   resolve: {
     alias: {
       "@src": path.resolve("./src"),

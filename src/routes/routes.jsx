@@ -6,7 +6,6 @@
 import { Suspense, lazy } from "react";
 import { Navigate } from "react-router-dom";
 import RequireAuthRedirect from "@src/components/LoginScreen/RequireAuthRedirect";
-const VerticalLayout = lazy(() => import("@src/layouts/VerticalLayout"));
 const GoogleMaps = lazy(() => import("@src/pages/maps/GoogleMaps"));
 const LoadComponent = ({ component: Component }) => {
   return (
@@ -492,7 +491,9 @@ const authRoutes = [
     path: "/auth/login",
     element: (
       <LoadComponent
-        component={lazy(() => import("@src/components/LoginScreen/LoginScreen"))}
+        component={lazy(
+          () => import("@src/components/LoginScreen/LoginScreen"),
+        )}
       />
     ),
   },
@@ -752,7 +753,9 @@ const adminRoutes = [
     path: "/dashboard",
     element: (
       <LoadComponent
-        component={lazy(() => import("../components/AdminComponents/dashbord/AdminDashBoard"))}
+        component={lazy(
+          () => import("../components/AdminComponents/Dashbord/AdminDashBoard"),
+        )}
       />
     ),
   },
@@ -760,7 +763,7 @@ const adminRoutes = [
     path: "/fleet-dashboard",
     element: (
       <LoadComponent
-        // component={lazy(() => import("../components/AdminComponents/Dummy"))}
+      // component={lazy(() => import("../components/AdminComponents/Dummy"))}
       />
     ),
   },
@@ -768,7 +771,10 @@ const adminRoutes = [
     path: "/device-asset-management",
     element: (
       <LoadComponent
-        component={lazy(() => import("../components/compliance/DeviceAssetManagement/DeviceAssetManagement"))}
+        component={lazy(
+          () =>
+            import("../components/compliance/DeviceAssetManagement/DeviceAssetManagement"),
+        )}
       />
     ),
   },
@@ -776,7 +782,10 @@ const adminRoutes = [
     path: "/account-management",
     element: (
       <LoadComponent
-        component={lazy(() => import("../components/compliance/AccountManagement/AccountManagement"))}
+        component={lazy(
+          () =>
+            import("../components/compliance/AccountManagement/AccountManagement"),
+        )}
       />
     ),
   },
@@ -784,7 +793,10 @@ const adminRoutes = [
     path: "/device-model-management",
     element: (
       <LoadComponent
-        component={lazy(() => import("../components/compliance/DeviceModelManagement/DeviceModelManagement"))}
+        component={lazy(
+          () =>
+            import("../components/compliance/DeviceModelManagement/DeviceModelManagement"),
+        )}
       />
     ),
   },
@@ -792,7 +804,10 @@ const adminRoutes = [
     path: "/device-management",
     element: (
       <LoadComponent
-        component={lazy(() => import("../components/compliance/DeviceManagement/DeviceManagement"))}
+        component={lazy(
+          () =>
+            import("../components/compliance/DeviceManagement/DeviceManagement"),
+        )}
       />
     ),
   },
@@ -800,7 +815,21 @@ const adminRoutes = [
     path: "/user-management",
     element: (
       <LoadComponent
-        component={lazy(() => import("../components/compliance/UserManagement/UserManagement"))}
+        component={lazy(
+          () =>
+            import("../components/compliance/UserManagement/UserManagement"),
+        )}
+      />
+    ),
+  },
+  {
+    path: "/alert-center",
+    element: (
+      <LoadComponent
+        component={lazy(
+          () =>
+            import("../components/AdminComponents/Dashbord/AlertCeneter/AlertCenterScreen"),
+        )}
       />
     ),
   },

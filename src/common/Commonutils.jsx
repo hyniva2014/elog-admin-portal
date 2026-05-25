@@ -19,3 +19,15 @@ export const formatDateRange = (start, end, variant = "single-or-range") => {
         : `${formatDisplayDate(start)} - ${formatDisplayDate(end)}`;
   }
 };
+
+export const buildSummaryCards = (apiBody = {}, config = {}) => {
+  return Object.entries(config)
+    .filter(([key]) => key in apiBody)
+    .map(([key, meta]) => ({
+      id: meta.id,
+      title: meta.title,
+      value: apiBody[key] ?? 0,
+      accentcolor: meta.accentcolor,
+      icon: meta.icon,
+    }));
+};
