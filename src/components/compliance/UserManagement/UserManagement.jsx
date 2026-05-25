@@ -16,7 +16,7 @@ import { getUsers, getUserDetails, onboardUser } from "./userManagementService";
 const formatDate = (iso) => (iso ? dayjs(iso).format("DD-MM-YYYY") : "-");
 
 const UserManagement = () => {
-  const { LoadingContainer } = CommonLoading();
+  const { setLoading, LoadingContainer } = CommonLoading();
 
   const [data, setData] = useState({
     rows: [],
@@ -40,6 +40,7 @@ const UserManagement = () => {
     status_id,
     from_date,
     to_date,
+    isLoading,
   } = data;
 
   const [summaryCards, setSummaryCards] = useState([]);
@@ -115,6 +116,10 @@ const UserManagement = () => {
   ]);
 
   useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading, setLoading]);
+
+  useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
@@ -122,7 +127,7 @@ const UserManagement = () => {
     async (row) => {
       try {
         setFormLoading(true);
-
+setLoading(true);
         const response = await getUserDetails(fetchApi, row.user_id);
 
         let user = response?.body?.data;
@@ -146,9 +151,10 @@ const UserManagement = () => {
         });
       } finally {
         setFormLoading(false);
+        setLoading(false);
       }
     },
-    [fetchApi],
+    [fetchApi, setLoading],
   );
 
   const columnsWithActions = useMemo(
@@ -193,7 +199,7 @@ const UserManagement = () => {
   const handleCreateUser = async (formValues) => {
     try {
       setFormLoading(true);
-
+setLoading(true);
       const payload = buildFormData(formValues);
 
       const response = await onboardUser(createApi, payload);
@@ -223,6 +229,7 @@ const UserManagement = () => {
       });
     } finally {
       setFormLoading(false);
+      setLoading(false);
     }
   };
   const handleSubmitForm = async (formValues, submitMode = mode) => {
@@ -236,6 +243,7 @@ const UserManagement = () => {
   const handleUpdateUser = async (formValues) => {
     try {
       setFormLoading(true);
+setLoading(true);
 
       const payload = buildFormData(formValues, true);
 
@@ -268,6 +276,7 @@ const UserManagement = () => {
       });
     } finally {
       setFormLoading(false);
+        setLoading(false);
     }
   };
 

@@ -316,6 +316,7 @@ const UserManagementForm = ({
       submitButtonText={submitButtonText}
       headerActions={editHeaderButton}
       maxWidth="sm"
+      isEditing={isEditing}
     />
   );
 };
