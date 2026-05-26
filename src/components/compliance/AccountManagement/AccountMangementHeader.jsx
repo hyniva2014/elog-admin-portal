@@ -7,6 +7,8 @@ const AccountManagementHeader = ({
   setData,
   searchKey,
   handleClick,
+  primaryContactOptions = [],
+  secondaryContactOptions = [],
   carrierOptions,
   statusOptions,
 }) => {
@@ -34,12 +36,12 @@ const AccountManagementHeader = ({
           {
             label: "Primary Contact Name",
             dataKey: "primaryContactName",
-            options: [],
+            options: primaryContactOptions,
           },
           {
             label: "Secondary Contact Name",
             dataKey: "secondaryContactName",
-            options: [],
+            options: secondaryContactOptions,
           },
           {
             label: "All Carrier",

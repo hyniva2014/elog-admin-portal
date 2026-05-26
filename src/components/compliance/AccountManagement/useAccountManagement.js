@@ -45,13 +45,21 @@ export const useAccountManagement = (
       const endUrl = buildFetchUrl();
       const response = await fetchApi(endUrl);
 
-      const rowData = AccountManagementRowData(response?.body?.data?.data || []);
+      const responseData = response?.body?.data;
+      const records = Array.isArray(responseData?.data)
+        ? responseData.data
+        : responseData && !responseData.data
+        ? [responseData]
+        : [];
+      const total = responseData?.pagination?.total_records ?? records.length;
+
+      const rowData = AccountManagementRowData(records);
 
       setData((prev) => ({
         ...prev,
         isLoading: false,
         rows: rowData,
-        total: response?.body?.data?.pagination?.total_records || 0,
+        total,
       }));
     } catch (err) {
       console.error("Error fetching companies:", err);
@@ -151,13 +159,47 @@ export const useAccountManagement = (
         setLoading(false);
       }
     },
-    [companyId, setLoading, setSelectedCompany, setDialogMode, setIsAddAccountOpen, handleSnackbar]
+    [setLoading, setSelectedCompany, setDialogMode, setIsAddAccountOpen, handleSnackbar]
   );
+
+  const fetchCompaniesDropdown = useCallback(async () => {
+    try {
+      const response = await fetchApi("/masteradmin/dropdown/companies");
+      const data = response?.body?.data ?? [];
+
+      return data.map(({ company_id, company_name }) => ({
+        value: company_id,
+        label: company_name,
+      }));
+    } catch (err) {
+      console.error("Error fetching companies dropdown:", err);
+      return [];
+    }
+  }, []);
+
+  const fetchContactsDropdown = useCallback(async () => {
+    try {
+      const response = await fetchApi("/masteradmin/dropdown/contacts");
+      const data = response?.body?.data ?? {};
+
+      const toOption = ({ id, name }) => ({ value: name, label: name });
+
+      return {
+        primaryContactOptions: (data.primary_contact ?? []).map(toOption),
+        secondaryContactOptions: (data.secondary_contact ?? []).map(toOption),
+      };
+    } catch (err) {
+      console.error("Error fetching contacts dropdown:", err);
+      return { primaryContactOptions: [], secondaryContactOptions: [] };
+    }
+  }, []);
 
   return {
     buildFetchUrl,
     fetchData,
     handleCreateAccount,
     handleViewAccount,
+    fetchContactsDropdown,
+    fetchCompaniesDropdown,
   };
 };
