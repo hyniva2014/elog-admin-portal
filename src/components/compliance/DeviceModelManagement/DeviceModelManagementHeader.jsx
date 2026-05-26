@@ -1,7 +1,7 @@
 import CommonPageHeader from "@src/common/CommonPageHeader";
 import CommonFilters from "@src/common/CommonFilters";
 import CommonSummaryCardGroup from "@src/common/CommonSummaryCardGroup";
-import { HeaderContainer, SummaryCardBox, SubtitleTypography } from "./DeviceModelManagement.styled";
+import { HeaderContainer, SummaryCardBox } from "./DeviceModelManagement.styled";
 import { HeaderAddButton } from "./DeviceModelManagementButtons";
 
 const DeviceModelManagementHeader = (props) => {
@@ -26,13 +26,11 @@ const DeviceModelManagementHeader = (props) => {
     <HeaderContainer>
       <CommonPageHeader
         title="Device Model Management"
+        subtitle="Manage device models and specifications"
         handleClick={handleClick}
         addButton={true}
         rightContent={<HeaderAddButton onClick={handleClick} />}
       />
-      <SubtitleTypography variant="h6">
-        Manage device models and specifications
-      </SubtitleTypography>
       <SummaryCardBox>
         <CommonSummaryCardGroup cards={summaryCards} />
       </SummaryCardBox>
