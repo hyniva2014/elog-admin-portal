@@ -3,12 +3,11 @@ import { Grid } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonTextField from "../../../common/CommonTextField";
 import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdown";
 import { FormContainer } from "./UserManagementForm.styled";
-import { ACCOUNT_OPTIONS, USER_PROFILE_OPTIONS } from "./Constants";
+import { USER_PROFILE_OPTIONS } from "./Constants";
 import { EditHeaderButton } from "./UserManagementForm.styled";
 
 const STATUS_OPTIONS = [
@@ -55,29 +54,13 @@ const EMPTY_DEFAULTS = {
   confirmPassword: "",
 };
 
-// const rowToFormValues = (row) => ({
-//   company_id: row.company_id || "",
-//   role_id: row.role_id || "",
-//   status_id: row.status_id ? String(row.status_id) : "1",
-//   firstName: row.firstName || "",
-//   lastName: row.lastName || "",
-//   email: row.primaryContactEmail || row.email || "",
-//   password: "",
-//   confirmPassword: "",
-// });
 const rowToFormValues = (row) => ({
   company_id: row?.company_id ? String(row.company_id) : "",
-
   role_id: row?.role_id ? String(row.role_id) : "",
-
   status_id: row?.status_id ? String(row.status_id) : "1",
-
   firstName: row?.firstName || "",
-
   lastName: row?.lastName || "",
-
   email: row?.primaryContactEmail || row?.email || "",
-
   password: "",
   confirmPassword: "",
 });
@@ -87,8 +70,9 @@ const UserManagementForm = ({
   onClose,
   onSubmitForm,
   loading = false,
-  mode = "add", // "add" | "view"
+  mode = "add",
   initialData = null,
+  companyOptions = [],
 }) => {
   const isViewMode = mode === "view";
 
@@ -174,7 +158,7 @@ const UserManagementForm = ({
             name="company_id"
             label="Select Account"
             value={watch("company_id")}
-            options={ACCOUNT_OPTIONS}
+            options={companyOptions}
             onChange={handleAccountChange}
             error={!!errors.company_id}
             helperText={errors.company_id?.message}

@@ -4,7 +4,12 @@ import "@testing-library/jest-dom";
 
 import UserManagement from "./UserManagement";
 
-import { getUsers, getUserDetails, onboardUser } from "./userManagementService";
+import {
+  getUsers,
+  getUserDetails,
+  onboardUser,
+  getCompaniesDropdown,
+} from "./userManagementService";
 
 import { useServices } from "../../../services/services";
 
@@ -12,6 +17,7 @@ jest.mock("./userManagementService", () => ({
   getUsers: jest.fn(),
   getUserDetails: jest.fn(),
   onboardUser: jest.fn(),
+  getCompaniesDropdown: jest.fn(),
 }));
 
 jest.mock("../../../services/services", () => ({
@@ -21,26 +27,24 @@ jest.mock("../../../services/services", () => ({
 jest.mock("@src/common/CommonDataGrid", () => {
   return function MockGrid(props) {
     return (
-      <div>
-        <div data-testid="grid">
-          {props?.rowData?.map((row) => (
-            <div key={row.id}>
-              <span>{row.firstName}</span>
+      <div data-testid="grid">
+        {props?.rowData?.map((row) => (
+          <div key={row.id}>
+            <span>{row.firstName}</span>
 
-              <button
-                onClick={() => {
-                  const actionColumn = props.columnsData.find(
-                    (c) => c.field === "action",
-                  );
+            <button
+              onClick={() => {
+                const actionColumn = props.columnsData.find(
+                  (c) => c.field === "action",
+                );
 
-                  actionColumn?.onView?.(row);
-                }}
-              >
-                View
-              </button>
-            </div>
-          ))}
-        </div>
+                actionColumn?.onView?.(row);
+              }}
+            >
+              View
+            </button>
+          </div>
+        ))}
       </div>
     );
   };
@@ -90,6 +94,7 @@ jest.mock("../../../common/CommonSnackbar", () => {
 
 jest.mock("../../../common/CommonLoading", () => {
   return () => ({
+    setLoading: jest.fn(),
     LoadingContainer: () => <div>Loading</div>,
   });
 });
@@ -153,6 +158,17 @@ const mockUserDetailsResponse = {
   },
 };
 
+const mockCompaniesResponse = {
+  body: {
+    data: [
+      {
+        company_id: 7,
+        company_name: "TrackPulse Logistics",
+      },
+    ],
+  },
+};
+
 describe("UserManagement", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -171,6 +187,8 @@ describe("UserManagement", () => {
         message: "User created successfully",
       },
     });
+
+    getCompaniesDropdown.mockResolvedValue(mockCompaniesResponse);
   });
 
   test("renders component successfully", async () => {
@@ -188,6 +206,14 @@ describe("UserManagement", () => {
 
     await waitFor(() => {
       expect(getUsers).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  test("fetches companies on mount", async () => {
+    render(<UserManagement />);
+
+    await waitFor(() => {
+      expect(getCompaniesDropdown).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -215,7 +241,7 @@ describe("UserManagement", () => {
     fireEvent.click(screen.getByText("Submit Form"));
 
     await waitFor(() => {
-      expect(onboardUser).toHaveBeenCalled();
+      expect(onboardUser).toHaveBeenCalledTimes(1);
     });
 
     expect(screen.getByText("User created successfully")).toBeInTheDocument();
@@ -245,7 +271,7 @@ describe("UserManagement", () => {
     fireEvent.click(screen.getByText("View"));
 
     await waitFor(() => {
-      expect(getUserDetails).toHaveBeenCalled();
+      expect(getUserDetails).toHaveBeenCalledTimes(1);
     });
 
     expect(screen.getByText("User Form")).toBeInTheDocument();
@@ -289,6 +315,28 @@ describe("UserManagement", () => {
     });
   });
 
+  test("handles update user failure", async () => {
+    onboardUser.mockRejectedValue(new Error("Failed to update user"));
+
+    render(<UserManagement />);
+
+    await waitFor(() => {
+      expect(screen.getByText("John")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("View"));
+
+    await waitFor(() => {
+      expect(screen.getByText("User Form")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("Submit Form"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Failed to update user")).toBeInTheDocument();
+    });
+  });
+
   test("handles fetch users failure", async () => {
     getUsers.mockRejectedValue(new Error("Failed to fetch users"));
 
@@ -296,6 +344,18 @@ describe("UserManagement", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Failed to fetch users.")).toBeInTheDocument();
+    });
+  });
+
+  test("handles fetch companies failure", async () => {
+    getCompaniesDropdown.mockRejectedValue(
+      new Error("Failed to fetch companies"),
+    );
+
+    render(<UserManagement />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Failed to fetch companies")).toBeInTheDocument();
     });
   });
 
@@ -310,6 +370,18 @@ describe("UserManagement", () => {
 
     await waitFor(() => {
       expect(screen.queryByText("User Form")).not.toBeInTheDocument();
+    });
+  });
+
+  test("shows snackbar after successful creation", async () => {
+    render(<UserManagement />);
+
+    fireEvent.click(screen.getByText("Add User"));
+
+    fireEvent.click(screen.getByText("Submit Form"));
+
+    await waitFor(() => {
+      expect(screen.getByText("User created successfully")).toBeInTheDocument();
     });
   });
 });

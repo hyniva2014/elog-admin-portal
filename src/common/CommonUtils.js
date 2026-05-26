@@ -27,21 +27,13 @@ export const formatDateRange = (start, end, variant = "single-or-range") => {
 };
 
 export const buildSummaryCards = (apiBody = {}, config = {}) => {
-  const configList = Array.isArray(config)
-    ? config
-    : Object.entries(config).map(([key, meta]) => ({ key, ...meta }));
-
-  return configList
-    .map((meta) => {
-      const sourceKey = meta.key || meta.id;
-      return {
-        id: meta.id,
-        title: meta.title,
-        value: apiBody[sourceKey] ?? 0,
-        accentcolor: meta.accentcolor,
-        icon: meta.icon || meta.iconPath || null,
-        iconPath: meta.iconPath,
-      };
-    })
-    .filter((card) => card.id && card.title);
+  return Object.entries(config)
+    .filter(([key]) => key in apiBody)
+    .map(([key, meta]) => ({
+      id: meta.id,
+      title: meta.title,
+      value: apiBody[key] ?? 0,
+      accentcolor: meta.accentcolor,
+      icon: meta.icon,
+    }));
 };

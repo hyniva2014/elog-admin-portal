@@ -1,275 +1,247 @@
-// UserManagementHeader.test.jsx
-
 import React from "react";
-import {
-  render,
-  screen,
-  fireEvent,
-} from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 
 import "@testing-library/jest-dom";
 
 import UserManagementHeader from "./UserManagementHeader";
 
-const mockHandleClick = jest.fn();
-const mockSetData = jest.fn();
+import { getUserManagementFilters } from "./Constants";
 
-// Mock CommonPageHeader
-jest.mock(
-  "../../../common/CommonPageHeader",
-  () => (props) => (
-    <div data-testid="common-page-header">
-      <h1>{props.title}</h1>
-      <p>{props.subtitle}</p>
+jest.mock("./Constants", () => ({
+  getUserManagementFilters: jest.fn(),
+}));
 
-      <div>{props.rightContent}</div>
-    </div>
-  )
-);
+jest.mock("../../../common/CommonPageHeader", () => {
+  return function MockCommonPageHeader(props) {
+    return (
+      <div>
+        <div>{props.title}</div>
 
-// Mock CommonSummaryCardGroup
-jest.mock(
-  "../../../common/CommonSummaryCardGroup",
-  () => (props) => (
-    <div data-testid="summary-card-group">
-      {props.cards?.map((card, index) => (
-        <div key={index}>{card.title}</div>
-      ))}
-    </div>
-  )
-);
+        <div>{props.subtitle}</div>
 
-// Mock CommonFilters
-jest.mock(
-  "../../../common/CommonFilters",
-  () => (props) => (
-    <div data-testid="common-filters">
-      Filters Component
-      <button
-        onClick={() =>
-          props.setData({
-            search: "test",
-          })
-        }
-      >
-        Apply Filter
-      </button>
-    </div>
-  )
-);
-
-// Mock styled components
-jest.mock(
-  "./UserManagementHeader.styled",
-  () => ({
-    HeaderContainer: ({ children }) => (
-      <div data-testid="header-container">
-        {children}
+        {props.rightContent}
       </div>
-    ),
+    );
+  };
+});
 
-    SummaryCardWrapper: ({
-      children,
-    }) => (
-      <div data-testid="summary-wrapper">
-        {children}
+jest.mock("../../../common/CommonSummaryCardGroup", () => {
+  return function MockSummaryCards(props) {
+    return <div data-testid="summary-cards">{JSON.stringify(props.cards)}</div>;
+  };
+});
+
+jest.mock("../../../common/CommonFilters", () => {
+  return function MockCommonFilters(props) {
+    return (
+      <div data-testid="common-filters">
+        Filters Component
+        <div>{JSON.stringify(props.filters)}</div>
       </div>
-    ),
+    );
+  };
+});
 
-    AddUserButton: ({
-      children,
-      onClick,
-    }) => (
-      <button onClick={onClick}>
-        {children}
-      </button>
-    ),
-  })
-);
+describe("UserManagementHeader", () => {
+  const mockSetData = jest.fn();
 
-// Mock feature constants
-jest.mock(
-  "./Constants",
-  () => ({
-    USER_MANAGEMENT_FILTERS: [
-      {
-        label: "Status",
-        key: "status",
-      },
-    ],
-  })
-);
+  const mockHandleClick = jest.fn();
 
-describe("UserManagementHeader Component", () => {
+  const mockCompanyOptions = [
+    {
+      label: "TrackPulse Logistics",
+      value: "7",
+    },
+  ];
+
+  const mockSummaryCards = [
+    {
+      id: "total_users",
+      title: "Total Users",
+      value: "10",
+    },
+  ];
+
+  const mockFilters = [
+    {
+      label: "User Profile",
+      dataKey: "role_id",
+    },
+  ];
+
   beforeEach(() => {
     jest.clearAllMocks();
-  });
 
-  const defaultProps = {
-    data: [],
-    setData: mockSetData,
-    searchKey: {},
-    summaryCards: [
-      {
-        title: "Total Users",
-        count: 10,
-      },
-      {
-        title: "Active Users",
-        count: 8,
-      },
-    ],
-    handleClick: mockHandleClick,
-  };
+    getUserManagementFilters.mockReturnValue(mockFilters);
+  });
 
   test("renders component correctly", () => {
     render(
       <UserManagementHeader
-        {...defaultProps}
-      />
+        data={[]}
+        setData={mockSetData}
+        searchKey={{}}
+        summaryCards={mockSummaryCards}
+        handleClick={mockHandleClick}
+        companyOptions={mockCompanyOptions}
+      />,
     );
 
+    expect(screen.getByText("User Management")).toBeInTheDocument();
+
     expect(
-      screen.getByTestId(
-        "header-container"
-      )
+      screen.getByText("Manage user accounts and permissions"),
     ).toBeInTheDocument();
   });
 
-  test("renders page header title and subtitle", () => {
+  test("renders add user button", () => {
     render(
       <UserManagementHeader
-        {...defaultProps}
-      />
+        data={[]}
+        setData={mockSetData}
+        searchKey={{}}
+        summaryCards={mockSummaryCards}
+        handleClick={mockHandleClick}
+        companyOptions={mockCompanyOptions}
+      />,
     );
 
-    expect(
-      screen.getByText("User Management")
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByText(
-        "Manage user accounts and permissions"
-      )
-    ).toBeInTheDocument();
+    expect(screen.getByText("Add User")).toBeInTheDocument();
   });
 
-  test("renders Add User button", () => {
+  test("calls handleClick when add user button clicked", () => {
     render(
       <UserManagementHeader
-        {...defaultProps}
-      />
+        data={[]}
+        setData={mockSetData}
+        searchKey={{}}
+        summaryCards={mockSummaryCards}
+        handleClick={mockHandleClick}
+        companyOptions={mockCompanyOptions}
+      />,
     );
 
-    expect(
-      screen.getByText("Add User")
-    ).toBeInTheDocument();
-  });
+    fireEvent.click(screen.getByText("Add User"));
 
-  test("calls handleClick when Add User button clicked", () => {
-    render(
-      <UserManagementHeader
-        {...defaultProps}
-      />
-    );
-
-    fireEvent.click(
-      screen.getByText("Add User")
-    );
-
-    expect(
-      mockHandleClick
-    ).toHaveBeenCalledTimes(1);
+    expect(mockHandleClick).toHaveBeenCalledTimes(1);
   });
 
   test("renders summary cards correctly", () => {
     render(
       <UserManagementHeader
-        {...defaultProps}
-      />
+        data={[]}
+        setData={mockSetData}
+        searchKey={{}}
+        summaryCards={mockSummaryCards}
+        handleClick={mockHandleClick}
+        companyOptions={mockCompanyOptions}
+      />,
     );
 
-    expect(
-      screen.getByText("Total Users")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("summary-cards")).toBeInTheDocument();
 
     expect(
-      screen.getByText("Active Users")
-    ).toBeInTheDocument();
-  });
-
-  test("renders CommonFilters component", () => {
-    render(
-      <UserManagementHeader
-        {...defaultProps}
-      />
-    );
-
-    expect(
-      screen.getByTestId(
-        "common-filters"
-      )
+      screen.getByText(JSON.stringify(mockSummaryCards)),
     ).toBeInTheDocument();
   });
 
-  test("calls setData from filters", () => {
+  test("renders common filters correctly", () => {
     render(
       <UserManagementHeader
-        {...defaultProps}
-      />
+        data={[]}
+        setData={mockSetData}
+        searchKey={{}}
+        summaryCards={mockSummaryCards}
+        handleClick={mockHandleClick}
+        companyOptions={mockCompanyOptions}
+      />,
     );
 
-    fireEvent.click(
-      screen.getByText("Apply Filter")
-    );
+    expect(screen.getByTestId("common-filters")).toBeInTheDocument();
 
-    expect(
-      mockSetData
-    ).toHaveBeenCalledWith({
-      search: "test",
-    });
+    expect(screen.getByText("Filters Component")).toBeInTheDocument();
   });
 
-  test("renders summary wrapper", () => {
+  test("calls getUserManagementFilters with company options", () => {
     render(
       <UserManagementHeader
-        {...defaultProps}
-      />
+        data={[]}
+        setData={mockSetData}
+        searchKey={{}}
+        summaryCards={mockSummaryCards}
+        handleClick={mockHandleClick}
+        companyOptions={mockCompanyOptions}
+      />,
     );
 
-    expect(
-      screen.getByTestId(
-        "summary-wrapper"
-      )
-    ).toBeInTheDocument();
+    expect(getUserManagementFilters).toHaveBeenCalledWith(mockCompanyOptions);
+  });
+
+  test("passes generated filters to CommonFilters", () => {
+    render(
+      <UserManagementHeader
+        data={[]}
+        setData={mockSetData}
+        searchKey={{}}
+        summaryCards={mockSummaryCards}
+        handleClick={mockHandleClick}
+        companyOptions={mockCompanyOptions}
+      />,
+    );
+
+    expect(screen.getByText(JSON.stringify(mockFilters))).toBeInTheDocument();
+  });
+
+  test("renders correctly with empty props", () => {
+    render(<UserManagementHeader handleClick={mockHandleClick} />);
+
+    expect(screen.getByText("User Management")).toBeInTheDocument();
+
+    expect(screen.getByText("Add User")).toBeInTheDocument();
   });
 
   test("renders without summary cards", () => {
     render(
       <UserManagementHeader
-        {...defaultProps}
+        data={[]}
+        setData={mockSetData}
+        searchKey={{}}
         summaryCards={[]}
-      />
+        handleClick={mockHandleClick}
+        companyOptions={mockCompanyOptions}
+      />,
     );
 
-    expect(
-      screen.getByTestId(
-        "summary-card-group"
-      )
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("summary-cards")).toBeInTheDocument();
   });
 
-  test("renders with empty data prop", () => {
+  test("renders without company options", () => {
     render(
       <UserManagementHeader
         data={[]}
         setData={mockSetData}
+        searchKey={{}}
+        summaryCards={mockSummaryCards}
         handleClick={mockHandleClick}
-      />
+        companyOptions={[]}
+      />,
     );
 
-    expect(
-      screen.getByText("User Management")
-    ).toBeInTheDocument();
+    expect(getUserManagementFilters).toHaveBeenCalledWith([]);
+  });
+
+  test("matches snapshot", () => {
+    const { container } = render(
+      <UserManagementHeader
+        data={[]}
+        setData={mockSetData}
+        searchKey={{}}
+        summaryCards={mockSummaryCards}
+        handleClick={mockHandleClick}
+        companyOptions={mockCompanyOptions}
+      />,
+    );
+
+    expect(container).toMatchSnapshot();
   });
 });

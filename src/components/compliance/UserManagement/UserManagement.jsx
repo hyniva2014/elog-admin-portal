@@ -10,7 +10,12 @@ import { buildSummaryCards } from "../../../common/CommonUtils";
 import { useServices } from "../../../services/services";
 import CommonSnackbar from "../../../common/CommonSnackbar";
 import dayjs from "dayjs";
-import { getUsers, getUserDetails, onboardUser } from "./userManagementService";
+import {
+  getUsers,
+  getUserDetails,
+  onboardUser,
+  getCompaniesDropdown,
+} from "./userManagementService";
 
 /** Format ISO date string to DD-MM-YYYY */
 const formatDate = (iso) => (iso ? dayjs(iso).format("DD-MM-YYYY") : "-");
@@ -53,12 +58,38 @@ const UserManagement = () => {
     message: "",
     severity: "success",
   });
-
+  const [companyOptions, setCompanyOptions] = useState([]);
   const { fetchApi, createApi } = useServices();
 
   const handleSnackbarClose = useCallback(() => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   }, []);
+
+  const fetchCompanies = useCallback(async () => {
+    try {
+      const response = await getCompaniesDropdown(fetchApi);
+
+      const companies = response?.body?.data || [];
+
+      const mappedCompanies = companies.map((company) => ({
+        label: company.company_name,
+        value: String(company.company_id),
+      }));
+
+      setCompanyOptions(mappedCompanies);
+    } catch (error) {
+      console.log("COMPANY DROPDOWN ERROR =>", error);
+
+      setSnackbar({
+        open: true,
+        message: "Failed to fetch companies",
+        severity: "error",
+      });
+    }
+  }, []);
+  useEffect(() => {
+    fetchCompanies();
+  }, [fetchCompanies]);
 
   const fetchUsers = useCallback(async () => {
     setData((prev) => ({ ...prev, isLoading: true }));
@@ -86,16 +117,7 @@ const UserManagement = () => {
         isLoading: false,
       }));
 
-      // Update summary cards with live counts from the API
-      const built = buildSummaryCards(response?.body, USER_SUMMARY_CARDS).map(
-        (c) => ({
-          ...c,
-          icon: c.iconPath ? (
-            <img src={c.iconPath} alt={c.title} width={36} height={36} />
-          ) : null,
-        }),
-      );
-      setSummaryCards(built);
+      setSummaryCards(buildSummaryCards(response?.body, USER_SUMMARY_CARDS));
     } catch {
       setData((prev) => ({ ...prev, isLoading: false }));
       setSnackbar({
@@ -189,7 +211,7 @@ const UserManagement = () => {
     formData.append("email", formValues.email || "");
     formData.append("status_id", formValues.status_id || "1");
 
-    formData.append("middle_name", "NA");
+    formData.append("middle_name", "");
 
     formData.append("is_superadmin", "1");
 
@@ -287,6 +309,7 @@ const UserManagement = () => {
           mode={mode}
           setMode={setMode}
           handleClick={handleAddClick}
+          companyOptions={companyOptions}
         />
         <CommonDataGrid
           columnsData={columnsWithActions}
@@ -295,6 +318,8 @@ const UserManagement = () => {
           setData={setData}
           paginationMode="server"
           getRowHeight={handleGetRowHeight}
+          showMuiLoading={false}
+          useAutoHeight={true}
         />
       </PageContainer>
 
@@ -305,6 +330,7 @@ const UserManagement = () => {
         loading={formLoading}
         mode={mode}
         initialData={selectedUser}
+        companyOptions={companyOptions}
       />
 
       <CommonSnackbar
