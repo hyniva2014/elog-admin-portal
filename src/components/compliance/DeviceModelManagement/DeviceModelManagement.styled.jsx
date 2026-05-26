@@ -57,7 +57,3 @@ export const StyledActionIcon = styled(VisibilityOutlinedIcon)(({ theme }) => ({
   fontSize: 20,
   color: theme.palette.text.secondary,
 }));
-
-export const SubtitleTypography = styled(Typography)(() => ({
-  fontWeight: 300,
-}));

@@ -133,7 +133,7 @@ const DeviceModelManagementForm = ({
         error={!!errors.assetType}
         helperText={errors.assetType?.message}
         fullWidth
-        InputLabelProps={{ shrink: getShrinkValue(field.value, isDisabled) }}
+        InputLabelProps={{ shrink: getShrinkValue(field.value, isDisabled), required: true }}
       >
         {assetTypeOptions}
       </CommonTextFieldStyled>
@@ -153,7 +153,7 @@ const DeviceModelManagementForm = ({
         error={!!errors.supportsElogs}
         helperText={errors.supportsElogs?.message}
         fullWidth
-        InputLabelProps={{ shrink: getShrinkValue(field.value, isDisabled) }}
+        InputLabelProps={{ shrink: getShrinkValue(field.value, isDisabled), required: true }}
       >
         {elogsOptions}
       </CommonTextFieldStyled>
