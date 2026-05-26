@@ -1,28 +1,47 @@
 import dayjs from "dayjs";
 
-export const buildSummaryCards = (responseData, cardConfig) => {
-  return cardConfig.map((card) => ({
-    ...card,
-    value: String(responseData?.[card.key] ?? 0),
-  }));
+const formatDisplayDate = (date) => {
+  return dayjs(date).format("MM-DD-YYYY");
 };
 
-export const formatDateRange = (
-  start,
-  end,
-  displayVariant = "single-or-range",
-) => {
-  const formattedStart = start ? dayjs(start).format("MM-DD-YYYY") : "";
-  const formattedEnd = end ? dayjs(end).format("MM-DD-YYYY") : "";
+export const formatDateRange = (start, end, variant = "single-or-range") => {
+  if (!start || !end) return "";
 
-  if (!formattedStart && !formattedEnd) return "";
+  const sameDay = dayjs(start).isSame(end, "day");
 
-  if (displayVariant === "single-or-range") {
-    if (!formattedEnd || formattedStart === formattedEnd) {
-      return formattedStart;
-    }
-    return `${formattedStart} - ${formattedEnd}`;
+  switch (variant) {
+    case "iso":
+      return `${dayjs(start).format("YYYY-MM-DD")} to ${dayjs(end).format(
+        "YYYY-MM-DD",
+      )}`;
+
+    case "range-only":
+      return `${formatDisplayDate(start)} - ${formatDisplayDate(end)}`;
+
+    case "single-or-range":
+    default:
+      return sameDay
+        ? formatDisplayDate(start)
+        : `${formatDisplayDate(start)} - ${formatDisplayDate(end)}`;
   }
+};
 
-  return `${formattedStart}${formattedEnd ? ` - ${formattedEnd}` : ""}`;
+export const buildSummaryCards = (apiBody = {}, config = {}) => {
+  const configList = Array.isArray(config)
+    ? config
+    : Object.entries(config).map(([key, meta]) => ({ key, ...meta }));
+
+  return configList
+    .map((meta) => {
+      const sourceKey = meta.key || meta.id;
+      return {
+        id: meta.id,
+        title: meta.title,
+        value: apiBody[sourceKey] ?? 0,
+        accentcolor: meta.accentcolor,
+        icon: meta.icon || meta.iconPath || null,
+        iconPath: meta.iconPath,
+      };
+    })
+    .filter((card) => card.id && card.title);
 };

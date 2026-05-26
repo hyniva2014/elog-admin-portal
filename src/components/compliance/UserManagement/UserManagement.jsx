@@ -27,8 +27,8 @@ const UserManagement = () => {
     company_id: "",
     role_id: "",
     status_id: "",
-    from_date: "",
-    to_date: "",
+    fromDate: null,
+    toDate: null,
     isLoading: false,
   });
   const {
@@ -38,8 +38,8 @@ const UserManagement = () => {
     company_id,
     role_id,
     status_id,
-    from_date,
-    to_date,
+    fromDate,
+    toDate,
     isLoading,
   } = data;
 
@@ -67,8 +67,8 @@ const UserManagement = () => {
         page,
         limit: pageSize,
         company_id: company_id || "",
-        from_date: from_date || "",
-        to_date: to_date || "",
+        from_date: fromDate ? dayjs(fromDate).format("YYYY-MM-DD") : "",
+        to_date: toDate ? dayjs(toDate).format("YYYY-MM-DD") : "",
         role_id: role_id || "",
         status_id: status_id || "",
         search: search || "",
@@ -111,8 +111,8 @@ const UserManagement = () => {
     company_id,
     role_id,
     status_id,
-    from_date,
-    to_date,
+    fromDate,
+    toDate,
   ]);
 
   useEffect(() => {
@@ -127,7 +127,7 @@ const UserManagement = () => {
     async (row) => {
       try {
         setFormLoading(true);
-setLoading(true);
+        setLoading(true);
         const response = await getUserDetails(fetchApi, row.user_id);
 
         let user = response?.body?.data;
@@ -199,12 +199,10 @@ setLoading(true);
   const handleCreateUser = async (formValues) => {
     try {
       setFormLoading(true);
-setLoading(true);
+      setLoading(true);
       const payload = buildFormData(formValues);
 
       const response = await onboardUser(createApi, payload);
-
-      console.log("CREATE RESPONSE =>", response);
 
       setSnackbar({
         open: true,
@@ -243,7 +241,7 @@ setLoading(true);
   const handleUpdateUser = async (formValues) => {
     try {
       setFormLoading(true);
-setLoading(true);
+      setLoading(true);
 
       const payload = buildFormData(formValues, true);
 
@@ -264,8 +262,6 @@ setLoading(true);
 
       setOpenForm(false);
     } catch (error) {
-      console.log("UPDATE ERROR =>", error);
-
       setSnackbar({
         open: true,
         message:
@@ -276,7 +272,7 @@ setLoading(true);
       });
     } finally {
       setFormLoading(false);
-        setLoading(false);
+      setLoading(false);
     }
   };
 

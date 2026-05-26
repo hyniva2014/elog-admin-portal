@@ -28,22 +28,25 @@ export const SummaryCardRoot = styled(Box)(({ theme }) => {
 
 export const AccentBar = styled(Box, {
   shouldForwardProp: (prop) => prop !== "accentcolor",
-})(({ accentcolor }) => ({
-  width: 4,
-  height: "100%",
-  backgroundColor: accentcolor,
-  borderRadius: "4px 0 0 4px",
-  position: "absolute",
-  left: 0,
-  top: 0,
-}));
+})(({ theme, accentcolor }) => {
+  const paletteColor = accentcolor && theme.palette[accentcolor];
+  const resolvedColor =
+    paletteColor?.main || accentcolor || theme.palette.primary.main;
+
+  return {
+    width: 4,
+    height: "100%",
+    backgroundColor: resolvedColor,
+    borderRadius: "4px 0 0 4px",
+    position: "absolute",
+    left: 0,
+    top: 0,
+  };
+});
 
 export const ContentWrapper = styled(Box)(({ theme }) => ({
   marginLeft: theme.spacing(1),
 }));
-
-
-
 
 export const ValueText = styled(Typography, {
   shouldForwardProp: (prop) => prop !== "isdashboard",
