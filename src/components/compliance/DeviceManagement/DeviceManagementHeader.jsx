@@ -2,12 +2,16 @@ import { Typography } from "@mui/material";
 import CommonPageHeader from "../../../common/CommonPageHeader";
 import CommonFilters from "../../../common/CommonFilters";
 import {
-  DEVICE_CARRIER_ID_FILTER_OPTIONS,
   DEVICE_STATUS_FILTER_OPTIONS,
-  DEVICE_TRUCK_FILTER_OPTIONS,
 } from "./Constants";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
-import { HeaderContainer, AddButton, SummaryCardBox } from "./DeviceManagement.styles";
+import {
+  HeaderContainer,
+  AddButton,
+  SummaryCardBox,
+} from "./DeviceManagement.styles";
+import { useServices } from "../../../services/services";
+import { useEffect, useState } from "react";
 
 const DeviceManagementHeader = (props) => {
   const {
@@ -16,7 +20,46 @@ const DeviceManagementHeader = (props) => {
     searchKey = {},
     summaryCards = [],
     handleClick,
+    isAssignDeviceEnabled,
   } = props;
+  const { fetchApi } = useServices();
+  const [truckOptions, setTruckOptions] = useState([]);
+  const [carrierOptions, setCarrierOptions] = useState([]);
+
+  useEffect(() => {
+    fetchTrucks();
+    fetchCarriers();
+  }, []);
+
+  const fetchTrucks = async () => {
+    try {
+      const response = await fetchApi("/masteradmin/dropdown/trucks");
+      const dropdownData = response?.body?.data || [];
+      const formattedOptions = dropdownData.map((item) => ({
+        value: item.truck_id,
+        label: item.plate_number,
+      }));
+
+      setTruckOptions(formattedOptions);
+    } catch (error) {
+      console.error("Device Model Dropdown Error:", error);
+    }
+  };
+
+  const fetchCarriers = async () => {
+    try {
+      const response = await fetchApi("/masteradmin/dropdown/companies");
+      const dropdownData = response?.body?.data || [];
+      const formattedOptions = dropdownData.map((item) => ({
+        value: item.company_id,
+        label: item.company_name,
+      }));
+
+      setCarrierOptions(formattedOptions);
+    } catch (error) {
+      console.error("Device Model Dropdown Error:", error);
+    }
+  };
 
   return (
     <HeaderContainer>
@@ -25,8 +68,12 @@ const DeviceManagementHeader = (props) => {
         handleClick={handleClick}
         addButton={true}
         rightContent={
-          <AddButton variant="contained" onClick={handleClick}>
-            Add Device
+          <AddButton
+            variant="contained"
+            onClick={handleClick}
+            disabled={!isAssignDeviceEnabled}
+          >
+            Assign Device
           </AddButton>
         }
       />
@@ -45,12 +92,12 @@ const DeviceManagementHeader = (props) => {
           {
             label: "All Truck",
             dataKey: "truckNumber",
-            options: DEVICE_TRUCK_FILTER_OPTIONS,
+            options: truckOptions,
           },
           {
             label: "All Carrier",
             dataKey: "carrierId",
-            options: DEVICE_CARRIER_ID_FILTER_OPTIONS,
+            options: carrierOptions,
           },
           {
             label: "All Status",

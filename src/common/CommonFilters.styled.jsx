@@ -6,7 +6,7 @@ export const FiltersContainer = styled(Box)(({ theme }) => ({
   width: "100%",
   display: "flex",
   alignItems: "center",
-  gap: theme.spacing(2),
+  // gap: theme.spacing(1),
   flexWrap: "wrap",
 }));
 

@@ -11,13 +11,10 @@ import {
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import LeaderboardOutlinedIcon from "@mui/icons-material/LeaderboardOutlined";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { PageMetaData } from "@src/components";
 import CommonSnackbar from "@src/common/CommonSnackbar";
 import { useAuthContext } from "@src/states";
-import logo from "@src/assets/images/logo.png";
 import TruckLogo from "@src/assets/images/TruckLogo.png";
 import { useServices } from "@src/services/services";
 import { setLoginDetails, setLoginPermissions } from "./Loginstore/Login.slice";
@@ -45,7 +42,6 @@ const loginSchema = yup.object().shape({
     .email("Enter valid email")
     .required("Email is required"),
   password: yup.string().required("Password is required"),
-  // truckId: yup.string().required("Company Code is required"),
 });
 
 const forgotEmailSchema = yup.object().shape({
@@ -298,7 +294,6 @@ const LoginScreen = () => {
 
   return (
     <>
-      <PageMetaData title="Login" />
       <LoginWrapper>
         <LoadingContainer />
         <LogoRow>

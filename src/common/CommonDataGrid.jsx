@@ -43,6 +43,7 @@ const CommonDataGrid = ({
   checkboxSelection = false,
   rowSelectionModel = [],
   onRowSelectionModelChange = () => {},
+  isRowSelectable,
 }) => {
   const pagePaginationModel = {
     page: (data.page || 1) - 1,
@@ -75,7 +76,7 @@ const CommonDataGrid = ({
       if (!virtualScroller) return;
       const scrollLeft = virtualScroller.scrollLeft;
       const stickyHeaders = root.querySelectorAll(
-        ".MuiDataGrid-columnHeader.sticky-col-left-1, .MuiDataGrid-columnHeader.sticky-col-left-2",
+        ".MuiDataGrid-columnHeader.sticky-col-left-1, .MuiDataGrid-columnHeader.sticky-col-left-2, .MuiDataGrid-columnHeaderCheckbox",
       );
       stickyHeaders.forEach((el) => {
         el.style.setProperty(
@@ -202,6 +203,7 @@ const CommonDataGrid = ({
   return (
     <Box ref={containerRef} sx={getContainerSx(localRows.length > 0)}>
       <DataGrid
+        className={checkboxSelection ? "has-checkbox" : ""}
         rows={localRows}
         columns={withHeaderTooltip(enhancedColumns)}
         rowCount={data.total || 0}
@@ -218,6 +220,7 @@ const CommonDataGrid = ({
         checkboxSelection={checkboxSelection}
         rowSelectionModel={rowSelectionModel}
         onRowSelectionModelChange={onRowSelectionModelChange}
+        isRowSelectable={isRowSelectable}
         onPaginationModelChange={(model) =>
           setData((prev) => ({
             ...prev,

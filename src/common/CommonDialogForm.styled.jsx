@@ -1,6 +1,6 @@
 export const dialogStyles = (theme) => ({
   paper: {
-    borderRadius: theme.spacing(0.375),
+    borderRadius: theme.spacing(1.25),
     width: "100%",
     position: "relative",
   },
@@ -63,9 +63,9 @@ export const dialogStyles = (theme) => ({
     fontSize: 16,
     fontWeight: 400,
     color: theme.palette.common.white,
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: "#284495",
     borderRadius: theme.spacing(0.25),
-    borderColor: theme.palette.primary.main,
+    borderColor: "#284495",
   },
 });
 
