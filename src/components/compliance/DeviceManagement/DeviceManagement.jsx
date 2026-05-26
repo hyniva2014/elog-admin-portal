@@ -10,8 +10,15 @@ import {
   transformDeviceData,
   DEVICE_SUMMARY_CARDS,
 } from "./Constants";
-import { buildSummaryCards } from "../../../common/CommonUtils";
+import {
+  buildSummaryCards,
+  getSelectedDevices,
+} from "../../../common/CommonUtils";
 import AssignDevicesToCarriers from "./AssignDevicesToCarriers";
+
+const isDeviceSelectable = (params) => {
+  return params.row.status?.toLowerCase() === "unassigned";
+};
 
 const DeviceManagement = () => {
   const { fetchApi } = useServices();
@@ -34,12 +41,6 @@ const DeviceManagement = () => {
     isLoading: false,
   });
 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
-
   useEffect(() => {
     fetchDeviceList();
   }, [
@@ -56,11 +57,24 @@ const DeviceManagement = () => {
   const fetchDeviceList = async () => {
     try {
       setLoading(true);
-      let endUrl = `/masteradmin/get-devices-list?page=${data.page}&limit=${data.pageSize}&company_id=${data.carrierId}&search=${data.search}&truck_number=${data.truckNumber}&status=${data.status}`;
+
+      const queryParams = new URLSearchParams({
+        page: data.page,
+        limit: data.pageSize,
+        company_id: data.carrierId,
+        search: data.search,
+        truck_number: data.truckNumber,
+        status: data.status,
+      });
 
       if (data.fromDate) {
-        endUrl += `&created_at=${dayjs(data.fromDate).format("YYYY-MM-DD")}`;
+        queryParams.append(
+          "created_at",
+          dayjs(data.fromDate).format("YYYY-MM-DD"),
+        );
       }
+
+      const endUrl = `/masteradmin/get-devices-list?${queryParams.toString()}`;
 
       const response = await fetchApi(endUrl);
       const apiData = response?.body?.data || [];
@@ -105,6 +119,12 @@ const DeviceManagement = () => {
     setIsAssignDialogOpen(false);
   };
 
+  const handleRowSelectionChange = (newSelection) => {
+    setSelectedRows(newSelection);
+    const selectedDeviceIds = getSelectedDevices(newSelection);
+    console.log("Selected Devices:", selectedDeviceIds);
+  };
+
   return (
     <>
       <LoadingContainer />
@@ -129,21 +149,9 @@ const DeviceManagement = () => {
           paginationMode="server"
           getRowHeight={() => "auto"}
           checkboxSelection
-          isRowSelectable={(params) =>
-            params.row.status?.toLowerCase() === "unassigned"
-          }
+          isRowSelectable={isDeviceSelectable}
           rowSelectionModel={selectedRows}
-          onRowSelectionModelChange={(newSelection) => {
-            setSelectedRows(newSelection);
-
-            const selectedDeviceIds = allRows
-              .filter((row) => newSelection.includes(row.id))
-              .map((row) => ({
-                device_id: row.id,
-              }));
-
-            console.log("Selected Devices:", selectedDeviceIds);
-          }}
+          onRowSelectionModelChange={handleRowSelectionChange}
         />
       </PageContainer>
 

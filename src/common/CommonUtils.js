@@ -45,3 +45,11 @@ export const buildSummaryCards = (apiBody = {}, config = {}) => {
     })
     .filter((card) => card.id && card.title);
 };
+
+export const getSelectedDevices = (selectedIds) => {
+  return allRows
+    .filter((row) => selectedIds.includes(row.id))
+    .map((row) => ({
+      device_id: row.id,
+    }));
+};

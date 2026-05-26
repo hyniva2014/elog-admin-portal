@@ -3,6 +3,7 @@ import CommonDialogForm from "../../../common/CommonDialogForm";
 import { ADD_DEVICE_FORM_ID } from "./Constants";
 import { useEffect, useState } from "react";
 import { useServices } from "../../../services/services";
+import { Grid } from "@mui/material";
 
 const AssignDevicesToCarriers = ({
   open,
@@ -33,8 +34,12 @@ const AssignDevicesToCarriers = ({
     }
   };
 
+  const handleFormSubmit = () => {
+    handleSubmit(selectedCarrier);
+  };
+
   const content = (
-    <div style={{ padding: "16px" }}>
+    <Grid sx={{ p: 3 }}>
       <CommonAutocompleteDropdown
         name="carrier"
         label="Carrier Name"
@@ -43,7 +48,7 @@ const AssignDevicesToCarriers = ({
         onChange={(value) => setSelectedCarrier(value)}
         disabled={false}
       />
-    </div>
+    </Grid>
   );
 
   return (
@@ -53,7 +58,7 @@ const AssignDevicesToCarriers = ({
       content={content}
       formId={ADD_DEVICE_FORM_ID}
       onCancel={handleCancel}
-      onSubmit={() => handleSubmit(selectedCarrier)}
+      onSubmit={handleFormSubmit}
       loading={loading}
       submitButtonText="Assign"
       maxWidth="md"
