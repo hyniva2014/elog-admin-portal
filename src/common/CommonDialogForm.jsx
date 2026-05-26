@@ -12,8 +12,11 @@ import {
 import { useTheme } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
 
-import { dialogStyles } from "./CommonDialogForm.styled";
-import { DIALOG_MODES, BUTTON_LABELS } from "./CommonDialogForm.styled";
+import {
+  dialogStyles,
+  DIALOG_MODES,
+  BUTTON_LABELS,
+} from "./CommonDialogForm.styled";
 
 const CommonDialogForm = ({
   open,
@@ -34,7 +37,9 @@ const CommonDialogForm = ({
   const styles = dialogStyles(theme);
 
   const isEditMode = mode === DIALOG_MODES.EDIT;
-  const shouldShowActions = !isEditMode || isEditing;
+
+  const shouldShowActions =
+    mode === DIALOG_MODES.ADD || mode === DIALOG_MODES.EDIT || isEditing;
 
   const handleDialogClose = () => {
     if (loading) {
@@ -63,6 +68,39 @@ const CommonDialogForm = ({
       : isEditMode
         ? BUTTON_LABELS.UPDATE
         : BUTTON_LABELS.SAVE);
+
+  const dialogContent =
+    typeof content === "string" ? (
+      <Typography color="text.secondary">{content}</Typography>
+    ) : (
+      content
+    );
+
+  const dialogActions = shouldShowActions ? (
+    <DialogActions sx={styles.dialogActions}>
+      <Button
+        variant="outlined"
+        onClick={onCancel}
+        fullWidth
+        disabled={loading}
+        sx={styles.cancelButton}
+      >
+        {BUTTON_LABELS.CANCEL}
+      </Button>
+
+      <Button
+        type="submit"
+        variant="contained"
+        fullWidth
+        form={formId}
+        onClick={onSubmit}
+        disabled={loading}
+        sx={styles.submitButton}
+      >
+        {submitLabel}
+      </Button>
+    </DialogActions>
+  ) : null;
 
   return (
     <Dialog
@@ -93,39 +131,9 @@ const CommonDialogForm = ({
         </Box>
       </DialogTitle>
 
-      <DialogContent>
-        {typeof content === "string" ? (
-          <Typography color="text.secondary">{content}</Typography>
-        ) : (
-          content
-        )}
-      </DialogContent>
+      <DialogContent>{dialogContent}</DialogContent>
 
-      {shouldShowActions && (
-        <DialogActions sx={styles.dialogActions}>
-          <Button
-            variant="outlined"
-            onClick={onCancel}
-            fullWidth
-            disabled={loading}
-            sx={styles.cancelButton}
-          >
-            {BUTTON_LABELS.CANCEL}
-          </Button>
-
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            form={formId}
-            onClick={onSubmit}
-            disabled={loading}
-            sx={styles.submitButton}
-          >
-            {submitLabel}
-          </Button>
-        </DialogActions>
-      )}
+      {dialogActions}
     </Dialog>
   );
 };
