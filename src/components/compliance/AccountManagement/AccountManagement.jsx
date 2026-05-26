@@ -7,14 +7,8 @@ import CommonLoading from "../../../common/CommonLoading";
 import { GridContainer } from "./AccountManagement.styled";
 import AddAccountDialog from "./AddAccountDialog";
 import { useServices } from "../../../services/services";
-// import { useFilters } from "../../../common/FilterContext";
-import { useSelector } from "react-redux";
-import { defaultPageSize } from "./Constants";
-import {
-  AccountManagementColumnsData,
-  AccountManagementRowData,
-} from "./CommonRowColumnUtils";
-import { STATUS_OPTIONS } from "./Constants";
+import { defaultPageSize, STATUS_OPTIONS } from "./Constants";
+import { AccountManagementColumnsData } from "./CommonRowColumnUtils";
 import { useAccountManagement } from "./useAccountManagement";
 
 const AccountManagement = () => {
@@ -29,6 +23,11 @@ const AccountManagement = () => {
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState("add");
   const [selectedCompany, setSelectedCompany] = useState(null);
+  const [contactOptions, setContactOptions] = useState({
+    primaryContactOptions: [],
+    secondaryContactOptions: [],
+  });
+  const [carrierOptions, setCarrierOptions] = useState([]);
 
   const getDefaultFilters = () => {
     return {
@@ -98,7 +97,7 @@ const AccountManagement = () => {
     setDialogMode("view");
   }, []);
 
-  const { buildFetchUrl, fetchData, handleCreateAccount, handleViewAccount } = useAccountManagement(
+  const { buildFetchUrl, fetchData, handleCreateAccount, handleViewAccount, fetchContactsDropdown, fetchCompaniesDropdown } = useAccountManagement(
     companyId,
     primaryContactName,
     secondaryContactName,
@@ -173,6 +172,14 @@ const AccountManagement = () => {
   }, [isLoading, setLoading]);
 
   useEffect(() => {
+    fetchContactsDropdown().then(setContactOptions);
+  }, [fetchContactsDropdown]);
+
+  useEffect(() => {
+    fetchCompaniesDropdown().then(setCarrierOptions);
+  }, [fetchCompaniesDropdown]);
+
+  useEffect(() => {
     fetchData();
   }, [
     page,
@@ -204,7 +211,9 @@ const AccountManagement = () => {
         setData={setData}
         searchKey={searchKey}
         handleClick={handleAddAccount}
-        carrierOptions={[]}
+        primaryContactOptions={contactOptions.primaryContactOptions}
+        secondaryContactOptions={contactOptions.secondaryContactOptions}
+        carrierOptions={carrierOptions}
         statusOptions={STATUS_OPTIONS}
       />
 
