@@ -54,6 +54,7 @@ export const ValueText = styled(Typography, {
   color: isdashboard
     ? theme.palette.text.primary
     : theme.palette.text.secondary,
+  paddingLeft: isdashboard ? theme.spacing(6) : 0,
 }));
 
 export const CardContentWrapper = styled(Box)(({ theme }) => ({

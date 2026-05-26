@@ -1,156 +1,315 @@
-// UserManagement.test.jsx
-
-import { render, screen, fireEvent } from "@testing-library/react";
+import React from "react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
+
 import UserManagement from "./UserManagement";
 
-// Mock CommonDataGrid
-jest.mock("@src/common/CommonDataGrid", () => (props) => (
-  <div data-testid="common-data-grid">
-    CommonDataGrid
-    <div>Rows Count: {props.data.rows.length}</div>
-  </div>
-));
+import { getUsers, getUserDetails, onboardUser } from "./userManagementService";
 
-// Mock UserManagementHeader
-jest.mock("./UserManagementHeader", () => (props) => (
-  <div data-testid="user-management-header">
-    UserManagementHeader
-    <button onClick={props.handleClick}>Open Form</button>
-  </div>
-));
+import { useServices } from "../../../services/services";
 
-// Mock PageContainer
-jest.mock("../../../common/PageContainer", () => ({
-  PageContainer: ({ children }) => (
-    <div data-testid="page-container">{children}</div>
-  ),
+jest.mock("./userManagementService", () => ({
+  getUsers: jest.fn(),
+  getUserDetails: jest.fn(),
+  onboardUser: jest.fn(),
 }));
 
-// Mock CommonLoading
-jest.mock("../../../common/CommonLoading", () => () => ({
-  setLoading: jest.fn(),
-  LoadingContainer: () => (
-    <div data-testid="loading-container">LoadingContainer</div>
-  ),
+jest.mock("../../../services/services", () => ({
+  useServices: jest.fn(),
 }));
 
-// Mock UserManagementForm
-jest.mock(
-  "./UserManagementForm",
-  () => (props) =>
-    props.open ? (
-      <div data-testid="user-management-form">
-        UserManagementForm
+jest.mock("@src/common/CommonDataGrid", () => {
+  return function MockGrid(props) {
+    return (
+      <div>
+        <div data-testid="grid">
+          {props?.rowData?.map((row) => (
+            <div key={row.id}>
+              <span>{row.firstName}</span>
+
+              <button
+                onClick={() => {
+                  const actionColumn = props.columnsData.find(
+                    (c) => c.field === "action",
+                  );
+
+                  actionColumn?.onView?.(row);
+                }}
+              >
+                View
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+});
+
+jest.mock("./UserManagementHeader", () => {
+  return function MockHeader(props) {
+    return <button onClick={props.handleClick}>Add User</button>;
+  };
+});
+
+jest.mock("./UserManagementForm", () => {
+  return function MockForm(props) {
+    if (!props.open) return null;
+
+    return (
+      <div>
+        <div>User Form</div>
+
+        <button
+          onClick={() =>
+            props.onSubmitForm({
+              company_id: "7",
+              role_id: "1",
+              firstName: "John",
+              lastName: "Doe",
+              email: "john@test.com",
+              password: "test@123",
+              status_id: "1",
+            })
+          }
+        >
+          Submit Form
+        </button>
+
         <button onClick={props.onClose}>Close Form</button>
       </div>
-    ) : null,
-);
+    );
+  };
+});
 
-// Mock Row & Column Data
-jest.mock("./CommonRowColumnUtils", () => ({
-  UserManagementColumnData: [
-    { field: "id", headerName: "ID" },
-    { field: "name", headerName: "Name" },
-  ],
-  UserManagementRowData: [
-    { id: 1, name: "John" },
-    { id: 2, name: "Doe" },
-  ],
-}));
+jest.mock("../../../common/CommonSnackbar", () => {
+  return function MockSnackbar(props) {
+    return props.open ? <div>{props.message}</div> : null;
+  };
+});
 
-describe("UserManagement Component", () => {
-  test("renders loading container", () => {
-    render(<UserManagement />);
-
-    expect(screen.getByTestId("loading-container")).toBeInTheDocument();
-  });
-
-  test("renders page container", () => {
-    render(<UserManagement />);
-
-    expect(screen.getByTestId("page-container")).toBeInTheDocument();
-  });
-
-  test("renders UserManagementHeader component", () => {
-    render(<UserManagement />);
-
-    expect(screen.getByTestId("user-management-header")).toBeInTheDocument();
-  });
-
-  test("renders CommonDataGrid component", () => {
-    render(<UserManagement />);
-
-    expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
-  });
-
-  test("passes row data correctly to CommonDataGrid", () => {
-    render(<UserManagement />);
-
-    expect(screen.getByText("Rows Count: 2")).toBeInTheDocument();
-  });
-
-  test("UserManagementForm should not render initially", () => {
-    render(<UserManagement />);
-
-    expect(
-      screen.queryByTestId("user-management-form"),
-    ).not.toBeInTheDocument();
-  });
-
-  test("opens UserManagementForm when handleClick is triggered", () => {
-    render(<UserManagement />);
-
-    const openButton = screen.getByText("Open Form");
-    fireEvent.click(openButton);
-
-    expect(screen.getByTestId("user-management-form")).toBeInTheDocument();
-  });
-
-  test("closes UserManagementForm when onClose is triggered", () => {
-    render(<UserManagement />);
-
-    // Open form
-    fireEvent.click(screen.getByText("Open Form"));
-
-    expect(screen.getByTestId("user-management-form")).toBeInTheDocument();
-
-    // Close form
-    fireEvent.click(screen.getByText("Close Form"));
-
-    expect(
-      screen.queryByTestId("user-management-form"),
-    ).not.toBeInTheDocument();
-  });
-
-  test("renders UserManagementForm with mode='add'", () => {
-    render(<UserManagement />);
-
-    fireEvent.click(screen.getByText("Open Form"));
-
-    expect(screen.getByTestId("user-management-form")).toBeInTheDocument();
+jest.mock("../../../common/CommonLoading", () => {
+  return () => ({
+    LoadingContainer: () => <div>Loading</div>,
   });
 });
 
-describe("Edge Cases & Data Integrity", () => {
+jest.mock("../../../common/PageContainer", () => ({
+  PageContainer: ({ children }) => <div>{children}</div>,
+}));
+
+const mockUsersResponse = {
+  body: {
+    total_users: 1,
+    active_users: 1,
+    inactive_users: 0,
+
+    pagination: {
+      total_records: 1,
+    },
+
+    data: [
+      {
+        user_id: 1,
+        company_id: 7,
+        company_name: "TrackPulse Logistics",
+
+        role_id: 1,
+        user_profile: "Admin",
+
+        first_name: "John",
+        last_name: "Doe",
+
+        email: "john@test.com",
+
+        status_id: 1,
+        status: "Active",
+
+        created_at: "2026-05-25T10:00:00.000Z",
+
+        updated_at: "2026-05-25T10:00:00.000Z",
+      },
+    ],
+  },
+};
+
+const mockUserDetailsResponse = {
+  body: {
+    data: {
+      user_id: 1,
+      company_id: 7,
+      company_name: "TrackPulse Logistics",
+
+      role_id: 1,
+      user_profile: "Admin",
+
+      first_name: "John",
+      last_name: "Doe",
+
+      email: "john@test.com",
+
+      status_id: 1,
+    },
+  },
+};
+
+describe("UserManagement", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+
+    useServices.mockReturnValue({
+      fetchApi: jest.fn(),
+      createApi: jest.fn(),
+    });
+
+    getUsers.mockResolvedValue(mockUsersResponse);
+
+    getUserDetails.mockResolvedValue(mockUserDetailsResponse);
+
+    onboardUser.mockResolvedValue({
+      body: {
+        message: "User created successfully",
+      },
+    });
   });
 
-  test("renders gracefully with empty row data", () => {
-    // Mock CommonRowColumnUtils to return empty rows for this test
-    jest.mock("./CommonRowColumnUtils", () => ({
-      ...jest.requireActual("./CommonRowColumnUtils"),
-      UserManagementRowData: [],
-    }));
+  test("renders component successfully", async () => {
+    render(<UserManagement />);
 
-    // We just render and make sure it doesn't crash
-    const { container } = render(<UserManagement />);
-    expect(container).toBeInTheDocument();
+    expect(screen.getByText("Loading")).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(getUsers).toHaveBeenCalled();
+    });
   });
 
-  test("handles undefined data state gracefully", () => {
-    const { container } = render(<UserManagement />);
-    expect(container).toBeInTheDocument();
+  test("fetches users on initial render", async () => {
+    render(<UserManagement />);
+
+    await waitFor(() => {
+      expect(getUsers).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  test("renders fetched users in grid", async () => {
+    render(<UserManagement />);
+
+    await waitFor(() => {
+      expect(screen.getByText("John")).toBeInTheDocument();
+    });
+  });
+
+  test("opens add user form", async () => {
+    render(<UserManagement />);
+
+    fireEvent.click(screen.getByText("Add User"));
+
+    expect(screen.getByText("User Form")).toBeInTheDocument();
+  });
+
+  test("creates user successfully", async () => {
+    render(<UserManagement />);
+
+    fireEvent.click(screen.getByText("Add User"));
+
+    fireEvent.click(screen.getByText("Submit Form"));
+
+    await waitFor(() => {
+      expect(onboardUser).toHaveBeenCalled();
+    });
+
+    expect(screen.getByText("User created successfully")).toBeInTheDocument();
+  });
+
+  test("handles create user failure", async () => {
+    onboardUser.mockRejectedValue(new Error("Create failed"));
+
+    render(<UserManagement />);
+
+    fireEvent.click(screen.getByText("Add User"));
+
+    fireEvent.click(screen.getByText("Submit Form"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Create failed")).toBeInTheDocument();
+    });
+  });
+
+  test("opens user details on view click", async () => {
+    render(<UserManagement />);
+
+    await waitFor(() => {
+      expect(screen.getByText("John")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("View"));
+
+    await waitFor(() => {
+      expect(getUserDetails).toHaveBeenCalled();
+    });
+
+    expect(screen.getByText("User Form")).toBeInTheDocument();
+  });
+
+  test("handles get user details failure", async () => {
+    getUserDetails.mockRejectedValue(new Error("Failed to fetch user details"));
+
+    render(<UserManagement />);
+
+    await waitFor(() => {
+      expect(screen.getByText("John")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("View"));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Failed to fetch user details"),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test("updates user successfully", async () => {
+    render(<UserManagement />);
+
+    await waitFor(() => {
+      expect(screen.getByText("John")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("View"));
+
+    await waitFor(() => {
+      expect(screen.getByText("User Form")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("Submit Form"));
+
+    await waitFor(() => {
+      expect(onboardUser).toHaveBeenCalled();
+    });
+  });
+
+  test("handles fetch users failure", async () => {
+    getUsers.mockRejectedValue(new Error("Failed to fetch users"));
+
+    render(<UserManagement />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Failed to fetch users.")).toBeInTheDocument();
+    });
+  });
+
+  test("closes form correctly", async () => {
+    render(<UserManagement />);
+
+    fireEvent.click(screen.getByText("Add User"));
+
+    expect(screen.getByText("User Form")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("Close Form"));
+
+    await waitFor(() => {
+      expect(screen.queryByText("User Form")).not.toBeInTheDocument();
+    });
   });
 });

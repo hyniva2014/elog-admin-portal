@@ -1,225 +1,57 @@
-// import eyeIcon from "../../../src/assets/images/svg/eyeicon.png";
-import { STATUS_COLOR_MAP } from "./Constants";
-import eyeIcon from "../../../../src/assets/images/svg/eyeicon.png";
+import React, { useCallback } from "react";
+import eyeIcon from "../../../assets/images/svg/eyeIcon.png";
 import { IconButton } from "@mui/material";
 import { StatusText } from "./CommonRowColumnUtils.styled";
+import { USER_STATUS, USER_STATUS_COL_CONFIG } from "./Constants";
+import dayjs from "dayjs";
+
+const formatDate = (iso) => (iso ? dayjs(iso).format("DD-MM-YYYY") : "-");
 
 const StatusCell = (params) => {
-  const color = STATUS_COLOR_MAP[params.value] || params.row.statusColor;
-  return <StatusText statuscolor={color}>{params.value}</StatusText>;
+  const color = USER_STATUS_COL_CONFIG[params.value]?.colorKey || "text.primary";
+  return <StatusText statuscolor={color}>{params.value || "-"}</StatusText>;
 };
 
-const ActionCell = () => (
-  <IconButton size="small" color="primary">
-    <img src={eyeIcon} alt="view" width={16} height={16} />
-  </IconButton>
-);
+const ActionCell = (params) => {
+  const handleClick = useCallback(() => {
+    params.colDef.onView?.(params.row);
+  }, [params]);
+
+  return (
+    <IconButton size="small" color="primary" onClick={handleClick}>
+      <img src={eyeIcon} alt="view" width={16} height={16} />
+    </IconButton>
+  );
+};
 
 export const UserManagementColumnData = [
-  {
-    field: "carrierId",
-    headerName: "Carrier ID",
-    width: 50,
-    minWidth: 150,
-    maxWidth: 220,
-    headerTooltip: true,
-    cellClassName: "sticky-col-left-1",
-    headerClassName: "sticky-col-left-1",
-  },
-  {
-    field: "carrierName",
-    headerName: "Carrier Name",
-    width: 180,
-    minWidth: 150,
-    maxWidth: 220,
-    headerTooltip: true,
-    cellClassName: "sticky-col-left-2",
-    headerClassName: "sticky-col-left-2",
-  },
-  {
-    field: "userProfile",
-    headerName: "User Profile",
-    flex: 1,
-    minWidth: 150,
-    maxWidth: 220,
-    headerTooltip: true,
-  },
-  {
-    field: "firstName",
-    headerName: "First Name",
-    flex: 1,
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-  },
-  {
-    field: "lastName",
-    headerName: "Last Name",
-    flex: 1,
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-  },
-  {
-    field: "createdOn",
-    headerName: "Created On",
-    flex: 1,
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-  },
-  {
-    field: "updatedOn",
-    headerName: "Updated On",
-    flex: 1,
-    minWidth: 180,
-    maxWidth: 250,
-    headerTooltip: true,
-  },
-  {
-    field: "primaryContactEmail",
-    headerName: "Primary Contact Email",
-    minWidth: 180,
-    maxWidth: 250,
-    flex: 1,
-    headerTooltip: true,
-    // align: "center",
-    // headerAlign: "center",
-  },
+  { field: "carrierId", headerName: "Carrier ID", minWidth: 120, maxWidth: 160, headerTooltip: true, cellClassName: "sticky-col-left-1", headerClassName: "sticky-col-left-1" },
+  { field: "carrierName", headerName: "Carrier Name", minWidth: 160, maxWidth: 220, headerTooltip: true, cellClassName: "sticky-col-left-2", headerClassName: "sticky-col-left-2" },
+  { field: "userProfile", headerName: "User Profile", flex: 1, minWidth: 140, maxWidth: 200, headerTooltip: true },
+  { field: "firstName", headerName: "First Name", flex: 1, minWidth: 140, maxWidth: 200, headerTooltip: true },
+  { field: "lastName", headerName: "Last Name", flex: 1, minWidth: 140, maxWidth: 200, headerTooltip: true },
+  { field: "primaryContactEmail", headerName: "Email", flex: 1, minWidth: 200, maxWidth: 280, headerTooltip: true },
+  { field: "createdOn", headerName: "Created On", flex: 1, minWidth: 140, maxWidth: 180, headerTooltip: true },
+  { field: "updatedOn", headerName: "Updated On", flex: 1, minWidth: 140, maxWidth: 180, headerTooltip: true },
+  { field: "status", headerName: "Status", flex: 1, minWidth: 120, maxWidth: 160, headerTooltip: true, renderCell: StatusCell },
+  { field: "action", headerName: "Action", minWidth: 80, maxWidth: 100, sortable: false, renderCell: ActionCell },
+];
 
-  {
-    field: "status",
-    headerName: "Status",
-    minWidth: 180,
-    maxWidth: 250,
-    flex: 1,
-    headerTooltip: true,
-    renderCell: StatusCell,
-  },
-  {
-    field: "action",
-    headerName: "Action",
-    flex: 1,
-    minWidth: 100,
-    renderCell: ActionCell,
-  },
-];
-export const UserManagementRowData = [
-  {
-    id: 1,
-    carrierId: 1,
-    carrierName: "Swift Transportation",
-    userProfile: "Admin",
-    firstName: "John",
-    lastName: "Doe",
-    createdOn: "05-05-2026",
-    updatedOn: "10-05-2026",
-    primaryContactEmail: "john.doe@swift.com",
-    status: "Active",
-    statusColor: "success",
-  },
-  {
-    id: 2,
-    carrierId: 2,
-    carrierName: "J.B. Hunt",
-    userProfile: "Super Admin",
-    firstName: "Sarah",
-    lastName: "Smith",
-    createdOn: "05-05-2025",
-    updatedOn: "10-05-2025",
-    primaryContactEmail: "sarah.smith@jbhunt.com",
-    status: "Inactive",
-    statusColor: "error",
-  },
-  {
-    id: 3,
-    carrierId: 3,
-    carrierName: "Knight Transportation",
-    userProfile: "User",
-    firstName: "Michael",
-    lastName: "Johnson",
-    createdOn: "05-05-2025",
-    updatedOn: "10-05-2025",
-    primaryContactEmail: "michael.johnson@knight.com",
-    status: "Active",
-    statusColor: "success",
-  },
-  {
-    id: 4,
-    carrierId: 4,
-    carrierName: "Werner Enterprises",
-    userProfile: "Admin",
-    firstName: "Emily",
-    lastName: "Williams",
-    createdOn: "05-05-2025",
-    updatedOn: "10-05-2025",
-    primaryContactEmail: "emily.williams@werner.com",
-    status: "Active",
-    statusColor: "success",
-  },
-  {
-    id: 5,
-    carrierId: 5,
-    carrierName: "Schneider National",
-    userProfile: "Admin",
-    firstName: "David",
-    lastName: "Brown",
-    createdOn: "05-05-2025",
-    updatedOn: "10-05-2025",
-    primaryContactEmail: "david.brown@schneider.com",
-    status: "Inactive",
-    statusColor: "error",
-  },
-  {
-    id: 6,
-    carrierId: 6,
-    carrierName: "XPO Logistics",
-    userProfile: "Super Admin",
-    firstName: "Olivia",
-    lastName: "Taylor",
-    createdOn: "05-05-2025",
-    updatedOn: "10-05-2025",
-    primaryContactEmail: "olivia.taylor@xpo.com",
-    status: "Active",
-    statusColor: "success",
-  },
-  {
-    id: 7,
-    carrierId: 7,
-    carrierName: "FedEx Freight",
-    userProfile: "Admin",
-    firstName: "Daniel",
-    lastName: "Anderson",
-    createdOn: "05-05-2025",
-    updatedOn: "10-05-2025",
-    primaryContactEmail: "daniel.anderson@fedex.com",
-    status: "Active",
-    statusColor: "success",
-  },
-  {
-    id: 8,
-    carrierId: 8,
-    carrierName: "Old Dominion",
-    userProfile: "Admin",
-    firstName: "Sophia",
-    lastName: "Thomas",
-    createdOn: "05-05-2025",
-    updatedOn: "10-05-2025",
-    primaryContactEmail: "sophia.thomas@odfl.com",
-    status: "Inactive",
-    statusColor: "error",
-  },
-  {
-    id: 9,
-    carrierId: 9,
-    carrierName: "Old Dominion",
-    userProfile: "Admin",
-    firstName: "Sophia",
-    lastName: "Thomas",
-    createdOn: "05-05-2025",
-    updatedOn: "10-05-2025",
-    primaryContactEmail: "sophia.thomas@odfl.com",
-    status: "Inactive",
-    statusColor: "error",
-  }
-];
+export const mapUserToRow = (user) => ({
+  id: user.user_id,
+  user_id: user.user_id,
+  company_id: user.company_id ?? "",
+  role_id: user.role_id ?? "",
+  status_id: user.status_id,
+  carrierId: user.company_id ?? "-",
+  carrierName: user.company_name ?? "-",
+  userProfile: user.role_name ?? user.user_profile ?? "-",
+  firstName: user.first_name ?? "-",
+  lastName: user.last_name ?? "-",
+  primaryContactEmail: user.email ?? "-",
+  createdOn: formatDate(user.created_at ?? user.createdOn),
+  updatedOn: formatDate(user.updated_at ?? user.updatedOn),
+  status: USER_STATUS[String(user.status_id)] || user.status || "-",
+  status_id: user.status_id ?? "",
+  user_name: (user.user_name ?? `${user.first_name ?? ""} ${user.last_name ?? ""}`).trim(),
+});

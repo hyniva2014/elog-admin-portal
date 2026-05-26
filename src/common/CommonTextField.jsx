@@ -73,7 +73,7 @@ const CommonTextField = ({
         multiline={multiline}
         rows={multiline ? rows : undefined}
         InputLabelProps={{
-          shrink: Boolean(value) || shrinkLabel || true,
+          shrink: Boolean(value) || shrinkLabel || disabled,
           required: required,
         }}
         disabled={disabled}

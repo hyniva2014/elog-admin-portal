@@ -1,15 +1,32 @@
-import {
-  Box,
-  Button,
-  Typography,
-  Menu,
-  MenuItem,
-  Stack,
-  Grid,
-} from "@mui/material";
+import { Menu, MenuItem } from "@mui/material";
+
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { useState } from "react";
-import { useTheme } from "@mui/material";
+
+import { useState, useCallback } from "react";
+
+import {
+  HeaderContainer,
+  TitleContainer,
+  HeaderTitle,
+  HeaderSubtitle,
+  ActionContainer,
+  HeaderButton,
+} from "./CommonPageHeader.styled";
+
+const EXPORT_OPTIONS = [
+  {
+    label: "CSV",
+    value: "csv",
+  },
+  {
+    label: "PDF",
+    value: "pdf",
+  },
+  {
+    label: "Excel",
+    value: "excel",
+  },
+];
 
 const CommonPageHeader = ({
   title,
@@ -20,87 +37,86 @@ const CommonPageHeader = ({
   handleClick,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
+
   const open = Boolean(anchorEl);
-  const theme = useTheme();
 
-  const handleOpen = (event) => {
+  const handleMenuOpen = useCallback((event) => {
     setAnchorEl(event.currentTarget);
-  };
+  }, []);
 
-  const handleClose = () => {
+  const handleMenuClose = useCallback(() => {
     setAnchorEl(null);
+  }, []);
+
+  const handleExportSelect = useCallback(
+    (type) => {
+      onExport?.(type);
+      handleMenuClose();
+    },
+    [onExport, handleMenuClose],
+  );
+
+  const renderExportMenuItems = () => {
+    return EXPORT_OPTIONS.map((option) => (
+      <MenuItem
+        key={option.value}
+        onClick={() => handleExportSelect(option.value)}
+      >
+        {option.label}
+      </MenuItem>
+    ));
   };
 
-  const handleSelect = (type) => {
-    onExport?.(type);
-    handleClose();
+  const renderDefaultActions = () => {
+    return (
+      <>
+        <ActionContainer>
+          {addButton && (
+            <HeaderButton variant="contained" onClick={handleClick}>
+              Add
+            </HeaderButton>
+          )}
+
+          <HeaderButton
+            variant="contained"
+            endIcon={<KeyboardArrowDownIcon />}
+            onClick={handleMenuOpen}
+          >
+            Export
+          </HeaderButton>
+        </ActionContainer>
+
+        <Menu
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleMenuClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+        >
+          {renderExportMenuItems()}
+        </Menu>
+      </>
+    );
   };
 
   return (
-    <Box display="flex" justifyContent="space-between" alignItems="center">
-      <Box>
-        <Typography
-          variant="inherit"
-          color={theme.palette.mode === "dark" ? "#fff" : "#202027"}
-          fontSize={20}
-          fontWeight={600}
-          // mb={0.5}
-        >
-          {title}
-        </Typography>
+    <HeaderContainer>
+      <TitleContainer>
+        <HeaderTitle>{title}</HeaderTitle>
 
-        <Typography
-          fontSize={13}
-          color="#787C85"
-          fontWeight={400}
-          sx={{
-            visibility: subtitle ? "visible" : "hidden",
-            minHeight: "20px",
-            display: subtitle ? "block" : "none",
-          }}
-        >
+        <HeaderSubtitle isvisible={Boolean(subtitle)}>
           {subtitle || "placeholder"}
-        </Typography>
-      </Box>
+        </HeaderSubtitle>
+      </TitleContainer>
 
-      {rightContent !== undefined ? (
-        rightContent
-      ) : (
-        <>
-          <Grid sx={{ display: "flex", gap: 2 }}>
-            {addButton && (
-              <Button
-                sx={{ color: "#FFFFFF", backgroundColor: "#284495" }}
-                variant="contained"
-                onClick={handleClick}
-              >
-                Add
-              </Button>
-            )}
-
-            <Button
-              sx={{ color: "#FFFFFF", backgroundColor: "#284495" }}
-              variant="contained"
-              endIcon={<KeyboardArrowDownIcon />}
-              onClick={handleOpen}
-            >
-              Export
-            </Button>
-          </Grid>
-          <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            transformOrigin={{ vertical: "top", horizontal: "right" }}
-          >
-            <MenuItem onClick={() => handleSelect("csv")}>CSV</MenuItem>
-            <MenuItem onClick={() => handleSelect("pdf")}>PDF</MenuItem>
-            <MenuItem onClick={() => handleSelect("excel")}>Excel</MenuItem>
-          </Menu>
-        </>
-      )}
-    </Box>
+      {rightContent !== undefined ? rightContent : renderDefaultActions()}
+    </HeaderContainer>
   );
 };
 
