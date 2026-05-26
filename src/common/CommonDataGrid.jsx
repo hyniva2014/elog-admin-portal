@@ -9,6 +9,7 @@ import {
   containerSx,
   gridSx,
   getContainerSx,
+  NoRowsOverlayContainer,
 } from "./CommonDataGrid.styles";
 
 const withHeaderTooltip = (columns) =>
@@ -32,17 +33,7 @@ const withHeaderTooltip = (columns) =>
   });
 
 const NoRowsOverlay = () => (
-  <Box
-    sx={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      height: "100%",
-      py: 2,
-    }}
-  >
-    No rows
-  </Box>
+  <NoRowsOverlayContainer>No rows</NoRowsOverlayContainer>
 );
 
 const CommonDataGrid = ({

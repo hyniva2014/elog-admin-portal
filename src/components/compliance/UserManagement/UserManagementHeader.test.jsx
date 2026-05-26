@@ -5,9 +5,9 @@ import "@testing-library/jest-dom";
 
 import UserManagementHeader from "./UserManagementHeader";
 
-import { getUserManagementFilters } from "./Constants";
+import { getUserManagementFilters } from "./userManagementFilters";
 
-jest.mock("./Constants", () => ({
+jest.mock("./userManagementFilters", () => ({
   getUserManagementFilters: jest.fn(),
 }));
 

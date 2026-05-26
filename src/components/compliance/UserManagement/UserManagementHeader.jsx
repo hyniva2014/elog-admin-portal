@@ -6,7 +6,7 @@ import {
   HeaderContainer,
   SummaryCardWrapper,
 } from "./UserManagementHeader.styled";
-import { getUserManagementFilters } from "./Constants";
+import { getUserManagementFilters } from "./userManagementFilters";
 
 const UserManagementHeader = (props) => {
   const {

@@ -1,3 +1,5 @@
+import { Box, styled } from "@mui/material";
+
 export const tooltipLabelSx = {
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -5,6 +7,15 @@ export const tooltipLabelSx = {
   width: "100%",
   display: "block",
 };
+
+export const NoRowsOverlayContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  height: "100%",
+  paddingTop: theme.spacing(2),
+  paddingBottom: theme.spacing(2),
+}));
 
 export const getHeaderWrapperSx = (isSortable) => ({
   cursor: isSortable ? "pointer" : "default",
