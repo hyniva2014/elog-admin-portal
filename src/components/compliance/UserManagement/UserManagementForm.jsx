@@ -1,5 +1,5 @@
-import React from "react";
-import { Box, Grid, MenuItem, TextField } from "@mui/material";
+import { useEffect, useState, useCallback } from "react";
+import { Grid } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -9,10 +9,17 @@ import CommonTextField from "../../../common/CommonTextField";
 import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdown";
 import { FormContainer } from "./UserManagementForm.styled";
 import { ACCOUNT_OPTIONS, USER_PROFILE_OPTIONS } from "./Constants";
+import { EditHeaderButton } from "./UserManagementForm.styled";
 
-const schema = yup.object().shape({
-  selectAccount: yup.string().required("Account is required"),
-  userProfile: yup.string().required("User Profile is required"),
+const STATUS_OPTIONS = [
+  { label: "Active", value: "1" },
+  { label: "Inactive", value: "2" },
+];
+
+const addSchema = yup.object().shape({
+  company_id: yup.string().required("Account is required"),
+  role_id: yup.string().required("User Profile is required"),
+
   firstName: yup.string().required("First Name is required"),
   lastName: yup.string().required("Last Name is required"),
   email: yup.string().email("Enter valid email").required("Email is required"),
@@ -26,56 +33,134 @@ const schema = yup.object().shape({
     .required("Confirm Password is required"),
 });
 
+const editSchema = yup.object().shape({
+  company_id: yup.string().required("Account is required"),
+  role_id: yup.string().required("User Profile is required"),
+  status_id: yup.string().required("Status is required"),
+  firstName: yup.string().required("First Name is required"),
+  lastName: yup.string().required("Last Name is required"),
+  email: yup.string().email("Enter valid email").required("Email is required"),
+  password: yup.string().optional(),
+  confirmPassword: yup.string().optional(),
+});
+
+const EMPTY_DEFAULTS = {
+  company_id: "",
+  role_id: "",
+  status_id: "1",
+  firstName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+};
+
+// const rowToFormValues = (row) => ({
+//   company_id: row.company_id || "",
+//   role_id: row.role_id || "",
+//   status_id: row.status_id ? String(row.status_id) : "1",
+//   firstName: row.firstName || "",
+//   lastName: row.lastName || "",
+//   email: row.primaryContactEmail || row.email || "",
+//   password: "",
+//   confirmPassword: "",
+// });
+const rowToFormValues = (row) => ({
+  company_id: row?.company_id ? String(row.company_id) : "",
+
+  role_id: row?.role_id ? String(row.role_id) : "",
+
+  status_id: row?.status_id ? String(row.status_id) : "1",
+
+  firstName: row?.firstName || "",
+
+  lastName: row?.lastName || "",
+
+  email: row?.primaryContactEmail || row?.email || "",
+
+  password: "",
+  confirmPassword: "",
+});
+
 const UserManagementForm = ({
   open,
   onClose,
   onSubmitForm,
   loading = false,
-  mode = "add",
+  mode = "add", // "add" | "view"
+  initialData = null,
 }) => {
+  const isViewMode = mode === "view";
+
+  // Internal editing state — only relevant when mode === "view"
+  const [isEditing, setIsEditing] = useState(false);
+
+  // The effective read-only state
+  const isReadOnly = isViewMode && !isEditing;
+
   const {
     handleSubmit,
-    control,
     register,
     formState: { errors },
     reset,
     setValue,
+    watch,
   } = useForm({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      account: "",
-      userProfile: "",
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
+    resolver: yupResolver(isViewMode ? editSchema : addSchema),
+    defaultValues: EMPTY_DEFAULTS,
   });
 
-  const handleFormSubmit = (data) => {
-    console.log("Form Data:", data);
-
-    if (onSubmitForm) {
-      onSubmitForm(data);
+  // Populate / clear form whenever the dialog opens
+  useEffect(() => {
+    if (!open) return;
+    if (isViewMode && initialData) {
+      reset(rowToFormValues(initialData));
+    } else {
+      reset(EMPTY_DEFAULTS);
     }
+    // Always start in read mode when the dialog opens
+    setIsEditing(false);
+  }, [open, isViewMode, initialData, reset]);
 
-    reset();
+  const handleFormSubmit = (data) => {
+    const submitMode = isViewMode && isEditing ? "edit" : mode;
+    if (onSubmitForm) onSubmitForm(data, submitMode);
+  };
+
+  /** Close the dialog entirely */
+  const handleClose = () => {
+    reset(EMPTY_DEFAULTS);
+    setIsEditing(false);
     onClose();
   };
 
-  const handleCancel = () => {
-    reset();
-    onClose();
+  /** Cancel edit — restore original values, go back to read mode */
+  const handleCancelEdit = () => {
+    if (initialData) reset(rowToFormValues(initialData));
+    setIsEditing(false);
   };
 
-  const handleAccountChange = (value) => {
-    setValue("selectAccount", value, { shouldValidate: true });
-  };
+  const handleAccountChange = (value) =>
+    setValue("company_id", value, { shouldValidate: true });
 
-  const handleUserProfileChange = (value) => {
-    setValue("userProfile", value, { shouldValidate: true });
-  };
+  const handleUserProfileChange = (value) =>
+    setValue("role_id", value, { shouldValidate: true });
+
+  const handleStatusChange = (value) =>
+    setValue("status_id", value, { shouldValidate: true });
+
+  const handleEditClick = useCallback(() => setIsEditing(true), []);
+
+  // Edit button shown in the dialog header (next to close icon)
+  const editHeaderButton = isViewMode && !isEditing && (
+    <EditHeaderButton
+      size="small"
+      variant="contained"
+      onClick={handleEditClick}
+    >
+      Edit
+    </EditHeaderButton>
+  );
 
   const formContent = (
     <FormContainer
@@ -86,30 +171,47 @@ const UserManagementForm = ({
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <CommonAutocompleteDropdown
-            name="selectAccount"
+            name="company_id"
             label="Select Account"
-            value=""
+            value={watch("company_id")}
             options={ACCOUNT_OPTIONS}
             onChange={handleAccountChange}
-            error={!!errors.selectAccount}
-            helperText={errors.selectAccount?.message}
-            required
+            error={!!errors.company_id}
+            helperText={errors.company_id?.message}
+            required={!isReadOnly}
+            disabled={isReadOnly}
           />
         </Grid>
 
-        {/* User Profile */}
         <Grid item xs={12}>
           <CommonAutocompleteDropdown
-            name="userProfile"
+            name="role_id"
             label="User Profile"
-            value=""
+            value={watch("role_id")}
             options={USER_PROFILE_OPTIONS}
             onChange={handleUserProfileChange}
-            error={!!errors.userProfile}
-            helperText={errors.userProfile?.message}
-            required
+            error={!!errors.role_id}
+            helperText={errors.role_id?.message}
+            required={!isReadOnly}
+            disabled={isReadOnly}
           />
         </Grid>
+
+        {isViewMode && (
+          <Grid item xs={12}>
+            <CommonAutocompleteDropdown
+              name="status_id"
+              label="Status"
+              value={watch("status_id")}
+              options={STATUS_OPTIONS}
+              onChange={handleStatusChange}
+              error={!!errors.status_id}
+              helperText={errors.status_id?.message}
+              required={!isReadOnly}
+              disabled={isReadOnly}
+            />
+          </Grid>
+        )}
 
         <Grid item xs={12}>
           <CommonTextField
@@ -118,7 +220,9 @@ const UserManagementForm = ({
             register={register}
             error={!!errors.firstName}
             helperText={errors.firstName?.message}
-            required
+            required={!isReadOnly}
+            disabled={isReadOnly}
+            shrinkLabel={!!watch("firstName")}
           />
         </Grid>
 
@@ -126,11 +230,12 @@ const UserManagementForm = ({
           <CommonTextField
             name="lastName"
             label="Last Name"
-            control={control}
             register={register}
             error={!!errors.lastName}
             helperText={errors.lastName?.message}
-            required
+            required={!isReadOnly}
+            disabled={isReadOnly}
+            shrinkLabel={!!watch("lastName")}
           />
         </Grid>
 
@@ -141,41 +246,62 @@ const UserManagementForm = ({
             register={register}
             error={!!errors.email}
             helperText={errors.email?.message}
-            required
+            required={!isReadOnly}
+            disabled={isReadOnly}
+            shrinkLabel={!!watch("email")}
           />
         </Grid>
 
-        <Grid item xs={12}>
-          <CommonTextField
-            name="password"
-            label="Enter Password"
-            fullWidth
-            autoComplete="new-password"
-            register={register}
-            error={!!errors.password}
-            helperText={errors.password?.message}
-            required
-          />
-        </Grid>
+        {/* Password fields — only shown when adding a new user */}
+        {!isViewMode && (
+          <>
+            <Grid item xs={12}>
+              <CommonTextField
+                name="password"
+                label="Enter Password"
+                type="password"
+                fullWidth
+                autoComplete="new-password"
+                register={register}
+                error={!!errors.password}
+                helperText={errors.password?.message}
+                required
+                shrinkLabel={!!watch("password")}
+              />
+            </Grid>
 
-        <Grid item xs={12}>
-          <CommonTextField
-            name="confirmPassword"
-            label="Confirm Password"
-            type="password"
-            autoComplete="new-password"
-            register={register}
-            error={!!errors.confirmPassword}
-            helperText={errors.confirmPassword?.message}
-            required
-          />
-        </Grid>
+            <Grid item xs={12}>
+              <CommonTextField
+                name="confirmPassword"
+                label="Confirm Password"
+                type="password"
+                autoComplete="new-password"
+                register={register}
+                error={!!errors.confirmPassword}
+                helperText={errors.confirmPassword?.message}
+                required
+                shrinkLabel={!!watch("confirmPassword")}
+              />
+            </Grid>
+          </>
+        )}
       </Grid>
     </FormContainer>
   );
 
-  const dialogTitle = mode === "edit" ? "Edit User" : "Add User";
-  const dialogSubmitText = mode === "edit" ? "Update User" : "Add User";
+  // Dialog title
+  const dialogTitle = isViewMode
+    ? isEditing
+      ? "Edit User"
+      : "View User"
+    : "Add User";
+
+  // Submit button label — null hides the entire footer in read-only view
+  const submitButtonText = isReadOnly
+    ? null
+    : isViewMode
+      ? "Update User"
+      : "Add User";
 
   return (
     <CommonDialogForm
@@ -183,11 +309,14 @@ const UserManagementForm = ({
       title={dialogTitle}
       content={formContent}
       formId="user-management-form"
-      onCancel={handleCancel}
+      onClose={handleClose}
+      onCancel={isEditing ? handleCancelEdit : handleClose}
       loading={loading}
-      mode={mode}
-      submitButtonText={dialogSubmitText}
+      mode={isEditing ? "edit" : mode}
+      submitButtonText={submitButtonText}
+      headerActions={editHeaderButton}
       maxWidth="sm"
+      isEditing={isEditing}
     />
   );
 };
