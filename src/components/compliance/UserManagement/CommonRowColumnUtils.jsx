@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import eyeIcon from "../../../assets/images/svg/eyeIcon.png";
+import eyeIcon from "../../../assets/images/svg/eyeicon.png";
 import { IconButton } from "@mui/material";
 import { StatusText } from "./CommonRowColumnUtils.styled";
 import { USER_STATUS, USER_STATUS_COL_CONFIG } from "./Constants";
