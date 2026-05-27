@@ -5,6 +5,7 @@ import { PageContainer } from "../../../common/PageContainer";
 import CommonLoading from "../../../common/CommonLoading";
 import DeviceManagementHeader from "./DeviceManagementHeader";
 import { useServices } from "../../../services/services";
+import CommonSnackbar from "../../../common/CommonSnackbar";
 import {
   columns,
   transformDeviceData,
@@ -21,7 +22,7 @@ const isDeviceSelectable = (params) => {
 };
 
 const DeviceManagement = () => {
-  const { fetchApi } = useServices();
+  const { fetchApi, createApi } = useServices();
   const { setLoading, LoadingContainer } = CommonLoading();
 
   const [allRows, setAllRows] = useState([]);
@@ -54,6 +55,20 @@ const DeviceManagement = () => {
     data.search,
   ]);
 
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const showSnackbar = (message, severity = "success") => {
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    });
+  };
+
   const fetchDeviceList = async () => {
     try {
       setLoading(true);
@@ -66,13 +81,6 @@ const DeviceManagement = () => {
         truck_number: data.truckNumber,
         status: data.status,
       });
-
-      // if (data.fromDate) {
-      //   queryParams.append(
-      //     "created_at",
-      //     dayjs(data.fromDate).format("YYYY-MM-DD"),
-      //   );
-      // }
 
       if (data.fromDate) {
         queryParams.append(
@@ -113,27 +121,40 @@ const DeviceManagement = () => {
     setIsAssignDialogOpen(false);
   };
 
-  const handleAssignSubmit = (selectedCarrier) => {
-    const selectedDevices = allRows
+  const handleAssignSubmit = async (selectedCompanyId) => {
+    const deviceIds = allRows
       .filter((row) => selectedRows.includes(row.id))
-      .map((row) => ({
-        device_id: row.id,
-      }));
+      .map((row) => row.id);
 
     const payload = {
-      carrier_id: selectedCarrier,
-      devices: selectedDevices,
+      company_id: selectedCompanyId,
+      device_ids: deviceIds,
     };
 
-    console.log("Assign Payload:", payload);
-
+    try {
+      const endurl = "/masteradmin/assign-devices";
+      const response = await createApi(payload, endurl);
+      if (response?.statusCode === 200) {
+        showSnackbar(
+          response.body?.data?.message || "Devices assigned successfully",
+        );
+        setSelectedRows([]);
+        fetchDeviceList();
+      } else {
+        showSnackbar(
+          response?.body?.data?.message || "Failed to assign devices",
+          "error",
+        );
+      }
+    } catch (error) {
+      showSnackbar("Failed to assign devices", "error");
+    }
     setIsAssignDialogOpen(false);
   };
 
   const handleRowSelectionChange = (newSelection) => {
     setSelectedRows(newSelection);
     const selectedDeviceIds = getSelectedDevices(newSelection);
-    console.log("Selected Devices:", selectedDeviceIds);
   };
 
   return (
@@ -165,17 +186,17 @@ const DeviceManagement = () => {
           onRowSelectionModelChange={handleRowSelectionChange}
         />
       </PageContainer>
-
-      {/* <AddDeviceDialog
-        open={isAddDeviceOpen}
-        onClose={handleCloseAddDevice}
-        onSubmit={handleAddDevice}
-      /> */}
       <AssignDevicesToCarriers
         open={isAssignDialogOpen}
         handleCancel={handleAssignCancel}
         handleSubmit={handleAssignSubmit}
         loading={false}
+      />
+      <CommonSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
       />
     </>
   );
