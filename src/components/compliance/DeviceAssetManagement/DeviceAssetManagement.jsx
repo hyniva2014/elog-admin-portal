@@ -7,13 +7,8 @@ import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonSnackbar from "../../../common/CommonSnackbar";
 import DeviceAssetManagementHeader from "./DeviceAssetManagementHeader";
 import DeviceAssetManagementForm from "./DeviceAssetManagementForm";
-import {
-  EditButton,
-  CancelEditButton,
-} from "./DeviceAssetManagement.styles";
-import {
-  GridContainer,
-} from "../AccountManagement/AccountManagement.styled";
+import { EditButton, CancelEditButton } from "./DeviceAssetManagement.styles";
+import { GridContainer } from "../AccountManagement/AccountManagement.styled";
 import { useServices } from "../../../services/services";
 import { DEVICE_ASSET_STATUS_FILTER_OPTIONS } from "./Constants";
 import {
@@ -128,7 +123,10 @@ const DeviceAssetManagement = () => {
         endUrl += `&status=${String(data.status)}`;
       }
       if (data.fromDate) {
-        endUrl += `&created_at=${dayjs(data.fromDate).format("YYYY-MM-DD")}`;
+        endUrl += `&from_date=${dayjs(data.fromDate).format("YYYY-MM-DD")}`;
+      }
+      if (data.toDate) {
+        endUrl += `&to_date=${dayjs(data.toDate).format("YYYY-MM-DD")}`;
       }
 
       const response = await fetchApi(endUrl);
@@ -343,9 +341,7 @@ const DeviceAssetManagement = () => {
           handleClick={handleClick}
           modelOptions={deviceModelOptions}
           statusOptions={DEVICE_ASSET_STATUS_FILTER_OPTIONS}
-          isAssetAllocationEnabled={
-            selectedRows.length > 0
-          }
+          isAssetAllocationEnabled={selectedRows.length > 0}
         />
         <GridContainer>
           <CommonDataGrid
@@ -357,7 +353,7 @@ const DeviceAssetManagement = () => {
             getRowHeight={getRowHeight}
             checkboxSelection
             rowSelectionModel={selectedRows}
-            onRowSelectionModelChange = {setSelectedRows}
+            onRowSelectionModelChange={setSelectedRows}
           />
         </GridContainer>
       </PageContainer>
