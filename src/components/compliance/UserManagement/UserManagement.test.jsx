@@ -25,22 +25,16 @@ jest.mock("../../../services/services", () => ({
 }));
 
 jest.mock("@src/common/CommonDataGrid", () => {
-  return function MockGrid(props) {
+  const MockCommonDataGrid = ({ rowData = [], columnsData = [] }) => {
+    const actionColumn = columnsData.find(({ field }) => field === "action");
+
     return (
       <div data-testid="grid">
-        {props?.rowData?.map((row) => (
-          <div key={row.id}>
-            <span>{row.firstName}</span>
+        {rowData.map((row) => (
+          <div key={row.user_id}>
+            <span>{row.firstName || row.first_name}</span>
 
-            <button
-              onClick={() => {
-                const actionColumn = props.columnsData.find(
-                  (c) => c.field === "action",
-                );
-
-                actionColumn?.onView?.(row);
-              }}
-            >
+            <button type="button" onClick={() => actionColumn?.onView?.(row)}>
               View
             </button>
           </div>
@@ -48,6 +42,10 @@ jest.mock("@src/common/CommonDataGrid", () => {
       </div>
     );
   };
+
+  MockCommonDataGrid.displayName = "MockCommonDataGrid";
+
+  return MockCommonDataGrid;
 });
 
 jest.mock("./UserManagementHeader", () => {
