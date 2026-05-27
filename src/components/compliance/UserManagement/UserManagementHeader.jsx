@@ -6,7 +6,7 @@ import {
   HeaderContainer,
   SummaryCardWrapper,
 } from "./UserManagementHeader.styled";
-import { USER_MANAGEMENT_FILTERS } from "./Constants";
+import { getUserManagementFilters } from "./userManagementFilters";
 
 const UserManagementHeader = (props) => {
   const {
@@ -15,8 +15,9 @@ const UserManagementHeader = (props) => {
     searchKey = {},
     summaryCards = [],
     handleClick,
+    companyOptions = [],
   } = props;
-
+ const filters = getUserManagementFilters(companyOptions);
   return (
     <HeaderContainer>
       <CommonPageHeader
@@ -32,7 +33,7 @@ const UserManagementHeader = (props) => {
         <CommonSummaryCardGroup
           cards={summaryCards}
           showAccentBar={true}
-          layout="dashboard"
+          layout="default"
         />
       </SummaryCardWrapper>
 
@@ -41,7 +42,7 @@ const UserManagementHeader = (props) => {
         setData={setData}
         searchKey={searchKey}
         allowDateClear={true}
-        filters={USER_MANAGEMENT_FILTERS}
+        filters={filters}
       />
     </HeaderContainer>
   );

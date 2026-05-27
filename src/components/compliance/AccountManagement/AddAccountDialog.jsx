@@ -11,9 +11,6 @@ import {
   SecondarySectionHeader,
   EditButton,
   CancelEditButton,
-  DialogFormActionsContainer,
-  DialogCancelButton,
-  DialogSubmitButton,
 } from "./AccountManagement.styled";
 
 import { STATUS_OPTIONS, ACCOUNT_FORM_FIELDS, PRIMARY_CONTACT_FIELDS, SECONDARY_CONTACT_FIELDS } from "./Constants";
@@ -144,28 +141,6 @@ const DIALOG_TITLES = {
   add: "Add New Account",
 };
 
-const FormActions = ({ onCancel, loading, submitButtonText }) => (
-  <DialogFormActionsContainer>
-    <DialogCancelButton
-      variant="outlined"
-      onClick={loading ? undefined : onCancel}
-      fullWidth
-      disabled={loading}
-    >
-      Cancel
-    </DialogCancelButton>
-    <DialogSubmitButton
-      type="submit"
-      variant="contained"
-      fullWidth
-      form={ADD_ACCOUNT_FORM_ID}
-      disabled={loading}
-    >
-      {submitButtonText}
-    </DialogSubmitButton>
-  </DialogFormActionsContainer>
-);
-
 const AddAccountDialog = ({ open, onClose, onSubmit, loading = false, mode = "add", initialData = null, onEditClick, onCancelEdit }) => {
   const isEditMode = mode === "edit";
   const isViewMode = mode === "view";
@@ -280,16 +255,10 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false, mode = "ad
           </DialogFormContainer>
         </form>
 
-        {!isViewMode && (
-          <FormActions
-            onCancel={handleCancel}
-            loading={loading}
-            submitButtonText={submitButtonText}
-          />
-        )}
+       
       </>
     ),
-    [control, errors, isFieldDisabled, shouldShowStatusField, isViewMode, handleCancel, loading, submitButtonText, handleSubmit, submitHandler]
+    [control, errors, isFieldDisabled, shouldShowStatusField]
   );
 
   return (
@@ -299,10 +268,11 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false, mode = "ad
       content={contentWithActions}
       formId={ADD_ACCOUNT_FORM_ID}
       onCancel={handleCancel}
+      onSubmit={handleSubmit(submitHandler)}
       loading={loading}
       maxWidth="md"
       headerActions={headerActions}
-      mode="edit"
+      mode={isViewMode ? "view" : isEditMode ? "edit" : "add"}
       key={mode}
     />
   );

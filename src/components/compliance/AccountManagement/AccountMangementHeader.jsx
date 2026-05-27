@@ -34,12 +34,12 @@ const AccountManagementHeader = ({
         allowDateClear={true}
         filters={[
           {
-            label: "Primary Contact Name",
+            label: "Primary Name",
             dataKey: "primaryContactName",
             options: primaryContactOptions,
           },
           {
-            label: "Secondary Contact Name",
+            label: "Secondary Name",
             dataKey: "secondaryContactName",
             options: secondaryContactOptions,
           },
