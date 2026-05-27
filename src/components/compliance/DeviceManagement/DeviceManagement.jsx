@@ -69,6 +69,13 @@ const DeviceManagement = () => {
     });
   };
 
+  const handleSnackbarClose = () => {
+    setSnackbar((prev) => ({
+      ...prev,
+      open: false,
+    }));
+  };
+
   const fetchDeviceList = async () => {
     try {
       setLoading(true);
@@ -196,7 +203,7 @@ const DeviceManagement = () => {
         open={snackbar.open}
         message={snackbar.message}
         severity={snackbar.severity}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+        onClose={handleSnackbarClose}
       />
     </>
   );
