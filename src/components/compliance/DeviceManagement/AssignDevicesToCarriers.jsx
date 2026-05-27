@@ -16,6 +16,12 @@ const AssignDevicesToCarriers = ({
   const [selectedCarrier, setSelectedCarrier] = useState(null);
 
   useEffect(() => {
+    if (!open) {
+      setSelectedCarrier(null);
+    }
+  }, [open]);
+
+  useEffect(() => {
     fetchCarriers();
   }, []);
 

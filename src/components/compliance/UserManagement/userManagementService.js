@@ -16,3 +16,6 @@ export const getUserDetails = async (fetchApi, userId) => {
 export const onboardUser = async (createApi, payload) => {
   return createApi(payload, USER_ONBOARD_ENDPOINT);
 };
+export const getCompaniesDropdown = async (fetchApi) => {
+  return fetchApi("/masteradmin/dropdown/companies", {}, "GET");
+};

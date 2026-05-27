@@ -9,6 +9,7 @@ import {
   containerSx,
   gridSx,
   getContainerSx,
+  NoRowsOverlayContainer,
 } from "./CommonDataGrid.styles";
 
 const withHeaderTooltip = (columns) =>
@@ -24,14 +25,16 @@ const withHeaderTooltip = (columns) =>
 
         return (
           <Tooltip title={params.colDef.headerName} placement="right">
-            <Box sx={tooltipLabelSx}>
-              {originalHeader}
-            </Box>
+            <Box sx={tooltipLabelSx}>{originalHeader}</Box>
           </Tooltip>
         );
       },
     };
   });
+
+const NoRowsOverlay = () => (
+  <NoRowsOverlayContainer>No rows</NoRowsOverlayContainer>
+);
 
 const CommonDataGrid = ({
   columnsData = [],
@@ -43,7 +46,9 @@ const CommonDataGrid = ({
   checkboxSelection = false,
   rowSelectionModel = [],
   onRowSelectionModelChange = () => {},
-  isRowSelectable,
+  showMuiLoading = true,
+  useAutoHeight = false,
+  isRowSelectable = null,
 }) => {
   const pagePaginationModel = {
     page: (data.page || 1) - 1,
@@ -167,10 +172,20 @@ const CommonDataGrid = ({
   const applyEqualWidth = (columns) => {
     return columns.map((col, index) =>
       index === 0
-        ? { ...col, ...stickyWidth, cellClassName: "sticky-col-left-1", headerClassName: "sticky-col-left-1" }
+        ? {
+            ...col,
+            ...stickyWidth,
+            cellClassName: "sticky-col-left-1",
+            headerClassName: "sticky-col-left-1",
+          }
         : index === 1
-          ? { ...col, ...stickyWidth, cellClassName: "sticky-col-left-2", headerClassName: "sticky-col-left-2" }
-          : { ...col, flex: 1, minWidth: 150, width: 500, maxWidth: 500 }
+          ? {
+              ...col,
+              ...stickyWidth,
+              cellClassName: "sticky-col-left-2",
+              headerClassName: "sticky-col-left-2",
+            }
+          : { ...col, flex: 1, minWidth: 150, width: 500, maxWidth: 500 },
     );
   };
 
@@ -189,9 +204,7 @@ const CommonDataGrid = ({
             if (isSortable) handleSort(col.field);
           }}
         >
-          <Box sx={headerLabelSx}>
-            {col.headerName}
-          </Box>
+          <Box sx={headerLabelSx}>{col.headerName}</Box>
           {isSortable &&
             sortConfig.field === col.field &&
             (sortConfig.direction === "asc" ? " 🔼" : " 🔽")}
@@ -201,13 +214,16 @@ const CommonDataGrid = ({
   });
 
   return (
-    <Box ref={containerRef} sx={getContainerSx(localRows.length > 0)}>
+    <Box
+      ref={containerRef}
+      sx={getContainerSx(localRows.length > 0, useAutoHeight)}
+    >
       <DataGrid
-        className={checkboxSelection ? "has-checkbox" : ""}
+        autoHeight={useAutoHeight || localRows.length === 0}
         rows={localRows}
         columns={withHeaderTooltip(enhancedColumns)}
         rowCount={data.total || 0}
-        loading={data.isLoading}
+        loading={showMuiLoading && Boolean(data.isLoading)}
         paginationModel={pagePaginationModel}
         paginationMode="server"
         disableColumnMenu
@@ -228,8 +244,12 @@ const CommonDataGrid = ({
             pageSize: model.pageSize,
           }))
         }
+        components={{
+          NoRowsOverlay,
+        }}
         slots={{
           pagination: CustomPagination,
+          noRowsOverlay: NoRowsOverlay,
         }}
         sx={(theme) => ({
           ...gridSx(theme),

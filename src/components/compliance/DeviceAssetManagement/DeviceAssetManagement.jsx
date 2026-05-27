@@ -134,7 +134,10 @@ const DeviceAssetManagement = () => {
         endUrl += `&status=${String(data.status)}`;
       }
       if (data.fromDate) {
-        endUrl += `&created_at=${dayjs(data.fromDate).format("YYYY-MM-DD")}`;
+        endUrl += `&from_date=${dayjs(data.fromDate).format("YYYY-MM-DD")}`;
+      }
+      if (data.toDate) {
+        endUrl += `&to_date=${dayjs(data.toDate).format("YYYY-MM-DD")}`;
       }
 
       const response = await fetchApi(endUrl);
