@@ -67,11 +67,22 @@ const DeviceManagement = () => {
         status: data.status,
       });
 
+      // if (data.fromDate) {
+      //   queryParams.append(
+      //     "created_at",
+      //     dayjs(data.fromDate).format("YYYY-MM-DD"),
+      //   );
+      // }
+
       if (data.fromDate) {
         queryParams.append(
-          "created_at",
+          "from_date",
           dayjs(data.fromDate).format("YYYY-MM-DD"),
         );
+      }
+
+      if (data.toDate) {
+        queryParams.append("to_date", dayjs(data.toDate).format("YYYY-MM-DD"));
       }
 
       const endUrl = `/masteradmin/get-devices-list?${queryParams.toString()}`;
