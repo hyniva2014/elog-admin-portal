@@ -7,13 +7,8 @@ import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonSnackbar from "../../../common/CommonSnackbar";
 import DeviceAssetManagementHeader from "./DeviceAssetManagementHeader";
 import DeviceAssetManagementForm from "./DeviceAssetManagementForm";
-import {
-  EditButton,
-  CancelEditButton,
-} from "./DeviceAssetManagement.styles";
-import {
-  GridContainer,
-} from "../AccountManagement/AccountManagement.styled";
+import { EditButton, CancelEditButton } from "./DeviceAssetManagement.styles";
+import { GridContainer } from "../AccountManagement/AccountManagement.styled";
 import { useServices } from "../../../services/services";
 import { DEVICE_ASSET_STATUS_FILTER_OPTIONS } from "./Constants";
 import {
@@ -21,12 +16,14 @@ import {
   getRowHeight,
   transformDeviceAssetData,
 } from "./DeviceAssetManagementTable.utils";
+import BulkUploadForm from "./BulkUploadForm";
 
 const DeviceAssetManagement = () => {
   const { fetchApi, createApi } = useServices();
   const { setLoading, LoadingContainer } = CommonLoading();
   const [allRows, setAllRows] = useState([]);
   const [deviceModelOptions, setDeviceModelOptions] = useState([]);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [data, setData] = useState({
     total: 0,
     page: 1,
@@ -62,7 +59,16 @@ const DeviceAssetManagement = () => {
   });
   const [isEditMode, setIsEditMode] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedRows, setSelectedRows] = useState([]);
+  // const [selectedRows, setSelectedRows] = useState([]);
+
+  // ── Bulk Upload ────────────────────────────────────────────────────────────────
+  const handleBulkClick = useCallback(() => {
+    setIsBulkModalOpen(true);
+  }, []);
+
+  const handleBulkCancel = useCallback(() => {
+    setIsBulkModalOpen(false);
+  }, []);
 
   // ── Snackbar ────────────────────────────────────────────────────────────────
   const handleSnackbar = useCallback((message, severity = "info") => {
@@ -267,6 +273,39 @@ const DeviceAssetManagement = () => {
     }
   };
 
+  const handleBulkSubmit = async (formValues) => {
+    try {
+      setLoading(true);
+
+      const formData = new FormData();
+
+      // files comes from BulkUploadForm
+      formData.append("file", formValues.files);
+
+      const response = await createApi(
+        formData,
+        "/masteradmin/bulk-onboard-eld-device",
+      );
+
+      if (response?.statusCode === 200) {
+        handleSnackbar("Bulk asset uploaded successfully", "success");
+
+        setIsBulkModalOpen(false);
+
+        // refresh grid
+        fetchDeviceAssets();
+      } else {
+        handleSnackbar(response?.body?.message || "Upload failed", "warning");
+      }
+    } catch (error) {
+      console.error("Bulk Upload Error:", error);
+
+      handleSnackbar("Unexpected error occurred", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAddCancel = useCallback(() => {
     setIsAddModalOpen(false);
 
@@ -341,11 +380,10 @@ const DeviceAssetManagement = () => {
           mode=""
           setMode={handleSetMode}
           handleClick={handleClick}
+          handleAddAsset={handleBulkClick}
           modelOptions={deviceModelOptions}
           statusOptions={DEVICE_ASSET_STATUS_FILTER_OPTIONS}
-          isAssetAllocationEnabled={
-            selectedRows.length > 0
-          }
+          // isAssetAllocationEnabled={selectedRows.length > 0}
         />
         <GridContainer>
           <CommonDataGrid
@@ -355,9 +393,9 @@ const DeviceAssetManagement = () => {
             setData={setData}
             paginationMode="server"
             getRowHeight={getRowHeight}
-            checkboxSelection
-            rowSelectionModel={selectedRows}
-            onRowSelectionModelChange = {setSelectedRows}
+            // checkboxSelection
+            // rowSelectionModel={selectedRows}
+            // onRowSelectionModelChange={setSelectedRows}
           />
         </GridContainer>
       </PageContainer>
@@ -387,6 +425,20 @@ const DeviceAssetManagement = () => {
             isEditMode={isEditMode}
             onSubmit={handleAddSubmit}
           />
+        }
+      />
+
+      <CommonDialogForm
+        open={isBulkModalOpen}
+        onCancel={handleBulkCancel}
+        mode="add"
+        title="Add Bulk Asset"
+        formId="bulkAssetForm"
+        loading={false}
+        submitButtonText="Upload"
+        maxWidth="xs"
+        content={
+          <BulkUploadForm formId="bulkAssetForm" onSubmit={handleBulkSubmit} />
         }
       />
     </>

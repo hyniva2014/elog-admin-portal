@@ -18,11 +18,9 @@ const DeviceAssetManagementHeader = (props) => {
     mode,
     setMode,
     handleClick,
-    handleAsset,
     handleAddAsset,
     modelOptions = [],
     statusOptions = [],
-    isAssetAllocationEnabled,
   } = props;
 
   const resolvedModelOptions =
@@ -44,13 +42,13 @@ const DeviceAssetManagementHeader = (props) => {
         addButton={true}
         rightContent={
           <Box display="flex" gap={2}>
-            <AddButton
+            {/* <AddButton
               variant="contained"
               onClick={handleAsset}
               disabled={!isAssetAllocationEnabled}
             >
               Asset Allocation
-            </AddButton>
+            </AddButton> */}
             <AddButton variant="contained" onClick={handleAddAsset}>
               Add Bulk Asset
             </AddButton>
