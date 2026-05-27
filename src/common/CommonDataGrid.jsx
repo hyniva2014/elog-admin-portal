@@ -48,6 +48,7 @@ const CommonDataGrid = ({
   onRowSelectionModelChange = () => {},
   showMuiLoading = true,
   useAutoHeight = false,
+  isRowSelectable = null,
 }) => {
   const pagePaginationModel = {
     page: (data.page || 1) - 1,
