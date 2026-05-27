@@ -42,13 +42,6 @@ const DeviceAssetManagementHeader = (props) => {
         addButton={true}
         rightContent={
           <Box display="flex" gap={2}>
-            {/* <AddButton
-              variant="contained"
-              onClick={handleAsset}
-              disabled={!isAssetAllocationEnabled}
-            >
-              Asset Allocation
-            </AddButton> */}
             <AddButton variant="contained" onClick={handleAddAsset}>
               Add Bulk Asset
             </AddButton>

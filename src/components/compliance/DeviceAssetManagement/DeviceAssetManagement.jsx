@@ -20,7 +20,7 @@ import BulkUploadForm from "./BulkUploadForm";
 
 const DeviceAssetManagement = () => {
   const { fetchApi, createApi } = useServices();
-  const { setLoading, LoadingContainer } = CommonLoading();
+  const { loading,setLoading, LoadingContainer } = CommonLoading();
   const [allRows, setAllRows] = useState([]);
   const [deviceModelOptions, setDeviceModelOptions] = useState([]);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
@@ -393,9 +393,6 @@ const DeviceAssetManagement = () => {
             setData={setData}
             paginationMode="server"
             getRowHeight={getRowHeight}
-            // checkboxSelection
-            // rowSelectionModel={selectedRows}
-            // onRowSelectionModelChange={setSelectedRows}
           />
         </GridContainer>
       </PageContainer>
