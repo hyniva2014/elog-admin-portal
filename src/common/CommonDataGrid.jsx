@@ -80,7 +80,7 @@ const CommonDataGrid = ({
       if (!virtualScroller) return;
       const scrollLeft = virtualScroller.scrollLeft;
       const stickyHeaders = root.querySelectorAll(
-        ".MuiDataGrid-columnHeader.sticky-col-left-1, .MuiDataGrid-columnHeader.sticky-col-left-2",
+        ".MuiDataGrid-columnHeader.sticky-col-left-1, .MuiDataGrid-columnHeader.sticky-col-left-2, .MuiDataGrid-columnHeaderCheckbox",
       );
       stickyHeaders.forEach((el) => {
         el.style.setProperty(
@@ -235,6 +235,7 @@ const CommonDataGrid = ({
         checkboxSelection={checkboxSelection}
         rowSelectionModel={rowSelectionModel}
         onRowSelectionModelChange={onRowSelectionModelChange}
+        isRowSelectable={isRowSelectable}
         onPaginationModelChange={(model) =>
           setData((prev) => ({
             ...prev,

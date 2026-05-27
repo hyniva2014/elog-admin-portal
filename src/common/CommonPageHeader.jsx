@@ -108,9 +108,9 @@ const CommonPageHeader = ({
   return (
     <HeaderContainer>
       <TitleContainer>
-        <HeaderTitle>{title}</HeaderTitle>
+        <HeaderTitle variant="inherit">{title}</HeaderTitle>
 
-        <HeaderSubtitle isvisible={Boolean(subtitle)}>
+        <HeaderSubtitle variant="inherit" isvisible={Boolean(subtitle)}>
           {subtitle || "placeholder"}
         </HeaderSubtitle>
       </TitleContainer>

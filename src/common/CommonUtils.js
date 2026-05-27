@@ -37,3 +37,11 @@ export const buildSummaryCards = (apiBody = {}, config = {}) => {
       icon: meta.icon,
     }));
 };
+
+export const getSelectedDevices = (selectedIds) => {
+  return allRows
+    .filter((row) => selectedIds.includes(row.id))
+    .map((row) => ({
+      device_id: row.id,
+    }));
+};
