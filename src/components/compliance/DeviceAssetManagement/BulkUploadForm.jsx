@@ -110,27 +110,30 @@ const BulkUploadForm = ({ formId, onSubmit }) => {
     );
   };
 
-  const renderFilePreview = (field) => {
-    return (
-      <FilePreviewContainer>
-        <FileInfoWrapper>
-          {renderFileIcon(field.value)}
+const renderFilePreview = (field) => {
+  const { name, size } = field.value;
+    const fileIcon = renderFileIcon(field.value);
 
-          <Box>
-            <FileNameText>{field.value.name}</FileNameText>
+  return (
+    <FilePreviewContainer>
+      <FileInfoWrapper>
+        {fileIcon}
 
-            <Typography variant="caption" color="text.secondary">
-              {(field.value.size / 1024).toFixed(1)} KB
-            </Typography>
-          </Box>
-        </FileInfoWrapper>
+        <Box>
+          <FileNameText>{name}</FileNameText>
 
-        <IconButton onClick={createRemoveHandler(field.onChange)} size="small">
-          <CloseIcon />
-        </IconButton>
-      </FilePreviewContainer>
-    );
-  };
+          <Typography variant="caption" color="text.secondary">
+            {(size / 1024).toFixed(1)} KB
+          </Typography>
+        </Box>
+      </FileInfoWrapper>
+
+      <IconButton onClick={createRemoveHandler(field.onChange)} size="small">
+        <CloseIcon />
+      </IconButton>
+    </FilePreviewContainer>
+  );
+};
 
   const renderUploadContent = (field) => {
     return field.value ? renderFilePreview(field) : renderUploadBox();
