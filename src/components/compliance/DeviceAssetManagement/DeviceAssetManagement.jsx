@@ -47,10 +47,12 @@ const DeviceAssetManagement = () => {
     deviceId: "",
     modelName: "",
     serialNumber: "",
+    imei: "",
     firmware: "",
     manufacturerName: "",
     simNumber: "",
     iccid: "",
+    bleMacAddress: "",
     hardwareVersion: "",
     providerDeviceId: "",
     integrationType: "",
@@ -59,7 +61,7 @@ const DeviceAssetManagement = () => {
   });
   const [isEditMode, setIsEditMode] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  // const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
 
   // ── Bulk Upload ────────────────────────────────────────────────────────────────
   const handleBulkClick = useCallback(() => {
@@ -97,24 +99,24 @@ const DeviceAssetManagement = () => {
     data.status,
     data.fromDate,
   ]);
-  useEffect(() => {
-    fetchDeviceModelDropdown();
-  }, []);
+  // useEffect(() => {
+  //   fetchDeviceModelDropdown();
+  // }, []);
 
-  const fetchDeviceModelDropdown = async () => {
-    try {
-      const response = await fetchApi("/masteradmin/get-device-model-dropdown");
-      const dropdownData = response?.body?.data || [];
-      const formattedOptions = dropdownData.map((item) => ({
-        value: item.model_name,
-        label: item.model_name,
-      }));
+  // const fetchDeviceModelDropdown = async () => {
+  //   try {
+  //     const response = await fetchApi("/masteradmin/get-device-model-dropdown");
+  //     const dropdownData = response?.body?.data || [];
+  //     const formattedOptions = dropdownData.map((item) => ({
+  //       value: item.model_name,
+  //       label: item.model_name,
+  //     }));
 
-      setDeviceModelOptions(formattedOptions);
-    } catch (error) {
-      console.error("Device Model Dropdown Error:", error);
-    }
-  };
+  //     setDeviceModelOptions(formattedOptions);
+  //   } catch (error) {
+  //     console.error("Device Model Dropdown Error:", error);
+  //   }
+  // };
 
   const fetchDeviceAssets = async () => {
     try {
@@ -164,10 +166,12 @@ const DeviceAssetManagement = () => {
       deviceId: "",
       modelName: "",
       serialNumber: "",
+      imei: "",
       firmware: "",
       manufacturerName: "",
       simNumber: "",
       iccid: "",
+      bleMacAddress: "",
       hardwareVersion: "",
       providerDeviceId: "",
       integrationType: "",
@@ -203,6 +207,15 @@ const DeviceAssetManagement = () => {
         device_model_id: formValues.modelName,
         status: formValues.status || "1",
       };
+      if (formValues.imei?.trim()) {
+        payload.imei = formValues.imei.trim();
+      }
+      if (formValues.iccid?.trim()) {
+        payload.iccid = formValues.iccid.trim();
+      }
+      if (formValues.bleMacAddress?.trim()) {
+        payload.ble_mac_address = formValues.bleMacAddress.trim();
+      }
       if (formValues.deviceId) {
         payload.device_id = formValues.deviceId;
       }
@@ -222,7 +235,7 @@ const DeviceAssetManagement = () => {
         fetchDeviceAssets();
       } else {
         handleSnackbar(
-          response?.body?.message || "Something went wrong",
+          response?.body?.message || "serial number should be Unique",
           "warning",
         );
       }
@@ -248,10 +261,12 @@ const DeviceAssetManagement = () => {
         deviceId: deviceData?.device_id || "",
         modelName: deviceData?.device_model_id || "",
         serialNumber: deviceData?.device_serial_number || "",
+        imei: deviceData?.imei || "",
         firmware: deviceData?.firmware || "",
         manufacturerName: deviceData?.manufacturer_name || "",
         simNumber: deviceData?.sim_number || "",
         iccid: deviceData?.iccid || "",
+        bleMacAddress: deviceData?.ble_mac_address || "",
         hardwareVersion: deviceData?.hardware_version || "",
         providerDeviceId: deviceData?.provider_device_id || "",
         integrationType: deviceData?.integration_type || "",
@@ -316,10 +331,12 @@ const DeviceAssetManagement = () => {
       deviceId: "",
       modelName: "",
       serialNumber: "",
+      imei: "",
       firmware: "",
       manufacturerName: "",
       simNumber: "",
       iccid: "",
+      bleMacAddress: "",
       hardwareVersion: "",
       providerDeviceId: "",
       integrationType: "",
@@ -331,6 +348,9 @@ const DeviceAssetManagement = () => {
   }, []);
 
   const handleSetMode = useCallback(() => {}, []);
+  const handleRowSelectionChange = (newSelection) => {
+    setSelectedRows(newSelection);
+  };
 
   const columns = useMemo(() => getColumns(handleViewClick), [handleViewClick]);
 
@@ -396,6 +416,9 @@ const DeviceAssetManagement = () => {
             setData={setData}
             paginationMode="server"
             getRowHeight={getRowHeight}
+            checkboxSelection
+            rowSelectionModel={selectedRows}
+            onRowSelectionModelChange={handleRowSelectionChange}
           />
         </GridContainer>
       </PageContainer>
