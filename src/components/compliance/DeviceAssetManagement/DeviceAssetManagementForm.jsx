@@ -26,6 +26,14 @@ const initialValues = {
   status: "",
 };
 
+const renderStatusOptions = () => {
+  return DEVICE_ASSET_STATUS_FILTER_OPTIONS.map((option) => (
+    <MenuItem key={option.value} value={option.value}>
+      {option.label}
+    </MenuItem>
+  ));
+};
+
 
 
 const DeviceAssetManagementForm = ({
@@ -168,11 +176,7 @@ const DeviceAssetManagementForm = ({
               disabled={isDisabled}
               onChange={handleStatusChange}
             >
-              {DEVICE_ASSET_STATUS_FILTER_OPTIONS.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
+              {renderStatusOptions()}
             </TextField>
           </Grid>
         )}
