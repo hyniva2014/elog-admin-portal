@@ -65,7 +65,7 @@ const AdminDashboard = () => {
 
   return (
     <PageContainer>
-      <LoadingContainer/>
+      <LoadingContainer />
       {/* Header */}
       <HeaderContainer>
         <HeaderLeft>
@@ -73,10 +73,10 @@ const AdminDashboard = () => {
           <HeaderSubtitle variant="inherit">
             Overview of key metrics and alerts
           </HeaderSubtitle>
-          <DateRangeText>{dateLabel}</DateRangeText>
+          {/* <DateRangeText>{dateLabel}</DateRangeText> */}
         </HeaderLeft>
 
-        <DateRangeSelector onDateRangeChange={handleDateChange} />
+        {/* <DateRangeSelector onDateRangeChange={handleDateChange} /> */}
       </HeaderContainer>
 
       <CommonSummaryCardGroup

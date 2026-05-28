@@ -127,5 +127,5 @@ export const formatSubtitle = (trendEntries, selectedYear) => {
   const first = trendEntries[0];
   const last = trendEntries[trendEntries.length - 1];
 
-  return `${first.monthName}.${first.year} - ${last.monthName}.${last.year}`;
+  return `${first.monthName} ${first.year} - ${last.monthName} ${last.year}`;
 };
