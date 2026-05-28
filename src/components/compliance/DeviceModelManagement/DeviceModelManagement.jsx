@@ -95,7 +95,6 @@ const DeviceModelManagement = () => {
             rowData={allRows}
             data={gridData}
             setData={setData}
-            paginationMode="server"
             getRowHeight={getRowHeight}
           />
         </GridContainer>
