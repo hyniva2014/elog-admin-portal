@@ -1,5 +1,8 @@
 import dayjs from "dayjs";
-import { StatusTypography, ELogsTypography } from "./DeviceModelManagement.styled";
+import {
+  StatusTypography,
+  ELogsTypography,
+} from "./DeviceModelManagement.styled";
 import DeviceModelManagementActionButton from "./DeviceModelManagementActionButton";
 
 export const formatDate = (value) =>
@@ -25,7 +28,9 @@ const ELogsCellComponent = ({ value }) => {
   );
 };
 
-const StatusCell = (params) => <StatusCellComponent value={params.value} row={params.row} />;
+const StatusCell = (params) => (
+  <StatusCellComponent value={params.value} row={params.row} />
+);
 const ELogsCell = (params) => <ELogsCellComponent value={params.value} />;
 
 const ActionCell = ({ row, onView }) => (
@@ -49,13 +54,19 @@ export const getColumns = (onView) => [
     headerClassName: "sticky-col-left-1",
   },
   {
-    field: "assetType",
-    headerName: "Asset Type",
+    field: "modelCode",
+    headerName: "Model Code",
     flex: 1,
-    minWidth: 120,
+    minWidth: 180,
     headerTooltip: true,
     cellClassName: "sticky-col-left-2",
     headerClassName: "sticky-col-left-2",
+  },
+  {
+    field: "assetType",
+    headerName: "Asset Type",
+    flex: 1,
+    minWidth: 150,
   },
   {
     field: "description",

@@ -159,37 +159,6 @@ export const columns = [
   // },
 ];
 
-export const summaryCards = [
-  {
-    id: "total_devices",
-    title: "Total Devices",
-    value: "1095",
-    accentcolor: "brand",
-    icon: <DevicesIcon sx={{ fontSize: 28 }} color="brand" />,
-  },
-  {
-    id: "online_devices",
-    title: "Online Devices",
-    value: "1077",
-    accentcolor: "success",
-    icon: <WifiIcon sx={{ fontSize: 28 }} color="success" />,
-  },
-  {
-    id: "offline_devices",
-    title: "Offline Devices",
-    value: "18",
-    accentcolor: "error",
-    icon: <WifiOffIcon sx={{ fontSize: 28 }} color="error" />,
-  },
-  {
-    id: "unassigned_devices",
-    title: "Unassigned Devices",
-    value: "34",
-    accentcolor: "warning",
-    icon: <Inventory2OutlinedIcon sx={{ fontSize: 28 }} color="warning" />,
-  },
-];
-
 export const transformDeviceData = (data = []) =>
   data.map((item) => ({
     id: item.device_id,
@@ -209,32 +178,32 @@ export const transformDeviceData = (data = []) =>
       item.status === "1" || item.status === 1 ? "Assigned" : "Unassigned",
   }));
 
-export const DEVICE_SUMMARY_CARDS = [
-  {
+export const DEVICE_SUMMARY_CARDS = {
+  totalDevices: {
     id: "totalDevices",
     title: "Total Devices",
     accentcolor: "brand",
-    icon: <DevicesIcon sx={{ fontSize: 28 }} color="brand" />,
+    icon: <DevicesIcon fontSize="small" color="brand" />,
   },
-  {
+  onlineDevices: {
     id: "onlineDevices",
     title: "Online Devices",
     accentcolor: "success",
-    icon: <WifiIcon sx={{ fontSize: 28 }} color="success" />,
+    icon: <WifiIcon sfontSize="small" color="success" />,
   },
-  {
+  offlineDevices: {
     id: "offlineDevices",
     title: "Offline Devices",
     accentcolor: "error",
-    icon: <WifiOffIcon sx={{ fontSize: 28 }} color="error" />,
+    icon: <WifiOffIcon fontSize="small" color="error" />,
   },
-  {
+  unassignedDevices: {
     id: "unassignedDevices",
     title: "Unassigned Devices",
     accentcolor: "warning",
-    icon: <Inventory2OutlinedIcon sx={{ fontSize: 28 }} color="warning" />,
+    icon: <Inventory2OutlinedIcon fontSize="small" a color="warning" />,
   },
-];
+};
 
 export const GVWR_OPTIONS = [
   { value: "26,001 lbs", label: "26,001 lbs" },

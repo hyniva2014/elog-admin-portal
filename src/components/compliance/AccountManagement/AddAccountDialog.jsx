@@ -13,7 +13,12 @@ import {
   CancelEditButton,
 } from "./AccountManagement.styled";
 
-import { STATUS_OPTIONS, ACCOUNT_FORM_FIELDS, PRIMARY_CONTACT_FIELDS, SECONDARY_CONTACT_FIELDS } from "./Constants";
+import {
+  STATUS_OPTIONS,
+  ACCOUNT_FORM_FIELDS,
+  PRIMARY_CONTACT_FIELDS,
+  SECONDARY_CONTACT_FIELDS,
+} from "./Constants";
 import FormSelect from "./FormSelect";
 import FormFieldsSection from "./FormFieldsSection";
 
@@ -36,32 +41,35 @@ const validationSchema = yup.object({
   mcNumber: yup
     .string()
     .required("MC Number is required")
-    .matches(/^(MC-?\d{6,8}|\d{6,8})$/, "MC Number must be 6-8 digits (e.g., 123456, MC123456, or MC-123456)"),
+    .matches(
+      /^(MC-?\d{6,8}|\d{6,8})$/,
+      "MC Number must be 6-8 digits (e.g., 123456, MC123456, or MC-123456)",
+    ),
   maxDevices: yup
     .number()
     .typeError("Max Devices must be a number")
     .required("Max Devices is required")
     .positive("Max Devices must be greater than 0")
     .integer("Max Devices must be a whole number"),
-  website: yup
-    .string()
-    .test(
-      "website",
-      "Please enter a valid website URL (e.g., example.com, www.example.com, https://example.com)",
-      (value) => {
-        if (!value) return true;
-        try {
-          const urlToTest = value.startsWith('http://') || value.startsWith('https://') 
-            ? value 
-            : `http://${value}`;
-          const url = new URL(urlToTest);
-          return url.hostname && url.hostname.includes('.');
-        } catch {
-          return false;
-        }
-      }
-    )
-    .nullable(),
+  // website: yup
+  //   .string()
+  //   .test(
+  //     "website",
+  //     "Please enter a valid website URL (e.g., example.com, www.example.com, https://example.com)",
+  //     (value) => {
+  //       if (!value) return true;
+  //       try {
+  //         const urlToTest = value.startsWith('http://') || value.startsWith('https://')
+  //           ? value
+  //           : `http://${value}`;
+  //         const url = new URL(urlToTest);
+  //         return url.hostname && url.hostname.includes('.');
+  //       } catch {
+  //         return false;
+  //       }
+  //     }
+  //   )
+  //   .nullable(),
   tollFree: yup
     .string()
     .required("Toll Free is required")
@@ -69,13 +77,13 @@ const validationSchema = yup.object({
       /^(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/,
       "Please enter a valid phone number",
     ),
-  fax: yup
-    .string()
-    .required("Fax is required")
-    .matches(
-      /^(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/,
-      "Please enter a valid fax number",
-    ),
+  // fax: yup
+  //   .string()
+  //   .required("Fax is required")
+  //   .matches(
+  //     /^(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/,
+  //     "Please enter a valid fax number",
+  //   ),
   carrierAddress: yup
     .string()
     .required("Carrier Address is required")
@@ -141,7 +149,16 @@ const DIALOG_TITLES = {
   add: "Add New Account",
 };
 
-const AddAccountDialog = ({ open, onClose, onSubmit, loading = false, mode = "add", initialData = null, onEditClick, onCancelEdit }) => {
+const AddAccountDialog = ({
+  open,
+  onClose,
+  onSubmit,
+  loading = false,
+  mode = "add",
+  initialData = null,
+  onEditClick,
+  onCancelEdit,
+}) => {
   const isEditMode = mode === "edit";
   const isViewMode = mode === "view";
   const isFieldDisabled = loading || isViewMode;
@@ -182,20 +199,28 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false, mode = "ad
       });
       reset(defaultValues);
     },
-    [onSubmit, initialData, reset]
+    [onSubmit, initialData, reset],
   );
 
   const headerActions = useMemo(() => {
     if (isViewMode && onEditClick) {
       return (
-        <EditButton variant="contained" onClick={onEditClick} disabled={loading}>
+        <EditButton
+          variant="contained"
+          onClick={onEditClick}
+          disabled={loading}
+        >
           Edit
         </EditButton>
       );
     }
     if (isEditMode && onCancelEdit) {
       return (
-        <CancelEditButton variant="outlined" onClick={onCancelEdit} disabled={loading}>
+        <CancelEditButton
+          variant="outlined"
+          onClick={onCancelEdit}
+          disabled={loading}
+        >
           Cancel Edit
         </CancelEditButton>
       );
@@ -241,7 +266,9 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false, mode = "ad
               />
 
               <Grid item xs={12}>
-                <SecondarySectionHeader>SECONDARY DETAILS</SecondarySectionHeader>
+                <SecondarySectionHeader>
+                  SECONDARY DETAILS
+                </SecondarySectionHeader>
                 <Divider />
               </Grid>
 
@@ -254,11 +281,9 @@ const AddAccountDialog = ({ open, onClose, onSubmit, loading = false, mode = "ad
             </Grid>
           </DialogFormContainer>
         </form>
-
-       
       </>
     ),
-    [control, errors, isFieldDisabled, shouldShowStatusField]
+    [control, errors, isFieldDisabled, shouldShowStatusField],
   );
 
   return (

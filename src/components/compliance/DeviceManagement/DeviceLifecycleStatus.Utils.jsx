@@ -50,11 +50,11 @@ export const mapLifecycleToSegments = (lifecycle = {}) => [
     label: "In Stock",
     count: lifecycle.in_stock_device_count ?? 0,
   },
-  {
-    key: "inMaintenance",
-    label: "In Maintenance",
-    count: lifecycle.out_of_service_device_count ?? 0,
-  },
+  // {
+  //   key: "inMaintenance",
+  //   label: "In Maintenance",
+  //   count: lifecycle.out_of_service_device_count ?? 0,
+  // },
   {
     key: "retired",
     label: "Retired",
