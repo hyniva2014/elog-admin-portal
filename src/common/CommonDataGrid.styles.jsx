@@ -1,3 +1,5 @@
+import { Box, styled } from "@mui/material";
+
 export const tooltipLabelSx = {
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -5,6 +7,15 @@ export const tooltipLabelSx = {
   width: "100%",
   display: "block",
 };
+
+export const NoRowsOverlayContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  height: "100%",
+  paddingTop: theme.spacing(2),
+  paddingBottom: theme.spacing(2),
+}));
 
 export const getHeaderWrapperSx = (isSortable) => ({
   cursor: isSortable ? "pointer" : "default",
@@ -84,18 +95,57 @@ export const gridSx = (theme) => ({
       outline: "none",
     },
 
+  "&.has-checkbox .MuiDataGrid-cellCheckbox": {
+    position: "sticky",
+    left: 0,
+    backgroundColor: theme.palette.background.paper,
+    zIndex: 3,
+  },
+  "& .MuiCheckbox-root.Mui-disabled": {
+    position: "relative",
+    "&::before": {
+      content: '""',
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      width: "16px",
+      height: "16px",
+      backgroundColor: theme.palette.action.disabledBackground,
+      borderRadius: "2px",
+      zIndex: 0,
+    },
+    "& svg": {
+      position: "relative",
+      zIndex: 1,
+    },
+  },
+
   "& .MuiDataGrid-cell.sticky-col-left-1": {
     position: "sticky",
     left: 0,
     backgroundColor: theme.palette.background.paper,
     zIndex: 3,
   },
+  "&.has-checkbox .MuiDataGrid-cell.sticky-col-left-1": {
+    left: 50,
+  },
+  
   "& .MuiDataGrid-cell.sticky-col-left-2": {
     position: "sticky",
     left: 150,
     backgroundColor: theme.palette.background.paper,
     zIndex: 3,
     borderRight: `1.5px solid ${theme.palette.divider}`,
+  },
+  "&.has-checkbox .MuiDataGrid-cell.sticky-col-left-2": {
+    left: 200,
+  },
+
+  "&.has-checkbox .MuiDataGrid-columnHeaderCheckbox": {
+    zIndex: 1000,
+    backgroundColor: theme.palette.grey[50],
+    willChange: "transform",
   },
 
   "& .MuiDataGrid-columnHeader.sticky-col-left-1": {
@@ -111,6 +161,14 @@ export const gridSx = (theme) => ({
     willChange: "transform",
   },
 
+  "& .MuiDataGrid-row:hover": {
+    backgroundColor: theme.palette.grey[100],
+  },
+
+  "& .MuiDataGrid-row:hover .MuiDataGrid-cell": {
+    backgroundColor: theme.palette.grey[100],
+  },
+
   "& .MuiDataGrid-row:hover .sticky-col-left-1, & .MuiDataGrid-row:hover .sticky-col-left-2":
     {
       backgroundColor: theme.palette.grey[100],
@@ -124,11 +182,15 @@ export const gridSx = (theme) => ({
   },
 });
 
-export const getContainerSx = (hasRows) => ({
+export const getContainerSx = (hasRows, useAutoHeight = false) => ({
   display: "flex",
   flexDirection: "column",
   flex: 1,
   minHeight: 0,
   width: "100%",
-  height: hasRows ? "auto" : 600,
+  ...(useAutoHeight
+    ? { height: "auto" }
+    : hasRows
+      ? { height: "auto" }
+      : { minHeight: 240 }),
 });

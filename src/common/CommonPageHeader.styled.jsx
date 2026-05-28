@@ -19,7 +19,9 @@ export const HeaderTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 600,
 }));
 
-export const HeaderSubtitle = styled(Typography)(({ theme, isvisible }) => ({
+export const HeaderSubtitle = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== "isvisible",
+})(({ theme, isvisible }) => ({
   fontSize: 13,
   color: theme.palette.text.secondary,
   fontWeight: 400,

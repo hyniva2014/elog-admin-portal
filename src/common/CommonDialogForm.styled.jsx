@@ -1,6 +1,8 @@
+import { COLORS } from "../components/compliance/DeviceAssetManagement/DeviceAssetManagement.styles";
+
 export const dialogStyles = (theme) => ({
   paper: {
-    borderRadius: theme.spacing(0.375),
+    borderRadius: theme.spacing(1.25),
     width: "100%",
     position: "relative",
   },
@@ -54,7 +56,7 @@ export const dialogStyles = (theme) => ({
     fontSize: 16,
     fontWeight: 400,
     color: theme.palette.primary.main,
-    borderRadius: theme.spacing(0.25),
+    borderRadius: theme.spacing(0.5),
     borderColor: theme.palette.primary.main,
     backgroundColor: theme.palette.common.white,
   },
@@ -63,9 +65,9 @@ export const dialogStyles = (theme) => ({
     fontSize: 16,
     fontWeight: 400,
     color: theme.palette.common.white,
-    backgroundColor: theme.palette.primary.main,
-    borderRadius: theme.spacing(0.25),
-    borderColor: theme.palette.primary.main,
+    backgroundColor: COLORS.primary,
+    borderRadius: theme.spacing(0.5),
+    borderColor: COLORS.primary,
   },
 });
 

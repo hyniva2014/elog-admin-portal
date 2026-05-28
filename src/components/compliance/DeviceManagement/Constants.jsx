@@ -11,8 +11,8 @@ const formatDate = (value) =>
   value ? dayjs(value).format("MMM DD, YYYY") : "-";
 
 export const DEVICE_STATUS_FILTER_OPTIONS = [
-  { value: "1", label: "Active" },
-  { value: "0", label: "Inactive" },
+  { value: "1", label: "Assigned" },
+  { value: "0", label: "Unassigned" },
 ];
 
 export const DEVICE_IGNITION_FILTER_OPTIONS = [
@@ -150,13 +150,13 @@ export const columns = [
     minWidth: 90,
     renderCell: (params) => <StatusCell value={params.value} />,
   },
-  {
-    field: "action",
-    headerName: "Action",
-    flex: 1,
-    minWidth: 100,
-    renderCell: () => <ActionCell />,
-  },
+  // {
+  //   field: "action",
+  //   headerName: "Action",
+  //   flex: 1,
+  //   minWidth: 100,
+  //   renderCell: () => <ActionCell />,
+  // },
 ];
 
 export const summaryCards = [
@@ -205,35 +205,32 @@ export const transformDeviceData = (data = []) =>
     speed: item.speed ?? 0,
     createdOn: item.created_at,
     updatedOn: item.updated_at,
-    status: item.status === "1" || item.status === 1 ? "Active" : "Inactive",
+    status:
+      item.status === "1" || item.status === 1 ? "Assigned" : "Unassigned",
   }));
 
-export const buildSummaryCards = (counts = {}) => [
+export const DEVICE_SUMMARY_CARDS = [
   {
-    id: "total_devices",
+    id: "totalDevices",
     title: "Total Devices",
-    value: String(counts.totalDevices ?? 0),
     accentcolor: "brand",
     icon: <DevicesIcon sx={{ fontSize: 28 }} color="brand" />,
   },
   {
-    id: "online_devices",
+    id: "onlineDevices",
     title: "Online Devices",
-    value: String(counts.onlineDevices ?? 0),
     accentcolor: "success",
     icon: <WifiIcon sx={{ fontSize: 28 }} color="success" />,
   },
   {
-    id: "offline_devices",
+    id: "offlineDevices",
     title: "Offline Devices",
-    value: String(counts.offlineDevices ?? 0),
     accentcolor: "error",
     icon: <WifiOffIcon sx={{ fontSize: 28 }} color="error" />,
   },
   {
-    id: "unassigned_devices",
+    id: "unassignedDevices",
     title: "Unassigned Devices",
-    value: String(counts.unassignedDevices ?? 0),
     accentcolor: "warning",
     icon: <Inventory2OutlinedIcon sx={{ fontSize: 28 }} color="warning" />,
   },

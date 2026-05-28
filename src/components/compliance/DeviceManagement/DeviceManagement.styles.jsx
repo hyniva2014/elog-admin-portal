@@ -10,6 +10,10 @@ export const AddButton = styled(Button)(({ theme }) => ({
   backgroundColor: theme.palette.brand.main,
   fontSize: 14,
   fontWeight: 400,
+  "&:disabled": {
+    backgroundColor: theme.palette.action.disabledBackground,
+    color: theme.palette.action.disabled,
+  },
 }));
 
 export const SummaryCardBox = styled(Box)(({ theme }) => ({
@@ -21,7 +25,7 @@ export const FormBox = styled(Box)(({ theme }) => ({
 }));
 
 export const StatusTypography = styled(Typography)(({ theme, value }) => ({
-  color: value === "Active" ? theme.palette.success.dark : theme.palette.error.dark,
+  color: value === "Assigned" ? theme.palette.success.dark : theme.palette.error.dark,
 }));
 
 export const DialogFormContainer = styled(Box)(({ theme }) => ({

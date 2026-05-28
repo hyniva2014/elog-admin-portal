@@ -2,7 +2,10 @@ import { useCallback, useState, useEffect, useRef } from "react";
 import dayjs from "dayjs";
 import { useServices } from "@src/services/services";
 import { useAuthContext } from "@src/states/useAuthContext";
-import { transformDeviceModelData, generateDeviceCode } from "@src/helpers/deviceModelHelpers";
+import {
+  transformDeviceModelData,
+  generateDeviceCode,
+} from "@src/helpers/deviceModelHelpers";
 
 const EMPTY_FORM_VALUES = {
   deviceModelId: "",
@@ -64,7 +67,10 @@ const useDeviceModelManagement = () => {
       let dropdownData = [];
       if (response?.body?.data && Array.isArray(response.body.data)) {
         dropdownData = response.body.data;
-      } else if (response?.body?.data?.data && Array.isArray(response.body.data.data)) {
+      } else if (
+        response?.body?.data?.data &&
+        Array.isArray(response.body.data.data)
+      ) {
         dropdownData = response.body.data.data;
       }
       const formattedOptions = dropdownData.map((item) => ({
@@ -94,17 +100,27 @@ const useDeviceModelManagement = () => {
         endUrl += `&status=${String(current.status)}`;
       }
       if (current.fromDate) {
-        endUrl += `&created_at=${dayjs(current.fromDate).format("YYYY-MM-DD")}`;
+        endUrl += `&from_date=${dayjs(current.fromDate).format("YYYY-MM-DD")}`;
+      }
+      if (current.toDate) {
+        endUrl += `&to_date=${dayjs(current.toDate).format("YYYY-MM-DD")}`;
       }
 
       const response = await fetchApi(endUrl);
 
       let apiData = [];
-      if (response?.body?.data?.data && Array.isArray(response.body.data.data)) {
+      if (
+        response?.body?.data?.data &&
+        Array.isArray(response.body.data.data)
+      ) {
         apiData = response.body.data.data;
       } else if (response?.body?.data && Array.isArray(response.body.data)) {
         apiData = response.body.data;
-      } else if (response?.body?.data && typeof response.body.data === "object" && response.body.data !== null) {
+      } else if (
+        response?.body?.data &&
+        typeof response.body.data === "object" &&
+        response.body.data !== null
+      ) {
         apiData = [response.body.data];
       } else if (response?.body?.device_model_id) {
         apiData = [response.body];
@@ -132,7 +148,8 @@ const useDeviceModelManagement = () => {
     async (formValues) => {
       try {
         setIsLoading(true);
-        const deviceCode = formValues.deviceCode || generateDeviceCode(formValues.modelName);
+        const deviceCode =
+          formValues.deviceCode || generateDeviceCode(formValues.modelName);
         const payload = {
           device_code: deviceCode,
           model_name: formValues.modelName,
@@ -149,13 +166,18 @@ const useDeviceModelManagement = () => {
         const response = await createApi(payload, "/masteradmin/device-model");
         if (response?.statusCode >= 200 && response?.statusCode < 300) {
           handleSnackbar(
-            formValues.deviceModelId ? "Asset updated successfully" : "Asset created successfully",
+            formValues.deviceModelId
+              ? "Asset updated successfully"
+              : "Asset created successfully",
             "success",
           );
           setIsAddModalOpen(false);
           fetchDeviceModels();
         } else {
-          handleSnackbar(response?.body?.message || "Something went wrong", "warning");
+          handleSnackbar(
+            response?.body?.message || "Something went wrong",
+            "warning",
+          );
         }
       } catch (error) {
         console.error("Create/Update Device Model Error:", error);
@@ -205,9 +227,18 @@ const useDeviceModelManagement = () => {
 
   useEffect(() => {
     fetchDeviceModelsRef.current();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  // Using ref pattern to avoid infinite loops caused by unstable fetchApi and handleSnackbar references from service layer
-  }, [data.page, data.pageSize, data.search, data.model, data.assetType, data.supportsElogs, data.status, data.fromDate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Using ref pattern to avoid infinite loops caused by unstable fetchApi and handleSnackbar references from service layer
+  }, [
+    data.page,
+    data.pageSize,
+    data.search,
+    data.model,
+    data.assetType,
+    data.supportsElogs,
+    data.status,
+    data.fromDate,
+  ]);
 
   useEffect(() => {
     fetchModelDropdownRef.current();
