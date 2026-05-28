@@ -9,12 +9,18 @@ export const defaultColumnProps = {
   minWidth: 180,
   maxWidth: 250,
   headerTooltip: true,
+  flex: 1,
+  align: "center",
+  headerAlign: "center",
 };
 
 export const getStickyColumnProps = (className) => ({
-  ...defaultColumnProps,
+  minWidth: 180,
+  maxWidth: 250,
+  headerTooltip: true,
   cellClassName: className,
   headerClassName: className,
+  flex: 1,
 });
 
 export const ACCOUNT_FORM_FIELDS = [
