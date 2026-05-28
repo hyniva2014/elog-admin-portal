@@ -78,6 +78,12 @@ const DeviceAssetManagementForm = ({
     fetchDeviceModels();
   }, []);
 
+  const handleStatusChange = (event) => {
+    setValue("status", event.target.value, {
+      shouldValidate: true,
+    });
+  };
+
   return (
     <StyledForm id={formId} onSubmit={handleSubmit(submitHandler)}>
       <Grid container spacing={2}>
@@ -160,11 +166,7 @@ const DeviceAssetManagementForm = ({
               label="Status"
               value={watch("status")}
               disabled={isDisabled}
-              onChange={(e) =>
-                setValue("status", e.target.value, {
-                  shouldValidate: true,
-                })
-              }
+              onChange={handleStatusChange}
             >
               {DEVICE_ASSET_STATUS_FILTER_OPTIONS.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
