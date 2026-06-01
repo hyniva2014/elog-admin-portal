@@ -1,10 +1,10 @@
 export const flyoutPaperSx = {
   minWidth: 180,
-  borderRadius: "12px",
+  borderRadius: 3,
   overflow: "hidden",
   py: 1,
   backgroundColor: "background.paper",
-  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.12)",
+  boxShadow: 3,
 };
 
 export const flyoutPopperSx = { zIndex: 1300 };
@@ -18,8 +18,8 @@ export const getFlyoutItemSx = (isActive) => ({
   px: 1.5,
   py: 1,
   cursor: "pointer",
-  fontSize: "15px",
-  borderRadius: "10px",
+  fontSize: "0.9375rem",
+  borderRadius: 2.5,
   transition: "color 0.15s, background-color 0.15s",
   fontWeight: 400,
   color: isActive ? "primary.main" : "text.secondary",
@@ -31,12 +31,12 @@ export const getFlyoutItemSx = (isActive) => ({
 });
 
 export const getCollapsedIconBoxSx = (isActive) => ({
-  p: "12px",
+  p: 1.5,
   display: "flex",
   justifyContent: "center",
   cursor: "pointer",
   borderRadius: "20px 0px 0px 20px",
-  marginLeft: "5px",
+  ml: 0.625,
   color: isActive ? "primary.main" : "common.white",
   backgroundColor: isActive ? "common.white" : "transparent",
   transition: "all 0.2s ease",
@@ -49,8 +49,9 @@ export const getExpandedMenuRowSx = (isOpen, theme) => ({
   cursor: "pointer",
   display: "flex",
   alignItems: "center",
-  padding: "12px 16px",
-  gap: "12px",
+  px: 2,
+  py: 1.5,
+  gap: 1.5,
   color: isOpen ? theme.item.active : theme.item.color,
 });
 
@@ -65,15 +66,16 @@ export const chevronStyle = (isOpen) => ({
   transition: "0.15s",
 });
 
-export const childrenListSx = { listStyle: "none", paddingLeft: "28px" };
+export const childrenListSx = { listStyle: "none", pl: 3.5 };
 
 export const getExpandedMenuItemSx = (isActive, theme) => ({
   display: "flex",
   alignItems: "center",
-  padding: "10px 16px",
+  px: 2,
+  py: 1.25,
   color: isActive ? theme.item.active : theme.item.color,
   textDecoration: "none",
-  borderRadius: "8px",
+  borderRadius: 2,
   "&:hover": { backgroundColor: "action.hover" },
 });
 
@@ -85,6 +87,6 @@ export const menuIconImgSx = (size) => ({
   display: "block",
 });
 
-export const menuListSx = { listStyle: "none", padding: 0 };
+export const menuListSx = { listStyle: "none", p: 0 };
 
 export const chevronContainerSx = { marginLeft: "auto" };

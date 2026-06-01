@@ -159,6 +159,7 @@ const MenuItemWithChildren = ({
 
   const collapsedIconSx = useMemo(() => getCollapsedIconBoxSx(isChildActive), [isChildActive]);
   const expandedRowSx = useMemo(() => getExpandedMenuRowSx(open, theme), [open, theme]);
+  const chevronSx = useMemo(() => chevronStyle(open), [open]);
 
   return (
     <li>
@@ -190,14 +191,14 @@ const MenuItemWithChildren = ({
             <Typography>{item.label}</Typography>
           )}
           <Box sx={chevronContainerSx}>
-            <LuChevronRight size={16} style={chevronStyle(open)} />
+            <LuChevronRight size={16} style={chevronSx} />
           </Box>
         </Box>
       )}
 
       {!isCollapsed && (
         <Collapse in={open}>
-          <ul style={childrenListSx}>
+          <Box component="ul" sx={childrenListSx}>
             {(item.children || []).map((child) => (
               <MenuItem
                 key={child.key}
@@ -207,7 +208,7 @@ const MenuItemWithChildren = ({
                 onNavigate={onNavigate}
               />
             ))}
-          </ul>
+          </Box>
         </Collapse>
       )}
     </li>
@@ -331,7 +332,7 @@ const SideMenu = ({ menuItems, isCollapsed }) => {
 
   return (
     <Box>
-      <ul style={menuListSx}>
+      <Box component="ul" sx={menuListSx}>
         {filteredMenuItems.map((item) =>
           item.children ? (
             <MenuItemWithChildren
@@ -354,7 +355,7 @@ const SideMenu = ({ menuItems, isCollapsed }) => {
             />
           ),
         )}
-      </ul>
+      </Box>
     </Box>
   );
 };
