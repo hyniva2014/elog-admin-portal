@@ -7,6 +7,7 @@ import { Button, IconButton } from "@mui/material";
 import { Controller } from "react-hook-form";
 import DeleteIcon from "@mui/icons-material/Delete";
 import dayjs from "dayjs";
+import { useCallback } from "react";
 
 const EmploymentHistoryEntry = ({
   index,
@@ -17,10 +18,10 @@ const EmploymentHistoryEntry = ({
   setValue,
   watch,
 }) => {
-  const handleRemoveClick = (event) => {
+  const handleRemoveClick = useCallback((event) => {
     const selectedIndex = Number(event.currentTarget.dataset.index);
     handleRemoveEmployment(selectedIndex);
-  };
+  }, [handleRemoveEmployment]);
 
   return (
     <Grid container spacing={2} item={12} key={index}>

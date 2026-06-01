@@ -11,13 +11,9 @@ import {
 } from "./UserTopHeader.styled";
 
 const UserTopHeader = ({ data }) => {
-//    const rolesOptions = useSelector((state) => state.userFilterSlice.roles);
-//    const roleLabel = rolesOptions?.find(
-//   (item) => item.value === data.role
-// )?.label;
-const rolesOptions = useSelector(
-  (state) => state.userFilterSlice?.roles || [],
-);
+  const rolesOptions = useSelector(
+    (state) => state.userFilterSlice?.roles || [],
+  );
 
   const roleLabel =
     rolesOptions.find((item) => item.value === data.role)?.label ||

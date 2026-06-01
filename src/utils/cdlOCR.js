@@ -11,12 +11,14 @@ const defaultCdlResult = {
 /**
  * Extract CDL information from uploaded license image using OCR
  * @param {File} imageFile - The uploaded CDL license image
+ * @param {Function} onProgress - Optional progress callback
  * @returns {Promise<Object>} - Extracted CDL information
+ * @throws {Error} - If imageFile is not provided
  */
 export const extractCDLFromImage = async (imageFile, onProgress) => {
-  console.warn(
-    'CDL OCR is not enabled because tesseract.js is not installed. Returning fallback CDL data.',
-  );
+  if (!imageFile) {
+    throw new Error('Image file is required for CDL extraction');
+  }
 
   if (typeof onProgress === 'function') {
     onProgress(100);
@@ -155,7 +157,6 @@ const parseCDLText = (ocrText) => {
       /PLACE\s*OF\s*ISSUE[:\s]*([A-Z]{2})\b/i,
     ];
     
-    console.log("=== Testing State Patterns ===");
     for (const pattern of statePatterns) {
       const stateMatch = text.match(pattern);
       if (stateMatch) {
@@ -223,10 +224,8 @@ const parseCDLText = (ocrText) => {
     /CLAS\s*([A-M])/i, 
   ];
   
-  console.log("=== Testing Class Patterns ===");
   for (const pattern of classPatterns) {
     const classMatch = text.match(pattern);
-    console.log("Testing class pattern:", pattern.toString(), "Match:", classMatch);
     if (classMatch) {
       result.cdl_class = classMatch[1];
       result.confidence += 25;
@@ -315,8 +314,6 @@ const parseCDLText = (ocrText) => {
  */
 const parseDate = (dateStr) => {
   try {
-    console.log("Attempting to parse date:", dateStr);
-    
     const formats = [
       'MM/DD/YYYY',
       'MM-DD-YYYY', 
@@ -342,7 +339,6 @@ const parseDate = (dateStr) => {
         }
         
         if (day < 1 || day > 31) {
-          console.log("Day out of range:", day);
           continue;
         }
         
@@ -360,7 +356,6 @@ const parseDate = (dateStr) => {
     
     return null;
   } catch (error) {
-    console.error('Date parsing error:', error);
     return null;
   }
 };
@@ -383,7 +378,6 @@ const convertToDayjs = (date) => {
     
     return date;
   } catch (error) {
-    console.error('Error converting to dayjs:', error);
     return date;
   }
 };

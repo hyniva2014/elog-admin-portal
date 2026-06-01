@@ -1,7 +1,7 @@
 import { Box, Button, Typography, LinearProgress } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import DoneIcon from "@mui/icons-material/Done";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import {
   AddHeaderContainerSx,
   AddHeaderTopSx,
@@ -35,18 +35,24 @@ const StatusIndicator = ({ item }) => (
   </Box>
 );
 
-const UserAddHeaderStep = ({ step, active, onClick, index }) => (
-  <Box
-    data-step-id={step.id}
-    data-index={index}
-    onClick={onClick}
-    sx={StepItemSx(active)}
-  >
-    <Typography sx={StepTextSx(active)}>
-      {step.number}. {step.label}
-    </Typography>
-  </Box>
-);
+const UserAddHeaderStep = ({ step, active, onClick, index }) => {
+  const handleClick = useCallback(() => {
+    onClick(step.id, index);
+  }, [onClick, step.id, index]);
+
+  return (
+    <Box
+      data-step-id={step.id}
+      data-index={index}
+      onClick={handleClick}
+      sx={StepItemSx(active)}
+    >
+      <Typography sx={StepTextSx(active)}>
+        {step.number}. {step.label}
+      </Typography>
+    </Box>
+  );
+};
 
 const UserAddHeader = ({
   handleBack,
@@ -234,13 +240,13 @@ const UserAddHeader = ({
   }, [steps, setActiveStep, scrollContainerRef]);
 
   // Handle click on stepper item to scroll to section
-  const handleStepClick = (stepId, index) => {
+  const handleStepClick = useCallback((stepId, index) => {
     const sectionElement = document.getElementById(stepId);
     if (sectionElement && setActiveStep) {
       sectionElement.scrollIntoView({ behavior: "smooth", block: "start" });
       setActiveStep(index);
     }
-  };
+  }, [setActiveStep]);
 
   const statusItems = [
     { label: "Basic", completed: sectionCompletion.basic || false },

@@ -1,3 +1,29 @@
+/**
+ * Helper function to get background color based on state
+ * @param {boolean} disabled - Whether the component is disabled
+ * @param {boolean} error - Whether there's an error
+ * @param {Object} theme - MUI theme object
+ * @returns {string} - Background color
+ */
+const getBackgroundColor = (disabled, error, theme) => {
+  if (disabled) return theme.palette.grey[100];
+  if (error) return theme.palette.error.light;
+  return "transparent";
+};
+
+/**
+ * Helper function to get border color based on state
+ * @param {boolean} disabled - Whether the component is disabled
+ * @param {boolean} error - Whether there's an error
+ * @param {Object} theme - MUI theme object
+ * @returns {string} - Border color
+ */
+const getBorderColor = (disabled, error, theme) => {
+  if (disabled) return theme.palette.divider;
+  if (error) return theme.palette.error.main;
+  return theme.palette.divider;
+};
+
 export const getUploadAreaSx = ({ disabled, error, size }) => (theme) => ({
   mt: size === "small" ? 1 : 2,
   p: size === "small" ? 1.5 : 3,
@@ -7,8 +33,8 @@ export const getUploadAreaSx = ({ disabled, error, size }) => (theme) => ({
   opacity: disabled ? 0.6 : 1,
   pointerEvents: disabled ? "none" : "auto",
   cursor: disabled ? "not-allowed" : "pointer",
-  backgroundColor: disabled ? theme.palette.grey[100] : error ? theme.palette.error.light : "transparent",
-  borderColor: disabled ? theme.palette.divider : error ? theme.palette.error.main : theme.palette.divider,
+  backgroundColor: getBackgroundColor(disabled, error, theme),
+  borderColor: getBorderColor(disabled, error, theme),
 });
 
 export const HiddenInputStyle = {

@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { useCareerUsers } from "../../../hooks";
 import { useSelector } from "react-redux";
-// import { hasPermission } from "./Constants";
 
 const CareerManagementHeader = (props) => {
   const { data = [], setData, searchKey = {}, summaryCards, addData } = props;
@@ -24,16 +23,7 @@ const CareerManagementHeader = (props) => {
     }
   }, [companyId]);
 
-  //   const permissions = useSelector((state) => state.rolePermissions.permissions);
-  // const permissions = useSelector(
-  //   (state) => state.rolePermissions?.permissions || {},
-  // );
-
-  //   const canCreate = hasPermission(
-  //     permissions,
-  //     "CAREER_USER_MANAGEMENT",
-  //     "USER_CREATE",
-  //   );
+  
   const canCreate = true;
 
   const addButtonSx = {
@@ -73,6 +63,7 @@ const CareerManagementHeader = (props) => {
     <Box sx={{ mb: 2 }}>
       <CommonPageHeader
         title="Career Users Management"
+        subtitle="Manage career users, view details and activity history"
         addButton={true}
         rightContent={
           <Button
@@ -105,11 +96,6 @@ const CareerManagementHeader = (props) => {
             dataKey: "user",
             options: driverOptions,
           },
-          // {
-          //   label: "All Vehicle",
-          //   dataKey: "vehicle",
-          //   options: vehicleOptions,
-          // },
           { label: "All Status", dataKey: "status", options: statusOptions },
         ]}
       />

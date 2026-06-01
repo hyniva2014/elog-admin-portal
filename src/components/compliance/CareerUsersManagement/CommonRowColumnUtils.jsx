@@ -1,5 +1,4 @@
-
-
+import { useCallback } from "react";
 import eyeIcon from "../../../assets/images/svg/eye.svg";
 import pencilLight from "../../../assets/images/svg/pencil.png";
 import pencilDark from "../../../assets/images/svg/pencildark.png";
@@ -26,12 +25,14 @@ const StatusCell = ({ value, row }) => (
 );
 
 const ActionsCell = ({ row, handleOpenEdit, handleDeleteClick, canDelete, eyeIcon, trashIcon }) => {
-  const handleViewClick = () => handleOpenEdit(row);
+  const handleViewClick = useCallback(() => {
+    handleOpenEdit(row);
+  }, [handleOpenEdit, row]);
 
-  const handleDeleteAction = () => {
+  const handleDeleteAction = useCallback(() => {
     if (!canDelete) return;
     handleDeleteClick?.(row);
-  };
+  }, [canDelete, handleDeleteClick, row]);
 
   return (
     <Box width="100%" display="flex" justifyContent="center" gap={1}>
