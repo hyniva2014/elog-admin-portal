@@ -10,6 +10,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import TabletMacIcon from '@mui/icons-material/TabletMac';
 import MemoryIcon from '@mui/icons-material/Memory';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 const MENU_ITEMS = [
   {
@@ -47,6 +48,12 @@ const MENU_ITEMS = [
     label: "User Management",
     url: "/user-management",
     icon: GroupIcon,
+  },
+  {
+    key: "role-management",
+    label: "Role Management",
+    url: "/role-management",
+    icon: SettingsIcon,
   },
 ];
 export { MENU_ITEMS };

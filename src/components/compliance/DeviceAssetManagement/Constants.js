@@ -15,3 +15,14 @@ export const DEVICE_ASSET_MODEL_FILTER_OPTIONS = [
   { value: "Omnitracs IVG", label: "Omnitracs IVG" },
   { value: "VG34", label: "VG34" },
 ];
+
+export const STATUS_OPTIONS = [
+  {
+    value: 1,
+    label: "Active",
+  },
+  {
+    value: 0,
+    label: "Inactive",
+  },
+];

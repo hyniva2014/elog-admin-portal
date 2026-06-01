@@ -801,6 +801,39 @@ const adminRoutes = [
     ),
   },
   {
+    path: "/role-management",
+    element: (
+      <LoadComponent
+        component={lazy(
+          () =>
+            import("../components/compliance/RoleManagement/RoleManagement"),
+        )}
+      />
+    ),
+  },
+  {
+    path: "/role-permissions/:roleId",
+    element: (
+      <LoadComponent
+        component={lazy(
+          () =>
+            import("../components/compliance/RoleManagement/RolePermissions"),
+        )}
+      />
+    ),
+  },
+  {
+    path: "/role-user-management",
+    element: (
+      <LoadComponent
+        component={lazy(
+          () =>
+            import("../components/compliance/RoleManagement/RoleUserManagement"),
+        )}
+      />
+    ),
+  },
+  {
     path: "/device-management",
     element: (
       <LoadComponent
