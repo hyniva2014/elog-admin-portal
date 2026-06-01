@@ -17,7 +17,7 @@ export const COLORS = {
 export const PageWrapper = styled(Box)(() => ({
   background: COLORS.background,
   minHeight: "100vh",
-  marginTop: "15px",
+  marginTop: theme.spacing(2),
 }));
 
 export const ContentWrapper = styled(Box)(({ theme }) => ({

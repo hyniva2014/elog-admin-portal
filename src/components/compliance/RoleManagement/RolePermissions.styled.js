@@ -200,3 +200,22 @@ export const ModuleTitle = styled(Typography)(
     lineHeight: "24px",
   }),
 );
+
+export const Container = styled(Box)(
+  ({ theme }) => ({
+    padding: theme.spacing(3),
+    backgroundColor:
+      theme.palette.background.default,
+    minHeight: "100vh",
+  }),
+);
+
+export const Title = styled(Typography)(
+  ({ theme }) => ({
+    fontSize: "28px",
+    fontWeight: 700,
+    color: theme.palette.text.primary,
+    lineHeight: "36px",
+    marginBottom: theme.spacing(1),
+  }),
+);

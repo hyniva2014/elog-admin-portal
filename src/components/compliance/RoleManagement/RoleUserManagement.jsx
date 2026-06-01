@@ -1,12 +1,13 @@
-import { Box, Typography } from "@mui/material";
+import React from "react";
+import { Container, Title } from "./RolePermissions.styled";
 
 const RoleUserManagement = () => {
   return (
-    <Box p={3}>
-      <Typography variant="h4">
-        Role User Management Screen
-      </Typography>
-    </Box>
+    <Container>
+      <Title>
+        Role User Management
+      </Title>
+    </Container>
   );
 };
 

@@ -128,13 +128,33 @@ const AddPermission = () => {
         enabled_permissions,
         disabled_permissions,
       };
-      console.log(payload);
     } catch (error) {
       console.error("Save Permission Error:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  const getToggleHandler = useCallback(
+  (module, idx) => () => {
+    handleToggle(module, idx);
+  },
+  [],
+);
+
+const getEnableAllHandler = useCallback(
+  (module) => () => {
+    handleEnableAll(module);
+  },
+  [],
+);
+
+const getDisableAllHandler = useCallback(
+  (module) => () => {
+    handleDisableAll(module);
+  },
+  [],
+);
 
   const renderPermissionCards = () => {
     return Object.keys(groupedPermissions || {}).map((module, index) => {
@@ -156,7 +176,7 @@ const AddPermission = () => {
 
               <StyledSwitch
                 checked={permissionState[module]?.[idx] || false}
-                onChange={() => handleToggle(module, idx)}
+                onChange={getToggleHandler(module, idx)}
               />
             </PermissionContent>
           </PermissionItem>
@@ -181,7 +201,7 @@ const AddPermission = () => {
               <OutlineButton
                 fullWidth
                 variant="outlined"
-                onClick={() => handleEnableAll(module)}
+                onClick={getEnableAllHandler(module)}
               >
                 Enable All
               </OutlineButton>
@@ -189,7 +209,7 @@ const AddPermission = () => {
               <OutlineButton
                 fullWidth
                 variant="outlined"
-                onClick={() => handleDisableAll(module)}
+                onClick={getDisableAllHandler(module)}
               >
                 Disable All
               </OutlineButton>

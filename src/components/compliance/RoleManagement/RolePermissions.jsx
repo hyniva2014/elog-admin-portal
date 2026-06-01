@@ -32,6 +32,7 @@ import {
 
 import CommonTextField from "../../../common/CommonTextField";
 import CommonSnackbar from "../../../common/CommonSnackbar";
+import PermissionCardItem from "./PermissionCardItem";
 
 const RolePermissions = () => {
   const { roleId } = useParams();
@@ -50,42 +51,66 @@ const RolePermissions = () => {
 
   const roleName = roleData?.name || "-";
   const roleDescription = roleData?.description || "-";
+  
   useEffect(() => {
-    if (roleId) {
-      fetchRoleById();
-    }
-  }, [roleId]);
+    let isMounted = true;
 
-  const fetchRoleById = async () => {
-    try {
-      setLoading(true);
-      const response = await fetchApi(
-        `/masteradmin/role/get-roles?is_superuser=1&role_id=${roleId}`,
-      );
-      const roleDetails = response?.body?.Roles;
-      setRoleData(roleDetails);
-      const grouped = roleDetails?.permissions?.reduce((acc, permission) => {
-        if (!acc[permission.module]) {
-          acc[permission.module] = [];
-        }
-        acc[permission.module].push(permission);
-        return acc;
-      }, {});
-      setGroupedPermissions(grouped);
-      const switchState = {};
-      Object.keys(grouped || {}).forEach((module) => {
-        switchState[module] = grouped[module].map(
-          (permission) => permission.is_enabled === 1,
+    const fetchRoleData = async () => {
+      if (!roleId) {
+        return;
+      }
+
+      try {
+        setLoading(true);
+
+        const response = await fetchApi(
+          `/masteradmin/role/get-roles?is_superuser=1&role_id=${roleId}`,
         );
-      });
 
-      setPermissionState(switchState);
-    } catch (error) {
-      console.error("Fetch Role Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        if (!isMounted) {
+          return;
+        }
+
+        const roleDetails = response?.body?.Roles;
+
+        setRoleData(roleDetails);
+
+        const grouped = roleDetails?.permissions?.reduce((acc, permission) => {
+          if (!acc[permission.module]) {
+            acc[permission.module] = [];
+          }
+
+          acc[permission.module].push(permission);
+
+          return acc;
+        }, {});
+
+        setGroupedPermissions(grouped);
+
+        const switchState = {};
+
+        Object.keys(grouped || {}).forEach((module) => {
+          switchState[module] = grouped[module].map(
+            (permission) => permission.is_enabled === 1,
+          );
+        });
+
+        setPermissionState(switchState);
+      } catch (error) {
+        console.error("Fetch Role Error:", error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchRoleData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [roleId]);
 
   const handleToggle = (module, permissionIndex) => {
     setPermissionState((prev) => {
@@ -179,89 +204,44 @@ const RolePermissions = () => {
     }));
   }, []);
 
-  const renderPermissionsList = (module) => {
-    return groupedPermissions[module]?.map((permission, idx) => (
-      <PermissionItem key={permission.id}>
-        <div>
-          <PermissionTitle>{permission.action}</PermissionTitle>
+  const getToggleHandler = useCallback(
+    (module, idx) => () => {
+      handleToggle(module, idx);
+    },
+    [],
+  );
 
-          <PermissionDescription>
-            {permission.description || permission.code}
-          </PermissionDescription>
-        </div>
+  const getEnableAllHandler = useCallback(
+    (module) => () => {
+      handleEnableAll(module);
+    },
+    [],
+  );
 
-        <StyledSwitch
-          checked={permissionState[module]?.[idx] || false}
-          onChange={() => handleToggle(module, idx)}
-        />
-      </PermissionItem>
-    ));
-  };
-
-  const permissionCount = `${enabledCount}/${totalCount}`;
-
-  const renderPermissionCards = () => {
-    return Object.keys(groupedPermissions || {}).map((module, index) => {
-      const enabledCount = permissionState[module]?.filter(Boolean).length || 0;
-      const totalCount = groupedPermissions[module]?.length || 0;
-      const isAllEnabled = enabledCount === totalCount;
-      const isAllDisabled = enabledCount === 0;
-
-      const permissionCardEnabled = isAllEnabled ? 1 : 0;
-
-      const enableAllDisabled = isAllEnabled ? 1 : 0;
-
-      const disableAllDisabled = isAllDisabled ? 1 : 0;
-
-      return (
-        <Grid item xs={12} md={6} key={index}>
-          <PermissionCard isenabled={permissionCardEnabled}>
-            <CardContentWrapper>
-              <CardHeader>
-                <ModuleTitle>{module}</ModuleTitle>
-
-                <CountBadge>{permissionCount}</CountBadge>
-              </CardHeader>
-
-              <PermissionsWrapper>
-                <PermissionsList>
-                  {renderPermissionsList(module)}
-                </PermissionsList>
-              </PermissionsWrapper>
-            </CardContentWrapper>
-
-            <StyledDivider />
-
-            <CardFooter>
-              <FooterActionButton
-                fullWidth
-                variant="outlined"
-                disabledbutton={enableAllDisabled}
-                disabled={isAllEnabled}
-                onClick={() => handleEnableAll(module)}
-              >
-                Enable All
-              </FooterActionButton>
-
-              <FooterActionButton
-                fullWidth
-                variant="outlined"
-                disabledbutton={disableAllDisabled}
-                disabled={isAllDisabled}
-                onClick={() => handleDisableAll(module)}
-              >
-                Disable All
-              </FooterActionButton>
-            </CardFooter>
-          </PermissionCard>
-        </Grid>
-      );
-    });
-  };
+  const getDisableAllHandler = useCallback(
+    (module) => () => {
+      handleDisableAll(module);
+    },
+    [],
+  );
 
   const handleCancel = () => {
     navigate("/role-management");
   };
+
+  const permissionCards = Object.keys(groupedPermissions || {}).map(
+    (module) => (
+      <PermissionCardItem
+        key={module}
+        module={module}
+        permissions={groupedPermissions[module]}
+        permissionState={permissionState}
+        onToggle={getToggleHandler}
+        onEnableAll={getEnableAllHandler}
+        onDisableAll={getDisableAllHandler}
+      />
+    ),
+  );
 
   return (
     <>
@@ -294,7 +274,7 @@ const RolePermissions = () => {
 
         <CardsWrapper>
           <Grid container spacing={3}>
-            {renderPermissionCards()}
+            {permissionCards}
           </Grid>
         </CardsWrapper>
 
