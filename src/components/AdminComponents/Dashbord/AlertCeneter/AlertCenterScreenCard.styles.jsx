@@ -457,27 +457,6 @@ export const DividerLine = styled(Box)(({ theme }) => ({
   margin: `${theme.spacing(2)} 0`,
 }));
 
-// export const ConversationContainer = styled(Box)(({ theme }) => ({
-//   display: "flex",
-//   flexDirection: "column",
-//   gap: theme.spacing(2),
-//   marginTop: theme.spacing(1),
-//   marginBottom: theme.spacing(2),
-// }));
-
-// export const ConversationMessage = styled(Box)(({ theme, isCurrentUser }) => ({
-//   display: "flex",
-//   flexDirection: "column",
-//   alignItems: isCurrentUser ? "flex-end" : "flex-start",
-//   padding: theme.spacing(1.5),
-//   backgroundColor: isCurrentUser
-//     ? theme.palette.primary.light
-//     : theme.palette.grey[100],
-//   borderRadius: theme.spacing(1.5),
-//   maxWidth: "80%",
-//   alignSelf: isCurrentUser ? "flex-end" : "flex-start",
-//   marginLeft: isCurrentUser ? "auto" : 0,
-// }));
 
 export const MessageHeader = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -486,16 +465,6 @@ export const MessageHeader = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(0.5),
 }));
 
-// export const MessageContent = styled(Typography)(({ theme }) => ({
-//   fontSize: 14,
-//   color: theme.palette.text.primary,
-//   wordBreak: "break-word",
-// }));
-
-// export const Timestamp = styled(Typography)(({ theme }) => ({
-//   fontSize: 11,
-//   color: theme.palette.text.secondary,
-// }));
 
 //---------------------------
 
@@ -519,8 +488,8 @@ export const AvatarCircle = styled(Box)(({ theme }) => ({
   width: 40,
   height: 40,
   borderRadius: "50%",
-  background: "#D50000",
-  color: "#fff",
+  background: theme.palette.error.main,
+  color: theme.palette.common.white,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -529,19 +498,16 @@ export const AvatarCircle = styled(Box)(({ theme }) => ({
   flexShrink: 0,
 }));
 
-export const MessageBubble = styled(Box)(({ theme, isCurrentUser }) => ({
+export const MessageBubble = styled(Box)(({ theme }) => ({
   maxWidth: "70%",
   padding: "12px 16px",
   borderRadius: "16px",
-  border: "1px solid #E0E0E0",
-
-  backgroundColor: "#fff",
-
+  border: `1px solid ${theme.palette.grey[300]}`,
+  backgroundColor: theme.palette.common.white,
   display: "flex",
   alignItems: "center",
   flexDirection: "row",
   flexWrap: "wrap",
-  flexcontent: "center",
   gap: "6px",
 }));
 

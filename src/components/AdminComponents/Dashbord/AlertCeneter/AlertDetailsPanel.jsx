@@ -27,12 +27,10 @@ import {
   ActionButton,
   ConversationContainer,
   ConversationMessage,
-  MessageHeader,
   MessageContent,
   Timestamp,
   DateSection,
   DateText,
-  DividerLine,
   AvatarCircle,
   MessageBubble,
   RightAvatar,
@@ -44,10 +42,8 @@ import LocationIcon from "../../../../assets/images/active/Icon-3.png";
 import TpLogo from "../../../../assets/images/TP logo.png";
 
 import {
-  ACTION_BUTTONS,
   defaultConversations,
   getDriverDeviceInfo,
-  getTriggerInfo,
 } from "./AlertDetailsPanel.utils";
 
 const AlertActionButton = ({ label }) => {
@@ -140,7 +136,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
   const formattedDate = date || "25 April";
 
   const driverInfo = getDriverDeviceInfo(company, truck);
-  const triggerInfo = getTriggerInfo();
+  // const triggerInfo = getTriggerInfo();
 
   const conversationList =
     conversations.length > 0 ? conversations : defaultConversations;
@@ -167,7 +163,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
         </AlertDetailItem>
       </DetailHeader>
 
-      <InfoSection>
+      {/* <InfoSection>
         <InfoGrid>
           {driverInfo.map(({ label, value, isStatus }) => (
             <DriverInfoCardItem
@@ -178,7 +174,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
             />
           ))}
         </InfoGrid>
-      </InfoSection>
+      </InfoSection> */}
 
       {/* <DividerLine /> */}
 
