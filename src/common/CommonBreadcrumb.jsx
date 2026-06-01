@@ -10,6 +10,13 @@ import {
 const CommonBreadcrumb = ({ breadcrumbs = [] }) => {
   const navigate = useNavigate();
 
+  const handleBreadcrumbClick = (event) => {
+    const path = event.currentTarget.dataset.path;
+    if (path) {
+      navigate(path);
+    }
+  };
+
   return (
     <BreadcrumbText>
       {breadcrumbs.map((item, index) => {
@@ -23,7 +30,8 @@ const CommonBreadcrumb = ({ breadcrumbs = [] }) => {
               <Typography
                 component="span"
                 sx={BreadcrumbLinkSx}
-                onClick={() => item.path && navigate(item.path)}
+                data-path={item.path}
+                onClick={handleBreadcrumbClick}
               >
                 {item.label}
               </Typography>

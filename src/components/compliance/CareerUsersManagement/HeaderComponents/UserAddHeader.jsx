@@ -241,7 +241,7 @@ const UserAddHeader = ({
             Back
           </Button>
 
-          <Typography fontWeight={600} fontSize="20px" color="#111827">
+          <Typography fontWeight={600} fontSize="20px" color="text.primary">
             Add User
           </Typography>
 
@@ -281,7 +281,7 @@ const UserAddHeader = ({
             {statusItems.map((item) => (
               <Box key={item.label} sx={StatusItemSx(item.completed)}>
                 {item.completed ? (
-                  <DoneIcon sx={{ fontSize: 18, color: "#27AE60" }} />
+                  <DoneIcon sx={{ fontSize: 18, color: "success.main" }} />
                 ) : null}
                 <Typography variant="body2" sx={StatusItemTextSx(item.completed)}>
                   {item.label}

@@ -9,6 +9,7 @@ import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { USER_STATUS, USER_STATUS_COL_CONFIG } from "./Constants";
 import { formatDateTime } from "../../../common/CommonUtils";
+
 export const UserManagementTableData = (
   response = [],
   handleOpenEdit,
@@ -135,7 +136,7 @@ export const UserManagementTableData = (
       renderCell: (params) => (
         <Box>
           <Typography fontSize={14}>{params.row.createdDate}</Typography>
-          <Typography fontSize={14} color="#6E7079">
+          <Typography fontSize={14} color="text.secondary">
             {params.row.createdTime}
           </Typography>
         </Box>
@@ -149,14 +150,9 @@ export const UserManagementTableData = (
       flex: 1,
       headerTooltip: true,
       renderCell: (params) => (
-        <span
-          style={{
-            color: params.row.statusColor,
-            fontWeight: 400,
-          }}
-        >
+        <Typography sx={{ color: params.row.statusColor, fontWeight: 400 }}>
           {params.value}
-        </span>
+        </Typography>
       ),
     },
 
@@ -219,7 +215,8 @@ export const UserManagementTableData = (
             : rawStatus?.trim()?.toLowerCase() === "inactive"
               ? "Inactive"
               : "-";
-    const statusColor = USER_STATUS_COL_CONFIG[statusLabel]?.color || "#000000";
+    const statusColor =
+      USER_STATUS_COL_CONFIG[statusLabel]?.colorKey || "text.primary";
     // const roleName =
     //   item.role || getRoleName(Number(item.role_id)) || item.role || "-";
     return {

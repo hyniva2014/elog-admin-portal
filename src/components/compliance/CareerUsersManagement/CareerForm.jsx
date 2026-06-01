@@ -778,18 +778,35 @@ const CareerForm = () => {
     });
   }, []);
 
+  const handleStepClick = (event) => {
+    const stepId = event.currentTarget.dataset.stepId;
+    const index = Number(event.currentTarget.dataset.index);
+
+    if (!stepId) return;
+
+    const sectionElement = document.getElementById(stepId);
+    if (sectionElement) {
+      sectionElement.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+      setActiveStep(index);
+    }
+  };
+
   return (
     <>
       <LoadingContainer />
       <Box
         sx={{
-          backgroundColor: "#fff",
-          border: "1px solid #e5e7eb",
+          backgroundColor: "background.paper",
+          border: (theme) => `1px solid ${theme.palette.divider}`,
           borderRadius: "12px",
           marginTop: 3,
           overflow: "hidden",
-          //   height: "calc(100vh - 100px)",
-          minHeight: "calc(100vh - 100px)",
+          display: "flex",
+          flexDirection: "column",
+          height: "calc(100vh - 100px)",
         }}
       >
         {/* Header Section */}
@@ -797,7 +814,11 @@ const CareerForm = () => {
           sx={{
             px: 3,
             py: 2,
-            // borderBottom: "1px solid #e5e7eb",
+            flexShrink: 0,
+            backgroundColor: "background.paper",
+            position: "sticky",
+            top: 0,
+            zIndex: 2,
           }}
         >
           {mode === "add" ? (
@@ -840,8 +861,8 @@ const CareerForm = () => {
           <Box
             sx={{
               px: 3,
-              borderBottom: "2px solid #e5e7eb",
-              backgroundColor: "#fff",
+              borderBottom: (theme) => `2px solid ${theme.palette.divider}`,
+              backgroundColor: "background.paper",
             }}
           >
             <Box
@@ -855,19 +876,12 @@ const CareerForm = () => {
               {steps.map((step, index) => (
                 <Box
                   key={step.label}
-                  onClick={() => {
-                    const sectionElement = document.getElementById(step.id);
-                    if (sectionElement) {
-                      sectionElement.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start",
-                      });
-                      setActiveStep(index);
-                    }
-                  }}
+                  data-step-id={step.id}
+                  data-index={index}
+                  onClick={handleStepClick}
                   sx={{
-                    borderBottom:
-                      index === activeStep ? "2px solid #284495" : "none",
+                    borderBottom: (theme) =>
+                      index === activeStep ? `2px solid ${theme.palette.brand.main}` : "none",
                     pb: index === activeStep ? 0.5 : 0,
                     cursor: "pointer",
                   }}
@@ -876,9 +890,9 @@ const CareerForm = () => {
                     sx={{
                       fontSize: "14px",
                       fontWeight: index === activeStep ? 600 : 400,
-                      color: index === activeStep ? "#284495" : "#9ca3af",
+                      color: index === activeStep ? "brand.main" : "text.secondary",
                       "&:hover": {
-                        color: index === activeStep ? "#284495" : "#6b7280",
+                        color: index === activeStep ? "brand.main" : "text.primary",
                       },
                     }}
                   >
@@ -894,12 +908,12 @@ const CareerForm = () => {
         <Box
           ref={scrollContainerRef}
           sx={{
-            // height: "calc(100vh - 350px)",
-            minHeight: "calc(100vh - 350px)",
+            flex: 1,
+            minHeight: 0,
             overflowY: "auto",
             px: 3,
             py: 2,
-            backgroundColor: "#fff",
+            backgroundColor: "background.paper",
           }}
         >
           <CareerUserForm

@@ -1,20 +1,20 @@
-export const AutocompleteSx = (minWidth) => ({
+export const AutocompleteSx = (minWidth) => (theme) => ({
   minWidth,
   "& .MuiInputBase-root.Mui-disabled": {
-    backgroundColor: "#f5f5f5",
-    color: "rgba(0, 0, 0, 0.6)",
+    backgroundColor: theme.palette.grey[100],
+    color: theme.palette.text.disabled,
   },
 });
 
-export const TextFieldSx = {
+export const TextFieldSx = (theme) => ({
   "& .MuiInputBase-root.Mui-disabled": {
-    backgroundColor: "#f5f5f5",
-    color: "rgba(0, 0, 0, 0.6)",
+    backgroundColor: theme.palette.grey[100],
+    color: theme.palette.text.disabled,
   },
   "& .MuiInputLabel-root.Mui-disabled": {
-    color: "rgba(0, 0, 0, 0.6)",
+    color: theme.palette.text.disabled,
   },
-};
+});
 
 export const CheckboxSx = {
   mr: 1,

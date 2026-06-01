@@ -5,13 +5,13 @@ export const PreviewContainerSx = (fieldName) => ({
       : 0,
 });
 
-export const PreviewLabelSx = {
+export const PreviewLabelSx = (theme) => ({
   fontWeight: 400,
   fontSize: 12,
-  color: "#000000",
-};
+  color: theme.palette.text.primary,
+});
 
-export const PreviewImageContainerSx = (fieldName) => ({
+export const PreviewImageContainerSx = (fieldName) => (theme) => ({
   width:
     fieldName === "files" || fieldName.includes("additional_licenses")
       ? "100%"
@@ -20,7 +20,7 @@ export const PreviewImageContainerSx = (fieldName) => ({
     fieldName === "files" || fieldName.includes("additional_licenses")
       ? 120
       : 120,
-  border: "1px solid #ddd",
+  border: `1px solid ${theme.palette.divider}`,
   borderRadius: 1,
   overflow: "hidden",
   position: "relative",
@@ -47,38 +47,39 @@ export const OcrOverlaySx = {
   gap: 1,
 };
 
-export const OcrCaptionSx = {
+export const OcrCaptionSx = (theme) => ({
   fontSize: 10,
   textAlign: "center",
-};
+  color: theme.palette.text.secondary,
+});
 
-export const OcrProgressSx = {
+export const OcrProgressSx = (theme) => ({
   fontSize: 9,
-  color: "#666",
-};
+  color: theme.palette.text.secondary,
+});
 
-export const RemoveImageButtonSx = {
+export const RemoveImageButtonSx = (theme) => ({
   position: "absolute",
   top: -8,
   right: -8,
-  backgroundColor: "white",
-  border: "1px solid #ddd",
+  backgroundColor: theme.palette.common.white,
+  border: `1px solid ${theme.palette.divider}`,
   "&:hover": {
-    backgroundColor: "#f5f5f5",
+    backgroundColor: theme.palette.grey[100],
   },
-};
+});
 
-export const PreviewBackIconSx = {
+export const PreviewBackIconSx = (theme) => ({
   fontSize: 20,
-  color: "#111",
-};
+  color: theme.palette.text.primary,
+});
 
 export const PreviewCaptionSx = {
   fontSize: 10,
   textAlign: "center",
 };
 
-export const PreviewProgressSx = {
+export const PreviewProgressSx = (theme) => ({
   fontSize: 9,
-  color: "#666",
-};
+  color: theme.palette.text.secondary,
+});

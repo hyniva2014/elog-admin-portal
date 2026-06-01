@@ -1,14 +1,14 @@
-export const TopHeaderSx = {
+export const TopHeaderSx = (theme) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  background: "#3f51b5",
-  color: "white",
+  background: theme.palette.brand.main,
+  color: theme.palette.common.white,
   px: 3,
   py: 2,
   borderRadius: "8px",
   mb: 3,
-};
+});
 
 export const TopHeaderLeftSx = {
   display: "flex",
@@ -16,11 +16,11 @@ export const TopHeaderLeftSx = {
   gap: 2,
 };
 
-export const AvatarSx = {
+export const AvatarSx = (theme) => ({
   width: 56,
   height: 56,
-  bgcolor: "#5c6bc0",
-};
+  bgcolor: theme.palette.primary.light,
+});
 
 export const RoleTextSx = {
   opacity: 0.8,

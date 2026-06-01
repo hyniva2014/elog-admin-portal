@@ -16,9 +16,9 @@ export const AddHeaderLeftSx = {
   gap: 2,
 };
 
-export const BackButtonSx = {
-  color: "#111",
-  borderColor: "#d1d5db",
+export const BackButtonSx = (theme) => ({
+  color: theme.palette.text.primary,
+  borderColor: theme.palette.divider,
   textTransform: "none",
   fontWeight: 500,
   borderRadius: "8px",
@@ -26,19 +26,19 @@ export const BackButtonSx = {
   py: 0.75,
   minWidth: "auto",
   fontSize: "14px",
-  backgroundColor: "#ffffff",
+  backgroundColor: theme.palette.common.white,
   "&:hover": {
-    borderColor: "#9ca3af",
-    backgroundColor: "#f9fafb",
+    borderColor: theme.palette.grey[400],
+    backgroundColor: theme.palette.grey[100],
   },
-};
+});
 
-export const BackIconSx = {
+export const BackIconSx = (theme) => ({
   fontSize: 20,
-  color: "#111",
-};
+  color: theme.palette.text.primary,
+});
 
-export const ActiveStatusSx = {
+export const ActiveStatusSx = (theme) => ({
   display: "flex",
   alignItems: "center",
   gap: 0.5,
@@ -47,24 +47,24 @@ export const ActiveStatusSx = {
   borderRadius: "16px",
   fontSize: "12px",
   fontWeight: 500,
-  background: "#dcfce7",
-  color: "#166534",
-};
+  background: theme.palette.success.light,
+  color: theme.palette.success.dark,
+});
 
-export const ActiveStatusDotSx = {
+export const ActiveStatusDotSx = (theme) => ({
   width: 6,
   height: 6,
   borderRadius: "50%",
-  backgroundColor: "#166534",
-};
+  backgroundColor: theme.palette.success.main,
+});
 
-export const CardContainerSx = {
-  border: "1px solid #e5e7eb",
+export const CardContainerSx = (theme) => ({
+  border: `1px solid ${theme.palette.divider}`,
   borderRadius: "8px",
   p: 3,
   mb: 1,
-  backgroundColor: "#ffffff",
-};
+  backgroundColor: theme.palette.background.paper,
+});
 
 export const ProgressWrapperSx = {
   display: "flex",
@@ -73,29 +73,29 @@ export const ProgressWrapperSx = {
   width: "100%",
 };
 
-export const ProgressTextSx = {
+export const ProgressTextSx = (theme) => ({
   fontSize: "14px",
   fontWeight: 500,
-  color: "#6b7280",
+  color: theme.palette.text.secondary,
   mb: 1,
-};
+});
 
-export const ProgressBarSx = {
+export const ProgressBarSx = (theme) => ({
   height: 8,
   borderRadius: 4,
-  backgroundColor: "#e5e7eb",
+  backgroundColor: theme.palette.grey[200],
   "& .MuiLinearProgress-bar": {
-    backgroundColor: "#284495",
+    backgroundColor: theme.palette.brand.main,
     borderRadius: 4,
   },
-};
+});
 
-export const ProgressValueSx = {
+export const ProgressValueSx = (theme) => ({
   fontWeight: 600,
-  color: "#284495",
+  color: theme.palette.brand.main,
   fontSize: "14px",
   minWidth: 40,
-};
+});
 
 export const StatusItemsSx = {
   display: "flex",
@@ -104,29 +104,29 @@ export const StatusItemsSx = {
   alignItems: "center",
 };
 
-export const StatusItemSx = (completed) => ({
+export const StatusItemSx = (completed) => (theme) => ({
   display: "flex",
   alignItems: "center",
   gap: 0.75,
   px: 2,
   py: 0.75,
   borderRadius: "999px",
-  backgroundColor: completed ? "#ecfdf5" : "#ffffff",
-  border: completed ? "1px solid #B8E8CA" : "1px solid #d1d5db",
+  backgroundColor: completed ? theme.palette.success.light : theme.palette.common.white,
+  border: completed ? `1px solid ${theme.palette.success.main}` : `1px solid ${theme.palette.divider}`,
 });
 
-export const StatusItemTextSx = (completed) => ({
+export const StatusItemTextSx = (completed) => (theme) => ({
   fontSize: "13px",
   fontWeight: 500,
-  color: completed ? "#27AE60" : "#9ca3af",
+  color: completed ? theme.palette.success.main : theme.palette.text.secondary,
 });
 
-export const StepperWrapperSx = {
+export const StepperWrapperSx = (theme) => ({
   width: "98%",
-  borderBottom: "2px solid #e5e7eb",
+  borderBottom: `2px solid ${theme.palette.divider}`,
   pb: 0,
   ml: 1,
-};
+});
 
 export const StepListSx = {
   display: "flex",
@@ -135,17 +135,17 @@ export const StepListSx = {
   flexWrap: "wrap",
 };
 
-export const StepItemSx = (isActive) => ({
-  borderBottom: isActive ? "2px solid #284495" : "none",
+export const StepItemSx = (isActive) => (theme) => ({
+  borderBottom: isActive ? `2px solid ${theme.palette.brand.main}` : "none",
   pb: isActive ? 0.5 : 0,
   cursor: "pointer",
 });
 
-export const StepTextSx = (isActive) => ({
+export const StepTextSx = (isActive) => (theme) => ({
   fontSize: "14px",
   fontWeight: isActive ? 600 : 400,
-  color: isActive ? "#284495" : "#9ca3af",
+  color: isActive ? theme.palette.brand.main : theme.palette.text.secondary,
   "&:hover": {
-    color: isActive ? "#284495" : "#6b7280",
+    color: isActive ? theme.palette.brand.main : theme.palette.text.primary,
   },
 });

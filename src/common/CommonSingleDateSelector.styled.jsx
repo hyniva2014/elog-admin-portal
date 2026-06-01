@@ -1,4 +1,4 @@
-export const getTextFieldSx = (disabled) => ({
+export const getTextFieldSx = (disabled) => (theme) => ({
   minWidth: 240,
   "& .MuiInputBase-root": {
     height: 36,
@@ -14,14 +14,14 @@ export const getTextFieldSx = (disabled) => ({
     textAlign: "left",
   },
   "& .MuiInputBase-root.Mui-disabled": {
-    backgroundColor: "#f5f5f5",
-    color: "rgba(0, 0, 0, 0.6)",
+    backgroundColor: theme.palette.grey[100],
+    color: theme.palette.text.disabled,
   },
   "& .MuiInputLabel-root.Mui-disabled": {
-    color: "rgba(0, 0, 0, 0.6)",
+    color: theme.palette.text.disabled,
   },
   "& .MuiFormLabel-asterisk": {
-    color: "#d32f2f",
+    color: theme.palette.error.main,
     fontWeight: 600,
   },
 });
@@ -30,11 +30,11 @@ export const CalendarIconSx = {
   fontSize: 22,
 };
 
-export const getCalendarIconSx = (hideBorder) =>
+export const getCalendarIconSx = (hideBorder) => (theme) =>
   hideBorder
     ? {
         ...CalendarIconSx,
-        color: "#2563EB",
+        color: theme.palette.info.main,
       }
     : CalendarIconSx;
 

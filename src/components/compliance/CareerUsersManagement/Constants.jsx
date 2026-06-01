@@ -9,22 +9,22 @@ export const DRIVER_STATUS_CONFIG = {
   total_drivers: {
     id: "total_drivers",
     title: "Total Drivers",
-    accentcolor: "#284495",
+    accentcolor: "brand",
   },
   on_trip: {
     id: "on_trip",
     title: "On Trip",
-    accentcolor: "#008236",
+    accentcolor: "success",
   },
   unassigned: {
     id: "unassigned",
     title: "Unassigned",
-    accentcolor: "#FEE685",
+    accentcolor: "warning",
   },
   inactive: {
     id: "inactive",
     title: "Off Duty",
-    accentcolor: "#C10007",
+    accentcolor: "error",
   },
 };
 export const defaultPageSize = 25;
@@ -32,17 +32,17 @@ export const USER_SUMMARY_CARDS = {
   totalCount: {
     id: "totalCount",
     title: "Total Users",
-    accentcolor: "#284495",
+    accentcolor: "brand",
   },
   active: {
     id: "active",
     title: "Active",
-    accentcolor: "#008236",
+    accentcolor: "success",
   },
   inactive: {
     id: "inactive",
     title: "In Active",
-    accentcolor: "#C10007",
+    accentcolor: "error",
   },
 };
 export const citizenship_options = [
@@ -98,10 +98,10 @@ export const countryCodeToName = {
 };
 export const USER_STATUS_COL_CONFIG = {
   Active: {
-    color: "#3D9B26",
+    colorKey: "success.main",
   },
   Inactive: {
-    color: "#DA0008",
+    colorKey: "error.main",
   },
 };
 export const USER_STATUS = {
@@ -133,15 +133,15 @@ export const hasPermission = (permissions = {}, moduleKey = "", actionKey = "") 
   return modulePermissions === actionKey;
 };
 
-export const BreadcrumbText = styled(Typography)({
+export const BreadcrumbText = styled(Typography)(({ theme }) => ({
   fontSize: "15px",
-  color: "#6B7280",
-});
+  color: theme.palette.text.secondary,
+}));
 
-export const BreadcrumbBold = styled("span")({
+export const BreadcrumbBold = styled("span")(({ theme }) => ({
   fontWeight: 600,
-  color: "#111827",
-});
+  color: theme.palette.text.primary,
+}));
 
 export const citizenshipMap = {
   US: 1,

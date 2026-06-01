@@ -1,14 +1,14 @@
-export const getUploadAreaSx = ({ disabled, error, size }) => ({
+export const getUploadAreaSx = ({ disabled, error, size }) => (theme) => ({
   mt: size === "small" ? 1 : 2,
   p: size === "small" ? 1.5 : 3,
-  border: error ? "2px solid #d32f2f" : "1px dashed #ccc",
+  border: error ? `2px solid ${theme.palette.error.main}` : `1px dashed ${theme.palette.divider}`,
   borderRadius: 2,
   textAlign: "center",
   opacity: disabled ? 0.6 : 1,
   pointerEvents: disabled ? "none" : "auto",
   cursor: disabled ? "not-allowed" : "pointer",
-  backgroundColor: disabled ? "#f5f5f5" : error ? "#fef2f2" : "transparent",
-  borderColor: disabled ? "#ddd" : error ? "#d32f2f" : "#ccc",
+  backgroundColor: disabled ? theme.palette.grey[100] : error ? theme.palette.error.light : "transparent",
+  borderColor: disabled ? theme.palette.divider : error ? theme.palette.error.main : theme.palette.divider,
 });
 
 export const HiddenInputStyle = {
@@ -41,7 +41,7 @@ export const UploadTextRowSx = {
 };
 
 export const UploadPrimaryTextSx = (size) => ({
-  color: "#284495",
+  color: "brand.main",
   fontWeight: 500,
   fontSize: size === "small" ? 12 : 14,
 });
@@ -64,19 +64,19 @@ export const FilesWrapperSx = (hasFiles, shouldHideUploadArea) => ({
   mt: shouldHideUploadArea ? 0 : 2,
 });
 
-export const FilePreviewContainerSx = {
+export const FilePreviewContainerSx = (theme) => ({
   position: "relative",
   width: 70,
   height: 70,
   borderRadius: 1,
   overflow: "hidden",
-  border: "1px solid #ddd",
+  border: `1px solid ${theme.palette.divider}`,
   cursor: "pointer",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-};
+});
 
 export const FilePreviewInnerSx = {
   display: "flex",
@@ -97,12 +97,12 @@ export const FileNameTypographySx = {
   fontSize: "10px",
 };
 
-export const RemoveButtonSx = {
+export const RemoveButtonSx = (theme) => ({
   position: "absolute",
   top: -8,
   right: -8,
-  background: "#fff",
-};
+  background: theme.palette.common.white,
+});
 
 export const ImagePreviewSx = {
   width: "100%",
@@ -112,27 +112,27 @@ export const ImagePreviewSx = {
 
 export const PdfIconSx = {
   fontSize: 30,
-  color: "#f44336",
+  color: "error.main",
 };
 
 export const TableIconSx = {
   fontSize: 30,
-  color: "#4caf50",
+  color: "success.main",
 };
 
 export const DocIconSx = {
   fontSize: 30,
-  color: "#2196f3",
+  color: "info.main",
 };
 
 export const TextIconSx = {
   fontSize: 30,
-  color: "#757575",
+  color: "text.secondary",
 };
 
 export const CsvIconSx = {
   fontSize: 30,
-  color: "#ff9800",
+  color: "warning.main",
 };
 
 export const ErrorTextSx = {

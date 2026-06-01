@@ -7,14 +7,14 @@ export const NoAccessContainerSx = {
   px: 2,
 };
 
-export const NoAccessTitleSx = {
+export const NoAccessTitleSx = (theme) => ({
   fontSize: "20px !important",
   fontWeight: 600,
-  color: "#6B7280",
-};
+  color: theme.palette.text.secondary,
+});
 
-export const NoAccessSubtitleSx = {
+export const NoAccessSubtitleSx = (theme) => ({
   fontSize: "15px !important",
-  color: "#9CA3AF",
+  color: theme.palette.text.secondary,
   mt: 1,
-};
+});

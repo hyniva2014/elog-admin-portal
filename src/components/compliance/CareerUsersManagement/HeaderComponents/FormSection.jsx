@@ -10,7 +10,7 @@ const FormSection = ({ title, subtitle, children, padding = 2.5,
   return (
     <Box id={id} sx={FormSectionContainerSx}>
       <Box sx={FormSectionHeaderSx}>
-        <Typography fontWeight={600} color="#2D303F">
+        <Typography fontWeight={600} color="text.primary">
           {title}
         </Typography>
         {subtitle && (

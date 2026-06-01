@@ -4,6 +4,7 @@ import {
   CircularProgress,
   Checkbox,
   createFilterOptions,
+  Box,
 } from "@mui/material";
 import {
   AutocompleteSx,
@@ -58,10 +59,10 @@ const CommonMultiSelectDropdown = ({
       filterOptions={filter}
       value={selectedOptions}
       renderOption={(props, option, { selected }) => (
-        <li {...props} key={`${option.value}-${option.label}`} style={OptionListItemSx}>
+        <Box component="li" {...props} key={`${option.value}-${option.label}`} sx={OptionListItemSx}>
           <Checkbox checked={selected} sx={CheckboxIconSx} />
           {option.label}
-        </li>
+        </Box>
       )}
       getOptionLabel={(option) => option.label || ""}
       isOptionEqualToValue={(option, val) => option.value === val?.value}

@@ -191,7 +191,7 @@ const ProfilePhotoPreview = ({
                 sx={{
                   fontWeight: 400,
                   fontSize: 12,
-                  color: "#000000",
+                  color: "text.primary",
                   marginTop: 0,
                 }}
               >

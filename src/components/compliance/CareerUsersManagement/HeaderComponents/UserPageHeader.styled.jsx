@@ -11,20 +11,20 @@ export const PageHeaderLeftSx = {
   gap: 2,
 };
 
-export const BackButtonSx = {
-  color: "#111",
-  borderColor: "#d1d5db",
+export const BackButtonSx = (theme) => ({
+  color: theme.palette.text.primary,
+  borderColor: theme.palette.divider,
   textTransform: "none",
   fontWeight: 500,
   borderRadius: "8px",
   px: 1.5,
   "&:hover": {
-    borderColor: "#9ca3af",
-    backgroundColor: "#f9fafb",
+    borderColor: theme.palette.grey[500],
+    backgroundColor: theme.palette.grey[100],
   },
-};
+});
 
-export const StatusChipSx = (isActive) => ({
+export const StatusChipSx = (isActive) => (theme) => ({
   display: "flex",
   alignItems: "center",
   gap: 0.5,
@@ -33,15 +33,15 @@ export const StatusChipSx = (isActive) => ({
   borderRadius: "16px",
   fontSize: "12px",
   fontWeight: 500,
-  background: isActive ? "#e6f4ea" : "#fdecea",
-  color: isActive ? "#2e7d32" : "#d32f2f",
+  background: isActive ? theme.palette.success.light : theme.palette.error.light,
+  color: isActive ? theme.palette.success.dark : theme.palette.error.main,
 });
 
-export const StatusDotSx = (isActive) => ({
+export const StatusDotSx = (isActive) => (theme) => ({
   width: 6,
   height: 6,
   borderRadius: "50%",
-  backgroundColor: isActive ? "#2e7d32" : "#d32f2f",
+  backgroundColor: isActive ? theme.palette.success.main : theme.palette.error.main,
 });
 
 export const HeaderButtonsSx = {

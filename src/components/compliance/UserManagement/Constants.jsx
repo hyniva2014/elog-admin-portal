@@ -2,9 +2,9 @@ import totalUsersIcon from "../../../assets/images/svg/totalUsers.png";
 import activeUsersIcon from "../../../assets/images/svg/activeUsers.png";
 import inactiveUsersIcon from "../../../assets/images/svg/inactiveUsers.png";
 import { CardIcon } from "../../AdminComponents/Dashbord/AdminDashBoard.styles";
-export const BRAND_COLOR = "#284495";
-export const SUCCESS_COLOR = "#008236";
-export const ERROR_COLOR = "#C10007";
+export const BRAND_COLOR = "brand";
+export const SUCCESS_COLOR = "success";
+export const ERROR_COLOR = "error";
 
 export const USER_PROFILE_OPTIONS = [
   { label: "Admin", value: "1" },

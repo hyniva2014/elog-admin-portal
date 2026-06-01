@@ -23,6 +23,7 @@ import {
   ImagePreviewModal,
   ImagePreviewContainer,
   ClosePreviewButton,
+  PreviewImageSx,
 } from "./CareerManagement.styled";
 import { useServices } from "../../../services/services";
 import UserPageHeader from "./HeaderComponents/UserPageHeader";
@@ -64,6 +65,16 @@ const CareerUserForm = ({
   const [imageUploaded, setImageUploaded] = useState(false);
   const [showEmploymentHistory, setShowEmploymentHistory] = useState(true);
   const [dynamicStates, setDynamicStates] = useState([]);
+
+  const handlePreviewModalClick = (event) => {
+    if (event.target === event.currentTarget) {
+      handleClosePreview();
+    }
+  };
+
+  const stopPreviewContainerPropagation = (event) => {
+    event.stopPropagation();
+  };
   const [loadingStates, setLoadingStates] = useState(false);
   const [secondaryDynamicStates, setSecondaryDynamicStates] = useState([]);
   const [loadingSecondaryStates, setLoadingSecondaryStates] = useState(false);
@@ -1009,14 +1020,8 @@ const filteredRoles = rolesOptions.filter(
       )}
 
       {showImagePreview && (
-        <ImagePreviewModal
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              handleClosePreview();
-            }
-          }}
-        >
-          <ImagePreviewContainer onClick={(e) => e.stopPropagation()}>
+        <ImagePreviewModal onClick={handlePreviewModalClick}>
+          <ImagePreviewContainer onClick={stopPreviewContainerPropagation}>
             <ClosePreviewButton onClick={handleClosePreview}>
               {/* {editMode && (
                 <IconButton
@@ -1028,14 +1033,11 @@ const filteredRoles = rolesOptions.filter(
                 <CloseIcon />
             </ClosePreviewButton>
           </ImagePreviewContainer>
-          <img
+          <Box
+            component="img"
             src={previewImage}
             alt="Profile Photo Preview"
-            style={{
-              maxWidth: "100%",
-              maxHeight: "80vh",
-              display: "block",
-            }}
+            sx={PreviewImageSx}
           />
         </ImagePreviewModal>
       )}

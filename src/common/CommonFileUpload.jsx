@@ -182,6 +182,26 @@ const CommonFileUpload = ({
     onFileChange(updatedFiles);
   };
 
+  const handlePreviewClick = (event) => {
+    const fileUrl = event.currentTarget.dataset.fileUrl;
+    if (fileUrl && onPreview) {
+      onPreview(fileUrl);
+    }
+  };
+
+  const handleRemoveClick = (event) => {
+    const index = Number(event.currentTarget.dataset.index);
+    const isExisting = event.currentTarget.dataset.isExisting === "true";
+
+    if (isExisting) {
+      const file = existingFiles?.[index];
+      onRemoveExistingFile?.(file, index);
+      return;
+    }
+
+    handleRemoveFile(index);
+  };
+
   const renderFilePreview = (file, index, isExisting = false) => {
     const fileName = file.name;
     const fileUrl = isExisting
@@ -199,10 +219,16 @@ const CommonFileUpload = ({
             src={fileUrl}
             alt={fileName}
             sx={ImagePreviewSx}
-            onClick={() => onPreview?.(fileUrl)}
+            data-file-url={fileUrl}
+            onClick={handlePreviewClick}
           />
         ) : (
-          <Box onClick={() => onPreview?.(fileUrl)} sx={FilePreviewInnerSx}>
+          <Box
+            component="div"
+            data-file-url={fileUrl}
+            onClick={handlePreviewClick}
+            sx={FilePreviewInnerSx}
+          >
             {getFileIcon(fileName)}
             <Typography variant="caption" sx={FileNameTypographySx}>
               {fileName}
@@ -212,11 +238,9 @@ const CommonFileUpload = ({
 
         <IconButton
           size="small"
-          onClick={() =>
-            isExisting
-              ? onRemoveExistingFile?.(file, index)
-              : handleRemoveFile(index)
-          }
+          data-index={index}
+          data-is-existing={String(isExisting)}
+          onClick={handleRemoveClick}
           sx={RemoveButtonSx}
         >
           <CloseIcon fontSize="small" />
@@ -236,12 +260,13 @@ const CommonFileUpload = ({
           onDragOver={handleDragOver}
           sx={getUploadAreaSx({ disabled, error, size })}
         >
-          <input
+          <Box
+            component="input"
             type="file"
             accept={getAcceptString()}
             multiple={multiple}
             id={inputId}
-            style={HiddenInputStyle}
+            sx={HiddenInputStyle}
             onChange={handleChange}
             disabled={disabled}
           />
@@ -278,7 +303,7 @@ const CommonFileUpload = ({
 
       {error && helperText && (
         <Box mt={1}>
-          <Typography variant="caption" color="#d32f2f" fontSize="12px" sx={ErrorTextSx}>
+          <Typography variant="caption" sx={[ErrorTextSx, { color: "error.main", fontSize: 12 }]}> 
             {helperText}
           </Typography>
         </Box>

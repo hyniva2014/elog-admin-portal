@@ -1,31 +1,31 @@
 import { Box, Typography, Button, Grid, IconButton } from "@mui/material";
 import styled from "@emotion/styled";
 
-export const InspectionContainer = styled(Box)(() => ({
-  background: "#fff",
+export const InspectionContainer = styled(Box)(({ theme }) => ({
+  background: theme.palette.background.paper,
   padding: 24,
   borderRadius: 12,
   fontSize: 13,
   marginTop: 10,
 }));
 
-export const PageTitle = styled(Typography)(() => ({
+export const PageTitle = styled(Typography)(({ theme }) => ({
   fontSize: 20,
   fontWeight: 700,
-  color: "#1C2434",
+  color: theme.palette.text.primary,
 }));
 
-export const CategoryTitle = styled(Typography)(() => ({
+export const CategoryTitle = styled(Typography)(({ theme }) => ({
   marginTop: 15,
   fontSize: 16,
   fontWeight: 700,
-  color: "#2D303F",
+  color: theme.palette.text.primary,
 }));
 
-export const SubCategoryTitle = styled(Typography)(() => ({
+export const SubCategoryTitle = styled(Typography)(({ theme }) => ({
   fontSize: 12,
   fontWeight: 500,
-  color: "#62748E",
+  color: theme.palette.text.secondary,
 }));
 
 export const LoadingBox = styled(Box)(() => ({
@@ -41,9 +41,9 @@ export const ButtonContainer = styled(Box)(() => ({
   justifyContent: 'center',
 }));
 
-export const CancelButton = styled(Button)(() => ({
-  color: "#284495",
-  borderColor: "#284495",
+export const CancelButton = styled(Button)(({ theme }) => ({
+  color: theme.palette.brand.main,
+  borderColor: theme.palette.brand.main,
   px: 2.25,
   py: 1.25,
   fontSize: 14,
@@ -53,18 +53,18 @@ export const CancelButton = styled(Button)(() => ({
   height: 44,
 }));
 
-export const SubmitButton = styled(Button)(() => ({
-  backgroundColor: "#284495",
-  color: "#FFFFFF",
+export const SubmitButton = styled(Button)(({ theme }) => ({
+  backgroundColor: theme.palette.brand.main,
+  color: theme.palette.common.white,
   px: 2.25,
   py: 1.25,
   fontSize: 14,
   borderRadius: 4,
   minWidth: 237.28,
   height: 44,
-  marginLeft:5,
+  marginLeft: 5,
   '&:hover': {
-    backgroundColor: "#203776",
+    backgroundColor: theme.palette.brand.dark,
   },
 }));
 
@@ -73,9 +73,9 @@ export const HeaderBox = styled(Box)(() => ({
   mt: 2,
 }));
 
-export const AddDriverButton = styled(Button)(() => ({
-  color: "#FFFFFF",
-  backgroundColor: "#284495",
+export const AddDriverButton = styled(Button)(({ theme }) => ({
+  color: theme.palette.common.white,
+  backgroundColor: theme.palette.brand.main,
 }));
 
 export const SummaryCardBox = styled(Box)(() => ({
@@ -89,11 +89,11 @@ export const LicenseHeaderContainer = styled(Grid)(() => ({
   mb: 1,
 }));
 
-export const FileUploadTypography = styled(Typography)(() => ({
+export const FileUploadTypography = styled(Typography)(({ theme }) => ({
   variant: "subtitle1",
   fontWeight: 400,
   fontSize: 12,
-  color: "#000000",
+  color: theme.palette.text.primary,
 }));
 
 export const FormHeaderBox = styled(Box)(() => ({
@@ -129,20 +129,26 @@ export const ImagePreviewModal = styled(Box)(() => ({
   zIndex: 9999,
 }));
 
-export const ImagePreviewContainer = styled(Box)(() => ({
+export const ImagePreviewContainer = styled(Box)(({ theme }) => ({
   position: "relative",
   maxWidth: "90%",
   maxHeight: "90%",
-  backgroundColor: "#fff",
+  backgroundColor: theme.palette.background.paper,
   borderRadius: 2,
   overflow: "hidden",
 }));
 
-export const ClosePreviewButton = styled(IconButton)(() => ({
+export const ClosePreviewButton = styled(IconButton)(({ theme }) => ({
   position: "absolute",
   top: 10,
   right: 10,
-  backgroundColor: "#fff",
+  backgroundColor: theme.palette.common.white,
   borderRadius: "50%",
   padding: 4,
 }));
+
+export const PreviewImageSx = {
+  maxWidth: "100%",
+  maxHeight: "80vh",
+  display: "block",
+};

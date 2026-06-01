@@ -34,6 +34,23 @@ const CareerManagementHeader = (props) => {
   //   );
   const canCreate = true;
 
+  const addButtonSx = {
+    color: "common.white",
+    backgroundColor: "brand.main",
+    opacity: canCreate ? 1 : 0.5,
+    cursor: canCreate ? "pointer" : "not-allowed",
+  };
+
+  const handleAddCareerUser = (event) => {
+    if (!canCreate) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    addData();
+  };
+
   const statusOptions = [
     ...Object.entries(DRIVER_STATUS).map(([key, value]) => ({
       value: Number(key),
@@ -67,22 +84,10 @@ const CareerManagementHeader = (props) => {
         addButton={true}
         rightContent={
           <Button
-            sx={{
-              color: "#FFFFFF",
-              backgroundColor: "#284495",
-              opacity: canCreate ? 1 : 0.5,
-              cursor: canCreate ? "pointer" : "not-allowed",
-            }}
+            sx={addButtonSx}
             variant="contained"
             disabled={!canCreate}
-            onClick={(e) => {
-              if (!canCreate) {
-                e.preventDefault();
-                e.stopPropagation();
-                return;
-              }
-              addData();
-            }}
+            onClick={handleAddCareerUser}
           >
             Add Career User
           </Button>
