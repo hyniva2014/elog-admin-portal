@@ -10,3 +10,4 @@ export { default as useTask } from "./useTask";
 export { default as useDeviceLifecycle } from "./useDeviceLifecycle";
 export { default as useDashboardMetrics } from "./useDashboardMetrics";
 export { default as useCarrierGrowthTrend } from "./useCarrierGrowthTrend";
+export { default as useCareerUsers } from "../components/compliance/CareerUsersManagement/useCareerUsers";

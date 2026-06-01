@@ -44,6 +44,90 @@ const iconStyles = {
   gif: TableIconSx,
 };
 
+const getFileIcon = (fileName) => {
+  const extension = fileName?.split(".").pop()?.toLowerCase() || "";
+  const iconSx = iconStyles[extension] || TextIconSx;
+
+  if (extension === "pdf") {
+    return <PictureAsPdfIcon sx={iconSx} />;
+  }
+
+  if (extension === "xls" || extension === "xlsx") {
+    return <TableChartIcon sx={iconSx} />;
+  }
+
+  if (extension === "doc" || extension === "docx") {
+    return <DescriptionIcon sx={iconSx} />;
+  }
+
+  if (extension === "txt") {
+    return <DescriptionIcon sx={iconSx} />;
+  }
+
+  if (extension === "csv") {
+    return <TableChartIcon sx={iconSx} />;
+  }
+
+  if (["jpg", "jpeg", "png", "gif"].includes(extension)) {
+    return <DescriptionIcon sx={iconSx} />;
+  }
+
+  return <InsertDriveFileIcon sx={iconSx} />;
+};
+
+const isImageFile = (fileName) => {
+  const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "webp", "svg"];
+  const extension = fileName?.split(".").pop()?.toLowerCase() || "";
+  return imageExtensions.includes(extension);
+};
+
+const FilePreviewItem = ({ file, index, isExisting, onPreview, onRemove }) => {
+  const fileName = file.name;
+  const fileUrl = isExisting
+    ? file.url
+    : file instanceof File
+    ? URL.createObjectURL(file)
+    : file;
+  const isImage = isImageFile(fileName);
+
+  return (
+    <Box key={`${isExisting ? "existing" : "new"}-${index}`} sx={FilePreviewContainerSx}>
+      {isImage ? (
+        <Box
+          component="img"
+          src={fileUrl}
+          alt={fileName}
+          sx={ImagePreviewSx}
+          data-file-url={fileUrl}
+          onClick={onPreview}
+        />
+      ) : (
+        <Box
+          component="div"
+          data-file-url={fileUrl}
+          onClick={onPreview}
+          sx={FilePreviewInnerSx}
+        >
+          {getFileIcon(fileName)}
+          <Typography variant="caption" sx={FileNameTypographySx}>
+            {fileName}
+          </Typography>
+        </Box>
+      )}
+
+      <IconButton
+        size="small"
+        data-index={index}
+        data-is-existing={String(isExisting)}
+        onClick={onRemove}
+        sx={RemoveButtonSx}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </Box>
+  );
+};
+
 const CommonFileUpload = ({
   accept = "*/*",
   multiple = true,
@@ -62,43 +146,6 @@ const CommonFileUpload = ({
   hideUploadAreaWhenFilesExist = false,
 }) => {
   const inputId = useId();
-
-  const getFileIcon = (fileName) => {
-    const extension = fileName?.split(".").pop()?.toLowerCase() || "";
-    const iconSx = iconStyles[extension] || TextIconSx;
-
-    if (extension === "pdf") {
-      return <PictureAsPdfIcon sx={iconSx} />;
-    }
-
-    if (extension === "xls" || extension === "xlsx") {
-      return <TableChartIcon sx={iconSx} />;
-    }
-
-    if (extension === "doc" || extension === "docx") {
-      return <DescriptionIcon sx={iconSx} />;
-    }
-
-    if (extension === "txt") {
-      return <DescriptionIcon sx={iconSx} />;
-    }
-
-    if (extension === "csv") {
-      return <TableChartIcon sx={iconSx} />;
-    }
-
-    if (["jpg", "jpeg", "png", "gif"].includes(extension)) {
-      return <DescriptionIcon sx={iconSx} />;
-    }
-
-    return <InsertDriveFileIcon sx={iconSx} />;
-  };
-
-  const isImageFile = (fileName) => {
-    const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "webp", "svg"];
-    const extension = fileName?.split(".").pop()?.toLowerCase() || "";
-    return imageExtensions.includes(extension);
-  };
 
   const formatFileSize = (bytes) => {
     if (bytes === 0) return "0 Bytes";
@@ -202,53 +249,6 @@ const CommonFileUpload = ({
     handleRemoveFile(index);
   };
 
-  const renderFilePreview = (file, index, isExisting = false) => {
-    const fileName = file.name;
-    const fileUrl = isExisting
-      ? file.url
-      : file instanceof File
-      ? URL.createObjectURL(file)
-      : file;
-    const isImage = isImageFile(fileName);
-
-    return (
-      <Box key={`${isExisting ? "existing" : "new"}-${index}`} sx={FilePreviewContainerSx}>
-        {isImage ? (
-          <Box
-            component="img"
-            src={fileUrl}
-            alt={fileName}
-            sx={ImagePreviewSx}
-            data-file-url={fileUrl}
-            onClick={handlePreviewClick}
-          />
-        ) : (
-          <Box
-            component="div"
-            data-file-url={fileUrl}
-            onClick={handlePreviewClick}
-            sx={FilePreviewInnerSx}
-          >
-            {getFileIcon(fileName)}
-            <Typography variant="caption" sx={FileNameTypographySx}>
-              {fileName}
-            </Typography>
-          </Box>
-        )}
-
-        <IconButton
-          size="small"
-          data-index={index}
-          data-is-existing={String(isExisting)}
-          onClick={handleRemoveClick}
-          sx={RemoveButtonSx}
-        >
-          <CloseIcon fontSize="small" />
-        </IconButton>
-      </Box>
-    );
-  };
-
   const hasFiles = existingFiles?.length > 0 || files?.length > 0;
   const shouldHideUploadArea = hideUploadAreaWhenFilesExist && hasFiles;
 
@@ -296,8 +296,26 @@ const CommonFileUpload = ({
 
       {hasFiles && (
         <Box sx={FilesWrapperSx(hasFiles, shouldHideUploadArea)}>
-          {existingFiles?.map((file, index) => renderFilePreview(file, index, true))}
-          {files?.map((file, index) => renderFilePreview(file, index, false))}
+          {existingFiles?.map((file, index) => (
+            <FilePreviewItem
+              key={`existing-${index}`}
+              file={file}
+              index={index}
+              isExisting
+              onPreview={handlePreviewClick}
+              onRemove={handleRemoveClick}
+            />
+          ))}
+          {files?.map((file, index) => (
+            <FilePreviewItem
+              key={`new-${index}`}
+              file={file}
+              index={index}
+              isExisting={false}
+              onPreview={handlePreviewClick}
+              onRemove={handleRemoveClick}
+            />
+          ))}
         </Box>
       )}
 

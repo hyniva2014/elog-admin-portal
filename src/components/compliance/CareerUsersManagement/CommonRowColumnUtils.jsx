@@ -10,6 +10,56 @@ import dayjs from "dayjs";
 import { USER_STATUS, USER_STATUS_COL_CONFIG } from "./Constants";
 import { formatDateTime } from "../../../common/CommonUtils";
 
+const CreatedAtCell = ({ row }) => (
+  <Box>
+    <Typography fontSize={14}>{row.createdDate}</Typography>
+    <Typography fontSize={14} color="text.secondary">
+      {row.createdTime}
+    </Typography>
+  </Box>
+);
+
+const StatusCell = ({ value, row }) => (
+  <Typography sx={{ color: row.statusColor, fontWeight: 400 }}>
+    {value}
+  </Typography>
+);
+
+const ActionsCell = ({ row, handleOpenEdit, handleDeleteClick, canDelete, eyeIcon, trashIcon }) => {
+  const handleViewClick = () => handleOpenEdit(row);
+
+  const handleDeleteAction = () => {
+    if (!canDelete) return;
+    handleDeleteClick?.(row);
+  };
+
+  return (
+    <Box width="100%" display="flex" justifyContent="center" gap={1}>
+      <Tooltip title="View" placement="right">
+        <IconButton size="small" onClick={handleViewClick}>
+          <img src={eyeIcon} alt="view" width={16} height={16} />
+        </IconButton>
+      </Tooltip>
+
+      <Tooltip title={canDelete ? "Delete" : "No permission"} placement="right">
+        <span>
+          <IconButton
+            size="small"
+            disabled={!canDelete}
+            onClick={handleDeleteAction}
+            sx={{
+              opacity: canDelete ? 1 : 0.5,
+              cursor: canDelete ? "pointer" : "not-allowed",
+            }}
+          >
+            <img src={trashIcon} alt="delete" width={16} height={16} />
+          </IconButton>
+        </span>
+      </Tooltip>
+    </Box>
+  );
+};
+
 export const UserManagementTableData = (
   response = [],
   handleOpenEdit,
@@ -31,8 +81,8 @@ export const UserManagementTableData = (
       headerTooltip: true,
       cellClassName: "sticky-col-left-1",
       headerClassName: "sticky-col-left-1",
-      renderCell: (params) => (
-        <Tooltip title={params.value || ""} placement="right">
+      renderCell: ({ value }) => (
+        <Tooltip title={value || ""} placement="right">
           <Typography
             fontSize={13}
             sx={{
@@ -41,7 +91,7 @@ export const UserManagementTableData = (
               whiteSpace: "nowrap",
             }}
           >
-            {params.value || "-"}
+            {value || "-"}
           </Typography>
         </Tooltip>
       ),
@@ -65,9 +115,9 @@ export const UserManagementTableData = (
       minWidth: 150,
       maxWidth: 220,
       headerTooltip: true,
-      renderCell: (params) => (
+      renderCell: ({ value }) => (
         <Typography fontSize={13} sx={{ textTransform: "capitalize" }}>
-          {params.value || "-"}
+          {value || "-"}
         </Typography>
       ),
     },
@@ -78,8 +128,8 @@ export const UserManagementTableData = (
       minWidth: 150,
       maxWidth: 220,
       headerTooltip: true,
-      renderCell: (params) => (
-        <Tooltip title={params.value || ""} placement="right">
+      renderCell: ({ value }) => (
+        <Tooltip title={value || ""} placement="right">
           <Typography
             fontSize={13}
             color="text.secondary"
@@ -89,7 +139,7 @@ export const UserManagementTableData = (
               whiteSpace: "nowrap",
             }}
           >
-            {params.value || "-"}
+            {value || "-"}
           </Typography>
         </Tooltip>
       ),
@@ -133,14 +183,7 @@ export const UserManagementTableData = (
       maxWidth: 250,
       flex: 1,
       headerTooltip: true,
-      renderCell: (params) => (
-        <Box>
-          <Typography fontSize={14}>{params.row.createdDate}</Typography>
-          <Typography fontSize={14} color="text.secondary">
-            {params.row.createdTime}
-          </Typography>
-        </Box>
-      ),
+      renderCell: ({ row }) => <CreatedAtCell row={row} />,
     },
     {
       field: "status",
@@ -149,11 +192,7 @@ export const UserManagementTableData = (
       maxWidth: 250,
       flex: 1,
       headerTooltip: true,
-      renderCell: (params) => (
-        <Typography sx={{ color: params.row.statusColor, fontWeight: 400 }}>
-          {params.value}
-        </Typography>
-      ),
+      renderCell: ({ value, row }) => <StatusCell value={value} row={row} />,
     },
 
     {
@@ -166,36 +205,15 @@ export const UserManagementTableData = (
       headerTooltip: true,
       align: "center",
       headerAlign: "center",
-      renderCell: (params) => (
-        <Box width="100%" display="flex" justifyContent="center" gap={1}>
-          <Tooltip title="View" placement="right">
-            <IconButton size="small" onClick={() => handleOpenEdit(params.row)}>
-              <img src={eyeIcon} alt="view" width={16} height={16} />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip
-            title={canDelete ? "Delete" : "No permission"}
-            placement="right"
-          >
-            <span>
-              <IconButton
-                size="small"
-                disabled={!canDelete}
-                onClick={(e) => {
-                  if (!canDelete) return;
-                  handleDeleteClick?.(params.row);
-                }}
-                sx={{
-                  opacity: canDelete ? 1 : 0.5,
-                  cursor: canDelete ? "pointer" : "not-allowed",
-                }}
-              >
-                <img src={trashIcon} alt="delete" width={16} height={16} />
-              </IconButton>
-            </span>
-          </Tooltip>
-        </Box>
+      renderCell: ({ row }) => (
+        <ActionsCell
+          row={row}
+          handleOpenEdit={handleOpenEdit}
+          handleDeleteClick={handleDeleteClick}
+          canDelete={canDelete}
+          eyeIcon={eyeIcon}
+          trashIcon={trashIcon}
+        />
       ),
     },
   ];

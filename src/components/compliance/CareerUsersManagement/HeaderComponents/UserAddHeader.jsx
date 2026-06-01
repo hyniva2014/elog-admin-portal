@@ -24,6 +24,30 @@ import {
   StepTextSx,
 } from "./UserAddHeader.styled";
 
+const StatusIndicator = ({ item }) => (
+  <Box sx={StatusItemSx(item.completed)}>
+    {item.completed ? (
+      <DoneIcon sx={{ fontSize: 18, color: "success.main" }} />
+    ) : null}
+    <Typography variant="body2" sx={StatusItemTextSx(item.completed)}>
+      {item.label}
+    </Typography>
+  </Box>
+);
+
+const UserAddHeaderStep = ({ step, active, onClick, index }) => (
+  <Box
+    data-step-id={step.id}
+    data-index={index}
+    onClick={onClick}
+    sx={StepItemSx(active)}
+  >
+    <Typography sx={StepTextSx(active)}>
+      {step.number}. {step.label}
+    </Typography>
+  </Box>
+);
+
 const UserAddHeader = ({
   handleBack,
   activeStep = 0,
@@ -279,14 +303,7 @@ const UserAddHeader = ({
           {/* Status Indicators */}
           <Box sx={StatusItemsSx}>
             {statusItems.map((item) => (
-              <Box key={item.label} sx={StatusItemSx(item.completed)}>
-                {item.completed ? (
-                  <DoneIcon sx={{ fontSize: 18, color: "success.main" }} />
-                ) : null}
-                <Typography variant="body2" sx={StatusItemTextSx(item.completed)}>
-                  {item.label}
-                </Typography>
-              </Box>
+              <StatusIndicator key={item.label} item={item} />
             ))}
           </Box>
         </Box>
@@ -296,15 +313,13 @@ const UserAddHeader = ({
       <Box sx={StepperWrapperSx}>
         <Box sx={StepListSx}>
           {steps.map((step, index) => (
-            <Box
+            <UserAddHeaderStep
               key={step.label}
-              onClick={() => handleStepClick(step.id, index)}
-              sx={StepItemSx(index === activeStep)}
-            >
-              <Typography sx={StepTextSx(index === activeStep)}>
-                {step.number}. {step.label}
-              </Typography>
-            </Box>
+              step={step}
+              active={index === activeStep}
+              index={index}
+              onClick={handleStepClick}
+            />
           ))}
         </Box>
       </Box>

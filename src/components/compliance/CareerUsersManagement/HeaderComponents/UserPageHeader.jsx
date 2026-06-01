@@ -26,6 +26,11 @@ const UserPageHeader = ({
 
   const isActive = statusLabel?.toLowerCase() === "active";
 
+  const handleStartEdit = () => {
+    if (!canUpdate) return;
+    setEditMode(true);
+  };
+
   return (
     <Box sx={PageHeaderContainerSx}>
       {/* LEFT SIDE */}
@@ -57,10 +62,7 @@ const UserPageHeader = ({
             <Button
               variant="contained"
               disabled={!canUpdate}
-              onClick={() => {
-                if (!canUpdate) return;
-                setEditMode(true);
-              }}
+              onClick={handleStartEdit}
             >
               Edit
             </Button>

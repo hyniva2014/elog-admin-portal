@@ -25,7 +25,6 @@ import {
   ClosePreviewButton,
   PreviewImageSx,
 } from "./CareerManagement.styled";
-import { useServices } from "../../../services/services";
 import UserPageHeader from "./HeaderComponents/UserPageHeader";
 import CareerUserFormFields, {
   userManagementValidationSchema,
@@ -54,7 +53,6 @@ const CareerUserForm = ({
   fetchUserData,
 }) => {
   const navigate = useNavigate();
-  const { fetchApi } = useServices();
   const [existingProfileFiles, setExistingProfileFiles] = useState([]);
   const [files, setFiles] = useState([]);
   const [existingMedicalFiles, setExistingMedicalFiles] = useState([]);
@@ -1023,14 +1021,7 @@ const filteredRoles = rolesOptions.filter(
         <ImagePreviewModal onClick={handlePreviewModalClick}>
           <ImagePreviewContainer onClick={stopPreviewContainerPropagation}>
             <ClosePreviewButton onClick={handleClosePreview}>
-              {/* {editMode && (
-                <IconButton
-                  onClick={() => handleRemoveExistingFile?.(files, index)}
-                >
-                  <CloseIcon />
-                </IconButton>
-              )} */}
-                <CloseIcon />
+              <CloseIcon />
             </ClosePreviewButton>
           </ImagePreviewContainer>
           <Box

@@ -4,23 +4,25 @@ import CommonFilters from "../../../common/CommonFilters";
 import { DRIVER_STATUS } from "./Constants";
 import { useState, useEffect } from "react";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
-import { useServices } from "../../../services/services";
+import { useCareerUsers } from "../../../hooks";
 import { useSelector } from "react-redux";
 // import { hasPermission } from "./Constants";
 
 const CareerManagementHeader = (props) => {
   const { data = [], setData, searchKey = {}, summaryCards, addData } = props;
-  const { fetchApi } = useServices();
+  const { getDriverOptions } = useCareerUsers();
   const [driverOptions, setDriverOptions] = useState([]);
-
-  useEffect(() => {
-    loadUsers();
-  }, []);
 
   const companyId = useSelector(
     (state) =>
       state.loginSlice.loginDetails?.body?.data?.userdetails?.company_id,
   );
+
+  useEffect(() => {
+    if (companyId) {
+      loadUsers();
+    }
+  }, [companyId]);
 
   //   const permissions = useSelector((state) => state.rolePermissions.permissions);
   // const permissions = useSelector(
@@ -60,18 +62,8 @@ const CareerManagementHeader = (props) => {
 
   const loadUsers = async () => {
     try {
-      const response = await fetchApi(
-        `/user/get-users-and-vehicles?company_id=${companyId}`,
-      );
-
-      const users = response?.body?.users || [];
-
-      setDriverOptions(
-        users.map((user) => ({
-          value: user.user_id,
-          label: user.user_name,
-        })),
-      );
+      const options = await getDriverOptions(companyId);
+      setDriverOptions(options);
     } catch (err) {
       console.error("User list error", err);
     }

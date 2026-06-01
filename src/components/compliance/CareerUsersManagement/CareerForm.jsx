@@ -11,9 +11,22 @@ import {
 } from "./CareerForm.styled";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
-import { useServices } from "../../../services/services";
+import { useCareerUsers } from "../../../hooks";
 import { useSelector } from "react-redux";
 import CommonLoading from "../../../common/CommonLoading";
+
+const CareerFormStepItem = ({ step, active, index, onClick }) => (
+  <StepItem
+    data-step-id={step.id}
+    data-index={index}
+    active={active}
+    onClick={onClick}
+  >
+    <StepLabel active={active}>
+      {step.number}. {step.label}
+    </StepLabel>
+  </StepItem>
+);
 import CommonSnackbar from "../../../common/CommonSnackbar";
 import CommonBreadcrumb from "../../../common/CommonBreadcrumb";
 import dayjs from "dayjs";
@@ -58,7 +71,7 @@ const CareerForm = () => {
 
   const isEditMode = Boolean(userId);
   const navigate = useNavigate();
-  const { fetchApi, createApi } = useServices();
+  const { getCareerUserDetails, getCarrierList, saveCareerUser } = useCareerUsers();
   const { setLoading, LoadingContainer } = CommonLoading();
   const [formData, setFormData] = useState({});
   //   const [mode, setMode] = useState("add");
@@ -136,9 +149,10 @@ const CareerForm = () => {
       setLoadingState(true);
       setLoading(true);
 
-      const response = await fetchApi(
-        `/masteradmin/superuser/get-superusers?company_id=${companyId}&user_id=${userId}&page=1&limit=${defaultPageSize}`,
-      );
+      const response = await getCareerUserDetails({
+        companyId,
+        userId,
+      });
 
       const data = response?.body?.users?.[0] || response?.users?.[0];
       if (!data) return;
@@ -147,9 +161,7 @@ const CareerForm = () => {
 
       if (data.carrier_id) {
         try {
-          const carrierResponse = await fetchApi(
-            `/carriers/get-carrier-list?company_id=${companyId}`,
-          );
+          const carrierResponse = await getCarrierList(companyId);
 
           const carriers =
             carrierResponse?.data?.body?.carriers ||
@@ -451,10 +463,7 @@ const CareerForm = () => {
         console.log(pair[0], pair[1]);
       }
 
-      const response = await createApi(
-        payload,
-        "/masteradmin/superuser/create-or-update",
-      );
+      const response = await saveCareerUser(payload);
 
       if (response?.statusCode === 200) {
         navigate("/career-users", {
@@ -783,17 +792,13 @@ const CareerForm = () => {
           <CareerFormStepper>
             <StepRow>
               {steps.map((step, index) => (
-                <StepItem
+                <CareerFormStepItem
                   key={step.label}
-                  data-step-id={step.id}
-                  data-index={index}
+                  step={step}
                   active={index === activeStep}
+                  index={index}
                   onClick={handleStepClick}
-                >
-                  <StepLabel active={index === activeStep}>
-                    {step.number}. {step.label}
-                  </StepLabel>
-                </StepItem>
+                />
               ))}
             </StepRow>
           </CareerFormStepper>

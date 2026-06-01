@@ -9,7 +9,7 @@ import CommonDataGrid from "../../../common/CommonDataGrid";
 import CareerManagementHeader from "./CareerManagementHeader";
 import CommonSnackbar from "../../../common/CommonSnackbar";
 import CommonConfirmDialog from "../../../common/CommonConfirmDialog";
-import { useServices } from "../../../services/services";
+import { useCareerUsers } from "../../../hooks";
 import dayjs from "dayjs";
 import { useSearchParams, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -18,7 +18,7 @@ import CommonNoAccess from "../../../common/CommonNoAccess";
 
 const CareerManagement = () => {
   const { setLoading, LoadingContainer } = CommonLoading();
-  const { fetchApi, createApi } = useServices();
+  const { getCareerUsers } = useCareerUsers();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchKey, setSearchKey] = useState(0);
@@ -158,8 +158,16 @@ const CareerManagement = () => {
     try {
       const fromDateStr = fromDate ? fromDate.format("YYYY-MM-DD") : "";
       const toDateStr = toDate ? toDate.format("YYYY-MM-DD") : "";
-      const endUrl = `/masteradmin/superuser/get-superusers?company_id=${companyId}&user_id=${user}&status=${status}&from_date=${fromDateStr}&to_date=${toDateStr}&page=${page}&limit=${pageSize}&search=${encodeURIComponent(search)}`;
-      const response = await fetchApi(endUrl);
+      const response = await getCareerUsers({
+        companyId,
+        user,
+        status,
+        fromDate,
+        toDate,
+        page,
+        limit: pageSize,
+        search,
+      });
       const records = response?.body?.users || [];
       const { UserManagementColumnData, UserManagementRowData } =
         UserManagementTableData(

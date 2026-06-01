@@ -8,6 +8,24 @@ import {
   BreadcrumbSeparatorSx,
 } from "./CommonBreadcrumb.styled";
 
+const BreadcrumbItem = ({ item, isLast, onClick }) => (
+  <Box key={`${item.label}-${item.path || "last"}`} component="span" sx={BreadcrumbItemSx}>
+    {isLast ? (
+      <BreadcrumbBold>{item.label}</BreadcrumbBold>
+    ) : (
+      <Typography
+        component="span"
+        sx={BreadcrumbLinkSx}
+        data-path={item.path}
+        onClick={onClick}
+      >
+        {item.label}
+      </Typography>
+    )}
+    {!isLast && <Box component="span" sx={BreadcrumbSeparatorSx}>/</Box>}
+  </Box>
+);
+
 const CommonBreadcrumb = ({ breadcrumbs = [] }) => {
   const navigate = useNavigate();
 
@@ -20,28 +38,14 @@ const CommonBreadcrumb = ({ breadcrumbs = [] }) => {
 
   return (
     <BreadcrumbText>
-      {breadcrumbs.map((item, index) => {
-        const isLast = index === breadcrumbs.length - 1;
-
-        return (
-          <Box key={`${item.label}-${index}`} component="span" sx={BreadcrumbItemSx}>
-            {isLast ? (
-              <BreadcrumbBold>{item.label}</BreadcrumbBold>
-            ) : (
-              <Typography
-                component="span"
-                sx={BreadcrumbLinkSx}
-                data-path={item.path}
-                onClick={handleBreadcrumbClick}
-              >
-                {item.label}
-              </Typography>
-            )}
-
-            {!isLast && <Box component="span" sx={BreadcrumbSeparatorSx}>/</Box>}
-          </Box>
-        );
-      })}
+      {breadcrumbs.map((item, index) => (
+        <BreadcrumbItem
+          key={`${item.label}-${index}`}
+          item={item}
+          isLast={index === breadcrumbs.length - 1}
+          onClick={handleBreadcrumbClick}
+        />
+      ))}
     </BreadcrumbText>
   );
 };
