@@ -2,10 +2,10 @@ import React from "react";
 import { Grid } from "@mui/material";
 import { Controller } from "react-hook-form";
 import CommonTextField from "../../../common/CommonTextField";
-import { formatTaxId, formatPhoneNumber } from "./utils";
+import { formatTaxId, formatPhoneNumber, formatUsdot, formatMcNumber } from "./utils";
 
 const createFormatChangeHandler = (field, formatter) => (event) => {
-  field.onChange(formatter(event.target.value));
+  field.onChange(formatter(event.target.value, field.value));
 };
 
 const FormTextField = ({ 
@@ -24,6 +24,8 @@ const FormTextField = ({
   const getFormatter = () => {
     if (formatter === "taxId") return formatTaxId;
     if (formatter === "phone") return formatPhoneNumber;
+    if (formatter === "usdot") return formatUsdot;
+    if (formatter === "mcNumber") return formatMcNumber;
     return null;
   };
 

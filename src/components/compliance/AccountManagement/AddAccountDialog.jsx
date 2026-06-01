@@ -41,35 +41,14 @@ const validationSchema = yup.object({
   mcNumber: yup
     .string()
     .required("MC Number is required")
-    .matches(
-      /^(MC-?\d{6,8}|\d{6,8})$/,
-      "MC Number must be 6-8 digits (e.g., 123456, MC123456, or MC-123456)",
-    ),
+    .matches(/^\d{6,8}$/, "MC Number must be 6-8 digits"),
   maxDevices: yup
     .number()
     .typeError("Max Devices must be a number")
     .required("Max Devices is required")
     .positive("Max Devices must be greater than 0")
     .integer("Max Devices must be a whole number"),
-  // website: yup
-  //   .string()
-  //   .test(
-  //     "website",
-  //     "Please enter a valid website URL (e.g., example.com, www.example.com, https://example.com)",
-  //     (value) => {
-  //       if (!value) return true;
-  //       try {
-  //         const urlToTest = value.startsWith('http://') || value.startsWith('https://')
-  //           ? value
-  //           : `http://${value}`;
-  //         const url = new URL(urlToTest);
-  //         return url.hostname && url.hostname.includes('.');
-  //       } catch {
-  //         return false;
-  //       }
-  //     }
-  //   )
-  //   .nullable(),
+
   tollFree: yup
     .string()
     .required("Toll Free is required")
@@ -77,13 +56,6 @@ const validationSchema = yup.object({
       /^(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/,
       "Please enter a valid phone number",
     ),
-  // fax: yup
-  //   .string()
-  //   .required("Fax is required")
-  //   .matches(
-  //     /^(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/,
-  //     "Please enter a valid fax number",
-  //   ),
   carrierAddress: yup
     .string()
     .required("Carrier Address is required")
@@ -97,7 +69,7 @@ const validationSchema = yup.object({
     .required("Primary Contact Number is required")
     .matches(
       /^(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/,
-      "Please enter a valid phone number (e.g., +1 (555) 123-4567)",
+      "Please enter a valid phone number",
     ),
   primaryContactEmail: yup
     .string()
@@ -112,7 +84,7 @@ const validationSchema = yup.object({
     .required("Secondary Contact Number is required")
     .matches(
       /^(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/,
-      "Please enter a valid phone number (e.g., +1 (555) 123-4567)",
+      "Please enter a valid phone number",
     ),
   secondaryContactEmail: yup
     .string()
