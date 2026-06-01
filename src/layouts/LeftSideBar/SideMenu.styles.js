@@ -86,3 +86,5 @@ export const menuIconImgSx = (size) => ({
 });
 
 export const menuListSx = { listStyle: "none", padding: 0 };
+
+export const chevronContainerSx = { marginLeft: "auto" };

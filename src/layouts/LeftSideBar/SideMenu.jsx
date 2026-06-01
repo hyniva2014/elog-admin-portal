@@ -34,6 +34,7 @@ import {
   getExpandedMenuItemSx,
   menuIconImgSx,
   menuListSx,
+  chevronContainerSx,
 } from "./SideMenu.styles";
 
 const MenuIcon = ({ icon, size }) => {
@@ -188,7 +189,7 @@ const MenuItemWithChildren = ({
           ) : (
             <Typography>{item.label}</Typography>
           )}
-          <Box sx={{ marginLeft: "auto" }}>
+          <Box sx={chevronContainerSx}>
             <LuChevronRight size={16} style={chevronStyle(open)} />
           </Box>
         </Box>

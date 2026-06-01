@@ -1,10 +1,10 @@
+import { useCallback, useEffect } from "react";
 import { Drawer } from "@mui/material";
 import LogoBox from "./LogoBox";
 import SideMenu from "./SideMenu";
 import { changeHTMLAttribute, getMenuItems } from "@src/helpers/menu";
 import { useLayoutContext } from "@src/states";
 import { useViewPort } from "@src/hooks";
-import { useCallback, useEffect } from "react";
 import { LeftSideBarWrapper, SidebarScrollContainer } from "./index.styles";
 
 const SideBarContent = ({ isCollapsed, isVisible }) => {
@@ -24,15 +24,21 @@ const LeftSideBarMenu = () => {
     >
       <LogoBox backgroundColor isCollapsed={settings.sidenav.isCollapsed} />
       <SidebarScrollContainer>
-        <SideBarContent isCollapsed={settings.sidenav.isCollapsed} isVisible={true}/>
+        <SideBarContent isCollapsed={settings.sidenav.isCollapsed} isVisible />
       </SidebarScrollContainer>
     </LeftSideBarWrapper>
   );
 };
+
 const LeftSideBar = () => {
   const { width } = useViewPort();
   const { settings, updateSidenav } = useLayoutContext();
   const showMobileMenu = settings.sidenav.showMobileMenu;
+
+  useEffect(() => {
+    updateSidenav({ isCollapsed: true });
+  }, []);
+
   useEffect(() => {
     changeHTMLAttribute("data-mode", settings.theme);
   }, [settings.theme]);
@@ -58,7 +64,7 @@ const LeftSideBar = () => {
       showMobileMenu: false,
     });
   }, [updateSidenav]);
-  return settings.sidenav.mode == "default" ? (
+  return settings.sidenav.mode === "default" ? (
     <LeftSideBarMenu />
   ) : (
     <Drawer open={showMobileMenu} onClose={hideSideNavMobile}>
@@ -66,4 +72,5 @@ const LeftSideBar = () => {
     </Drawer>
   );
 };
+
 export default LeftSideBar;
