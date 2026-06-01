@@ -11,7 +11,6 @@ import {
   DetailTitle,
   DetailSubTitle,
   InfoSection,
-  SectionTitle,
   TriggerSectionTitle,
   InfoGrid,
   TriggerInfoGrid,
@@ -141,15 +140,17 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
   const conversationList =
     conversations.length > 0 ? conversations : defaultConversations;
 
-  const conversationItems = conversationList.map((conv, index) => (
-    <ConversationItem
-      key={index}
-      sender={conv.sender}
-      message={conv.message}
-      time={conv.time}
-      isCurrentUser={conv.isCurrentUser}
-    />
-  ));
+  const conversationItems = conversationList.map(
+    ({ sender, message, time, isCurrentUser }, index) => (
+      <ConversationItem
+        key={index}
+        sender={sender}
+        message={message}
+        time={time}
+        isCurrentUser={isCurrentUser}
+      />
+    ),
+  );
 
   return (
     <AlertCardContainer detailsPanel>
@@ -185,7 +186,6 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
 
       {/* Conversation Section */}
       <ConversationContainer>
-        <SectionTitle>Conversation</SectionTitle>
         {conversationItems}
       </ConversationContainer>
     </AlertCardContainer>
