@@ -131,6 +131,21 @@ export const gridSx = (theme) => ({
     },
   },
 
+  // Disable vertical scrollbar
+  "& .MuiDataGrid-virtualScroller": {
+    overflowY: "hidden", // Hide vertical scrollbar
+    overflowX: "auto", // Keep horizontal scrollbar if needed
+  },
+
+  // Or completely remove scrollbar while keeping functionality
+  "& .MuiDataGrid-virtualScroller::-webkit-scrollbar": {
+    display: "none", // Hide scrollbar (Chrome, Safari, Edge)
+  },
+  "& .MuiDataGrid-virtualScroller": {
+    scrollbarWidth: "none", // Hide scrollbar (Firefox)
+    msOverflowStyle: "none", // Hide scrollbar (IE/Edge)
+  },
+
   "& .MuiDataGrid-cell.sticky-col-left-1": {
     position: "sticky",
     left: 0,
