@@ -17,10 +17,11 @@ import {
   transformDeviceAssetData,
 } from "./DeviceAssetManagementTable.utils";
 import BulkUploadForm from "./BulkUploadForm";
+import AssignDevicesToCarriers from "../DeviceManagement/AssignDevicesToCarriers";
 
 const DeviceAssetManagement = () => {
   const { fetchApi, createApi } = useServices();
-  const { loading,setLoading, LoadingContainer } = CommonLoading();
+  const { loading, setLoading, LoadingContainer } = CommonLoading();
   const [allRows, setAllRows] = useState([]);
   const [deviceModelOptions, setDeviceModelOptions] = useState([]);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
@@ -62,8 +63,8 @@ const DeviceAssetManagement = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
 
-  // ── Bulk Upload ────────────────────────────────────────────────────────────────
   const handleBulkClick = useCallback(() => {
     setIsBulkModalOpen(true);
   }, []);
@@ -72,7 +73,6 @@ const DeviceAssetManagement = () => {
     setIsBulkModalOpen(false);
   }, []);
 
-  // ── Snackbar ────────────────────────────────────────────────────────────────
   const handleSnackbar = useCallback((message, severity = "info") => {
     setSnackbar({
       open: true,
@@ -80,6 +80,15 @@ const DeviceAssetManagement = () => {
       severity,
     });
   }, []);
+
+  const showSnackbar = (message, severity = "success") => {
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    });
+  };
+
   const handleSnackbarClose = useCallback(() => {
     setSnackbar((prev) => ({
       ...prev,
@@ -99,24 +108,6 @@ const DeviceAssetManagement = () => {
     data.status,
     data.fromDate,
   ]);
-  // useEffect(() => {
-  //   fetchDeviceModelDropdown();
-  // }, []);
-
-  // const fetchDeviceModelDropdown = async () => {
-  //   try {
-  //     const response = await fetchApi("/masteradmin/get-device-model-dropdown");
-  //     const dropdownData = response?.body?.data || [];
-  //     const formattedOptions = dropdownData.map((item) => ({
-  //       value: item.model_name,
-  //       label: item.model_name,
-  //     }));
-
-  //     setDeviceModelOptions(formattedOptions);
-  //   } catch (error) {
-  //     console.error("Device Model Dropdown Error:", error);
-  //   }
-  // };
 
   const fetchDeviceAssets = async () => {
     try {
@@ -391,6 +382,49 @@ const DeviceAssetManagement = () => {
       : "Save"
     : "Add Asset";
 
+  const handleAssignCancel = () => {
+    setIsAssignDialogOpen(false);
+  };
+
+  const handleAssignSubmit = async (selectedCompanyId) => {
+    const deviceIds = allRows
+      .filter((row) => selectedRows.includes(row.id))
+      .map((row) => row.id);
+
+    const payload = {
+      company_id: selectedCompanyId,
+      device_ids: deviceIds,
+    };
+
+    try {
+      const endurl = "/masteradmin/assign-devices";
+      const response = await createApi(payload, endurl);
+      if (response?.statusCode === 200) {
+        showSnackbar(
+          response.body?.data?.message || "Devices assigned successfully",
+        );
+        setSelectedRows([]);
+        fetchDeviceAssets();
+      } else {
+        showSnackbar(
+          response?.body?.data?.message || "Failed to assign devices",
+          "error",
+        );
+      }
+    } catch (error) {
+      showSnackbar("Failed to assign devices", "error");
+    }
+    setIsAssignDialogOpen(false);
+  };
+
+  const handleAssignDevices = useCallback(() => {
+    if (selectedRows.length === 0) {
+      handleSnackbar("Please select at least one device", "warning");
+      return;
+    }
+    setIsAssignDialogOpen(true);
+  }, [selectedRows, handleSnackbar]);
+
   return (
     <>
       <LoadingContainer />
@@ -405,8 +439,9 @@ const DeviceAssetManagement = () => {
           handleClick={handleClick}
           handleAddAsset={handleBulkClick}
           modelOptions={deviceModelOptions}
+          handleAssignDevices={handleAssignDevices}
           statusOptions={DEVICE_ASSET_STATUS_FILTER_OPTIONS}
-          // isAssetAllocationEnabled={selectedRows.length > 0}
+          isAssignDeviceEnabled={selectedRows.length > 0}
         />
         <GridContainer>
           <CommonDataGrid
@@ -463,6 +498,13 @@ const DeviceAssetManagement = () => {
         content={
           <BulkUploadForm formId="bulkAssetForm" onSubmit={handleBulkSubmit} />
         }
+      />
+
+      <AssignDevicesToCarriers
+        open={isAssignDialogOpen}
+        handleCancel={handleAssignCancel}
+        handleSubmit={handleAssignSubmit}
+        loading={false}
       />
     </>
   );
