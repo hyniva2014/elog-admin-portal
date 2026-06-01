@@ -36,7 +36,6 @@ import {
   menuListSx,
 } from "./SideMenu.styles";
 
-
 const MenuIcon = ({ icon, size }) => {
   if (!icon) return null;
   if (typeof icon === "string") {
@@ -115,6 +114,7 @@ const MenuItemWithChildren = ({
   toggleMenu,
   theme,
   isCollapsed,
+  onNavigate,
 }) => {
   const [open, setOpen] = useState(activeMenuItems.includes(item.key));
   const [flyoutOpen, setFlyoutOpen] = useState(false);
@@ -137,7 +137,10 @@ const MenuItemWithChildren = ({
     toggleMenu?.(item, status);
   }, [open, toggleMenu, item]);
 
-  const stopLinkPropagation = useCallback((e) => e.stopPropagation(), []);
+  const stopLinkPropagation = useCallback((e) => {
+    e.stopPropagation();
+    onNavigate?.();
+  }, [onNavigate]);
 
   const handleMouseEnter = useCallback((e) => {
     if (!isCollapsed) return;
@@ -200,6 +203,7 @@ const MenuItemWithChildren = ({
                 item={child}
                 theme={theme}
                 activeMenuItems={activeMenuItems}
+                onNavigate={onNavigate}
               />
             ))}
           </ul>
@@ -209,7 +213,7 @@ const MenuItemWithChildren = ({
   );
 };
 
-const MenuItem = ({ item, theme, activeMenuItems, isCollapsed }) => {
+const MenuItem = ({ item, theme, activeMenuItems, isCollapsed, onNavigate }) => {
   const [flyoutOpen, setFlyoutOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const closeTimerRef = useRef(null);
@@ -262,7 +266,7 @@ const MenuItem = ({ item, theme, activeMenuItems, isCollapsed }) => {
           />
         </>
       ) : (
-        <Box component={Link} to={item.url} sx={expandedItemSx}>
+        <Box component={Link} to={item.url} onClick={onNavigate} sx={expandedItemSx}>
           <MenuIcon icon={item.icon} size={16} />
           <Typography ml={1}>{item.label}</Typography>
         </Box>
@@ -273,7 +277,7 @@ const MenuItem = ({ item, theme, activeMenuItems, isCollapsed }) => {
 
 const SideMenu = ({ menuItems, isCollapsed }) => {
   const location = useLocation();
-  const { settings } = useLayoutContext();
+  const { settings, updateSidenav } = useLayoutContext();
   const [activeMenuItems, setActiveMenuItems] = useState([]);
 
   const theme = useMemo(
@@ -301,6 +305,10 @@ const SideMenu = ({ menuItems, isCollapsed }) => {
       activateMenu();
     }
   }, [activateMenu]);
+
+  const handleNavigate = useCallback(() => {
+    updateSidenav({ isCollapsed: true });
+  }, [updateSidenav]);
 
   const toggleMenu = useCallback((menuItem, show) => {
     manualToggleRef.current = Date.now();
@@ -332,6 +340,7 @@ const SideMenu = ({ menuItems, isCollapsed }) => {
               toggleMenu={toggleMenu}
               activeMenuItems={activeMenuItems}
               isCollapsed={isCollapsed}
+              onNavigate={handleNavigate}
             />
           ) : (
             <MenuItem
@@ -340,6 +349,7 @@ const SideMenu = ({ menuItems, isCollapsed }) => {
               theme={theme}
               activeMenuItems={activeMenuItems}
               isCollapsed={isCollapsed}
+              onNavigate={handleNavigate}
             />
           ),
         )}

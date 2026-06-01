@@ -22,7 +22,7 @@ export const getFlyoutItemSx = (isActive) => ({
   borderRadius: "10px",
   transition: "color 0.15s, background-color 0.15s",
   fontWeight: 400,
-  color: isActive ? "primary.main" : "#5a6270",
+  color: isActive ? "primary.main" : "text.secondary",
   backgroundColor: isActive ? "action.hover" : "transparent",
   "&:hover": {
     color: "primary.main",
@@ -41,7 +41,7 @@ export const getCollapsedIconBoxSx = (isActive) => ({
   backgroundColor: isActive ? "common.white" : "transparent",
   transition: "all 0.2s ease",
   "&:hover": {
-    backgroundColor: isActive ? "common.white" : "rgba(255,255,255,0.12)",
+    backgroundColor: isActive ? "common.white" : "action.hover",
   },
 });
 
@@ -74,7 +74,7 @@ export const getExpandedMenuItemSx = (isActive, theme) => ({
   color: isActive ? theme.item.active : theme.item.color,
   textDecoration: "none",
   borderRadius: "8px",
-  "&:hover": { backgroundColor: "rgba(255,255,255,0.1)" },
+  "&:hover": { backgroundColor: "action.hover" },
 });
 
 export const menuIconImgSx = (size) => ({

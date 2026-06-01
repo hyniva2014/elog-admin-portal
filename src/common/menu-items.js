@@ -38,6 +38,12 @@ const MENU_ITEMS = [
         url: "/device-model-management",
         parentKey: "device-management",
       },
+      {
+        key: "request-device",
+        label: "Request Device",
+        url: "/request-device",
+        parentKey: "device-management",
+      },
     ],
   },
   {
@@ -45,12 +51,6 @@ const MENU_ITEMS = [
     label: "User Management",
     url: "/user-management",
     icon: GroupIcon,
-  },
-  {
-    key: "request-device",
-    label: "Request Device",
-    url: "/request-device",
-    icon: TabletMacIcon,
   },
 ];
 export { MENU_ITEMS };
