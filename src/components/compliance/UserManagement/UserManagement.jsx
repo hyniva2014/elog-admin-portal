@@ -318,6 +318,7 @@ const UserManagement = () => {
           setData={setData}
           paginationMode="server"
           getRowHeight={handleGetRowHeight}
+          checkboxSelection={false}
           showMuiLoading={false}
           useAutoHeight={true}
         />

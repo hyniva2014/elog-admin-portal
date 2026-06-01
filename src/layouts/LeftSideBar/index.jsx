@@ -1,67 +1,44 @@
+import { useCallback, useEffect } from "react";
 import { Drawer } from "@mui/material";
 import LogoBox from "./LogoBox";
 import SideMenu from "./SideMenu";
-import { changeHTMLAttribute, getMenuItems, getFleetMenuItems } from "@src/helpers/menu";
+import { changeHTMLAttribute, getMenuItems } from "@src/helpers/menu";
 import { useLayoutContext } from "@src/states";
 import { useViewPort } from "@src/hooks";
-import { useState, useEffect } from "react";
 import { LeftSideBarWrapper, SidebarScrollContainer } from "./index.styles";
 
-const SideBarContent = ({ isCollapsed,isVisible }) => {
-    const allMenuItems = [
-    ...getMenuItems(),
-  ];
+const SideBarContent = ({ isCollapsed, isVisible }) => {
+  const allMenuItems = getMenuItems();
   return isVisible ? (
     <SideMenu menuItems={allMenuItems} isCollapsed={isCollapsed} />
   ) : null;
 };
+
 const LeftSideBarMenu = () => {
-  const { settings, updateSidenav } = useLayoutContext();
-  const [isHoverExpanded, setIsHoverExpanded] = useState(false);
-
-  const handleMouseEnter = () => {
-    if (settings.sidenav.mode !== "default") {
-      return;
-    }
-
-    setIsHoverExpanded(true);
-
-    if (settings.sidenav.isCollapsed) {
-      updateSidenav({
-        isCollapsed: false,
-      });
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (!isHoverExpanded || settings.sidenav.mode !== "default") {
-      return;
-    }
-
-    setIsHoverExpanded(false);
-    updateSidenav({
-      isCollapsed: true,
-    });
-  };
+  const { settings } = useLayoutContext();
 
   return (
     <LeftSideBarWrapper
       settings={settings}
       className="app-menu-do-not-remove"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
       <LogoBox backgroundColor isCollapsed={settings.sidenav.isCollapsed} />
       <SidebarScrollContainer>
-        <SideBarContent isCollapsed={settings.sidenav.isCollapsed} isVisible={true}/>
+        <SideBarContent isCollapsed={settings.sidenav.isCollapsed} isVisible />
       </SidebarScrollContainer>
     </LeftSideBarWrapper>
   );
 };
+
 const LeftSideBar = () => {
   const { width } = useViewPort();
   const { settings, updateSidenav } = useLayoutContext();
   const showMobileMenu = settings.sidenav.showMobileMenu;
+
+  useEffect(() => {
+    updateSidenav({ isCollapsed: true });
+  }, []);
+
   useEffect(() => {
     changeHTMLAttribute("data-mode", settings.theme);
   }, [settings.theme]);
@@ -76,18 +53,18 @@ const LeftSideBar = () => {
       updateSidenav({
         mode: "mobile",
       });
-    } else if (width >= 1140 && settings.sidenav.mode == "mobile") {
+    } else if (width >= 1140 && settings.sidenav.mode === "mobile") {
       updateSidenav({
         mode: "default",
       });
     }
-  }, [width]);
-  const hideSideNavMobile = () => {
+  }, [width, updateSidenav, settings.sidenav.mode]);
+  const hideSideNavMobile = useCallback(() => {
     updateSidenav({
       showMobileMenu: false,
     });
-  };
-  return settings.sidenav.mode == "default" ? (
+  }, [updateSidenav]);
+  return settings.sidenav.mode === "default" ? (
     <LeftSideBarMenu />
   ) : (
     <Drawer open={showMobileMenu} onClose={hideSideNavMobile}>
@@ -95,4 +72,5 @@ const LeftSideBar = () => {
     </Drawer>
   );
 };
+
 export default LeftSideBar;

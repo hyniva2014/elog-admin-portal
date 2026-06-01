@@ -81,7 +81,9 @@ const CommonDataGrid = ({
       if (!virtualScroller) return;
       const scrollLeft = virtualScroller.scrollLeft;
       const stickyHeaders = root.querySelectorAll(
-        ".MuiDataGrid-columnHeader.sticky-col-left-1, .MuiDataGrid-columnHeader.sticky-col-left-2, .MuiDataGrid-columnHeaderCheckbox",
+        ".MuiDataGrid-columnHeaderCheckbox, \
+        .MuiDataGrid-columnHeader.sticky-col-left-1, \
+        .MuiDataGrid-columnHeader.sticky-col-left-2",
       );
       stickyHeaders.forEach((el) => {
         el.style.setProperty(
