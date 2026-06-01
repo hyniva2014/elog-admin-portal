@@ -8,6 +8,9 @@ export const COLORS = {
   success: "#2e7d32",
   error: "#c62828",
   grey: "#6B7280",
+  warning: "#ed6c02",
+  orange: "#FFA726",
+  textPrimary: "#111827",
 };
 
 export const HeaderContainer = styled(Box)(({ theme }) => ({
@@ -52,9 +55,17 @@ export const CancelEditButton = styled(Button)(({ theme }) => ({
   backgroundColor: COLORS.lightBlue,
 }));
 
-export const StatusTypography = styled(Typography)(({ value }) => ({
-  color: value === "Active" ? COLORS.success : COLORS.error,
-}));
+// export const StatusTypography = styled(Typography)(({ value }) => ({
+//   color: value === "Active" ? COLORS.success : COLORS.error,
+// }));
+
+export const StatusTypography = styled(Typography)(({ value }) => {
+  let color = COLORS.textPrimary;
+  if (value === "Assigned") color = COLORS.success;
+  else if (value === "In Stock") color = COLORS.warning;
+  else if (value === "Allocated") color = COLORS.orange;
+  return { color, fontWeight: 600 };
+});
 
 export const actionIconSx = {
   fontSize: 20,
