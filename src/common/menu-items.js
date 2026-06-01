@@ -46,5 +46,11 @@ const MENU_ITEMS = [
     url: "/user-management",
     icon: GroupIcon,
   },
+  {
+    key: "request-device",
+    label: "Request Device",
+    url: "/request-device",
+    icon: TabletMacIcon,
+  },
 ];
 export { MENU_ITEMS };

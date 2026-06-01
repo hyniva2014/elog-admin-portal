@@ -28,12 +28,9 @@ export const getColumns = (onView) => [
     maxWidth: 280,
     headerTooltip: true,
     flex: 1,
-    // align: "center",
-    // headerAlign: "center",
     cellClassName: "sticky-col-left-1",
     headerClassName: "sticky-col-left-1",
   },
-
   {
     field: "deviceModel",
     headerName: "Device Model",
@@ -42,8 +39,6 @@ export const getColumns = (onView) => [
     maxWidth: 280,
     headerTooltip: true,
     flex: 1,
-    // align: "center",
-    // headerAlign: "center",
     cellClassName: "sticky-col-left-2",
     headerClassName: "sticky-col-left-2",
   },
@@ -134,7 +129,11 @@ export const transformDeviceAssetData = (apiData) => {
     createdOn: item.created_at || null,
     updatedOn: item.updated_at || null,
     status:
-      item.status === "1" ? "Active" : item.status === "0" ? "Inactive" : "-",
+      item.status === "2"
+        ? "Assigned"
+        : item.status === "1"
+          ? "Allocated"
+          : "In Stock",
     imeiNumber: item.imei_number || "-",
     firmware: item.firmware || "-",
     manufacturerName: item.manufacturer_name || "-",
