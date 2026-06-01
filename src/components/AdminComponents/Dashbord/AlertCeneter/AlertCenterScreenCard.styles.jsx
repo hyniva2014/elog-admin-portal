@@ -9,7 +9,7 @@ export const AlertsContainer = styled(Box)(() => ({
 }));
 
 export const AlertCardContainer = styled(Paper)(({ theme, detailsPanel }) => ({
-  paddingLeft: "16px",
+  paddingLeft: detailsPanel ? theme.spacing(2) : 0,
   paddingTop: 0,
   paddingRight: detailsPanel ? theme.spacing(2) : 0,
   border: `1px solid ${theme.palette.grey[200]}`,
@@ -147,22 +147,22 @@ export const Badge = styled(Box, {
     variant === "critical"
       ? theme.palette.error.lighter
       : variant === "warning"
-      ? theme.palette.warning.lighter
-      : variant === "info"
-      ? theme.palette.info.lighter
-      : variant === "success"
-      ? theme.palette.success.lighter
-      : theme.palette.grey[100],
+        ? theme.palette.warning.lighter
+        : variant === "info"
+          ? theme.palette.info.lighter
+          : variant === "success"
+            ? theme.palette.success.lighter
+            : theme.palette.grey[100],
   color:
     variant === "critical"
       ? theme.palette.error.main
       : variant === "warning"
-      ? theme.palette.warning.dark
-      : variant === "info"
-      ? theme.palette.info.dark
-      : variant === "success"
-      ? theme.palette.success.dark
-      : theme.palette.text.secondary,
+        ? theme.palette.warning.dark
+        : variant === "info"
+          ? theme.palette.info.dark
+          : variant === "success"
+            ? theme.palette.success.dark
+            : theme.palette.text.secondary,
 }));
 
 // Information Grid Section
@@ -178,7 +178,7 @@ export const TriggerSection = styled(Box)(({ theme }) => ({
   gap: 16,
   backgroundColor: alpha(theme.palette.warning.main, 0.09),
   padding: 16,
-  border : `1px solid ${theme.palette.warning.lighter}`,
+  border: `1px solid ${theme.palette.warning.lighter}`,
   borderRadius: 6,
 }));
 
@@ -207,9 +207,11 @@ export const TriggerSectionTitle = styled(Typography)(({ theme }) => ({
 export const InfoGrid = styled(Box)(({ theme }) => ({
   display: "grid",
 
-  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
 
   gap: 16,
+
+  backgroundColor: theme.palette.grey[100],
 
   [theme.breakpoints.down("md")]: {
     gridTemplateColumns: "repeat(2, 1fr)",
@@ -406,7 +408,7 @@ export const AlertOpen = styled(Typography, {
 export const ELDTag = styled(Box)(({ theme }) => ({
   padding: "4px 10px",
   borderRadius: 6,
-  background: theme.palette.primary.lighter,
+  background: theme.palette.cyan?.[50],
   color: theme.palette.primary.main,
   fontSize: 12,
   width: "fit-content",
@@ -425,4 +427,149 @@ export const AlertScreenHeaderContainer = styled(Box)(({ theme }) => ({
 
 export const AlertSummaryCardBox = styled(Box)(({ theme }) => ({
   marginTop: theme.spacing(2),
+}));
+
+// Add these to your existing styles file
+
+export const DateSection = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
+  // backgroundColor: theme.palette.grey[50],
+  borderRadius: theme.spacing(1),
+  marginTop: theme.spacing(2),
+  // marginBottom: theme.spacing(2),
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+}));
+
+export const DateText = styled(Typography)(({ theme }) => ({
+  fontSize: 14,
+  fontWeight: 500,
+  color: theme.palette.text.secondary,
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing(1),
+}));
+
+export const DividerLine = styled(Box)(({ theme }) => ({
+  height: 1,
+  backgroundColor: theme.palette.divider,
+  margin: `${theme.spacing(2)} 0`,
+}));
+
+// export const ConversationContainer = styled(Box)(({ theme }) => ({
+//   display: "flex",
+//   flexDirection: "column",
+//   gap: theme.spacing(2),
+//   marginTop: theme.spacing(1),
+//   marginBottom: theme.spacing(2),
+// }));
+
+// export const ConversationMessage = styled(Box)(({ theme, isCurrentUser }) => ({
+//   display: "flex",
+//   flexDirection: "column",
+//   alignItems: isCurrentUser ? "flex-end" : "flex-start",
+//   padding: theme.spacing(1.5),
+//   backgroundColor: isCurrentUser
+//     ? theme.palette.primary.light
+//     : theme.palette.grey[100],
+//   borderRadius: theme.spacing(1.5),
+//   maxWidth: "80%",
+//   alignSelf: isCurrentUser ? "flex-end" : "flex-start",
+//   marginLeft: isCurrentUser ? "auto" : 0,
+// }));
+
+export const MessageHeader = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing(1),
+  marginBottom: theme.spacing(0.5),
+}));
+
+// export const MessageContent = styled(Typography)(({ theme }) => ({
+//   fontSize: 14,
+//   color: theme.palette.text.primary,
+//   wordBreak: "break-word",
+// }));
+
+// export const Timestamp = styled(Typography)(({ theme }) => ({
+//   fontSize: 11,
+//   color: theme.palette.text.secondary,
+// }));
+
+//---------------------------
+
+export const ConversationContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: theme.spacing(2),
+  padding: theme.spacing(2),
+}));
+
+export const ConversationMessage = styled(Box)(({ isCurrentUser }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: isCurrentUser ? "flex-end" : "flex-start",
+  gap: "10px",
+  width: "100%",
+  marginBottom: "12px",
+}));
+
+export const AvatarCircle = styled(Box)(({ theme }) => ({
+  width: 40,
+  height: 40,
+  borderRadius: "50%",
+  background: "#D50000",
+  color: "#fff",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontWeight: 600,
+  fontSize: 14,
+  flexShrink: 0,
+}));
+
+export const MessageBubble = styled(Box)(({ theme, isCurrentUser }) => ({
+  maxWidth: "70%",
+  padding: "12px 16px",
+  borderRadius: "16px",
+  border: "1px solid #E0E0E0",
+
+  backgroundColor: "#fff",
+
+  display: "flex",
+  alignItems: "center",
+  flexDirection: "row",
+  flexWrap: "wrap",
+  flexcontent: "center",
+  gap: "6px",
+}));
+
+export const MessageContent = styled(Typography)(({ theme }) => ({
+  fontSize: 15,
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+  color: theme.palette.text.primary,
+}));
+
+export const Timestamp = styled("span")(({ theme }) => ({
+  fontSize: 13,
+  color: theme.palette.text.secondary,
+  whiteSpace: "nowrap",
+}));
+
+export const RightAvatar = styled("img")({
+  width: 40,
+  height: 40,
+  borderRadius: "50%",
+  objectFit: "cover",
+  flexShrink: 0,
+});
+
+export const MessageText = styled(Typography)(({ theme }) => ({
+  fontSize: 14,
+  fontWeight: 400,
+  color: theme.palette.text.primary,
+  lineHeight: 1.4,
 }));

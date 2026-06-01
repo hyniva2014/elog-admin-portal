@@ -25,13 +25,27 @@ import {
   TriggerInfoCard,
   ActionSection,
   ActionButton,
+  ConversationContainer,
+  ConversationMessage,
+  MessageHeader,
+  MessageContent,
+  Timestamp,
+  DateSection,
+  DateText,
+  DividerLine,
+  AvatarCircle,
+  MessageBubble,
+  RightAvatar,
+  MessageText,
 } from "./AlertCenterScreenCard.styles.jsx";
 
 import HOS from "../../../../assets/images/active/Hos.png";
 import LocationIcon from "../../../../assets/images/active/Icon-3.png";
+import TpLogo from "../../../../assets/images/TP logo.png";
 
 import {
   ACTION_BUTTONS,
+  defaultConversations,
   getDriverDeviceInfo,
   getTriggerInfo,
 } from "./AlertDetailsPanel.utils";
@@ -89,6 +103,21 @@ const TriggerInfoCardItem = ({ label, value }) => (
   </TriggerInfoCard>
 );
 
+const ConversationItem = ({ sender, message, time, isCurrentUser }) => {
+  return (
+    <ConversationMessage isCurrentUser={isCurrentUser}>
+      {!isCurrentUser && <AvatarCircle>{sender?.substring(0, 2)}</AvatarCircle>}
+
+      <MessageBubble isCurrentUser={isCurrentUser}>
+        <MessageText>{message}</MessageText>
+        <Timestamp>{time}</Timestamp>
+      </MessageBubble>
+
+      {isCurrentUser && <RightAvatar src={TpLogo} alt="TP" />}
+    </ConversationMessage>
+  );
+};
+
 const AlertDetailsPanel = ({ selectedAlert }) => {
   if (!selectedAlert) return null;
 
@@ -101,35 +130,44 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
     location1,
     location2,
     city,
+    date,
+    conversations = [],
   } = selectedAlert;
 
   const displayTitle = title || message;
-
   const displaySeverity = severity || "Critical";
-
   const primaryLocation = location1 || city;
+  const formattedDate = date || "25 April";
 
   const driverInfo = getDriverDeviceInfo(company, truck);
-
   const triggerInfo = getTriggerInfo();
+
+  const conversationList =
+    conversations.length > 0 ? conversations : defaultConversations;
+
+  const conversationItems = conversationList.map((conv, index) => (
+    <ConversationItem
+      key={index}
+      sender={conv.sender}
+      message={conv.message}
+      time={conv.time}
+      isCurrentUser={conv.isCurrentUser}
+    />
+  ));
 
   return (
     <AlertCardContainer detailsPanel>
       <DetailHeader>
         <AlertDetailItem mt={2}>
           <DetailAlertIcon src={HOS} alt="Alert type icon" />
-
           <DetailTitleWrapper>
             <DetailTitle>{displayTitle}</DetailTitle>
-
             <DetailSubTitle>{displaySeverity}</DetailSubTitle>
           </DetailTitleWrapper>
         </AlertDetailItem>
       </DetailHeader>
 
       <InfoSection>
-        <SectionTitle>Driver &amp; Device Information</SectionTitle>
-
         <InfoGrid>
           {driverInfo.map(({ label, value, isStatus }) => (
             <DriverInfoCardItem
@@ -139,41 +177,21 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
               isStatus={isStatus}
             />
           ))}
-
-          <InfoCard>
-            <InfoLabel>Current Location</InfoLabel>
-
-            <LocationItem>
-              <LocationContentItem
-                primaryLocation={primaryLocation}
-                location2={location2}
-              />
-            </LocationItem>
-          </InfoCard>
         </InfoGrid>
       </InfoSection>
 
-      <TriggerSection>
-        <TriggerSectionTitle>Trigger Information</TriggerSectionTitle>
+      {/* <DividerLine /> */}
 
-        <TriggerInfoGrid>
-          {triggerInfo.map(({ label, value }) => (
-            <TriggerInfoCardItem
-              key={label}
-              label={label}
-              value={value}
-            />
-          ))}
-        </TriggerInfoGrid>
-      </TriggerSection>
+      {/* Date Section */}
+      <DateSection>
+        <DateText>{formattedDate}</DateText>
+      </DateSection>
 
-      <ActionSection>
-        <Grid container spacing={2}>
-          {ACTION_BUTTONS.map((label) => (
-            <AlertActionButton key={label} label={label} />
-          ))}
-        </Grid>
-      </ActionSection>
+      {/* Conversation Section */}
+      <ConversationContainer>
+        <SectionTitle>Conversation</SectionTitle>
+        {conversationItems}
+      </ConversationContainer>
     </AlertCardContainer>
   );
 };

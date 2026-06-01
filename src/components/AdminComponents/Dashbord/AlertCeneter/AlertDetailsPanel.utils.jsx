@@ -59,3 +59,26 @@ export const getTriggerInfo = () => [
     value: "Device Connection Lost",
   },
 ];
+
+
+// Sample conversation data if not provided
+export const defaultConversations = [
+  {
+    sender: "TP",
+    message: "Hello Emily Wilson!",
+    time: "10:25",
+    isCurrentUser: true,
+  },
+  {
+    sender: "EW",
+    message: "Hello",
+    time: "10:26",
+    isCurrentUser: false,
+  },
+  {
+    sender: "TP",
+    message: "Your 14-Hour Limit Approaching",
+    time: "10:27",
+    isCurrentUser: true,
+  },
+];

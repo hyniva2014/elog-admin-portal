@@ -151,6 +151,9 @@ const DeviceManagement = () => {
           }}
           setData={setData}
           paginationMode="server"
+          checkboxSelection
+          onRowSelectionModelChange={handleRowSelectionChange}
+          isRowSelectable={isDeviceSelectable}
           getRowHeight={() => "auto"}
         />
       </PageContainer>

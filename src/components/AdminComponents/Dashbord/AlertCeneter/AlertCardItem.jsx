@@ -21,6 +21,8 @@ import TruckIcon from "../../../../assets/images/active/Truck.png";
 import TimeIcon from "../../../../assets/images/active/ti.png";
 import { AlertAccentBar } from "../AlertCenter.styles";
 
+
+
 const AlertCardItem = ({ item, isSelected, onSelect }) => {
   const {
     role,
@@ -35,7 +37,9 @@ const AlertCardItem = ({ item, isSelected, onSelect }) => {
     city,
     time,
   } = item;
-
+  
+  const accentBar = isSelected && <AlertAccentBar accentcolor={color} />;
+  
   const handleClick = useCallback(() => {
     onSelect(item);
   }, [item, onSelect]);
@@ -48,7 +52,7 @@ const AlertCardItem = ({ item, isSelected, onSelect }) => {
 
   return (
     <AlertCard accentcolor={color} active={isSelected} onClick={handleClick}>
-      <AlertAccentBar accentcolor={color} />
+      {accentBar}
 
       <AlertContent>
         <AlertTopRow>
