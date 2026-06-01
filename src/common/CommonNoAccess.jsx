@@ -1,0 +1,17 @@
+import { Box, Typography } from "@mui/material";
+import {
+  NoAccessContainerSx,
+  NoAccessSubtitleSx,
+  NoAccessTitleSx,
+} from "./CommonNoAccess.styled";
+
+const CommonNoAccess = ({ height = "80vh", message = "No Access" }) => (
+  <Box sx={[NoAccessContainerSx, { height }]}> 
+    <Typography sx={NoAccessTitleSx}>🚫 {message}</Typography>
+    <Typography sx={NoAccessSubtitleSx}>
+      You don’t have permission to view this page
+    </Typography>
+  </Box>
+);
+
+export default CommonNoAccess;

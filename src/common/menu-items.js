@@ -48,5 +48,11 @@ const MENU_ITEMS = [
     url: "/user-management",
     icon: GroupIcon,
   },
+  {
+    key: "career-users-management",
+    label: "Career Users Management",
+    url: "/career-users",
+    icon: GroupIcon,
+  },
 ];
 export { MENU_ITEMS };
