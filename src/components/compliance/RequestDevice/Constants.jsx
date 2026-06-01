@@ -1,38 +1,32 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import eyeIcon from "../../../assets/images/svg/eyeicon.png";
-import { IconButton } from "@mui/material";
+import { IconButton, useTheme } from "@mui/material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import dayjs from "dayjs";
+import { StatusText } from "./RequestDevice.styled";
 
 const formatDate = (iso) => {
   return iso ? dayjs(iso).format("MMM DD, YYYY") : "-";
 };
 
-const STATUS_COLORS = {
-  Pending: "#ED6C02",
-  Approved: "#2E7D32",
+const StatusCell = ({ value }) => {
+  return <StatusText status={value}>{value || "-"}</StatusText>;
 };
 
-const StatusCell = (params) => {
-  const color = STATUS_COLORS[params.value] || "inherit";
-  return (
-    <span style={{ color, fontWeight: 500 }}>
-      {params.value || "-"}
-    </span>
-  );
-};
+const ActionCell = ({ row, colDef }) => {
+  const theme = useTheme();
 
-const ActionCell = (params) => {
-  if (params.row.status === "Pending") {
+  const handleClick = useCallback(() => {
+    colDef.onView?.(row);
+  }, [row, colDef]);
+
+  if (row.status === "Pending") {
     return (
       <IconButton size="small" color="primary">
         <AssignmentIcon fontSize="small" />
       </IconButton>
     );
   }
-  const handleClick = useCallback(() => {
-    params.colDef.onView?.(params.row);
-  }, [params]);
 
   return (
     <IconButton size="small" color="primary" onClick={handleClick}>
