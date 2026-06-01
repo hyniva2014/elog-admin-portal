@@ -1,20 +1,19 @@
 import { Drawer } from "@mui/material";
 import LogoBox from "./LogoBox";
 import SideMenu from "./SideMenu";
-import { changeHTMLAttribute, getMenuItems, getFleetMenuItems } from "@src/helpers/menu";
+import { changeHTMLAttribute, getMenuItems } from "@src/helpers/menu";
 import { useLayoutContext } from "@src/states";
 import { useViewPort } from "@src/hooks";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { LeftSideBarWrapper, SidebarScrollContainer } from "./index.styles";
 
-const SideBarContent = ({ isCollapsed,isVisible }) => {
-    const allMenuItems = [
-    ...getMenuItems(),
-  ];
+const SideBarContent = ({ isCollapsed, isVisible }) => {
+  const allMenuItems = getMenuItems();
   return isVisible ? (
     <SideMenu menuItems={allMenuItems} isCollapsed={isCollapsed} />
   ) : null;
 };
+
 const LeftSideBarMenu = () => {
   const { settings } = useLayoutContext();
 
@@ -48,17 +47,17 @@ const LeftSideBar = () => {
       updateSidenav({
         mode: "mobile",
       });
-    } else if (width >= 1140 && settings.sidenav.mode == "mobile") {
+    } else if (width >= 1140 && settings.sidenav.mode === "mobile") {
       updateSidenav({
         mode: "default",
       });
     }
-  }, [width]);
-  const hideSideNavMobile = () => {
+  }, [width, updateSidenav, settings.sidenav.mode]);
+  const hideSideNavMobile = useCallback(() => {
     updateSidenav({
       showMobileMenu: false,
     });
-  };
+  }, [updateSidenav]);
   return settings.sidenav.mode == "default" ? (
     <LeftSideBarMenu />
   ) : (

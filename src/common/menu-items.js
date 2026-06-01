@@ -1,7 +1,3 @@
-import DashboardIcon from "@src/assets/images/active/Icon.png";
-import AccountManagementIcon from "@src/assets/images/active/Icon-1.png";
-import DeviceManagementIcon from "@src/assets/images/active/Icon-4.png";
-import UserManagementIcon from "@src/assets/images/active/Icon-5.png";
 import { MdDashboard } from "react-icons/md";
 import GroupIcon from '@mui/icons-material/Group';
 import TabletMacIcon from '@mui/icons-material/TabletMac';
