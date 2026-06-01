@@ -49,6 +49,65 @@ const CommonMultiSelectDropdown = ({
     normalizedValue.includes(opt.value),
   );
 
+  const renderAutocompleteOption = (props, option, { selected }) => (
+    <Box component="li" {...props} key={`${option.value}-${option.label}`} sx={OptionListItemSx}>
+      <Checkbox checked={selected} sx={CheckboxIconSx} />
+      {option.label}
+    </Box>
+  );
+
+  const getSelectedValues = (newValue) => newValue.map((opt) => opt.value);
+
+  const handleAutocompleteChange = (_, newValue) => {
+    const selectedValues = getSelectedValues(newValue);
+
+    if (onChange) {
+      onChange(selectedValues);
+      return;
+    }
+
+    if (setData && dataKey) {
+      setData((prev) => ({
+        ...prev,
+        page: 1,
+        [dataKey]: selectedValues,
+      }));
+    }
+  };
+
+  const renderInputField = (params) => {
+    const endAdornment = (
+      <>
+        {loading ? <CircularProgress color="inherit" size={20} /> : null}
+        {params.InputProps.endAdornment}
+      </>
+    );
+
+    return (
+      <TextField
+        {...params}
+        label={label}
+        fullWidth
+        size={size}
+        error={error}
+        helperText={helperText}
+        disabled={disabled}
+        sx={TextFieldSx}
+        InputProps={{
+          ...params.InputProps,
+          endAdornment,
+        }}
+        InputLabelProps={{
+          ...params.InputLabelProps,
+          required: required,
+        }}
+      />
+    );
+  };
+
+  const isOptionEqualToValue = (option, val) => option.value === val?.value;
+  const getOptionLabel = (option) => option.label || "";
+
   return (
     <Autocomplete
       key={`${dataKey}-${uniqueOptions.length}`}
@@ -58,59 +117,13 @@ const CommonMultiSelectDropdown = ({
       options={uniqueOptions}
       filterOptions={filter}
       value={selectedOptions}
-      renderOption={(props, option, { selected }) => (
-        <Box component="li" {...props} key={`${option.value}-${option.label}`} sx={OptionListItemSx}>
-          <Checkbox checked={selected} sx={CheckboxIconSx} />
-          {option.label}
-        </Box>
-      )}
-      getOptionLabel={(option) => option.label || ""}
-      isOptionEqualToValue={(option, val) => option.value === val?.value}
-      onChange={(_, newValue) => {
-        const selectedValues = newValue.map((opt) => opt.value);
-
-        if (onChange) {
-          onChange(selectedValues);
-          return;
-        }
-
-        if (setData && dataKey) {
-          setData((prev) => ({
-            ...prev,
-            page: 1,
-            [dataKey]: selectedValues,
-          }));
-        }
-      }}
+      renderOption={renderAutocompleteOption}
+      getOptionLabel={getOptionLabel}
+      isOptionEqualToValue={isOptionEqualToValue}
+      onChange={handleAutocompleteChange}
       loading={loading}
       disabled={disabled}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label={label}
-          fullWidth
-          size={size}
-          error={error}
-          helperText={helperText}
-          disabled={disabled}
-          sx={TextFieldSx}
-          InputProps={{
-            ...params.InputProps,
-            endAdornment: (
-              <>
-                {loading ? (
-                  <CircularProgress color="inherit" size={20} />
-                ) : null}
-                {params.InputProps.endAdornment}
-              </>
-            ),
-          }}
-          InputLabelProps={{
-            ...params.InputLabelProps,
-            required: required,
-          }}
-        />
-      )}
+      renderInput={renderInputField}
       sx={AutocompleteSx(minWidth)}
     />
   );

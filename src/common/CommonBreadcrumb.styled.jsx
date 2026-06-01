@@ -1,3 +1,16 @@
+import { styled } from "@mui/material/styles";
+import { Typography } from "@mui/material";
+
+export const BreadcrumbText = styled(Typography)(({ theme }) => ({
+  fontSize: "15px",
+  color: theme.palette.text.secondary,
+}));
+
+export const BreadcrumbBold = styled("span")(({ theme }) => ({
+  fontWeight: 600,
+  color: theme.palette.text.primary,
+}));
+
 export const BreadcrumbItemSx = {
   display: "inline-flex",
   alignItems: "center",

@@ -138,4 +138,6 @@ export const CsvIconSx = {
 export const ErrorTextSx = {
   display: "block",
   mt: 0.5,
+  color: "error.main",
+  fontSize: 12,
 };

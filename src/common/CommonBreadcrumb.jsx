@@ -1,7 +1,8 @@
 import { Box, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { BreadcrumbBold, BreadcrumbText } from "../components/compliance/CareerUsersManagement/Constants";
 import {
+  BreadcrumbBold,
+  BreadcrumbText,
   BreadcrumbItemSx,
   BreadcrumbLinkSx,
   BreadcrumbSeparatorSx,

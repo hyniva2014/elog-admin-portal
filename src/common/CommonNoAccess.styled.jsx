@@ -1,11 +1,12 @@
-export const NoAccessContainerSx = {
+export const NoAccessWrapperSx = (height) => ({
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
   textAlign: "center",
   px: 2,
-};
+  height,
+});
 
 export const NoAccessTitleSx = (theme) => ({
   fontSize: "20px !important",

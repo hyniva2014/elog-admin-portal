@@ -33,6 +33,13 @@ export const PreviewImageSx = {
   objectFit: "contain",
 };
 
+export const PreviewSubtitleSx = (theme) => ({
+  fontWeight: 400,
+  fontSize: 12,
+  color: theme.palette.text.primary,
+  marginTop: 0,
+});
+
 export const OcrOverlaySx = {
   position: "absolute",
   top: 0,

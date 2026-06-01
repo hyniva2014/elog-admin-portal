@@ -1,5 +1,12 @@
-// import Tesseract from 'tesseract.js';
 import dayjs from 'dayjs';
+
+const defaultCdlResult = {
+  cdl_number: '',
+  cdl_state: '',
+  cdl_class: '',
+  cdl_expiry_date: null,
+  confidence: 0,
+};
 
 /**
  * Extract CDL information from uploaded license image using OCR
@@ -7,87 +14,15 @@ import dayjs from 'dayjs';
  * @returns {Promise<Object>} - Extracted CDL information
  */
 export const extractCDLFromImage = async (imageFile, onProgress) => {
-  try {
-    const img = new Image();
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+  console.warn(
+    'CDL OCR is not enabled because tesseract.js is not installed. Returning fallback CDL data.',
+  );
 
-    
-    return new Promise((resolve, reject) => {
-      img.onload = async () => {
-        try {
-          canvas.width = img.width;
-          canvas.height = img.height;
-          
-          ctx.drawImage(img, 0, 0);
-          
-          const result = await Tesseract.recognize(
-            canvas,
-            'eng',
-            {
-              logger: m => {
-                if (m.status === 'recognizing text') {
-                  if (onProgress) {
-                    onProgress(Math.round(m.progress * 100));
-                  }
-                }
-              },
-            }
-          );
-          
-          
-          const extractedData = parseCDLText(result.data.text);
-          
-          resolve(extractedData);
-        } catch (error) {
-          console.error('OCR Error:', error);
-          resolve({
-            cdl_number: '',
-            cdl_state: '',
-            cdl_class: '',
-            cdl_expiry_date: null,
-            confidence: 0
-          });
-        }
-      };
-      
-      img.onerror = () => {
-        console.error('Failed to load image');
-        resolve({
-          cdl_number: '',
-          cdl_state: '',
-          cdl_class: '',
-          cdl_expiry_date: null,
-          confidence: 0
-        });
-      };
-      
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        img.src = e.target.result;
-      };
-      reader.onerror = () => {
-        console.error('Failed to read file');
-        resolve({
-          cdl_number: '',
-          cdl_state: '',
-          cdl_class: '',
-          cdl_expiry_date: null,
-          confidence: 0
-        });
-      };
-      reader.readAsDataURL(imageFile);
-    });
-  } catch (error) {
-    console.error('CDL OCR Error:', error);
-    return {
-      cdl_number: '',
-      cdl_state: '',
-      cdl_class: '',
-      cdl_expiry_date: null,
-      confidence: 0
-    };
+  if (typeof onProgress === 'function') {
+    onProgress(100);
   }
+
+  return defaultCdlResult;
 };
 
 /**

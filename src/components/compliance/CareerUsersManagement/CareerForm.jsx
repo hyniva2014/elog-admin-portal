@@ -1,11 +1,14 @@
-import { Grid, Typography, Button, Box } from "@mui/material";
-// import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
+import { Box } from "@mui/material";
 import CareerUserForm from "./CareerUserForm";
 import {
-  InspectionContainer,
-  LoadingBox,
-  SubmitButton,
-} from "./CareerManagement.styled";
+  CareerFormContainer,
+  CareerFormHeader,
+  CareerFormStepper,
+  StepRow,
+  StepItem,
+  StepLabel,
+  CareerFormContent,
+} from "./CareerForm.styled";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { useServices } from "../../../services/services";
@@ -15,7 +18,6 @@ import CommonSnackbar from "../../../common/CommonSnackbar";
 import CommonBreadcrumb from "../../../common/CommonBreadcrumb";
 import dayjs from "dayjs";
 import { citizenshipMap, defaultPageSize, languageMap } from "./Constants";
-// import { hasPermission } from "./Constants";
 import UserAddHeader from "./HeaderComponents/UserAddHeader";
 import UserTopHeader from "./HeaderComponents/UserTopHeader";
 
@@ -52,7 +54,6 @@ const debounce = (func, delay) => {
 };
 
 const CareerForm = () => {
-  //   const { action, userId } = useParams();
   const { userId } = useParams();
 
   const isEditMode = Boolean(userId);
@@ -84,7 +85,6 @@ const CareerForm = () => {
     setEditMode(false);
   };
 
-  // Update editMode when mode changes
   useEffect(() => {
     if (mode === "add") {
       setEditMode(true);
@@ -120,37 +120,10 @@ const CareerForm = () => {
   const breadcrumbs = [
     { label: "Compliance", path: "/compliance" },
     { label: "Career Users Management", path: "/career-users" },
-    // { label: action === "edit" && userId ? "Career User Edit" : "Add Career User" },
     { label: userId ? "Career User View" : "Add Career User" },
   ];
 
   const lastActiveStepRef = useRef(-1);
-
-  //   useEffect(() => {
-  //     if (action === "edit" && userId) {
-  //       setMode("edit");
-  //       setLoadingState(true);
-  //       fetchUserData();
-  //     } else if (action === "add") {
-  //       setMode("add");
-  //       setLoading(true);
-  //       setTimeout(() => setLoading(false), 1000);
-  //     }
-  //   }, [action, userId]);
-  // useEffect(() => {
-  //   if (userId) {
-  //     setMode("edit");
-  //     setLoadingState(true);
-  //     fetchUserData();
-  //   } else {
-  //     setMode("add");
-  //     setLoading(true);
-
-  //     setTimeout(() => {
-  //       setLoading(false);
-  //     }, 500);
-  //   }
-  // }, [userId]);
   useEffect(() => {
     if (isEditMode) {
       fetchUserData();
@@ -163,9 +136,6 @@ const CareerForm = () => {
       setLoadingState(true);
       setLoading(true);
 
-      //   const response = await fetchApi(
-      //     `/user/get-users?company_id=${companyId}&user_id=${userId}&page=1&limit=${defaultPageSize}`,
-      //   );
       const response = await fetchApi(
         `/masteradmin/superuser/get-superusers?company_id=${companyId}&user_id=${userId}&page=1&limit=${defaultPageSize}`,
       );
@@ -194,8 +164,6 @@ const CareerForm = () => {
         }
       }
 
-      // address_type === "1" => primary
-      // address_type === "2" => secondary
       const primaryAddress = Array.isArray(data.address)
         ? data.address.find((addr) => String(addr.address_type) === "1") || {}
         : {};
@@ -229,13 +197,11 @@ const CareerForm = () => {
         email: data.email || "",
         phone: formatPhoneNumber(data.phone || ""),
 
-        // response key is emergency_contact_number
         alternate_contact_number: formatPhoneNumber(
           data.alternate_contact_number || "",
         ),
         total_years_of_experince: data.total_years_of_experince || "",
 
-        // PRIMARY ADDRESS from address[]
         address_line1:
           primaryAddress.street || data.street || data.address_line1 || "",
         city: primaryAddress.city || data.city || "",
@@ -243,7 +209,6 @@ const CareerForm = () => {
         zip_code: primaryAddress.zipcode || data.zipcode || "",
         country: primaryAddress.country || data.country || "",
 
-        // SECONDARY ADDRESS from address[]
         secondary_address_line: secondaryAddress.street || "",
         secondary_city: secondaryAddress.city || "",
         secondary_states: secondaryAddress.state || "",
@@ -258,8 +223,6 @@ const CareerForm = () => {
           secondaryAddress.zipcode === primaryAddress.zipcode &&
           secondaryAddress.street !== "" &&
           secondaryAddress.street !== undefined,
-
-        // citizenship: data.citizenship ? Number(data.citizenship) : null,
 
         citizenship:
           citizenshipMap[data.citizenship] ?? Number(data.citizenship) ?? null,
@@ -279,11 +242,8 @@ const CareerForm = () => {
             ? dayjs(data.passport_expiry_date || data.passport_visa_expiry)
             : null,
 
-        // if backend sends work_permit date later, this will work
         work_permit: data.work_permit ? dayjs(data.work_permit) : null,
 
-        // if you are using same field for work permit country
-        // keep this only if your form is intentionally using `country`
         work_permit_country:
           Number(data.citizenship) === 4 ? data.work_permit_country || "" : "",
 
@@ -293,14 +253,6 @@ const CareerForm = () => {
 
         role: data.role_id || "",
 
-        // language: Array.isArray(data.language)
-        //   ? data.language.map(Number)
-        //   : typeof data.language === "string"
-        //     ? data.language
-        //         .split(",")
-        //         .map((l) => Number(l.trim()))
-        //         .filter((l) => !isNaN(l))
-        //     : [Number(data.language) || 1],
         language:
           typeof data.language === "string"
             ? data.language
@@ -400,8 +352,6 @@ const CareerForm = () => {
           country: formValues.country || "",
         }),
 
-        // vendor_address: `${formValues.address_line1 || ""}, ${formValues.city || ""}, ${formValues.states || ""} ${formValues.zip_code || ""}`,
-
         secondary_address: JSON.stringify({
           street: formValues.secondary_address_line || "",
           city: formValues.secondary_city || "",
@@ -466,7 +416,6 @@ const CareerForm = () => {
         JSON.stringify(formValues.deleted_document_ids || []),
       );
 
-      //   if (mode === "edit") {
       if (isEditMode) {
         payload.append("user_id", userId);
       }
@@ -695,10 +644,6 @@ const CareerForm = () => {
       timeoutId = setTimeout(() => {
         const currentBestStep = calculateBestStep();
 
-        // if (currentBestStep !== lastActiveStep) {
-        //   setActiveStep(currentBestStep);
-        //   lastActiveStep = currentBestStep;
-        // }
         if (
           currentBestStep !== lastActiveStepRef.current &&
           currentBestStep !== activeStep
@@ -797,30 +742,8 @@ const CareerForm = () => {
   return (
     <>
       <LoadingContainer />
-      <Box
-        sx={{
-          backgroundColor: "background.paper",
-          border: (theme) => `1px solid ${theme.palette.divider}`,
-          borderRadius: "12px",
-          marginTop: 3,
-          overflow: "hidden",
-          display: "flex",
-          flexDirection: "column",
-          height: "calc(100vh - 100px)",
-        }}
-      >
-        {/* Header Section */}
-        <Box
-          sx={{
-            px: 3,
-            py: 2,
-            flexShrink: 0,
-            backgroundColor: "background.paper",
-            position: "sticky",
-            top: 0,
-            zIndex: 2,
-          }}
-        >
+      <CareerFormContainer>
+        <CareerFormHeader>
           {mode === "add" ? (
             <UserAddHeader
               handleBack={handleBack}
@@ -854,68 +777,29 @@ const CareerForm = () => {
               mode={mode}
             />
           )}
-        </Box>
+        </CareerFormHeader>
 
-        {/* Horizontal Text Stepper for edit/view mode - below blue card, outside scroll */}
         {mode !== "add" && (
-          <Box
-            sx={{
-              px: 3,
-              borderBottom: (theme) => `2px solid ${theme.palette.divider}`,
-              backgroundColor: "background.paper",
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                gap: { xs: 2, sm: 4, md: 6, lg: 9 },
-                alignItems: "center",
-                flexWrap: "wrap",
-              }}
-            >
+          <CareerFormStepper>
+            <StepRow>
               {steps.map((step, index) => (
-                <Box
+                <StepItem
                   key={step.label}
                   data-step-id={step.id}
                   data-index={index}
+                  active={index === activeStep}
                   onClick={handleStepClick}
-                  sx={{
-                    borderBottom: (theme) =>
-                      index === activeStep ? `2px solid ${theme.palette.brand.main}` : "none",
-                    pb: index === activeStep ? 0.5 : 0,
-                    cursor: "pointer",
-                  }}
                 >
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      fontWeight: index === activeStep ? 600 : 400,
-                      color: index === activeStep ? "brand.main" : "text.secondary",
-                      "&:hover": {
-                        color: index === activeStep ? "brand.main" : "text.primary",
-                      },
-                    }}
-                  >
+                  <StepLabel active={index === activeStep}>
                     {step.number}. {step.label}
-                  </Typography>
-                </Box>
+                  </StepLabel>
+                </StepItem>
               ))}
-            </Box>
-          </Box>
+            </StepRow>
+          </CareerFormStepper>
         )}
 
-        {/* Form Content */}
-        <Box
-          ref={scrollContainerRef}
-          sx={{
-            flex: 1,
-            minHeight: 0,
-            overflowY: "auto",
-            px: 3,
-            py: 2,
-            backgroundColor: "background.paper",
-          }}
-        >
+        <CareerFormContent ref={scrollContainerRef}>
           <CareerUserForm
             formData={formData}
             onSubmit={handleSubmit}
@@ -937,8 +821,8 @@ const CareerForm = () => {
             severity={snackbar.severity}
             onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
           />
-        </Box>
-      </Box>
+        </CareerFormContent>
+      </CareerFormContainer>
     </>
   );
 };

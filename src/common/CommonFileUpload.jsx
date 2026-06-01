@@ -303,7 +303,7 @@ const CommonFileUpload = ({
 
       {error && helperText && (
         <Box mt={1}>
-          <Typography variant="caption" sx={[ErrorTextSx, { color: "error.main", fontSize: 12 }]}> 
+          <Typography variant="caption" sx={ErrorTextSx}>
             {helperText}
           </Typography>
         </Box>
