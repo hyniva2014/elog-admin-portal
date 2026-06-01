@@ -12,6 +12,7 @@ import {
   Title,
   Subtitle,
   AddButton,
+  COLORS,
 } from "./RoleManagement.styled";
 
 const RoleManagement = () => {
@@ -197,26 +198,25 @@ const RoleManagement = () => {
     }
   };
 
-  const renderRoleCards = () =>
-    roles.map((role) => (
-      <RoleCard
-        key={role.id}
-        role={{
-          id: role.id,
+  const handleRoleEdit = useCallback(
+    (role) => {
+      handleEditRole(role);
+    },
+    [handleEditRole],
+  );
 
-          title: role.name,
+  const roleCards = roles.map((role) => {
+    const roleData = {
+      id: role.id,
+      title: role.name,
+      description: role.description,
+      users: role.user_count,
+      status: role.status === 1 ? "Active" : "Inactive",
+      color: COLORS.primary,
+    };
 
-          description: role.description,
-
-          users: role.user_count,
-
-          status: role.status === 1 ? "Active" : "Inactive",
-
-          color: "#284495",
-        }}
-        onEdit={() => handleEditRole(role)}
-      />
-    ));
+    return <RoleCard key={role.id} role={roleData} onEdit={handleRoleEdit} />;
+  });
 
   const pageTitle = isEditMode ? "Edit Role" : "Add Role";
 
@@ -235,7 +235,7 @@ const RoleManagement = () => {
             Add Role
           </AddButton>
         </Header>
-        <Box>{renderRoleCards()}</Box>
+        <Box>{roleCards}</Box>
         <CommonDialogForm
           open={openDialog}
           onCancel={handleCloseDialog}

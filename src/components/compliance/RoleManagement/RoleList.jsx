@@ -1,12 +1,13 @@
-import React from "react";
 import { Box } from "@mui/material";
+import React from "react";
 import RoleCard from "./RoleCard";
 
-const renderRoleCards = () =>
-  roles.map((role) => <RoleCard key={role.id} role={role} onEdit={onEdit} />);
-
 const RoleList = ({ roles, onEdit }) => {
-  return <Box>{renderRoleCards()}</Box>;
+  const roleCards = roles.map((role) => (
+    <RoleCard key={role.id} role={role} onEdit={onEdit} />
+  ));
+
+  return <Box>{roleCards}</Box>;
 };
 
 export default RoleList;

@@ -1,6 +1,4 @@
-// AddPermission.jsx
-
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Grid, Box } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import CommonPageHeader from "../../../common/CommonPageHeader";
@@ -12,23 +10,11 @@ import {
   ContentWrapper,
   HeaderWrapper,
   TopFieldsWrapper,
-  StyledCard,
-  CardHeaderWrapper,
-  ModuleTitleWrapper,
-  ModuleTitle,
-  CountBadge,
-  PermissionListWrapper,
-  PermissionItem,
-  PermissionContent,
-  PermissionTitle,
-  PermissionDescription,
-  StyledSwitch,
-  CardFooterWrapper,
-  OutlineButton,
   FooterWrapper,
   FooterCancelButton,
   FooterSaveButton,
 } from "./AddPermission.styles";
+import PermissionCardItem from "./PermissionCardItem";
 
 const AddPermission = () => {
   const navigate = useNavigate();
@@ -78,6 +64,20 @@ const AddPermission = () => {
       setLoading(false);
     }
   };
+
+  const permissionCards = Object.keys(groupedPermissions || {}).map(
+    (module) => (
+      <PermissionCardItem
+        key={module}
+        module={module}
+        permissions={groupedPermissions[module]}
+        permissionState={permissionState}
+        onToggle={getToggleHandler}
+        onEnableAll={getEnableAllHandler}
+        onDisableAll={getDisableAllHandler}
+      />
+    ),
+  );
 
   const handleToggle = (module, index) => {
     setPermissionState((prev) => {
@@ -136,89 +136,25 @@ const AddPermission = () => {
   };
 
   const getToggleHandler = useCallback(
-  (module, idx) => () => {
-    handleToggle(module, idx);
-  },
-  [],
-);
+    (module, idx) => () => {
+      handleToggle(module, idx);
+    },
+    [],
+  );
 
-const getEnableAllHandler = useCallback(
-  (module) => () => {
-    handleEnableAll(module);
-  },
-  [],
-);
+  const getEnableAllHandler = useCallback(
+    (module) => () => {
+      handleEnableAll(module);
+    },
+    [],
+  );
 
-const getDisableAllHandler = useCallback(
-  (module) => () => {
-    handleDisableAll(module);
-  },
-  [],
-);
-
-  const renderPermissionCards = () => {
-    return Object.keys(groupedPermissions || {}).map((module, index) => {
-      const enabledCount = permissionState[module]?.filter(Boolean).length || 0;
-
-      const totalCount = groupedPermissions[module]?.length || 0;
-
-      const renderPermissionItems = (module) => {
-        return groupedPermissions[module]?.map((permission, idx) => (
-          <PermissionItem key={permission.id}>
-            <PermissionContent>
-              <Box>
-                <PermissionTitle>{permission.action}</PermissionTitle>
-
-                <PermissionDescription>
-                  {permission.description || permission.code}
-                </PermissionDescription>
-              </Box>
-
-              <StyledSwitch
-                checked={permissionState[module]?.[idx] || false}
-                onChange={getToggleHandler(module, idx)}
-              />
-            </PermissionContent>
-          </PermissionItem>
-        ));
-      };
-
-      const permissionCountText = `${enabledCount}/${totalCount}`;
-
-      return (
-        <Grid item xs={12} md={6} key={index}>
-          <StyledCard>
-            <CardHeaderWrapper>
-              <ModuleTitleWrapper>
-                <ModuleTitle>{module}</ModuleTitle>
-              </ModuleTitleWrapper>
-              <CountBadge>{permissionCountText}</CountBadge>
-            </CardHeaderWrapper>
-            <PermissionListWrapper>
-              {renderPermissionItems(module)}
-            </PermissionListWrapper>
-            <CardFooterWrapper>
-              <OutlineButton
-                fullWidth
-                variant="outlined"
-                onClick={getEnableAllHandler(module)}
-              >
-                Enable All
-              </OutlineButton>
-
-              <OutlineButton
-                fullWidth
-                variant="outlined"
-                onClick={getDisableAllHandler(module)}
-              >
-                Disable All
-              </OutlineButton>
-            </CardFooterWrapper>
-          </StyledCard>
-        </Grid>
-      );
-    });
-  };
+  const getDisableAllHandler = useCallback(
+    (module) => () => {
+      handleDisableAll(module);
+    },
+    [],
+  );
 
   const handleCancel = () => {
     navigate("/role-management");
@@ -254,7 +190,7 @@ const getDisableAllHandler = useCallback(
           </TopFieldsWrapper>
           <Grid container spacing={3}>
             <Grid container spacing={3}>
-              {renderPermissionCards()}
+              {permissionCards}
             </Grid>
           </Grid>
           <FooterWrapper>

@@ -65,6 +65,10 @@ const RoleManagementForm = ({
     ));
   };
 
+  const handleStatusChange = (event) => {
+    field.onChange(Number(event.target.value));
+  };
+
   const renderStatusField = () => {
     if (!isEditMode) return null;
 
@@ -82,7 +86,7 @@ const RoleManagementForm = ({
               fullWidth
               size="small"
               value={field.value ?? ""}
-              onChange={(e) => field.onChange(Number(e.target.value))}
+              onChange={handleStatusChange}
               error={!!errors.status}
               helperText={errors.status?.message}
             >
