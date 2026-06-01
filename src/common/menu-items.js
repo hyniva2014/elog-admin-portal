@@ -23,9 +23,14 @@ const MENU_ITEMS = [
   {
     key: "device-management",
     label: "Device Management",
-    url: "/device-management",
     icon: TabletMacIcon,
     children: [
+      {
+        key: "device-management-overview",
+        label: "Device Management",
+        url: "/device-management",
+        parentKey: "device-management",
+      },
       {
         key: "device-asset-management",
         label: "Device Asset Management",
