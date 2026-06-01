@@ -1,9 +1,7 @@
 import { Typography } from "@mui/material";
 import CommonPageHeader from "../../../common/CommonPageHeader";
 import CommonFilters from "../../../common/CommonFilters";
-import {
-  DEVICE_STATUS_FILTER_OPTIONS,
-} from "./Constants";
+import { DEVICE_STATUS_FILTER_OPTIONS } from "./Constants";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import {
   HeaderContainer,
@@ -20,7 +18,6 @@ const DeviceManagementHeader = (props) => {
     searchKey = {},
     summaryCards = [],
     handleClick,
-    isAssignDeviceEnabled,
   } = props;
   const { fetchApi } = useServices();
   const [truckOptions, setTruckOptions] = useState([]);
@@ -67,15 +64,7 @@ const DeviceManagementHeader = (props) => {
         title="Device Management"
         handleClick={handleClick}
         addButton={true}
-        rightContent={
-          <AddButton
-            variant="contained"
-            onClick={handleClick}
-            disabled={!isAssignDeviceEnabled}
-          >
-            Assign Device
-          </AddButton>
-        }
+        rightContent={null}
       />
       <Typography variant="h6" fontWeight="300">
         Assign unassigned devices to carriers

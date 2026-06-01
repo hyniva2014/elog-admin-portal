@@ -124,41 +124,6 @@ const DeviceManagement = () => {
     setIsAssignDialogOpen(true);
   }, []);
 
-  const handleAssignCancel = () => {
-    setIsAssignDialogOpen(false);
-  };
-
-  const handleAssignSubmit = async (selectedCompanyId) => {
-    const deviceIds = allRows
-      .filter((row) => selectedRows.includes(row.id))
-      .map((row) => row.id);
-
-    const payload = {
-      company_id: selectedCompanyId,
-      device_ids: deviceIds,
-    };
-
-    try {
-      const endurl = "/masteradmin/assign-devices";
-      const response = await createApi(payload, endurl);
-      if (response?.statusCode === 200) {
-        showSnackbar(
-          response.body?.data?.message || "Devices assigned successfully",
-        );
-        setSelectedRows([]);
-        fetchDeviceList();
-      } else {
-        showSnackbar(
-          response?.body?.data?.message || "Failed to assign devices",
-          "error",
-        );
-      }
-    } catch (error) {
-      showSnackbar("Failed to assign devices", "error");
-    }
-    setIsAssignDialogOpen(false);
-  };
-
   const handleRowSelectionChange = (newSelection) => {
     setSelectedRows(newSelection);
     const selectedDeviceIds = getSelectedDevices(newSelection);
@@ -187,18 +152,8 @@ const DeviceManagement = () => {
           setData={setData}
           paginationMode="server"
           getRowHeight={() => "auto"}
-          checkboxSelection
-          isRowSelectable={isDeviceSelectable}
-          rowSelectionModel={selectedRows}
-          onRowSelectionModelChange={handleRowSelectionChange}
         />
       </PageContainer>
-      <AssignDevicesToCarriers
-        open={isAssignDialogOpen}
-        handleCancel={handleAssignCancel}
-        handleSubmit={handleAssignSubmit}
-        loading={false}
-      />
       <CommonSnackbar
         open={snackbar.open}
         message={snackbar.message}
