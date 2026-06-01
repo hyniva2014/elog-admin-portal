@@ -88,26 +88,6 @@ export const columns = [
   },
 ];
 
-export const transformRequestedDevicesData = (data = []) => {
-  return data.map((item, index) => ({
-    id: item.id || index,
-    carrierName: item.company_name || item.carrier_name || "-",
-    requestedDevices: item.requested_devices_count || "-",
-    description: item.description || "-",
-    requestedBy: item.requested_by_name || "-",
-    requestedOn: formatDate(
-      item.requested_on || item.created_at || item.created_on,
-    ),
-    approvedBy: item.approved_by || "-",
-    status:
-      item.status === 1 || item.status === "Pending"
-        ? "Pending"
-        : item.status === 2 || item.status === "Approved"
-          ? "Approved"
-          : item.status || "-",
-  }));
-};
-
 export const statusOptions = [
   { label: "Pending", value: "1" },
   { label: "Approved", value: "2" },

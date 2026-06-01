@@ -3,6 +3,14 @@ import CommonFilters from "../../../common/CommonFilters";
 import { HeaderContainer } from "./RequestDevice.styled";
 
 const RequestDeviceHeader = ({ data, setData, searchKey, statusOptions }) => {
+  const requestDeviceFilters = (statusOptions) => [
+    {
+      label: "All Status",
+      dataKey: "status",
+      options: statusOptions,
+    },
+  ];
+
   return (
     <HeaderContainer>
       <CommonPageHeader title="Requested Devices" rightContent={null} />
@@ -11,13 +19,7 @@ const RequestDeviceHeader = ({ data, setData, searchKey, statusOptions }) => {
         setData={setData}
         searchKey={searchKey}
         allowDateClear={true}
-        filters={[
-          {
-            label: "All Status",
-            dataKey: "status",
-            options: statusOptions,
-          },
-        ]}
+        filters={requestDeviceFilters(statusOptions)}
       />
     </HeaderContainer>
   );

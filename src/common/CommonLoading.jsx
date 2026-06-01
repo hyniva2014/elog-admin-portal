@@ -19,27 +19,24 @@ export const SpinnerWrapper = styled(Box)`
   justify-content: center;
 `;
 
+export const StyledCircularProgress = styled(CircularProgress)(({ theme }) => ({
+  color: theme.palette.primary.main,
+}));
+
+export const LoadingImage = styled(Box)({
+  position: "absolute",
+  width: 100,
+  height: 100,
+  objectFit: "contain",
+  filter: "brightness(0) invert(1)",
+});
+
 const LoadingContent = ({ isLoading }) =>
   isLoading ? (
     <LoadingOverlay>
       <SpinnerWrapper>
-        <CircularProgress
-          size={80}
-          thickness={2}
-          sx={{ color: "primary.main" }}
-        />
-        <Box
-          component="img"
-          src={image}
-          alt="Loading"
-          sx={{
-            position: "absolute",
-            width: 100,
-            height: 100,
-            objectFit: "contain",
-            filter: "brightness(0) invert(1)",
-          }}
-        />
+        <StyledCircularProgress size={80} thickness={2} />
+        <LoadingImage component="img" src={image} alt="Loading" />
       </SpinnerWrapper>
     </LoadingOverlay>
   ) : null;

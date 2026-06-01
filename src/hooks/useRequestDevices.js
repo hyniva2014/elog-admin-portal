@@ -6,6 +6,13 @@ const formatDate = (iso) => {
   return iso ? dayjs(iso).format("MMM DD, YYYY") : "-";
 };
 
+const STATUS_LABELS = {
+  1: "Pending",
+  2: "Approved",
+};
+
+const getStatusLabel = (status) => STATUS_LABELS[status] || status || "-";
+
 const transformRequestedDevicesData = (data = []) => {
   return data.map((item, index) => ({
     id: item.id || index,
@@ -17,12 +24,7 @@ const transformRequestedDevicesData = (data = []) => {
       item.requested_on || item.created_at || item.created_on,
     ),
     approvedBy: item.approved_by || "-",
-    status:
-      item.status === 1 || item.status === "Pending"
-        ? "Pending"
-        : item.status === 2 || item.status === "Approved"
-          ? "Approved"
-          : item.status || "-",
+    status: getStatusLabel(item.status),
   }));
 };
 
@@ -32,10 +34,8 @@ export const useRequestDevices = () => {
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchFunctionRef = useRef(null);
-
-  const createFetchFunction = useCallback(() => {
-    return async ({
+  const fetchRequestedDevices = useCallback(
+    async ({
       page = 1,
       pageSize = 25,
       search = "",
@@ -46,33 +46,26 @@ export const useRequestDevices = () => {
       try {
         setIsLoading(true);
 
-        let endUrl = `/masteradmin/requested-devices?page=${page}&limit=${pageSize}`;
-        if (search) endUrl += `&search=${search}`;
-        if (status) endUrl += `&status=${status}`;
-        if (fromDate)
-          endUrl += `&fromDate=${dayjs(fromDate).format("YYYY-MM-DD")}`;
-        if (toDate) endUrl += `&toDate=${dayjs(toDate).format("YYYY-MM-DD")}`;
+        const queryParams = [
+          `page=${page}`,
+          `limit=${pageSize}`,
+          search && `search=${encodeURIComponent(search)}`,
+          status && `status=${status}`,
+          fromDate && `from_date=${dayjs(fromDate).format("YYYY-MM-DD")}`,
+          toDate && `to_date=${dayjs(toDate).format("YYYY-MM-DD")}`,
+        ]
+          .filter(Boolean)
+          .join("&");
+
+        const endUrl = `/masteradmin/requested-devices?${queryParams}`;
 
         const response = await fetchApi(endUrl);
+        const apiData = response?.body?.data || [];
+        setAllRows(transformRequestedDevicesData(apiData));
 
-        if (response?.body?.data) {
-          const data = response.body.data;
-          const items = Array.isArray(data) ? data : data.items || [];
-          const totalRecords = data.totalRecords || data.total || items.length;
-
-          const transformedItems = transformRequestedDevicesData(items);
-          setAllRows(transformedItems);
-          setTotal(totalRecords);
-        } else if (response?.data) {
-          const { items = [], totalRecords = 0 } = response.data;
-
-          const transformedItems = transformRequestedDevicesData(items);
-          setAllRows(transformedItems);
-          setTotal(totalRecords);
-        } else {
-          setAllRows([]);
-          setTotal(0);
-        }
+        setTotal(
+          response?.body?.pagination?.total_records || apiData.length || 0,
+        );
       } catch (error) {
         console.error("Error fetching requested devices:", error);
         setAllRows([]);
@@ -80,18 +73,9 @@ export const useRequestDevices = () => {
       } finally {
         setIsLoading(false);
       }
-    };
-  }, [fetchApi]);
-
-  useEffect(() => {
-    fetchFunctionRef.current = createFetchFunction();
-  }, [createFetchFunction]);
-
-  const fetchRequestedDevices = useCallback((params) => {
-    if (fetchFunctionRef.current) {
-      return fetchFunctionRef.current(params);
-    }
-  }, []);
+    },
+    [fetchApi],
+  );
 
   return {
     allRows,
