@@ -29,8 +29,8 @@ export const ACCOUNT_FORM_FIELDS = [
   {
     name: "usdot",
     label: "USDOT Number",
-    inputProps: { maxLength: 8 },
     required: true,
+    formatter: "usdot",
   },
   {
     name: "taxId",
@@ -39,7 +39,7 @@ export const ACCOUNT_FORM_FIELDS = [
     placeholder: "XX-XXXXXXX",
     formatter: "taxId",
   },
-  { name: "mcNumber", label: "MC Number", required: true },
+  { name: "mcNumber", label: "MC Number", required: true, formatter: "mcNumber" },
   { name: "maxDevices", label: "Max Devices", required: true, type: "number" },
   {
     name: "tollFree",
