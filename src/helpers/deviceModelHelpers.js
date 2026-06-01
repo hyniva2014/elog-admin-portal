@@ -49,13 +49,15 @@ export const getStatusLabel = (value) => {
 export const transformDeviceModelData = (apiData) =>
   apiData.map((item) => ({
     id: item.device_model_id,
+    modelCode: item.device_code || "-",
     deviceModelId: item.device_model_id,
     deviceCode: item.device_code || "",
     model: item.model_name || "-",
     assetType: getAssetTypeLabel(item.asset_type),
     assetTypeValue: item.asset_type,
     description: item.description || "-",
-    supportsElogs: item.supports_elogs === 1 || item.supports_elogs === "1" ? 1 : 0,
+    supportsElogs:
+      item.supports_elogs === 1 || item.supports_elogs === "1" ? 1 : 0,
     createdOn: item.created_at || null,
     updatedOn: item.updated_at || null,
     status: item.status ?? 1,

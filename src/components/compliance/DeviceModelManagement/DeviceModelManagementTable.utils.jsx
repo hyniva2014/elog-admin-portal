@@ -1,5 +1,8 @@
 import dayjs from "dayjs";
-import { StatusTypography, ELogsTypography } from "./DeviceModelManagement.styled";
+import {
+  StatusTypography,
+  ELogsTypography,
+} from "./DeviceModelManagement.styled";
 import DeviceModelManagementActionButton from "./DeviceModelManagementActionButton";
 
 export const formatDate = (value) =>
@@ -25,7 +28,9 @@ const ELogsCellComponent = ({ value }) => {
   );
 };
 
-const StatusCell = (params) => <StatusCellComponent value={params.value} row={params.row} />;
+const StatusCell = (params) => (
+  <StatusCellComponent value={params.value} row={params.row} />
+);
 const ELogsCell = (params) => <ELogsCellComponent value={params.value} />;
 
 const ActionCell = ({ row, onView }) => (
@@ -49,18 +54,27 @@ export const getColumns = (onView) => [
     headerClassName: "sticky-col-left-1",
   },
   {
-    field: "assetType",
-    headerName: "Asset Type",
+    field: "modelCode",
+    headerName: "Model Code",
     flex: 1,
-    minWidth: 120,
+    minWidth: 180,
     headerTooltip: true,
     cellClassName: "sticky-col-left-2",
     headerClassName: "sticky-col-left-2",
   },
   {
+    field: "assetType",
+    headerName: "Asset Type",
+    flex: 1,
+    minWidth: 150,
+  },
+  {
     field: "description",
     headerName: "Description",
     flex: 1,
+    // align: "flexstart",
+    // headerAlign: "flexstart",
+    // gap :2,
     minWidth: 150,
     headerTooltip: true,
   },
@@ -68,6 +82,8 @@ export const getColumns = (onView) => [
     field: "supportsElogs",
     headerName: "E-Logs",
     flex: 1,
+    align: "center",
+    headerAlign: "center",
     minWidth: 100,
     headerTooltip: true,
     renderCell: ELogsCell,
@@ -76,6 +92,8 @@ export const getColumns = (onView) => [
     field: "createdOn",
     headerName: "Created On",
     flex: 1,
+    align: "center",
+    headerAlign: "center",
     minWidth: 140,
     headerTooltip: true,
     renderCell: renderDateCell,
@@ -84,6 +102,8 @@ export const getColumns = (onView) => [
     field: "updatedOn",
     headerName: "Updated On",
     flex: 1,
+    align: "center",
+    headerAlign: "center",
     minWidth: 140,
     headerTooltip: true,
     renderCell: renderDateCell,
@@ -92,6 +112,8 @@ export const getColumns = (onView) => [
     field: "statusLabel",
     headerName: "Status",
     flex: 1,
+    align: "center",
+    headerAlign: "center",
     minWidth: 120,
     headerTooltip: true,
     renderCell: StatusCell,
@@ -99,6 +121,9 @@ export const getColumns = (onView) => [
   {
     field: "action",
     headerName: "Action",
+    flex: 1,
+    align: "center",
+    headerAlign: "center",
     minWidth: 100,
     sortable: false,
     headerTooltip: true,

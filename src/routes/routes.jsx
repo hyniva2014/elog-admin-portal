@@ -866,6 +866,17 @@ const adminRoutes = [
       />
     ),
   },
+  {
+    path: "/request-device",
+    element: (
+      <LoadComponent
+        component={lazy(
+          () =>
+            import("../components/compliance/RequestDevice/RequestDevice"),
+        )}
+      />
+    ),
+  },
 ];
 export const defaultLayoutRoutes = [...otherRotes, ...authRoutes];
 export const verticalLayoutRoutes = [

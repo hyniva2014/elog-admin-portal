@@ -55,5 +55,11 @@ const MENU_ITEMS = [
     url: "/role-management",
     icon: SettingsIcon,
   },
+  {
+    key: "request-device",
+    label: "Request Device",
+    url: "/request-device",
+    icon: TabletMacIcon,
+  },
 ];
 export { MENU_ITEMS };

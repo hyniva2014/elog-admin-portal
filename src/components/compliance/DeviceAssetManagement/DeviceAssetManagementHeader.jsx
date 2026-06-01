@@ -3,11 +3,17 @@ import CommonPageHeader from "../../../common/CommonPageHeader";
 import CommonFilters from "../../../common/CommonFilters";
 import {
   DEVICE_ASSET_STATUS_FILTER_OPTIONS,
-  DEVICE_ASSET_MODEL_FILTER_OPTIONS,
+  // DEVICE_ASSET_MODEL_FILTER_OPTIONS,
 } from "./Constants";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { useSelector } from "react-redux";
-import { HeaderContainer, AddButton, SummaryCardBox } from "./DeviceAssetManagement.styles";
+import {
+  HeaderContainer,
+  AddButton,
+  SummaryCardBox,
+} from "./DeviceAssetManagement.styles";
+import { useServices } from "../../../services/services";
+import { useEffect, useState } from "react";
 
 const DeviceAssetManagementHeader = (props) => {
   const {
@@ -19,19 +25,48 @@ const DeviceAssetManagementHeader = (props) => {
     setMode,
     handleClick,
     handleAddAsset,
+    handleAssignDevices,
+    isAssignDeviceEnabled,
     modelOptions = [],
     statusOptions = [],
   } = props;
+  const { fetchApi } = useServices();
+  const [deviceModelOptions, setDeviceModelOptions] = useState([]);
 
-  const resolvedModelOptions =
-    modelOptions.length > 0 ? modelOptions : DEVICE_ASSET_MODEL_FILTER_OPTIONS;
+  // const resolvedModelOptions =
+  //   modelOptions.length > 0 ? modelOptions : DEVICE_ASSET_MODEL_FILTER_OPTIONS;
 
   const resolvedStatusOptions =
-    statusOptions.length > 0 ? statusOptions : DEVICE_ASSET_STATUS_FILTER_OPTIONS;
+    statusOptions.length > 0
+      ? statusOptions
+      : DEVICE_ASSET_STATUS_FILTER_OPTIONS;
+
+  useEffect(() => {
+    fetchDeviceModelDropdown();
+  }, []);
+
+  const fetchDeviceModelDropdown = async () => {
+    try {
+      const response = await fetchApi("/masteradmin/get-device-model-dropdown");
+      const dropdownData = response?.body?.data || [];
+      const formattedOptions = dropdownData.map((item) => ({
+        value: item.model_name,
+        label: item.model_name,
+      }));
+
+      setDeviceModelOptions(formattedOptions);
+    } catch (error) {
+      console.error("Device Model Dropdown Error:", error);
+    }
+  };
 
   const filters = [
-    { label: "Model Type", dataKey: "deviceModel", options: resolvedModelOptions },
-    { label: "All Status", dataKey: "status",       options: resolvedStatusOptions },
+    {
+      label: "Model Type",
+      dataKey: "deviceModel",
+      options: deviceModelOptions,
+    },
+    { label: "All Status", dataKey: "status", options: resolvedStatusOptions },
   ];
 
   return (
@@ -42,6 +77,13 @@ const DeviceAssetManagementHeader = (props) => {
         addButton={true}
         rightContent={
           <Box display="flex" gap={2}>
+            <AddButton
+              variant="contained"
+              onClick={handleAssignDevices}
+              disabled={!isAssignDeviceEnabled}
+            >
+              Assign Devices
+            </AddButton>
             <AddButton variant="contained" onClick={handleAddAsset}>
               Add Bulk Asset
             </AddButton>

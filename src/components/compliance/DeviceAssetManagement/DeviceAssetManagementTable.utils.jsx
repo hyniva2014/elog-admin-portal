@@ -27,10 +27,10 @@ export const getColumns = (onView) => [
     minWidth: 250,
     maxWidth: 280,
     headerTooltip: true,
+    flex: 1,
     cellClassName: "sticky-col-left-1",
     headerClassName: "sticky-col-left-1",
   },
-
   {
     field: "deviceModel",
     headerName: "Device Model",
@@ -38,15 +38,50 @@ export const getColumns = (onView) => [
     minWidth: 250,
     maxWidth: 280,
     headerTooltip: true,
+    flex: 1,
     cellClassName: "sticky-col-left-2",
     headerClassName: "sticky-col-left-2",
+  },
+  {
+    field: "imei",
+    headerName: "IMEI",
+    width: 250,
+    minWidth: 250,
+    maxWidth: 280,
+    headerTooltip: true,
+    flex: 1,
+    align: "center",
+    headerAlign: "center",
+  },
+  {
+    field: "iccId",
+    headerName: "ICCID",
+    width: 250,
+    minWidth: 250,
+    maxWidth: 280,
+    headerTooltip: true,
+    flex: 1,
+    align: "center",
+    headerAlign: "center",
+  },
+  {
+    field: "BLE_MAC_ADDRESS",
+    headerName: "BLE_MAC_ADDRESS",
+    width: 250,
+    minWidth: 250,
+    maxWidth: 280,
+    headerTooltip: true,
+    flex: 1,
+    align: "center",
+    headerAlign: "center",
   },
 
   {
     field: "createdOn",
     headerName: "Created On",
-    minWidth: 180,
-    maxWidth: 250,
+    flex: 1,
+    align: "center",
+    headerAlign: "center",
     headerTooltip: true,
     renderCell: (params) => formatDate(params.value),
   },
@@ -54,8 +89,9 @@ export const getColumns = (onView) => [
   {
     field: "updatedOn",
     headerName: "Updated On",
-    minWidth: 180,
-    maxWidth: 250,
+    flex: 1,
+    align: "center",
+    headerAlign: "center",
     headerTooltip: true,
     renderCell: (params) => formatDate(params.value),
   },
@@ -63,8 +99,9 @@ export const getColumns = (onView) => [
   {
     field: "status",
     headerName: "Status",
-    minWidth: 180,
-    maxWidth: 250,
+    flex: 1,
+    align: "center",
+    headerAlign: "center",
     headerTooltip: true,
     renderCell: StatusCell,
   },
@@ -72,8 +109,9 @@ export const getColumns = (onView) => [
   {
     field: "action",
     headerName: "Action",
-    minWidth: 180,
-    maxWidth: 250,
+    flex: 1,
+    align: "center",
+    headerAlign: "center",
     sortable: false,
     headerTooltip: true,
     renderCell: ActionCell(onView),
@@ -84,15 +122,18 @@ export const transformDeviceAssetData = (apiData) => {
   return apiData.map((item) => ({
     id: item.device_id,
     serialNumber: item.device_serial_number || "-",
-    deviceModel: item.device_model_id || "-",
+    deviceModel: item.device_model_name || "-",
+    imei: item.imei_number || "-",
+    iccId: item.iccid || "-",
+    BLE_MAC_ADDRESS: item.BLE_MAC_ADDRESS || "-",
     createdOn: item.created_at || null,
     updatedOn: item.updated_at || null,
     status:
-      item.status === "1"
-        ? "Active"
-        : item.status === "0"
-          ? "Inactive"
-          : "-",
+      item.status === "2"
+        ? "Assigned"
+        : item.status === "1"
+          ? "Allocated"
+          : "In Stock",
     imeiNumber: item.imei_number || "-",
     firmware: item.firmware || "-",
     manufacturerName: item.manufacturer_name || "-",

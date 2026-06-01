@@ -17,10 +17,11 @@ import {
   transformDeviceAssetData,
 } from "./DeviceAssetManagementTable.utils";
 import BulkUploadForm from "./BulkUploadForm";
+import AssignDevicesToCarriers from "../DeviceManagement/AssignDevicesToCarriers";
 
 const DeviceAssetManagement = () => {
   const { fetchApi, createApi } = useServices();
-  const { loading,setLoading, LoadingContainer } = CommonLoading();
+  const { loading, setLoading, LoadingContainer } = CommonLoading();
   const [allRows, setAllRows] = useState([]);
   const [deviceModelOptions, setDeviceModelOptions] = useState([]);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
@@ -47,10 +48,12 @@ const DeviceAssetManagement = () => {
     deviceId: "",
     modelName: "",
     serialNumber: "",
+    imei: "",
     firmware: "",
     manufacturerName: "",
     simNumber: "",
     iccid: "",
+    bleMacAddress: "",
     hardwareVersion: "",
     providerDeviceId: "",
     integrationType: "",
@@ -59,9 +62,9 @@ const DeviceAssetManagement = () => {
   });
   const [isEditMode, setIsEditMode] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  // const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
 
-  // ── Bulk Upload ────────────────────────────────────────────────────────────────
   const handleBulkClick = useCallback(() => {
     setIsBulkModalOpen(true);
   }, []);
@@ -70,7 +73,6 @@ const DeviceAssetManagement = () => {
     setIsBulkModalOpen(false);
   }, []);
 
-  // ── Snackbar ────────────────────────────────────────────────────────────────
   const handleSnackbar = useCallback((message, severity = "info") => {
     setSnackbar({
       open: true,
@@ -78,6 +80,15 @@ const DeviceAssetManagement = () => {
       severity,
     });
   }, []);
+
+  const showSnackbar = (message, severity = "success") => {
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    });
+  };
+
   const handleSnackbarClose = useCallback(() => {
     setSnackbar((prev) => ({
       ...prev,
@@ -97,24 +108,6 @@ const DeviceAssetManagement = () => {
     data.status,
     data.fromDate,
   ]);
-  useEffect(() => {
-    fetchDeviceModelDropdown();
-  }, []);
-
-  const fetchDeviceModelDropdown = async () => {
-    try {
-      const response = await fetchApi("/masteradmin/get-device-model-dropdown");
-      const dropdownData = response?.body?.data || [];
-      const formattedOptions = dropdownData.map((item) => ({
-        value: item.model_name,
-        label: item.model_name,
-      }));
-
-      setDeviceModelOptions(formattedOptions);
-    } catch (error) {
-      console.error("Device Model Dropdown Error:", error);
-    }
-  };
 
   const fetchDeviceAssets = async () => {
     try {
@@ -164,10 +157,12 @@ const DeviceAssetManagement = () => {
       deviceId: "",
       modelName: "",
       serialNumber: "",
+      imei: "",
       firmware: "",
       manufacturerName: "",
       simNumber: "",
       iccid: "",
+      bleMacAddress: "",
       hardwareVersion: "",
       providerDeviceId: "",
       integrationType: "",
@@ -203,6 +198,15 @@ const DeviceAssetManagement = () => {
         device_model_id: formValues.modelName,
         status: formValues.status || "1",
       };
+      if (formValues.imei?.trim()) {
+        payload.imei = formValues.imei.trim();
+      }
+      if (formValues.iccid?.trim()) {
+        payload.iccid = formValues.iccid.trim();
+      }
+      if (formValues.bleMacAddress?.trim()) {
+        payload.ble_mac_address = formValues.bleMacAddress.trim();
+      }
       if (formValues.deviceId) {
         payload.device_id = formValues.deviceId;
       }
@@ -222,7 +226,7 @@ const DeviceAssetManagement = () => {
         fetchDeviceAssets();
       } else {
         handleSnackbar(
-          response?.body?.message || "Something went wrong",
+          response?.body?.message || "serial number should be Unique",
           "warning",
         );
       }
@@ -248,10 +252,12 @@ const DeviceAssetManagement = () => {
         deviceId: deviceData?.device_id || "",
         modelName: deviceData?.device_model_id || "",
         serialNumber: deviceData?.device_serial_number || "",
+        imei: deviceData?.imei || "",
         firmware: deviceData?.firmware || "",
         manufacturerName: deviceData?.manufacturer_name || "",
         simNumber: deviceData?.sim_number || "",
         iccid: deviceData?.iccid || "",
+        bleMacAddress: deviceData?.ble_mac_address || "",
         hardwareVersion: deviceData?.hardware_version || "",
         providerDeviceId: deviceData?.provider_device_id || "",
         integrationType: deviceData?.integration_type || "",
@@ -316,10 +322,12 @@ const DeviceAssetManagement = () => {
       deviceId: "",
       modelName: "",
       serialNumber: "",
+      imei: "",
       firmware: "",
       manufacturerName: "",
       simNumber: "",
       iccid: "",
+      bleMacAddress: "",
       hardwareVersion: "",
       providerDeviceId: "",
       integrationType: "",
@@ -331,6 +339,9 @@ const DeviceAssetManagement = () => {
   }, []);
 
   const handleSetMode = useCallback(() => {}, []);
+  const handleRowSelectionChange = (newSelection) => {
+    setSelectedRows(newSelection);
+  };
 
   const columns = useMemo(() => getColumns(handleViewClick), [handleViewClick]);
 
@@ -371,6 +382,49 @@ const DeviceAssetManagement = () => {
       : "Save"
     : "Add Asset";
 
+  const handleAssignCancel = () => {
+    setIsAssignDialogOpen(false);
+  };
+
+  const handleAssignSubmit = async (selectedCompanyId) => {
+    const deviceIds = allRows
+      .filter((row) => selectedRows.includes(row.id))
+      .map((row) => row.id);
+
+    const payload = {
+      company_id: selectedCompanyId,
+      device_ids: deviceIds,
+    };
+
+    try {
+      const endurl = "/masteradmin/assign-devices";
+      const response = await createApi(payload, endurl);
+      if (response?.statusCode === 200) {
+        showSnackbar(
+          response.body?.data?.message || "Devices assigned successfully",
+        );
+        setSelectedRows([]);
+        fetchDeviceAssets();
+      } else {
+        showSnackbar(
+          response?.body?.data?.message || "Failed to assign devices",
+          "error",
+        );
+      }
+    } catch (error) {
+      showSnackbar("Failed to assign devices", "error");
+    }
+    setIsAssignDialogOpen(false);
+  };
+
+  const handleAssignDevices = useCallback(() => {
+    if (selectedRows.length === 0) {
+      handleSnackbar("Please select at least one device", "warning");
+      return;
+    }
+    setIsAssignDialogOpen(true);
+  }, [selectedRows, handleSnackbar]);
+
   return (
     <>
       <LoadingContainer />
@@ -385,8 +439,9 @@ const DeviceAssetManagement = () => {
           handleClick={handleClick}
           handleAddAsset={handleBulkClick}
           modelOptions={deviceModelOptions}
+          handleAssignDevices={handleAssignDevices}
           statusOptions={DEVICE_ASSET_STATUS_FILTER_OPTIONS}
-          // isAssetAllocationEnabled={selectedRows.length > 0}
+          isAssignDeviceEnabled={selectedRows.length > 0}
         />
         <GridContainer>
           <CommonDataGrid
@@ -396,6 +451,9 @@ const DeviceAssetManagement = () => {
             setData={setData}
             paginationMode="server"
             getRowHeight={getRowHeight}
+            checkboxSelection
+            rowSelectionModel={selectedRows}
+            onRowSelectionModelChange={handleRowSelectionChange}
           />
         </GridContainer>
       </PageContainer>
@@ -440,6 +498,13 @@ const DeviceAssetManagement = () => {
         content={
           <BulkUploadForm formId="bulkAssetForm" onSubmit={handleBulkSubmit} />
         }
+      />
+
+      <AssignDevicesToCarriers
+        open={isAssignDialogOpen}
+        handleCancel={handleAssignCancel}
+        handleSubmit={handleAssignSubmit}
+        loading={false}
       />
     </>
   );
