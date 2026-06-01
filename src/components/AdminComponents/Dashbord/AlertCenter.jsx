@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import {
   AlertContainer,
-  AlertHeader,
+  ChartHeader,
   AlertTitle,
   ViewAllText,
   AlertList,
@@ -66,20 +66,25 @@ const AlertCenter = ({
   title = "Alert Center",
   viewAllText = "View All",
   alerts = [],
+  isLoading = false,
 }) => {
   const navigate = useNavigate();
 
   const handleViewAll = () => {
-    navigate("/alert-center");
+     if (!isLoading) {
+       navigate("/alert-center");
+     }
   };
 
   return (
     <AlertContainer elevation={0}>
       <Box>
-        <AlertHeader>
+        <ChartHeader>
           <AlertTitle>{title}</AlertTitle>
-          <ViewAllText onClick={handleViewAll}>{viewAllText}</ViewAllText>
-        </AlertHeader>
+          <ViewAllText onClick={handleViewAll} isLoading={isLoading}>
+            {viewAllText}
+          </ViewAllText>
+        </ChartHeader>
 
         <AlertList>
           {alerts.map((item) => (

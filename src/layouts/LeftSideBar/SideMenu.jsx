@@ -1,79 +1,112 @@
 import {
-  Box,
-  Collapse,
-  Typography,
-  Tooltip,
-  tooltipClasses,
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
-const StyledTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} arrow />
-))(({ theme }) => {
-  const isDark = theme.palette.mode === "dark";
-  const bgColor = isDark ? "#222529" : "#6fa9e3";
-  const textColor = isDark ? "#ffffff" : "#222529";
-  const shadowColor = isDark ? "rgba(0, 0, 0, 0.3)" : "rgba(0, 0, 0, 0.15)";
-
-  return {
-    [`& .${tooltipClasses.tooltip}`]: {
-      backgroundColor: bgColor,
-      color: textColor,
-      gap: "8px",
-      fontSize: "12px",
-      padding: "6px 12px",
-      boxShadow: `0 2px 8px ${shadowColor}`,
-      marginLeft: "8px !important",
-      borderRadius: "4px",
-      fontWeight: 500,
-    },
-    [`& .${tooltipClasses.arrow}`]: {
-      color: bgColor,
-    },
-  };
-});
-import {
-  findAllParent,
-  findMenuItem,
-  getMenuItemFromURL,
-} from "@src/helpers/menu";
-import {
-  Fragment,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+import {
+  Box,
+  Collapse,
+  Typography,
+  Popper,
+  Paper,
+} from "@mui/material";
 import { LuChevronRight } from "react-icons/lu";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useLayoutContext } from "@src/states";
 import { getLeftbarTheme } from "@src/layouts/LeftSideBar/helpers";
-// import { Link, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
-// import { permissions } from "../../components/CommonRowColumnUtils";
+import {
+  findAllParent,
+  findMenuItem,
+  getMenuItemFromURL,
+} from "@src/helpers/menu";
+import {
+  flyoutPaperSx,
+  flyoutPopperSx,
+  flyoutPopperModifiers,
+  getFlyoutItemSx,
+  getCollapsedIconBoxSx,
+  getExpandedMenuRowSx,
+  parentLabelLinkSx,
+  chevronStyle,
+  childrenListSx,
+  getExpandedMenuItemSx,
+  menuIconImgSx,
+  menuListSx,
+  chevronContainerSx,
+} from "./SideMenu.styles";
 
 const MenuIcon = ({ icon, size }) => {
   if (!icon) return null;
-
   if (typeof icon === "string") {
-    return (
-      <Box
-        component="img"
-        src={icon}
-        alt=""
-        sx={{
-          width: size,
-          height: size,
-          objectFit: "contain",
-          flexShrink: 0,
-          display: "block",
-        }}
-      />
-    );
+    return <Box component="img" src={icon} alt="" sx={menuIconImgSx(size)} />;
   }
-
   const Icon = icon;
   return <Icon size={size} />;
+};
+
+const FlyoutItem = ({ child, currentPath, onItemClick }) => {
+  const isActive = currentPath === child.url;
+
+  const handleClick = useCallback(() => {
+    onItemClick(child.url);
+  }, [child.url, onItemClick]);
+
+  return (
+    <Box onClick={handleClick} sx={getFlyoutItemSx(isActive)}>
+      {child.label}
+    </Box>
+  );
+};
+
+const CollapsedFlyout = ({ item, anchorEl, open, onClose, closeTimerRef }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleItemClick = useCallback((url) => {
+    navigate(url);
+    onClose();
+  }, [navigate, onClose]);
+
+  const handleMouseEnter = useCallback(() => {
+    clearTimeout(closeTimerRef.current);
+  }, [closeTimerRef]);
+
+  const handleMouseLeave = useCallback(() => {
+    closeTimerRef.current = setTimeout(onClose, 100);
+  }, [closeTimerRef, onClose]);
+
+  const allItems = useMemo(() => [
+    ...(item.url ? [{ key: item.key, label: item.label, url: item.url }] : []),
+    ...(item.children || []),
+  ], [item]);
+
+  return (
+    <Popper
+      open={open}
+      anchorEl={anchorEl}
+      placement="right-start"
+      modifiers={flyoutPopperModifiers}
+      sx={flyoutPopperSx}
+    >
+      <Paper
+        elevation={3}
+        sx={flyoutPaperSx}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {allItems.map((child) => (
+          <FlyoutItem
+            key={child.key}
+            child={child}
+            currentPath={location.pathname}
+            onItemClick={handleItemClick}
+          />
+        ))}
+      </Paper>
+    </Popper>
+  );
 };
 
 const MenuItemWithChildren = ({
@@ -82,159 +115,160 @@ const MenuItemWithChildren = ({
   toggleMenu,
   theme,
   isCollapsed,
+  onNavigate,
 }) => {
   const [open, setOpen] = useState(activeMenuItems.includes(item.key));
+  const [flyoutOpen, setFlyoutOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const closeTimerRef = useRef(null);
+  const location = useLocation();
 
   useEffect(() => {
     setOpen(activeMenuItems.includes(item.key));
   }, [activeMenuItems, item.key]);
 
-  const toggleMenuItem = () => {
+  const isChildActive = useMemo(
+    () => (item.children || []).some((child) => location.pathname.startsWith(child.url)),
+    [item.children, location.pathname],
+  );
+
+  const toggleMenuItem = useCallback(() => {
     const status = !open;
     setOpen(status);
     toggleMenu?.(item, status);
-  };
+  }, [open, toggleMenu, item]);
 
-  const location = useLocation();
+  const stopLinkPropagation = useCallback((e) => {
+    e.stopPropagation();
+    onNavigate?.();
+  }, [onNavigate]);
 
-  const isChildActive = (item.children || []).some((child) =>
-    location.pathname.startsWith(child.url),
-  );
+  const handleMouseEnter = useCallback((e) => {
+    if (!isCollapsed) return;
+    clearTimeout(closeTimerRef.current);
+    setAnchorEl(e.currentTarget);
+    setFlyoutOpen(true);
+  }, [isCollapsed]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (!isCollapsed) return;
+    closeTimerRef.current = setTimeout(() => setFlyoutOpen(false), 100);
+  }, [isCollapsed]);
+
+  const handleFlyoutClose = useCallback(() => setFlyoutOpen(false), []);
+
+  const collapsedIconSx = useMemo(() => getCollapsedIconBoxSx(isChildActive), [isChildActive]);
+  const expandedRowSx = useMemo(() => getExpandedMenuRowSx(open, theme), [open, theme]);
+  const chevronSx = useMemo(() => chevronStyle(open), [open]);
 
   return (
     <li>
       {isCollapsed ? (
-        <Box
-          sx={{
-            p: "12px",
-            display: "flex",
-            justifyContent: "center",
-            cursor: "pointer",
-            borderRadius: "20px 0px 0px 20px",
-            marginLeft: "5px",
-            color: isChildActive ? "#284495" : "#fff",
-            backgroundColor: isChildActive ? "#ffffff" : "transparent",
-            // width: "80%",
-            transition: "all 0.2s ease",
-            "&:hover": {
-              backgroundColor: isChildActive
-                ? "#ffffff"
-                : "rgba(255,255,255,0.12)",
-            },
-          }}
-        >
-          <MenuIcon icon={item.icon} size={30} />
-        </Box>
+        <>
+          <Box
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            sx={collapsedIconSx}
+          >
+            <MenuIcon icon={item.icon} size={30} />
+          </Box>
+          <CollapsedFlyout
+            item={item}
+            anchorEl={anchorEl}
+            open={flyoutOpen}
+            onClose={handleFlyoutClose}
+            closeTimerRef={closeTimerRef}
+          />
+        </>
       ) : (
-        <Box
-          onClick={toggleMenuItem}
-          sx={{
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            padding: "12px 16px",
-            gap: "12px",
-            color: open ? theme.item.active : theme.item.color,
-          }}
-        >
+        <Box onClick={toggleMenuItem} sx={expandedRowSx}>
           <MenuIcon icon={item.icon} size={20} />
-          <Typography>{item.label}</Typography>
-          <Box sx={{ marginLeft: "auto" }}>
-            <LuChevronRight
-              size={16}
-              style={{
-                transform: open ? "rotate(90deg)" : "rotate(0deg)",
-                transition: "0.15s",
-              }}
-            />
+          {item.url ? (
+            <Typography component={Link} to={item.url} onClick={stopLinkPropagation} sx={parentLabelLinkSx}>
+              {item.label}
+            </Typography>
+          ) : (
+            <Typography>{item.label}</Typography>
+          )}
+          <Box sx={chevronContainerSx}>
+            <LuChevronRight size={16} style={chevronSx} />
           </Box>
         </Box>
       )}
 
       {!isCollapsed && (
         <Collapse in={open}>
-          <ul style={{ listStyle: "none", paddingLeft: "28px" }}>
+          <Box component="ul" sx={childrenListSx}>
             {(item.children || []).map((child) => (
               <MenuItem
                 key={child.key}
                 item={child}
                 theme={theme}
                 activeMenuItems={activeMenuItems}
+                onNavigate={onNavigate}
               />
             ))}
-          </ul>
+          </Box>
         </Collapse>
       )}
     </li>
   );
 };
 
-const MenuItem = ({ item, theme, activeMenuItems, isCollapsed }) => {
-  const [open, setOpen] = useState(activeMenuItems.includes(item.key));
+const MenuItem = ({ item, theme, activeMenuItems, isCollapsed, onNavigate }) => {
+  const [flyoutOpen, setFlyoutOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const closeTimerRef = useRef(null);
   const location = useLocation();
 
-  const isChildActive = (item.children || []).some((child) =>
-    location.pathname.startsWith(child.url),
+  const isChildActive = useMemo(
+    () => (item.children || []).some((child) => location.pathname.startsWith(child.url)),
+    [item.children, location.pathname],
   );
 
   const isDirectlyActive = activeMenuItems.includes(item.key);
   const active = isDirectlyActive || isChildActive;
 
-  useEffect(() => {
-    setOpen(isDirectlyActive);
-  }, [isDirectlyActive]);
-  const { settings, updateSidenav } = useLayoutContext();
-  const toggleSidebar = () => {
-    if (settings.sidenav.mode === "mobile") {
-      updateSidenav({
-        showMobileMenu: !settings.sidenav.showMobileMenu,
-      });
-    } else {
-      updateSidenav({
-        isCollapsed: !settings.sidenav.isCollapsed,
-      });
-    }
-  };
+  const handleMouseEnter = useCallback((e) => {
+    if (!isCollapsed) return;
+    clearTimeout(closeTimerRef.current);
+    setAnchorEl(e.currentTarget);
+    setFlyoutOpen(true);
+  }, [isCollapsed]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (!isCollapsed) return;
+    closeTimerRef.current = setTimeout(() => setFlyoutOpen(false), 100);
+  }, [isCollapsed]);
+
+  const handleFlyoutClose = useCallback(() => setFlyoutOpen(false), []);
+
+  const collapsedIconSx = useMemo(() => getCollapsedIconBoxSx(active), [active]);
+  const expandedItemSx = useMemo(() => getExpandedMenuItemSx(active, theme), [active, theme]);
+
   return (
     <li>
       {isCollapsed ? (
-        <Box
-          component={Link}
-          to={item.url}
-          onClick={toggleSidebar}
-          sx={{
-            p: "12px",
-            display: "flex",
-            justifyContent: "center",
-            cursor: "pointer",
-            borderRadius: "20px 0px 0px 20px",
-            marginLeft: "5px",
-            color: active ? "#284495" : "#fff",
-            backgroundColor: active ? "#ffffff" : "transparent",
-            textDecoration: "none",
-            transition: "all 0.2s ease",
-            "&:hover": {
-              backgroundColor: active ? "#ffffff" : "rgba(255,255,255,0.12)",
-            },
-          }}
-        >
-          <MenuIcon icon={item.icon} size={30} />
-        </Box>
+        <>
+          <Box
+            component={Link}
+            to={item.url}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            sx={collapsedIconSx}
+          >
+            <MenuIcon icon={item.icon} size={30} />
+          </Box>
+          <CollapsedFlyout
+            item={item}
+            anchorEl={anchorEl}
+            open={flyoutOpen}
+            onClose={handleFlyoutClose}
+            closeTimerRef={closeTimerRef}
+          />
+        </>
       ) : (
-        <Box
-          component={Link}
-          to={item.url}
-          onClick={toggleSidebar}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            padding: "10px 16px",
-            color: active ? theme.item.active : theme.item.color,
-            textDecoration: "none",
-            borderRadius: "8px",
-            "&:hover": { backgroundColor: "rgba(255,255,255,0.1)" },
-          }}
-        >
+        <Box component={Link} to={item.url} onClick={onNavigate} sx={expandedItemSx}>
           <MenuIcon icon={item.icon} size={16} />
           <Typography ml={1}>{item.label}</Typography>
         </Box>
@@ -245,70 +279,24 @@ const MenuItem = ({ item, theme, activeMenuItems, isCollapsed }) => {
 
 const SideMenu = ({ menuItems, isCollapsed }) => {
   const location = useLocation();
-  const { settings } = useLayoutContext();
+  const { settings, updateSidenav } = useLayoutContext();
   const [activeMenuItems, setActiveMenuItems] = useState([]);
-
-  // const permissions = useSelector((state) => state.loginSlice?.permissions);
-  // console.log("permissions", permissions);
-
-  // if (!permissions) return null;
 
   const theme = useMemo(
     () => getLeftbarTheme(settings.sidenav.theme),
     [settings.sidenav.theme],
   );
 
-  const MENU_PERMISSION_MAP = {
-    "compliance dashboard": "compliance_menu",
-    "fleet dashboard": "fleet_menu",
-  };
+  const filteredMenuItems = useMemo(() => menuItems || [], [menuItems]);
 
-  const filteredMenuItems = useMemo(() => {
-    // if (!permissions) return [];
-
-    // const allPermissions = permissions["Menu Permissions"] || [];
-
-    // return menuItems
-    //   .map((menu) => {
-    //     const filteredChildren = (menu.children || []).filter((child) => {
-    //       const childLabel = child?.label?.toLowerCase?.() || "";
-    //       const normalizedLabel = childLabel.replace(/\s/g, "_");
-
-    //       const expectedDesc =
-    //         MENU_PERMISSION_MAP[childLabel] || normalizedLabel;
-
-    //       return allPermissions.some((perm) => {
-    //         if (Number(perm?.granted) !== 1) return false;
-
-    //         const desc = perm?.description?.toLowerCase?.() || "";
-
-    //         return desc === expectedDesc;
-    //       });
-    //     });
-
-    //     if (!filteredChildren.length) return null;
-
-    //     return {
-    //       ...menu,
-    //       children: filteredChildren,
-    //     };
-    //   })
-    //   .filter(Boolean);
-      return menuItems || [];
-  }, [menuItems]);
   const activateMenu = useCallback(() => {
     const match = getMenuItemFromURL(filteredMenuItems, location.pathname);
-
     if (match) {
       const item = findMenuItem(filteredMenuItems, match.key);
       const newActive = [item.key, ...findAllParent(filteredMenuItems, item)];
-
-      setActiveMenuItems((prev) => {
-        if (JSON.stringify(prev) === JSON.stringify(newActive)) {
-          return prev;
-        }
-        return newActive;
-      });
+      setActiveMenuItems((prev) =>
+        JSON.stringify(prev) === JSON.stringify(newActive) ? prev : newActive,
+      );
     }
   }, [location.pathname, filteredMenuItems]);
 
@@ -320,41 +308,31 @@ const SideMenu = ({ menuItems, isCollapsed }) => {
     }
   }, [activateMenu]);
 
-  const toggleMenu = (menuItem, show) => {
-    manualToggleRef.current = Date.now();
+  const handleNavigate = useCallback(() => {
+    updateSidenav({ isCollapsed: true });
+  }, [updateSidenav]);
 
+  const toggleMenu = useCallback((menuItem, show) => {
+    manualToggleRef.current = Date.now();
     setActiveMenuItems((prev) => {
       if (show) {
-        const currentMatch = getMenuItemFromURL(
-          filteredMenuItems,
-          location.pathname,
-        );
-
+        const currentMatch = getMenuItemFromURL(filteredMenuItems, location.pathname);
         if (currentMatch) {
           const currentItem = findMenuItem(filteredMenuItems, currentMatch.key);
-
-          const activeItems = [
-            currentItem.key,
-            ...findAllParent(filteredMenuItems, currentItem),
-          ];
-
-          if (!activeItems.includes(menuItem.key)) {
-            return [menuItem.key, ...activeItems];
-          }
-
-          return activeItems;
+          const activeItems = [currentItem.key, ...findAllParent(filteredMenuItems, currentItem)];
+          return activeItems.includes(menuItem.key)
+            ? activeItems
+            : [menuItem.key, ...activeItems];
         }
-
         return [menuItem.key, ...findAllParent(filteredMenuItems, menuItem)];
-      } else {
-        return prev.filter((key) => key !== menuItem.key);
       }
+      return prev.filter((key) => key !== menuItem.key);
     });
-  };
+  }, [filteredMenuItems, location.pathname]);
 
   return (
     <Box>
-      <ul style={{ listStyle: "none", padding: 0 }}>
+      <Box component="ul" sx={menuListSx}>
         {filteredMenuItems.map((item) =>
           item.children ? (
             <MenuItemWithChildren
@@ -364,6 +342,7 @@ const SideMenu = ({ menuItems, isCollapsed }) => {
               toggleMenu={toggleMenu}
               activeMenuItems={activeMenuItems}
               isCollapsed={isCollapsed}
+              onNavigate={handleNavigate}
             />
           ) : (
             <MenuItem
@@ -372,10 +351,11 @@ const SideMenu = ({ menuItems, isCollapsed }) => {
               theme={theme}
               activeMenuItems={activeMenuItems}
               isCollapsed={isCollapsed}
+              onNavigate={handleNavigate}
             />
           ),
         )}
-      </ul>
+      </Box>
     </Box>
   );
 };

@@ -95,12 +95,22 @@ export const gridSx = (theme) => ({
       outline: "none",
     },
 
-  "&.has-checkbox .MuiDataGrid-cellCheckbox": {
+  // Make checkbox column sticky when present
+  "& .MuiDataGrid-cellCheckbox": {
     position: "sticky",
     left: 0,
     backgroundColor: theme.palette.background.paper,
     zIndex: 3,
   },
+
+  "& .MuiDataGrid-columnHeaderCheckbox": {
+    position: "sticky",
+    left: 0,
+    backgroundColor: theme.palette.grey[50],
+    zIndex: 1000,
+    willChange: "transform",
+  },
+
   "& .MuiCheckbox-root.Mui-disabled": {
     position: "relative",
     "&::before": {
@@ -121,16 +131,33 @@ export const gridSx = (theme) => ({
     },
   },
 
+  // Disable vertical scrollbar
+  "& .MuiDataGrid-virtualScroller": {
+    overflowY: "hidden", // Hide vertical scrollbar
+    overflowX: "auto", // Keep horizontal scrollbar if needed
+  },
+
+  // Or completely remove scrollbar while keeping functionality
+  "& .MuiDataGrid-virtualScroller::-webkit-scrollbar": {
+    display: "none", // Hide scrollbar (Chrome, Safari, Edge)
+  },
+  "& .MuiDataGrid-virtualScroller": {
+    scrollbarWidth: "none", // Hide scrollbar (Firefox)
+    msOverflowStyle: "none", // Hide scrollbar (IE/Edge)
+  },
+
   "& .MuiDataGrid-cell.sticky-col-left-1": {
     position: "sticky",
     left: 0,
     backgroundColor: theme.palette.background.paper,
     zIndex: 3,
   },
-  "&.has-checkbox .MuiDataGrid-cell.sticky-col-left-1": {
+
+  // Adjust left position for sticky-col-left-1 when checkbox is present
+  "&:has(.MuiDataGrid-cellCheckbox) .MuiDataGrid-cell.sticky-col-left-1": {
     left: 50,
   },
-  
+
   "& .MuiDataGrid-cell.sticky-col-left-2": {
     position: "sticky",
     left: 150,
@@ -138,14 +165,10 @@ export const gridSx = (theme) => ({
     zIndex: 3,
     borderRight: `1.5px solid ${theme.palette.divider}`,
   },
-  "&.has-checkbox .MuiDataGrid-cell.sticky-col-left-2": {
-    left: 200,
-  },
 
-  "&.has-checkbox .MuiDataGrid-columnHeaderCheckbox": {
-    zIndex: 1000,
-    backgroundColor: theme.palette.grey[50],
-    willChange: "transform",
+  // Adjust left position for sticky-col-left-2 when checkbox is present
+  "&:has(.MuiDataGrid-cellCheckbox) .MuiDataGrid-cell.sticky-col-left-2": {
+    left: 200, 
   },
 
   "& .MuiDataGrid-columnHeader.sticky-col-left-1": {

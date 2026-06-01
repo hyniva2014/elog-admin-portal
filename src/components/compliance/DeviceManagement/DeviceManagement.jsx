@@ -139,7 +139,6 @@ const DeviceManagement = () => {
           searchKey={data.search}
           summaryCards={dynamicSummaryCards}
           handleClick={handleClick}
-          isAssignDeviceEnabled={selectedRows.length > 0}
         />
         <CommonDataGrid
           columnsData={columns}
