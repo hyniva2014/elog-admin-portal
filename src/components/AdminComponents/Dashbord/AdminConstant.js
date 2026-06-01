@@ -11,24 +11,22 @@ export const Device_Metrics_Cards = {
     title: "Total Carriers",
     icon: TotalCarrierIcon,
   },
-  active_devices:{
+  active_devices: {
     id: "active_devices",
     title: "Active Devices",
     icon: ActiveDevicesCardIcon,
   },
-  open_incidents:{
+  open_incidents: {
     id: "open_incidents",
     title: "Open Incidents",
     icon: OpenIncidentsIcon,
   },
-  average_fmcsa_score:{
-    id: "average_fmcsa_score",
-    title: "Average FMCSA Score",
-    icon: FMCSAIcon,
-  },
- 
+  // average_fmcsa_score:{
+  //   id: "average_fmcsa_score",
+  //   title: "Average FMCSA Score",
+  //   icon: FMCSAIcon,
+  // },
 };
-
 
 // export const chartData = [
 //   {
@@ -114,7 +112,6 @@ export const TooltipKeys = [
     color: "red",
   },
 ];
-
 
 export const AlertCenterCards = [
   {

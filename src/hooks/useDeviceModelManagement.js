@@ -27,7 +27,7 @@ const useDeviceModelManagement = () => {
   const [data, setData] = useState({
     total: 0,
     page: 1,
-    pageSize: 25,
+    pageSize: 10,
     search: "",
     model: "",
     sortModel: [],
@@ -129,7 +129,10 @@ const useDeviceModelManagement = () => {
       setAllRows(transformDeviceModelData(apiData));
       setData((prev) => ({
         ...prev,
-        total: response?.body?.data?.pagination?.total_records || 0,
+        total:
+          response?.body?.pagination?.total_records ||
+          response?.body?.data?.pagination?.total_records ||
+          0,
       }));
     } catch (error) {
       console.error("Fetch Device Models Error:", error);

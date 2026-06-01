@@ -13,7 +13,9 @@ const formatDate = (value) => {
   return dayjs(value).format("MMM DD, YYYY");
 };
 
-const renderAddressCell = (params) => <AddressCellText>{params.value}</AddressCellText>;
+const renderAddressCell = (params) => (
+  <AddressCellText>{params.value}</AddressCellText>
+);
 
 const renderDateCell = (params) => formatDate(params.value);
 
@@ -35,14 +37,19 @@ const renderActionCell = (onViewAccount) => (params) => {
 
 export const AccountManagementColumnsData = (onViewAccount) => [
   {
+    field: "carrierId",
+    headerName: "Carrier ID",
+    ...getStickyColumnProps("sticky-col-left-1"),
+  },
+  {
     field: "carrierName",
     headerName: "Carrier Name",
-    ...getStickyColumnProps("sticky-col-left-1"),
+    ...getStickyColumnProps("sticky-col-left-2"),
   },
   {
     field: "taxId",
     headerName: "Tax ID(EIN)",
-    ...getStickyColumnProps("sticky-col-left-2"),
+    ...defaultColumnProps,
   },
   {
     field: "usdot",
@@ -88,23 +95,23 @@ export const AccountManagementColumnsData = (onViewAccount) => [
   {
     field: "secondaryContactEmail",
     headerName: "Secondary Contact Email",
-     ...defaultColumnProps,
+    ...defaultColumnProps,
   },
-  {
-    field: "website",
-    headerName: "Website",
-     ...defaultColumnProps,
-  },
+  // {
+  //   field: "website",
+  //   headerName: "Website",
+  //    ...defaultColumnProps,
+  // },
   {
     field: "tollFree",
     headerName: "Toll Free",
-     ...defaultColumnProps,
-  },
-  {
-    field: "fax",
-    headerName: "Fax",
     ...defaultColumnProps,
   },
+  // {
+  //   field: "fax",
+  //   headerName: "Fax",
+  //   ...defaultColumnProps,
+  // },
   {
     field: "maxDevices",
     headerName: "Max Devices",
@@ -113,19 +120,19 @@ export const AccountManagementColumnsData = (onViewAccount) => [
   {
     field: "createdOn",
     headerName: "Created On",
-     ...defaultColumnProps,
+    ...defaultColumnProps,
     renderCell: renderDateCell,
   },
   {
     field: "lastSync",
     headerName: "Updated on",
-     ...defaultColumnProps,
+    ...defaultColumnProps,
     renderCell: renderDateCell,
   },
   {
     field: "status",
     headerName: "Status",
-     ...defaultColumnProps,
+    ...defaultColumnProps,
     renderCell: renderStatusCell,
   },
   {
@@ -138,7 +145,11 @@ export const AccountManagementColumnsData = (onViewAccount) => [
 ];
 
 export const AccountManagementRowData = (response = []) => {
-  const companiesArray = Array.isArray(response) ? response : (response ? [response] : []);
+  const companiesArray = Array.isArray(response)
+    ? response
+    : response
+      ? [response]
+      : [];
 
   return companiesArray.map((company) => {
     const {
@@ -160,11 +171,20 @@ export const AccountManagementRowData = (response = []) => {
     } = company;
 
     const { street } = address;
-    const { name: primaryContactName, phone: primaryContactNumber, email: primaryContactEmail } = contact;
-    const { name: secondaryContactName, phone: secondaryContactNumber, email: secondaryContactEmail } = secondaryContact || {};
+    const {
+      name: primaryContactName,
+      phone: primaryContactNumber,
+      email: primaryContactEmail,
+    } = contact;
+    const {
+      name: secondaryContactName,
+      phone: secondaryContactNumber,
+      email: secondaryContactEmail,
+    } = secondaryContact || {};
 
     return {
       id: company_id,
+      carrierId: company_id ?? "-",
       carrierName: companyName || "-",
       taxId: ein || "-",
       usdot: dotNumber || "-",
