@@ -9,7 +9,7 @@ import {
 } from "./CommonBreadcrumb.styled";
 
 const BreadcrumbItem = ({ item, isLast, onClick }) => (
-  <Box key={`${item.label}-${item.path || "last"}`} component="span" sx={BreadcrumbItemSx}>
+  <Box component="span" sx={BreadcrumbItemSx}>
     {isLast ? (
       <BreadcrumbBold>{item.label}</BreadcrumbBold>
     ) : (
@@ -22,7 +22,11 @@ const BreadcrumbItem = ({ item, isLast, onClick }) => (
         {item.label}
       </Typography>
     )}
-    {!isLast && <Box component="span" sx={BreadcrumbSeparatorSx}>/</Box>}
+    {!isLast && (
+      <Box component="span" sx={BreadcrumbSeparatorSx}>
+        /
+      </Box>
+    )}
   </Box>
 );
 

@@ -6,6 +6,7 @@ import TableChartIcon from "@mui/icons-material/TableChart";
 import DescriptionIcon from "@mui/icons-material/Description";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import { useId } from "react";
+import { showFileValidationError } from "./CommonUtils";
 import {
   getUploadAreaSx,
   HiddenInputStyle,
@@ -86,12 +87,12 @@ const FilePreviewItem = ({ file, index, isExisting, onPreview, onRemove }) => {
   const fileUrl = isExisting
     ? file.url
     : file instanceof File
-    ? URL.createObjectURL(file)
-    : file;
+      ? URL.createObjectURL(file)
+      : file;
   const isImage = isImageFile(fileName);
 
   return (
-    <Box key={`${isExisting ? "existing" : "new"}-${index}`} sx={FilePreviewContainerSx}>
+    <Box sx={FilePreviewContainerSx}>
       {isImage ? (
         <Box
           component="img"
@@ -183,16 +184,23 @@ const CommonFileUpload = ({
     if (disabled) return;
     const selectedFiles = Array.from(e.target.files);
 
-    const invalidTypeFiles = selectedFiles.filter((file) => !isValidFileType(file));
+    const invalidTypeFiles = selectedFiles.filter(
+      (file) => !isValidFileType(file),
+    );
     if (invalidTypeFiles.length > 0) {
       const invalidNames = invalidTypeFiles.map((f) => f.name).join(", ");
-      alert(`Invalid file type(s): ${invalidNames}. Allowed types: ${getReadableFileTypes()}`);
+      showFileValidationError(
+        "invalid_type",
+        `${invalidNames}. Allowed types: ${getReadableFileTypes()}`,
+        maxSize,
+        formatFileSize,
+      );
       return;
     }
 
     const oversizedFiles = selectedFiles.filter((file) => file.size > maxSize);
     if (oversizedFiles.length > 0) {
-      alert(`Some files exceed the maximum size of ${formatFileSize(maxSize)}`);
+      showFileValidationError("oversized", null, maxSize, formatFileSize);
       return;
     }
 
@@ -204,16 +212,23 @@ const CommonFileUpload = ({
     e.preventDefault();
     const droppedFiles = Array.from(e.dataTransfer.files);
 
-    const invalidTypeFiles = droppedFiles.filter((file) => !isValidFileType(file));
+    const invalidTypeFiles = droppedFiles.filter(
+      (file) => !isValidFileType(file),
+    );
     if (invalidTypeFiles.length > 0) {
       const invalidNames = invalidTypeFiles.map((f) => f.name).join(", ");
-      alert(`Invalid file type(s): ${invalidNames}. Allowed types: ${getReadableFileTypes()}`);
+      showFileValidationError(
+        "invalid_type",
+        `${invalidNames}. Allowed types: ${getReadableFileTypes()}`,
+        maxSize,
+        formatFileSize,
+      );
       return;
     }
 
     const oversizedFiles = droppedFiles.filter((file) => file.size > maxSize);
     if (oversizedFiles.length > 0) {
-      alert(`Some files exceed the maximum size of ${formatFileSize(maxSize)}`);
+      showFileValidationError("oversized", null, maxSize, formatFileSize);
       return;
     }
 

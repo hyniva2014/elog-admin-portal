@@ -1,16 +1,16 @@
 export const getTextFieldSx = (disabled) => (theme) => ({
-  minWidth: 240,
+  minWidth: theme.spacing(30),
   "& .MuiInputBase-root": {
-    height: 36,
+    height: theme.spacing(4.5),
     display: "flex",
     alignItems: "center",
   },
   "& .MuiInputBase-input": {
-    fontSize: 13,
+    fontSize: theme.typography.pxToRem(13),
     fontWeight: 500,
     cursor: disabled ? "not-allowed" : "pointer",
-    paddingLeft: "8px",
-    paddingTop: "5px",
+    paddingLeft: theme.spacing(1),
+    paddingTop: theme.spacing(0.625),
     textAlign: "left",
   },
   "& .MuiInputBase-root.Mui-disabled": {

@@ -19,12 +19,16 @@ const UserTopHeader = ({ data }) => {
     rolesOptions.find((item) => item.value === data.role)?.label ||
     data.role ||
     "-";
+  const profileImage =
+    typeof data?.profile_photo === "string"
+      ? data.profile_photo
+      : data?.profile_photo?.[0]?.file_url || "";
 
   return (
     <Box sx={TopHeaderSx}>
       {/* LEFT: Avatar + Name */}
       <Box sx={TopHeaderLeftSx}>
-        <Avatar src={data.profile_photo} sx={AvatarSx}>
+        <Avatar src={profileImage} sx={AvatarSx}>
           {data.first_name?.[0]}
           {data.last_name?.[0]}
         </Avatar>

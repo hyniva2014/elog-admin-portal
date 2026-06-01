@@ -2,7 +2,7 @@ import { styled } from "@mui/material/styles";
 import { Typography } from "@mui/material";
 
 export const BreadcrumbText = styled(Typography)(({ theme }) => ({
-  fontSize: "15px",
+  fontSize: theme.typography.pxToRem(15),
   color: theme.palette.text.secondary,
 }));
 

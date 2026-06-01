@@ -9,13 +9,13 @@ export const NoAccessWrapperSx = (height) => ({
 });
 
 export const NoAccessTitleSx = (theme) => ({
-  fontSize: "20px !important",
+  fontSize: theme.typography.h5.fontSize,
   fontWeight: 600,
   color: theme.palette.text.secondary,
 });
 
 export const NoAccessSubtitleSx = (theme) => ({
-  fontSize: "15px !important",
+  fontSize: theme.typography.body1.fontSize,
   color: theme.palette.text.secondary,
-  mt: 1,
+  marginTop: theme.spacing(1),
 });

@@ -24,18 +24,22 @@ const getBorderColor = (disabled, error, theme) => {
   return theme.palette.divider;
 };
 
-export const getUploadAreaSx = ({ disabled, error, size }) => (theme) => ({
-  mt: size === "small" ? 1 : 2,
-  p: size === "small" ? 1.5 : 3,
-  border: error ? `2px solid ${theme.palette.error.main}` : `1px dashed ${theme.palette.divider}`,
-  borderRadius: 2,
-  textAlign: "center",
-  opacity: disabled ? 0.6 : 1,
-  pointerEvents: disabled ? "none" : "auto",
-  cursor: disabled ? "not-allowed" : "pointer",
-  backgroundColor: getBackgroundColor(disabled, error, theme),
-  borderColor: getBorderColor(disabled, error, theme),
-});
+export const getUploadAreaSx =
+  ({ disabled, error, size }) =>
+  (theme) => ({
+    mt: size === "small" ? 1 : 2,
+    p: size === "small" ? 1.5 : 3,
+    border: error
+      ? `2px solid ${theme.palette.error.main}`
+      : `1px dashed ${theme.palette.divider}`,
+    borderRadius: 2,
+    textAlign: "center",
+    opacity: disabled ? 0.6 : 1,
+    pointerEvents: disabled ? "none" : "auto",
+    cursor: disabled ? "not-allowed" : "pointer",
+    backgroundColor: getBackgroundColor(disabled, error, theme),
+    borderColor: getBorderColor(disabled, error, theme),
+  });
 
 export const HiddenInputStyle = {
   display: "none",
@@ -92,8 +96,8 @@ export const FilesWrapperSx = (hasFiles, shouldHideUploadArea) => ({
 
 export const FilePreviewContainerSx = (theme) => ({
   position: "relative",
-  width: 70,
-  height: 70,
+  width: theme.spacing(8.75),
+  height: theme.spacing(8.75),
   borderRadius: 1,
   overflow: "hidden",
   border: `1px solid ${theme.palette.divider}`,
@@ -114,19 +118,19 @@ export const FilePreviewInnerSx = {
   p: 1,
 };
 
-export const FileNameTypographySx = {
-  mt: 0.5,
-  maxWidth: "80px",
+export const FileNameTypographySx = (theme) => ({
+  marginTop: theme.spacing(0.5),
+  maxWidth: theme.spacing(10),
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
-  fontSize: "10px",
-};
+  fontSize: theme.typography.pxToRem(10),
+});
 
 export const RemoveButtonSx = (theme) => ({
   position: "absolute",
-  top: -8,
-  right: -8,
+  top: theme.spacing(-1),
+  right: theme.spacing(-1),
   background: theme.palette.common.white,
 });
 

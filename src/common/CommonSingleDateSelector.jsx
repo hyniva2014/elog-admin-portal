@@ -83,6 +83,19 @@ const CommonSingleDateSelector = ({
     setAnchorEl(null);
   }
 
+  const handleDateChange = (newDate) => {
+    if (!newDate || !dayjs(newDate).isValid()) {
+      return;
+    }
+
+    setInternalValue(newDate);
+
+    if (currentView === "day") {
+      onChange(newDate);
+      closePopover();
+    }
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box>
@@ -118,18 +131,7 @@ const CommonSingleDateSelector = ({
               views={["year", "month", "day"]}
               value={internalValue}
               onViewChange={setCurrentView}
-              onChange={(newDate) => {
-                if (!newDate || !dayjs(newDate).isValid()) {
-                  return;
-                }
-
-                setInternalValue(newDate);
-
-                if (currentView === "day") {
-                  onChange(newDate);
-                  closePopover();
-                }
-              }}
+              onChange={handleDateChange}
               minDate={effectiveMinDate}
               maxDate={maxDate || undefined}
               disablePast={disablePast}
