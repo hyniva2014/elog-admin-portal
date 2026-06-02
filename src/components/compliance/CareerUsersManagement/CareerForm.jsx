@@ -33,6 +33,7 @@ import dayjs from "dayjs";
 import { citizenshipMap, defaultPageSize, languageMap } from "./Constants";
 import UserAddHeader from "./HeaderComponents/UserAddHeader";
 import UserTopHeader from "./HeaderComponents/UserTopHeader";
+import { formatPhoneNumber } from "../../../common/CommonUtils";
 
 const formatSSN = (ssn) => {
   if (!ssn) return "";
@@ -42,16 +43,6 @@ const formatSSN = (ssn) => {
     return `${match[1]}-${match[2]}-${match[3]}`;
   }
   return ssn;
-};
-
-const formatPhoneNumber = (phoneNumber) => {
-  if (!phoneNumber) return "";
-  const cleaned = String(phoneNumber).replace(/\D/g, "");
-  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
-  if (match) {
-    return `(${match[1]}) ${match[2]}-${match[3]}`;
-  }
-  return phoneNumber;
 };
 
 const debounce = (func, delay) => {
@@ -149,12 +140,12 @@ const CareerForm = () => {
       setLoadingState(true);
       setLoading(true);
 
-      const response = await getCareerUserDetails({
+      const data = await getCareerUserDetails({
         companyId,
         userId,
       });
 
-      const data = response?.body?.users?.[0] || response?.users?.[0];
+      // const data = response?.body?.users?.[0] || response?.users?.[0];
       if (!data) return;
 
       let carrierName = "";

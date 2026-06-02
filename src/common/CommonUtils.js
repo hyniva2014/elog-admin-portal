@@ -153,3 +153,19 @@ export const formatSSN = (value) => {
   }
   return `${ssn.slice(0, 3)}-${ssn.slice(3, 5)}-${ssn.slice(5, 9)}`;
 };
+
+
+ 
+ export const formatPhoneNumber = (phoneNumber) => {
+  if (!phoneNumber) return "";
+  const cleaned = String(phoneNumber).replace(/\D/g, "");
+  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+  if (match) {
+    return `(${match[1]}) ${match[2]}-${match[3]}`;
+  }
+  return phoneNumber;
+};
+
+export const showFileValidationError = () => {
+
+};

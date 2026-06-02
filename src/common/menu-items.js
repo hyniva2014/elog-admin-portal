@@ -1,15 +1,9 @@
 import { MdDashboard } from "react-icons/md";
-<<<<<<< HEAD
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import GroupIcon from "@mui/icons-material/Group";
 import TabletMacIcon from "@mui/icons-material/TabletMac";
 import MemoryIcon from "@mui/icons-material/Memory";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
-=======
-import GroupIcon from '@mui/icons-material/Group';
-import TabletMacIcon from '@mui/icons-material/TabletMac';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
->>>>>>> 60a0a351b2db7dc738af7431e901be469d21afa0
 
 const MENU_ITEMS = [
   {
