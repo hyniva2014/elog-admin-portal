@@ -19,6 +19,10 @@ import {
 import BulkUploadForm from "./BulkUploadForm";
 import AssignDevicesToCarriers from "../DeviceManagement/AssignDevicesToCarriers";
 
+const isDeviceAssetSelectable = (params) => {
+  return params.row.status?.toLowerCase() === "in stock";
+};
+
 const DeviceAssetManagement = () => {
   const { fetchApi, createApi } = useServices();
   const { loading, setLoading, LoadingContainer } = CommonLoading();
@@ -454,6 +458,7 @@ const DeviceAssetManagement = () => {
             checkboxSelection
             rowSelectionModel={selectedRows}
             onRowSelectionModelChange={handleRowSelectionChange}
+            isRowSelectable={isDeviceAssetSelectable}
           />
         </GridContainer>
       </PageContainer>

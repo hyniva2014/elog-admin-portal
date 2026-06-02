@@ -1,10 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import CommonPageHeader from "../../../common/CommonPageHeader";
 import CommonFilters from "../../../common/CommonFilters";
-import {
-  DEVICE_ASSET_STATUS_FILTER_OPTIONS,
-  // DEVICE_ASSET_MODEL_FILTER_OPTIONS,
-} from "./Constants";
+import { DEVICE_ASSET_STATUS_FILTER_OPTIONS } from "./Constants";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { useSelector } from "react-redux";
 import {
@@ -50,7 +47,7 @@ const DeviceAssetManagementHeader = (props) => {
       const response = await fetchApi("/masteradmin/get-device-model-dropdown");
       const dropdownData = response?.body?.data || [];
       const formattedOptions = dropdownData.map((item) => ({
-        value: item.model_name,
+        value: item.device_model_id,
         label: item.model_name,
       }));
 

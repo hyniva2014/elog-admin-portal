@@ -30,70 +30,109 @@ const validationSchema = yup.object({
     .required("Carrier Name is required")
     .min(2, "Carrier Name must be at least 2 characters")
     .max(100, "Carrier Name must not exceed 100 characters"),
+
   usdot: yup
     .string()
     .required("USDOT Number is required")
     .matches(/^\d{6,8}$/, "USDOT Number must be 6-8 digits"),
+
   taxId: yup
     .string()
-    .required("Tax ID (EIN) is required")
-    .matches(/^\d{2}-\d{7}$/, "Tax ID (EIN) must be in format XX-XXXXXXX"),
+    .nullable()
+    .test(
+      "taxId",
+      "Tax ID (EIN) must be in format XX-XXXXXXX",
+      (value) => !value || /^\d{2}-\d{7}$/.test(value),
+    ),
+
   mcNumber: yup
     .string()
-    .required("MC Number is required")
-    .matches(/^\d{6,8}$/, "MC Number must be 6-8 digits"),
+    .nullable()
+    .test(
+      "mcNumber",
+      "MC Number must be 6-8 digits",
+      (value) => !value || /^\d{6,8}$/.test(value),
+    ),
+
   maxDevices: yup
     .number()
-    .typeError("Max Devices must be a number")
-    .required("Max Devices is required")
+    .transform((value, originalValue) =>
+      originalValue === "" ? undefined : value,
+    )
     .positive("Max Devices must be greater than 0")
     .integer("Max Devices must be a whole number"),
 
   tollFree: yup
     .string()
-    .required("Toll Free is required")
-    .matches(
-      /^(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/,
+    .test(
+      "phone",
       "Please enter a valid phone number",
+      (value) =>
+        !value ||
+        /^(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/.test(
+          value,
+        ),
     ),
+
   carrierAddress: yup
     .string()
-    .required("Carrier Address is required")
-    .min(5, "Address must be at least 5 characters"),
+    .test(
+      "address",
+      "Address must be at least 5 characters",
+      (value) => !value || value.length >= 5,
+    ),
+
   primaryContactName: yup
     .string()
-    .required("Primary Contact Name is required")
-    .min(2, "Name must be at least 2 characters"),
+    .test(
+      "name",
+      "Name must be at least 2 characters",
+      (value) => !value || value.length >= 2,
+    ),
+
   primaryContactNumber: yup
     .string()
-    .required("Primary Contact Number is required")
-    .matches(
-      /^(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/,
+    .test(
+      "phone",
       "Please enter a valid phone number",
+      (value) =>
+        !value ||
+        /^(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/.test(
+          value,
+        ),
     ),
+
   primaryContactEmail: yup
     .string()
-    .required("Primary Contact Email is required")
-    .email("Please enter a valid email address (e.g., user@example.com)"),
+    .email("Please enter a valid email address")
+    .nullable(),
+
   secondaryContactName: yup
     .string()
-    .required("Secondary Contact Name is required")
-    .min(2, "Name must be at least 2 characters"),
+    .test(
+      "name",
+      "Name must be at least 2 characters",
+      (value) => !value || value.length >= 2,
+    ),
+
   secondaryContactNumber: yup
     .string()
-    .required("Secondary Contact Number is required")
-    .matches(
-      /^(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/,
+    .test(
+      "phone",
       "Please enter a valid phone number",
+      (value) =>
+        !value ||
+        /^(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/.test(
+          value,
+        ),
     ),
+
   secondaryContactEmail: yup
     .string()
-    .required("Secondary Contact Email is required")
-    .email("Please enter a valid email address (e.g., user@example.com)"),
-  status: yup
-    .string()
-    .required("Status is required")
-    .oneOf(["1", "2"], "Status must be Active or Inactive"),
+    .email("Please enter a valid email address")
+    .nullable(),
+
+  status: yup.string().oneOf(["1", "2"]),
 });
 
 const defaultValues = {
