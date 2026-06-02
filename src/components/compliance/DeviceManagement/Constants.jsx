@@ -11,8 +11,8 @@ const formatDate = (value) =>
   value ? dayjs(value).format("MMM DD, YYYY") : "-";
 
 export const DEVICE_STATUS_FILTER_OPTIONS = [
-  { value: "1", label: "Assigned" },
-  { value: "0", label: "Unassigned" },
+  { value: "1", label: "Allocated" },
+  { value: "2", label: "Assigned" },
 ];
 
 export const DEVICE_IGNITION_FILTER_OPTIONS = [
@@ -176,16 +176,15 @@ export const columns = [
     minWidth: 90,
     renderCell: (params) => <StatusCell value={params.value} />,
   },
-  // {
-  //   field: "action",
-  //   headerName: "Action",
-  //   flex: 1,
-    // align: "center",
-    // headerAlign: "center",
-  //   minWidth: 100,
-  //   renderCell: () => <ActionCell />,
-  // },
 ];
+
+const DEVICE_STATUS_MAP = {
+  1: "Allocated",
+  2: "Assigned",
+};
+
+export const getDeviceStatus = (status) =>
+  DEVICE_STATUS_MAP[Number(status)] || "-";
 
 export const transformDeviceData = (data = []) =>
   data.map((item) => ({
@@ -202,14 +201,13 @@ export const transformDeviceData = (data = []) =>
     speed: item.speed ?? 0,
     createdOn: item.created_at,
     updatedOn: item.updated_at,
-    status:
-      item.status === "1" || item.status === 1 ? "Assigned" : "Unassigned",
+    status: getDeviceStatus(item.status),
   }));
 
 export const DEVICE_SUMMARY_CARDS = {
   totalDevices: {
     id: "totalDevices",
-    title: "Total Devices",
+    title: "Total Active Devices",
     accentcolor: "brand",
     icon: <DevicesIcon fontSize="small" color="brand" />,
   },
@@ -225,12 +223,12 @@ export const DEVICE_SUMMARY_CARDS = {
     accentcolor: "error",
     icon: <WifiOffIcon fontSize="small" color="error" />,
   },
-  unassignedDevices: {
-    id: "unassignedDevices",
-    title: "Unassigned Devices",
-    accentcolor: "warning",
-    icon: <Inventory2OutlinedIcon fontSize="small" a color="warning" />,
-  },
+  // unassignedDevices: {
+  //   id: "unassignedDevices",
+  //   title: "Unassigned Devices",
+  //   accentcolor: "warning",
+  //   icon: <Inventory2OutlinedIcon fontSize="small" a color="warning" />,
+  // },
 };
 
 export const GVWR_OPTIONS = [
