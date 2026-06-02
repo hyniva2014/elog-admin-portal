@@ -110,7 +110,7 @@ const AccountManagement = () => {
     setCompanyToDelete(null);
   }, []);
 
-  const { buildFetchUrl, fetchData, handleCreateAccount, handleViewAccount, handleDeleteAccount, fetchContactsDropdown, fetchCompaniesDropdown } = useAccountManagement(
+  const { buildFetchUrl, fetchData, handleCreateAccount, handleViewAccount, handleDeleteAccount, fetchContactsDropdown, fetchCompaniesDropdown, fetchCarrierOptions } = useAccountManagement(
     companyId,
     primaryContactName,
     secondaryContactName,
@@ -266,6 +266,7 @@ const AccountManagement = () => {
         initialData={initialFormData}
         onEditClick={handleEditClick}
         onCancelEdit={handleCancelEdit}
+        fetchCarrierOptions={fetchCarrierOptions}
       />
 
       <CommonConfirmDialog

@@ -1,4 +1,3 @@
-
 export const formatUsdot = (value) => {
   if (!value) return value;
   return value.replace(/\D/g, "").slice(0, 8);
@@ -6,7 +5,10 @@ export const formatUsdot = (value) => {
 
 export const formatMcNumber = (value) => {
   if (!value) return value;
-  return value.replace(/\D/g, "").slice(0, 8);
+  const upper = value.toUpperCase();
+  const hasPrefix = upper.startsWith("MC");
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  return hasPrefix ? `MC${digits}` : digits;
 };
 
 export const formatTaxId = (value) => {

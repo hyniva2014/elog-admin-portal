@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from "react";
+import CarrierNameAutocomplete from "./CarrierNameAutocomplete";
 import { Divider, Grid } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -16,6 +17,8 @@ import {
 import {
   STATUS_OPTIONS,
   ACCOUNT_FORM_FIELDS,
+  ACCOUNT_FORM_FIELDS_WITHOUT_CARRIER,
+  CARRIER_FIELD_MAP,
   PRIMARY_CONTACT_FIELDS,
   SECONDARY_CONTACT_FIELDS,
 } from "./Constants";
@@ -51,7 +54,7 @@ const validationSchema = yup.object({
     .test(
       "mcNumber",
       "MC Number must be 6-8 digits",
-      (value) => !value || /^\d{6,8}$/.test(value),
+      (value) => !value || /^(?:MC)?\d{6,8}$/i.test(value),
     ),
 
   maxDevices: yup
@@ -169,6 +172,7 @@ const AddAccountDialog = ({
   initialData = null,
   onEditClick,
   onCancelEdit,
+  fetchCarrierOptions,
 }) => {
   const isEditMode = mode === "edit";
   const isViewMode = mode === "view";
@@ -178,6 +182,7 @@ const AddAccountDialog = ({
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
@@ -193,8 +198,19 @@ const AddAccountDialog = ({
   }, [open, reset, initialData]);
 
   const shouldShowStatusField = mode !== "add";
-  const submitButtonText = isEditMode ? "Update" : "Save";
   const dialogTitle = DIALOG_TITLES[mode] ?? DIALOG_TITLES.add;
+
+  const handleCarrierSelect = useCallback(
+    (carrier) => {
+      Object.entries(CARRIER_FIELD_MAP).forEach(([apiKey, formKey]) => {
+        const value = carrier[apiKey];
+        if (value !== undefined && value !== null) {
+          setValue(formKey, String(value), { shouldValidate: true, shouldDirty: true });
+        }
+      });
+    },
+    [setValue],
+  );
 
   const handleCancel = useCallback(() => {
     reset(defaultValues);
@@ -239,69 +255,68 @@ const AddAccountDialog = ({
     return null;
   }, [isViewMode, isEditMode, onEditClick, onCancelEdit, loading]);
 
-  const contentWithActions = useMemo(
-    () => (
-      <>
-        <form id={ADD_ACCOUNT_FORM_ID} onSubmit={handleSubmit(submitHandler)}>
-          <DialogFormContainer>
-            <Grid container spacing={2}>
-              <FormFieldsSection
-                fields={ACCOUNT_FORM_FIELDS}
-                control={control}
-                errors={errors}
-                disabled={isFieldDisabled}
-              />
+  const formContent = (
+    <form id={ADD_ACCOUNT_FORM_ID} onSubmit={handleSubmit(submitHandler)}>
+      <DialogFormContainer>
+        <Grid container spacing={2}>
+          <CarrierNameAutocomplete
+            formProps={{ control, errors }}
+            carrierProps={{ fetchCarrierOptions, onCarrierSelect: handleCarrierSelect }}
+            disabled={isFieldDisabled}
+          />
 
-              {shouldShowStatusField && (
-                <FormSelect
-                  name="status"
-                  label="Status"
-                  control={control}
-                  errors={errors}
-                  disabled={isFieldDisabled}
-                  required
-                  options={STATUS_OPTIONS}
-                />
-              )}
+          <FormFieldsSection
+            fields={ACCOUNT_FORM_FIELDS_WITHOUT_CARRIER}
+            control={control}
+            errors={errors}
+            disabled={isFieldDisabled}
+          />
 
-              <Grid item xs={12}>
-                <PrimarySectionHeader>PRIMARY DETAILS</PrimarySectionHeader>
-                <Divider />
-              </Grid>
+          {shouldShowStatusField && (
+            <FormSelect
+              name="status"
+              label="Status"
+              control={control}
+              errors={errors}
+              disabled={isFieldDisabled}
+              required
+              options={STATUS_OPTIONS}
+            />
+          )}
 
-              <FormFieldsSection
-                fields={PRIMARY_CONTACT_FIELDS}
-                control={control}
-                errors={errors}
-                disabled={isFieldDisabled}
-              />
+          <Grid item xs={12}>
+            <PrimarySectionHeader>PRIMARY DETAILS</PrimarySectionHeader>
+            <Divider />
+          </Grid>
 
-              <Grid item xs={12}>
-                <SecondarySectionHeader>
-                  SECONDARY DETAILS
-                </SecondarySectionHeader>
-                <Divider />
-              </Grid>
+          <FormFieldsSection
+            fields={PRIMARY_CONTACT_FIELDS}
+            control={control}
+            errors={errors}
+            disabled={isFieldDisabled}
+          />
 
-              <FormFieldsSection
-                fields={SECONDARY_CONTACT_FIELDS}
-                control={control}
-                errors={errors}
-                disabled={isFieldDisabled}
-              />
-            </Grid>
-          </DialogFormContainer>
-        </form>
-      </>
-    ),
-    [control, errors, isFieldDisabled, shouldShowStatusField],
+          <Grid item xs={12}>
+            <SecondarySectionHeader>SECONDARY DETAILS</SecondarySectionHeader>
+            <Divider />
+          </Grid>
+
+          <FormFieldsSection
+            fields={SECONDARY_CONTACT_FIELDS}
+            control={control}
+            errors={errors}
+            disabled={isFieldDisabled}
+          />
+        </Grid>
+      </DialogFormContainer>
+    </form>
   );
 
   return (
     <CommonDialogForm
       open={open}
       title={dialogTitle}
-      content={contentWithActions}
+      content={formContent}
       formId={ADD_ACCOUNT_FORM_ID}
       onCancel={handleCancel}
       onSubmit={handleSubmit(submitHandler)}
