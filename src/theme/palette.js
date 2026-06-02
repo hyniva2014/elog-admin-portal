@@ -32,7 +32,7 @@ const paletteTheme = (themeMode) => {
 
     common: {
       white: "#fff",
-
+      sidebar:"rgba(255,255,255,0.1)",
       black: "#000",
     },
 
