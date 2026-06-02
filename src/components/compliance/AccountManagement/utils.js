@@ -1,3 +1,8 @@
+export const fetchCarriers = async (fetchApi, params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  const response = await fetchApi(`/masteradmin/external-fleet/carriers?${query}`);
+  return response?.body?.carriers ?? null;
+};
 
 export const formatUsdot = (value) => {
   if (!value) return value;
@@ -6,7 +11,10 @@ export const formatUsdot = (value) => {
 
 export const formatMcNumber = (value) => {
   if (!value) return value;
-  return value.replace(/\D/g, "").slice(0, 8);
+  const upper = value.toUpperCase();
+  const hasPrefix = upper.startsWith("MC");
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  return hasPrefix ? `MC${digits}` : digits;
 };
 
 export const formatTaxId = (value) => {

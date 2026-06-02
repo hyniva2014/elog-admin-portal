@@ -23,6 +23,22 @@ export const getStickyColumnProps = (className) => ({
   flex: 1,
 });
 
+export const CARRIER_FIELD_MAP = {
+  carrier_name: "carrierName",
+  carrier_address: "carrierAddress",
+  usdot_number: "usdot",
+  tax_id: "taxId",
+  mc_number: "mcNumber",
+  max_devices: "maxDevices",
+  toll_free_number: "tollFree",
+  primary_contact_name: "primaryContactName",
+  primary_contact_number: "primaryContactNumber",
+  primary_contact_email: "primaryContactEmail",
+  secondary_contact_name: "secondaryContactName",
+  secondary_contact_number: "secondaryContactNumber",
+  secondary_contact_email: "secondaryContactEmail",
+};
+
 export const ACCOUNT_FORM_FIELDS = [
   { name: "carrierName", label: "Carrier Name", required: true },
   { name: "carrierAddress", label: "Carrier Address" },
@@ -51,6 +67,10 @@ export const ACCOUNT_FORM_FIELDS = [
     formatter: "phone",
   },
 ];
+
+export const ACCOUNT_FORM_FIELDS_WITHOUT_CARRIER = ACCOUNT_FORM_FIELDS.filter(
+  (f) => f.name !== "carrierName",
+);
 
 export const PRIMARY_CONTACT_FIELDS = [
   { name: "primaryContactName", label: "Primary Contact Name" },

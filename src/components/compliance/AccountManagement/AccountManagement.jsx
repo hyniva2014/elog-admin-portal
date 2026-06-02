@@ -97,7 +97,7 @@ const AccountManagement = () => {
     setDialogMode("view");
   }, []);
 
-  const { buildFetchUrl, fetchData, handleCreateAccount, handleViewAccount, fetchContactsDropdown, fetchCompaniesDropdown } = useAccountManagement(
+  const { buildFetchUrl, fetchData, handleCreateAccount, handleViewAccount, fetchContactsDropdown, fetchCompaniesDropdown, fetchCarrierOptions } = useAccountManagement(
     companyId,
     primaryContactName,
     secondaryContactName,
@@ -244,6 +244,7 @@ const AccountManagement = () => {
         initialData={initialFormData}
         onEditClick={handleEditClick}
         onCancelEdit={handleCancelEdit}
+        fetchCarrierOptions={fetchCarrierOptions}
       />
     </PageContainer>
   );

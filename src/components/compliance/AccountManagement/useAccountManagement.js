@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { AccountManagementRowData } from "./CommonRowColumnUtils";
+import { fetchCarriers } from "./utils";
 
 export const useAccountManagement = (
   companyId,
@@ -194,6 +195,24 @@ export const useAccountManagement = (
     }
   }, []);
 
+  const fetchCarrierOptions = useCallback(
+    async ({ carrier_name, carrier_id } = {}) => {
+      try {
+        const params = {
+          ...(carrier_name && { carrier_name }),
+          ...(carrier_id && { carrier_id }),
+        };
+        const result = await fetchCarriers(fetchApi, params);
+        if (carrier_id) return result && !Array.isArray(result) ? result : null;
+        return Array.isArray(result) ? result : [];
+      } catch (err) {
+        console.error("Error fetching carriers:", err);
+        return carrier_id ? null : [];
+      }
+    },
+    [fetchApi],
+  );
+
   return {
     buildFetchUrl,
     fetchData,
@@ -201,5 +220,6 @@ export const useAccountManagement = (
     handleViewAccount,
     fetchContactsDropdown,
     fetchCompaniesDropdown,
+    fetchCarrierOptions,
   };
 };
