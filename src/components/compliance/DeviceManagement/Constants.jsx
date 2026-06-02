@@ -4,7 +4,7 @@ import DevicesIcon from "@mui/icons-material/Devices";
 import WifiIcon from "@mui/icons-material/Wifi";
 import WifiOffIcon from "@mui/icons-material/WifiOff";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
-import { IconButton } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import { StatusTypography } from "./DeviceManagement.styles";
 
 const formatDate = (value) =>
@@ -156,7 +156,16 @@ export const columns = [
     align: "center",
     headerAlign: "center",
     minWidth: 120,
-    renderCell: (params) => formatDate(params.value),
+    renderCell: (params) => (
+      <Box>
+        <Typography fontSize={14} fontWeight={400}>
+          {params.row.createdDate}
+        </Typography>
+        <Typography fontSize={14} fontWeight={400} color="#6E7079">
+          {params.row.createdTime}
+        </Typography>
+      </Box>
+    ),
   },
   {
     field: "updatedOn",
@@ -165,7 +174,16 @@ export const columns = [
     align: "center",
     headerAlign: "center",
     minWidth: 120,
-    renderCell: (params) => formatDate(params.value),
+    renderCell: (params) => (
+      <Box>
+        <Typography fontSize={14} fontWeight={400}>
+          {params.row.updatedDate}
+        </Typography>
+        <Typography fontSize={14} fontWeight={400} color="#6E7079">
+          {params.row.updatedTime}
+        </Typography>
+      </Box>
+    ),
   },
   {
     field: "status",
@@ -199,8 +217,18 @@ export const transformDeviceData = (data = []) =>
     longitude: item.longitude ?? "-",
     ignition: item.ignition ?? "-",
     speed: item.speed ?? 0,
-    createdOn: item.created_at,
-    updatedOn: item.updated_at,
+    createdDate: item.created_at
+      ? dayjs(item.created_at).format("MMM DD, YYYY")
+      : "-",
+    createdTime: item.created_at
+      ? dayjs(item.created_at).format("hh:mm A")
+      : "-",
+    updatedDate: item.updated_at
+      ? dayjs(item.updated_at).format("MMM DD, YYYY")
+      : "-",
+    updatedTime: item.updated_at
+      ? dayjs(item.updated_at).format("hh:mm A")
+      : "-",
     status: getDeviceStatus(item.status),
   }));
 

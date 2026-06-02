@@ -13,8 +13,8 @@ export const FiltersContainer = styled(Box)(({ theme }) => ({
 export const SearchWrapper = styled(Box)(({ theme }) => ({
   width: "100%",
   [theme.breakpoints.up("md")]: {
-    width: "35%",
-    minWidth: 220,
+    width: "25%",
+    minWidth: 300,
   },
   flexShrink: 0,
 }));

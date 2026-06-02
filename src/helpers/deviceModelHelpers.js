@@ -1,8 +1,5 @@
-/**
- * Generates a device code from a model name
- * @param {string} name - The model name (e.g., "Samsara G2")
- * @returns {string} - The generated device code (e.g., "SG2")
- */
+import dayjs from "dayjs";
+
 export const generateDeviceCode = (name) => {
   if (!name || typeof name !== "string") {
     return `DM${Date.now().toString().slice(-3)}`;
@@ -58,8 +55,18 @@ export const transformDeviceModelData = (apiData) =>
     description: item.description || "-",
     supportsElogs:
       item.supports_elogs === 1 || item.supports_elogs === "1" ? 1 : 0,
-    createdOn: item.created_at || null,
-    updatedOn: item.updated_at || null,
+    createdDate: item.created_at
+      ? dayjs(item.created_at).format("MMM DD, YYYY")
+      : "-",
+    createdTime: item.created_at
+      ? dayjs(item.created_at).format("hh:mm A")
+      : "-",
+    updatedDate: item.updated_at
+      ? dayjs(item.updated_at).format("MMM DD, YYYY")
+      : "-",
+    updatedTime: item.updated_at
+      ? dayjs(item.updated_at).format("hh:mm A")
+      : "-",
     status: item.status ?? 1,
     statusLabel: getStatusLabel(item.status),
   }));

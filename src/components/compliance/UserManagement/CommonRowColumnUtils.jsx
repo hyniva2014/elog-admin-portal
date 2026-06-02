@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import eyeIcon from "../../../assets/images/svg/eyeicon.png";
-import { IconButton } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import { StatusText } from "./CommonRowColumnUtils.styled";
 import { USER_STATUS, USER_STATUS_COL_CONFIG } from "./Constants";
 import dayjs from "dayjs";
@@ -52,70 +52,63 @@ export const UserManagementColumnData = [
     field: "userProfile",
     headerName: "User Profile",
     flex: 1,
-    align: "center",
-    headerAlign: "center",
-    minWidth: 140,
-    maxWidth: 200,
     headerTooltip: true,
   },
   {
     field: "firstName",
     headerName: "First Name",
     flex: 1,
-    align: "center",
-    headerAlign: "center",
-    minWidth: 140,
-    maxWidth: 200,
     headerTooltip: true,
   },
   {
     field: "lastName",
     headerName: "Last Name",
     flex: 1,
-    align: "center",
-    headerAlign: "center",
-    minWidth: 140,
-    maxWidth: 200,
     headerTooltip: true,
   },
   {
     field: "primaryContactEmail",
     headerName: "Email",
     flex: 1,
-    align: "center",
-    headerAlign: "center",
-    minWidth: 200,
-    maxWidth: 280,
     headerTooltip: true,
   },
   {
     field: "createdOn",
     headerName: "Created On",
     flex: 1,
-    align: "center",
-    headerAlign: "center",
-    minWidth: 140,
-    maxWidth: 180,
     headerTooltip: true,
+    renderCell: (params) => (
+      <Box>
+        <Typography fontSize={14} fontWeight={400}>
+          {params.row.createdDate}
+        </Typography>
+        <Typography fontSize={14} fontWeight={400} color="#6E7079">
+          {params.row.createdTime}
+        </Typography>
+      </Box>
+    ),
   },
   {
     field: "updatedOn",
     headerName: "Updated On",
     flex: 1,
-    align: "center",
-    headerAlign: "center",
-    minWidth: 140,
-    maxWidth: 180,
     headerTooltip: true,
+    renderCell: (params) => (
+      <Box>
+        <Typography fontSize={14} fontWeight={400}>
+          {params.row.updatedDate}
+        </Typography>
+        <Typography fontSize={14} fontWeight={400} color="#6E7079">
+          {params.row.updatedTime}
+        </Typography>
+      </Box>
+    ),
   },
+
   {
     field: "status",
     headerName: "Status",
     flex: 1,
-    align: "center",
-    headerAlign: "center",
-    minWidth: 120,
-    maxWidth: 160,
     headerTooltip: true,
     renderCell: StatusCell,
   },
@@ -123,8 +116,6 @@ export const UserManagementColumnData = [
     field: "action",
     headerName: "Action",
     flex: 1,
-    align: "center",
-    headerAlign: "center",
     sortable: false,
     renderCell: ActionCell,
   },
@@ -142,8 +133,15 @@ export const mapUserToRow = (user) => ({
   firstName: user.first_name ?? "-",
   lastName: user.last_name ?? "-",
   primaryContactEmail: user.email ?? "-",
-  createdOn: formatDate(user.created_at ?? user.createdOn),
-  updatedOn: formatDate(user.updated_at ?? user.updatedOn),
+  createdDate: user.created_at
+    ? dayjs(user.created_at).format("MMM DD, YYYY")
+    : "-",
+  createdTime: user.created_at ? dayjs(user.created_at).format("hh:mm A") : "-",
+  updatedOn: user.updated_at || null,
+  updatedDate: user.updated_at
+    ? dayjs(user.updated_at).format("MMM DD, YYYY")
+    : "-",
+  updatedTime: user.updated_at ? dayjs(user.updated_at).format("hh:mm A") : "-",
   status: USER_STATUS[String(user.status_id)] || user.status || "-",
   status_id: user.status_id ?? "",
   user_name: (

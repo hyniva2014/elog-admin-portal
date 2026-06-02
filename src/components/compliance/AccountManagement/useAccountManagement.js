@@ -20,7 +20,7 @@ export const useAccountManagement = (
   setDialogMode,
   setSelectedCompany,
   fetchApi,
-  createApi
+  createApi,
 ) => {
   const buildFetchUrl = useCallback(() => {
     const queryParams = {
@@ -37,7 +37,17 @@ export const useAccountManagement = (
 
     const params = new URLSearchParams(queryParams);
     return `/masteradmin/get-companies?${params.toString()}`;
-  }, [companyId, primaryContactName, secondaryContactName, fromDate, toDate, search, status, page, pageSize]);
+  }, [
+    companyId,
+    primaryContactName,
+    secondaryContactName,
+    fromDate,
+    toDate,
+    search,
+    status,
+    page,
+    pageSize,
+  ]);
 
   const fetchData = useCallback(async () => {
     setData((prev) => ({ ...prev, isLoading: true }));
@@ -47,11 +57,15 @@ export const useAccountManagement = (
       const response = await fetchApi(endUrl);
 
       const responseData = response?.body?.data;
-      const records = Array.isArray(responseData?.data)
-        ? responseData.data
-        : responseData && !responseData.data
-        ? [responseData]
-        : [];
+      const records = responseData?.data
+        ? Array.isArray(responseData.data)
+          ? responseData.data
+          : [responseData.data]
+        : responseData
+          ? Array.isArray(responseData)
+            ? responseData
+            : [responseData]
+          : [];
       const total = responseData?.pagination?.total_records ?? records.length;
 
       const rowData = AccountManagementRowData(records);
@@ -66,7 +80,19 @@ export const useAccountManagement = (
       console.error("Error fetching companies:", err);
       setData((prev) => ({ ...prev, isLoading: false }));
     }
-  }, [companyId, primaryContactName, secondaryContactName, fromDate, toDate, search, status, page, pageSize, setData, buildFetchUrl]);
+  }, [
+    companyId,
+    primaryContactName,
+    secondaryContactName,
+    fromDate,
+    toDate,
+    search,
+    status,
+    page,
+    pageSize,
+    setData,
+    buildFetchUrl,
+  ]);
 
   const handleCreateAccount = useCallback(
     async (account) => {
@@ -90,20 +116,20 @@ export const useAccountManagement = (
             city: "",
             state: "",
             zip: "",
-            country: "US"
+            country: "US",
           },
           contact: {
             name: account.primaryContactName,
             email: account.primaryContactEmail,
             phone: account.primaryContactNumber,
-            alternatePhone: ""
+            alternatePhone: "",
           },
           secondaryContact: {
             name: account.secondaryContactName,
             email: account.secondaryContactEmail,
             phone: account.secondaryContactNumber,
-            alternatePhone: ""
-          }
+            alternatePhone: "",
+          },
         };
 
         if (isUpdate) {
@@ -117,19 +143,38 @@ export const useAccountManagement = (
           setIsAddAccountOpen(false);
           setDialogMode("add");
           setSelectedCompany(null);
-          handleSnackbar(response?.body?.message || `${account.carrierName} account ${isUpdate ? "updated" : "added"} successfully.`, "success");
+          handleSnackbar(
+            response?.body?.message ||
+              `${account.carrierName} account ${isUpdate ? "updated" : "added"} successfully.`,
+            "success",
+          );
           fetchData();
         } else {
-          handleSnackbar(response?.body?.message || `Failed to ${isUpdate ? "update" : "add"} account.`, "error");
+          handleSnackbar(
+            response?.body?.message ||
+              `Failed to ${isUpdate ? "update" : "add"} account.`,
+            "error",
+          );
         }
       } catch (err) {
         console.error("Error creating/updating account:", err);
-        handleSnackbar(`Failed to ${dialogMode === "edit" ? "update" : "add"} account. Please try again.`, "error");
+        handleSnackbar(
+          `Failed to ${dialogMode === "edit" ? "update" : "add"} account. Please try again.`,
+          "error",
+        );
       } finally {
         setLoading(false);
       }
     },
-    [dialogMode, setLoading, handleSnackbar, setIsAddAccountOpen, setDialogMode, setSelectedCompany, fetchData]
+    [
+      dialogMode,
+      setLoading,
+      handleSnackbar,
+      setIsAddAccountOpen,
+      setDialogMode,
+      setSelectedCompany,
+      fetchData,
+    ],
   );
 
   const handleViewAccount = useCallback(
@@ -139,11 +184,19 @@ export const useAccountManagement = (
       try {
         const endUrl = `/masteradmin/get-companies?company_id=${row.id}`;
         const response = await fetchApi(endUrl);
-        
+
         if (response?.statusCode === 200 && response?.body?.data) {
-          const companyData = response?.body?.data;
-          const companyArray = Array.isArray(companyData) ? companyData : (companyData ? [companyData] : []);
-          const company = companyArray[0];
+          const responseData = response?.body?.data;
+          const records = responseData?.data
+            ? Array.isArray(responseData.data)
+              ? responseData.data
+              : [responseData.data]
+            : responseData
+              ? Array.isArray(responseData)
+                ? responseData
+                : [responseData]
+              : [];
+          const company = records[0];
 
           if (company) {
             setSelectedCompany(company);
@@ -155,12 +208,100 @@ export const useAccountManagement = (
         }
       } catch (err) {
         console.error("Error fetching company details:", err);
-        handleSnackbar("Failed to fetch company details. Please try again.", "error");
+        handleSnackbar(
+          "Failed to fetch company details. Please try again.",
+          "error",
+        );
       } finally {
         setLoading(false);
       }
     },
-    [setLoading, setSelectedCompany, setDialogMode, setIsAddAccountOpen, handleSnackbar]
+    [
+      setLoading,
+      setSelectedCompany,
+      setDialogMode,
+      setIsAddAccountOpen,
+      handleSnackbar,
+      fetchApi,
+    ],
+  );
+
+  const handleDeleteAccount = useCallback(
+    async (row) => {
+      setLoading(true);
+
+      try {
+        const endUrl = `/masteradmin/get-companies?company_id=${row.id}`;
+        const response = await fetchApi(endUrl);
+
+        if (response?.statusCode === 200 && response?.body?.data) {
+          const responseData = response?.body?.data;
+          const records = responseData?.data
+            ? Array.isArray(responseData.data)
+              ? responseData.data
+              : [responseData.data]
+            : responseData
+              ? Array.isArray(responseData)
+                ? responseData
+                : [responseData]
+              : [];
+          const company = records[0];
+
+          if (company) {
+            const payload = {
+              company_id: company.company_id,
+              companyName: company.companyName,
+              dotNumber: company.dotNumber,
+              mcNumber: company.mcNumber || null,
+              ein: company.ein || null,
+              company_code: company.companyName.substring(0, 4).toUpperCase(),
+              maxDevices: company.maxDevices,
+              website: company.website || null,
+              tollFree: company.tollFree || null,
+              fax: company.fax || null,
+              status_id: "2",
+              address: company.address,
+              contact: company.contact,
+              secondaryContact: company.secondaryContact,
+            };
+
+            const updateUrl = `/masteradmin/onboard-company`;
+            const updateResponse = await createApi(payload, updateUrl);
+
+            if (
+              updateResponse?.statusCode === 200 ||
+              updateResponse?.statusCode === 201
+            ) {
+              handleSnackbar(
+                `${company.companyName} account deactivated successfully.`,
+                "success",
+              );
+              fetchData();
+            } else {
+              handleSnackbar(
+                updateResponse?.body?.message ||
+                  "Failed to deactivate account.",
+                "error",
+              );
+            }
+          }
+        } else {
+          handleSnackbar(
+            "Failed to fetch company details for deactivation.",
+            "error",
+          );
+        }
+      } catch (err) {
+        console.error("Error deactivating account:", err);
+        handleSnackbar(
+          "Failed to deactivate account. Please try again.",
+          "error",
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [setLoading, fetchApi, createApi, fetchData, handleSnackbar],
   );
 
   const fetchCompaniesDropdown = useCallback(async () => {
@@ -218,6 +359,7 @@ export const useAccountManagement = (
     fetchData,
     handleCreateAccount,
     handleViewAccount,
+    handleDeleteAccount,
     fetchContactsDropdown,
     fetchCompaniesDropdown,
     fetchCarrierOptions,
