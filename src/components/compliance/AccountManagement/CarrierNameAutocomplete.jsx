@@ -14,7 +14,7 @@ import {
 const MIN_SEARCH_LENGTH = 3;
 const DEBOUNCE_DELAY_MS = 300;
 
-const CarrierSuggestionItem = ({ carrier, index, highlightedIndex, onSelect, onHighlight }) => {
+const CarrierSuggestionItem = ({ itemProps: { carrier, index, highlightedIndex }, handlers: { onSelect, onHighlight } }) => {
   const handleMouseDown = useCallback(() => onSelect(carrier), [onSelect, carrier]);
   const handleMouseEnter = useCallback(() => onHighlight(index), [onHighlight, index]);
 
@@ -29,7 +29,7 @@ const CarrierSuggestionItem = ({ carrier, index, highlightedIndex, onSelect, onH
   );
 };
 
-const SuggestionsList = ({ suggestions, loadingState, highlightedIndex, onSelect, onMouseEnter }) => {
+const SuggestionsList = ({ listProps: { suggestions, loadingState, highlightedIndex }, handlers: { onSelect, onMouseEnter } }) => {
   if (loadingState) {
     return <LoadingText>Searching...</LoadingText>;
   }
@@ -41,11 +41,8 @@ const SuggestionsList = ({ suggestions, loadingState, highlightedIndex, onSelect
   return suggestions.map((carrier, index) => (
     <CarrierSuggestionItem
       key={carrier.carrier_id}
-      carrier={carrier}
-      index={index}
-      highlightedIndex={highlightedIndex}
-      onSelect={onSelect}
-      onHighlight={onMouseEnter}
+      itemProps={{ carrier, index, highlightedIndex }}
+      handlers={{ onSelect, onHighlight: onMouseEnter }}
     />
   ));
 };
@@ -191,11 +188,8 @@ const CarrierNameAutocomplete = ({
         {showDropdown && (
           <SuggestionsDropdown>
             <SuggestionsList
-              suggestions={suggestions}
-              loadingState={loadingState}
-              highlightedIndex={highlightedIndex}
-              onSelect={handleSelectCarrier}
-              onMouseEnter={handleHighlight}
+              listProps={{ suggestions, loadingState, highlightedIndex }}
+              handlers={{ onSelect: handleSelectCarrier, onMouseEnter: handleHighlight }}
             />
           </SuggestionsDropdown>
         )}
