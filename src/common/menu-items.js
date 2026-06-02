@@ -2,6 +2,7 @@ import { MdDashboard } from "react-icons/md";
 import GroupIcon from '@mui/icons-material/Group';
 import TabletMacIcon from '@mui/icons-material/TabletMac';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 const MENU_ITEMS = [
   {
@@ -52,6 +53,18 @@ const MENU_ITEMS = [
     label: "User Management",
     url: "/user-management",
     icon: GroupIcon,
+  },
+  {
+    key: "role-management",
+    label: "Role Management",
+    url: "/role-management",
+    icon: SettingsIcon,
+  },
+  {
+    key: "request-device",
+    label: "Request Device",
+    url: "/request-device",
+    icon: TabletMacIcon,
   },
 ];
 export { MENU_ITEMS };

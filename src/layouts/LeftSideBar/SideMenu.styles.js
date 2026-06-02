@@ -41,7 +41,7 @@ export const getCollapsedIconBoxSx = (isActive) => ({
   backgroundColor: isActive ? "common.white" : "transparent",
   transition: "all 0.2s ease",
   "&:hover": {
-    backgroundColor: isActive ? "common.white" : "action.hover",
+    backgroundColor: isActive ? "common.white" : "common.sidebar",
   },
 });
 
