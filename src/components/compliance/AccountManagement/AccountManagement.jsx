@@ -4,6 +4,7 @@ import { PageContainer } from "../../../common/PageContainer";
 import AccountManagementHeader from "./AccountMangementHeader";
 import CommonSnackbar from "../../../common/CommonSnackbar";
 import CommonLoading from "../../../common/CommonLoading";
+import CommonConfirmDialog from "../../../common/CommonConfirmDialog";
 import { GridContainer } from "./AccountManagement.styled";
 import AddAccountDialog from "./AddAccountDialog";
 import { useServices } from "../../../services/services";
@@ -28,6 +29,8 @@ const AccountManagement = () => {
     secondaryContactOptions: [],
   });
   const [carrierOptions, setCarrierOptions] = useState([]);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [companyToDelete, setCompanyToDelete] = useState(null);
 
   const getDefaultFilters = () => {
     return {
@@ -97,7 +100,17 @@ const AccountManagement = () => {
     setDialogMode("view");
   }, []);
 
-  const { buildFetchUrl, fetchData, handleCreateAccount, handleViewAccount, fetchContactsDropdown, fetchCompaniesDropdown } = useAccountManagement(
+  const handleOpenDeleteConfirm = useCallback((company) => {
+    setCompanyToDelete(company);
+    setIsDeleteConfirmOpen(true);
+  }, []);
+
+  const handleCloseDeleteConfirm = useCallback(() => {
+    setIsDeleteConfirmOpen(false);
+    setCompanyToDelete(null);
+  }, []);
+
+  const { buildFetchUrl, fetchData, handleCreateAccount, handleViewAccount, handleDeleteAccount, fetchContactsDropdown, fetchCompaniesDropdown } = useAccountManagement(
     companyId,
     primaryContactName,
     secondaryContactName,
@@ -118,7 +131,16 @@ const AccountManagement = () => {
     createApi
   );
 
+  const handleConfirmDelete = useCallback(async () => {
+    if (companyToDelete) {
+      await handleDeleteAccount(companyToDelete);
+      handleCloseDeleteConfirm();
+    }
+  }, [companyToDelete, handleDeleteAccount, handleCloseDeleteConfirm]);
+
   const transformCompanyToFormData = useCallback((company) => {
+    if (!company) return null;
+
     const {
       companyName,
       dotNumber,
@@ -130,14 +152,14 @@ const AccountManagement = () => {
       fax,
       status_id,
       company_id,
-      address = {},
-      contact = {},
-      secondaryContact = {},
+      address,
+      contact,
+      secondaryContact,
     } = company;
 
-    const { street } = address;
-    const { name: primaryContactName, phone: primaryContactNumber, email: primaryContactEmail } = contact;
-    const { name: secondaryContactName, phone: secondaryContactNumber, email: secondaryContactEmail } = secondaryContact;
+    const { street } = address || {};
+    const { name: primaryContactName, phone: primaryContactNumber, email: primaryContactEmail } = contact || {};
+    const { name: secondaryContactName, phone: secondaryContactNumber, email: secondaryContactEmail } = secondaryContact || {};
 
     return {
       carrierName: companyName || "",
@@ -161,8 +183,8 @@ const AccountManagement = () => {
   }, []);
 
   const columns = useMemo(
-    () => AccountManagementColumnsData(handleViewAccount),
-    [handleViewAccount],
+    () => AccountManagementColumnsData(handleViewAccount, handleOpenDeleteConfirm),
+    [handleViewAccount, handleOpenDeleteConfirm],
   );
 
   const initialFormData = selectedCompany ? transformCompanyToFormData(selectedCompany) : null;
@@ -244,6 +266,16 @@ const AccountManagement = () => {
         initialData={initialFormData}
         onEditClick={handleEditClick}
         onCancelEdit={handleCancelEdit}
+      />
+
+      <CommonConfirmDialog
+        open={isDeleteConfirmOpen}
+        title="Inactive Account"
+        message={`Are you sure you want to Inactive ${companyToDelete?.carrierName || ""}?`}
+        confirmText="Inactive"
+        cancelText="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCloseDeleteConfirm}
       />
     </PageContainer>
   );

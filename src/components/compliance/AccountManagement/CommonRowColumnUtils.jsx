@@ -1,5 +1,6 @@
-import { IconButton, Tooltip } from "@mui/material";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import dayjs from "dayjs";
 import { defaultColumnProps, getStickyColumnProps } from "./Constants";
 import {
@@ -23,19 +24,41 @@ const renderStatusCell = (params) => (
   <StatusText accountStatus={params.value}>{params.value}</StatusText>
 );
 
-const renderActionCell = (onViewAccount) => (params) => {
-  const handleClick = () => onViewAccount(params.row);
+const renderActionCell = (onViewAccount, onDeleteAccount) => (params) => {
+  const isViewDisabled = params.row.status === "Inactive";
+  const isDeleteDisabled = params.row.status === "Inactive";
 
   return (
-    <Tooltip title="View">
-      <IconButton size="small" onClick={handleClick}>
-        <VisibilityOutlinedIcon sx={actionIconSx} />
-      </IconButton>
-    </Tooltip>
+    <Box display="flex" gap={1}>
+      <Tooltip title="View">
+        <IconButton size="small" onClick={() => onViewAccount(params.row)}>
+          <VisibilityOutlinedIcon sx={actionIconSx} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Delete">
+        <span>
+          <IconButton
+            size="small"
+            onClick={() => onDeleteAccount(params.row)}
+            disabled={isDeleteDisabled}
+          >
+            <DeleteOutlineIcon
+              sx={{
+                ...actionIconSx,
+                color: isDeleteDisabled ? "text.disabled" : "#D32F2F",
+              }}
+            />
+          </IconButton>
+        </span>
+      </Tooltip>
+    </Box>
   );
 };
 
-export const AccountManagementColumnsData = (onViewAccount) => [
+export const AccountManagementColumnsData = (
+  onViewAccount,
+  onDeleteAccount,
+) => [
   {
     field: "carrierId",
     headerName: "Carrier ID",
@@ -121,13 +144,31 @@ export const AccountManagementColumnsData = (onViewAccount) => [
     field: "createdOn",
     headerName: "Created On",
     ...defaultColumnProps,
-    renderCell: renderDateCell,
+    renderCell: (params) => (
+      <Box>
+        <Typography fontSize={14} fontWeight={400}>
+          {params.row.createdDate}
+        </Typography>
+        <Typography fontSize={14} fontWeight={400} color="#6E7079">
+          {params.row.createdTime}
+        </Typography>
+      </Box>
+    ),
   },
   {
     field: "lastSync",
     headerName: "Updated on",
     ...defaultColumnProps,
-    renderCell: renderDateCell,
+    renderCell: (params) => (
+      <Box>
+        <Typography fontSize={14} fontWeight={400}>
+          {params.row.updatedDate}
+        </Typography>
+        <Typography fontSize={14} fontWeight={400} color="#6E7079">
+          {params.row.updatedTime}
+        </Typography>
+      </Box>
+    ),
   },
   {
     field: "status",
@@ -140,7 +181,7 @@ export const AccountManagementColumnsData = (onViewAccount) => [
     headerName: "Action",
     ...defaultColumnProps,
     sortable: false,
-    renderCell: renderActionCell(onViewAccount),
+    renderCell: renderActionCell(onViewAccount, onDeleteAccount),
   },
 ];
 
@@ -200,8 +241,10 @@ export const AccountManagementRowData = (response = []) => {
       tollFree: tollFree || "-",
       fax: fax || "-",
       maxDevices: maxDevices || "-",
-      createdOn: formatDate(createdAt),
-      lastSync: formatDate(updatedAt),
+      createdDate: createdAt ? dayjs(createdAt).format("MMM DD, YYYY") : "-",
+      createdTime: createdAt ? dayjs(createdAt).format("hh:mm A") : "-",
+      updatedDate: updatedAt ? dayjs(updatedAt).format("MMM DD, YYYY") : "-",
+      updatedTime: updatedAt ? dayjs(updatedAt).format("hh:mm A") : "-",
       status: statusName || "-",
     };
   });

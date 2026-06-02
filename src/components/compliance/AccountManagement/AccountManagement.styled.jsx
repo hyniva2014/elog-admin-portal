@@ -47,7 +47,7 @@ export const actionIconSx = {
 export const DialogFormContainer = styled(Box)(() => ({
   paddingLeft: 16,
   paddingRight: 16,
-  paddingTop: 16,
+  paddingTop: 24,
   paddingBottom: 8,
 }));
 

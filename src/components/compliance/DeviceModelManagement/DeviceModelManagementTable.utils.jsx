@@ -4,6 +4,7 @@ import {
   ELogsTypography,
 } from "./DeviceModelManagement.styled";
 import DeviceModelManagementActionButton from "./DeviceModelManagementActionButton";
+import { Box, Typography } from "@mui/material";
 
 export const formatDate = (value) =>
   value ? dayjs(value).format("MMM DD, YYYY") : "-";
@@ -96,7 +97,16 @@ export const getColumns = (onView) => [
     headerAlign: "center",
     minWidth: 140,
     headerTooltip: true,
-    renderCell: renderDateCell,
+    renderCell: (params) => (
+      <Box>
+        <Typography fontSize={14} fontWeight={400}>
+          {params.row.createdDate}
+        </Typography>
+        <Typography fontSize={14} fontWeight={400} color="#6E7079">
+          {params.row.createdTime}
+        </Typography>
+      </Box>
+    ),
   },
   {
     field: "updatedOn",
@@ -106,7 +116,16 @@ export const getColumns = (onView) => [
     headerAlign: "center",
     minWidth: 140,
     headerTooltip: true,
-    renderCell: renderDateCell,
+    renderCell: (params) => (
+      <Box>
+        <Typography fontSize={14} fontWeight={400}>
+          {params.row.updatedDate}
+        </Typography>
+        <Typography fontSize={14} fontWeight={400} color="#6E7079">
+          {params.row.updatedTime}
+        </Typography>
+      </Box>
+    ),
   },
   {
     field: "statusLabel",
