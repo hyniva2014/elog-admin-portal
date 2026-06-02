@@ -8,6 +8,7 @@ import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { USER_STATUS, USER_STATUS_COL_CONFIG } from "./Constants";
 import { formatDateTime } from "../../../common/CommonUtils";
+import { EllipsisTextSx, getActionButtonSx } from "./CommonRowColumnUtils.styled";
 
 const CreatedAtCell = ({ row }) => (
   <Box>
@@ -48,10 +49,7 @@ const ActionsCell = ({ row, handleOpenEdit, handleDeleteClick, canDelete, eyeIco
             size="small"
             disabled={!canDelete}
             onClick={handleDeleteAction}
-            sx={{
-              opacity: canDelete ? 1 : 0.5,
-              cursor: canDelete ? "pointer" : "not-allowed",
-            }}
+            sx={getActionButtonSx(canDelete)}
           >
             <img src={trashIcon} alt="delete" width={16} height={16} />
           </IconButton>
@@ -86,11 +84,7 @@ export const UserManagementTableData = (
         <Tooltip title={value || ""} placement="right">
           <Typography
             fontSize={13}
-            sx={{
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
+            sx={EllipsisTextSx}
           >
             {value || "-"}
           </Typography>
@@ -134,11 +128,7 @@ export const UserManagementTableData = (
           <Typography
             fontSize={13}
             color="text.secondary"
-            sx={{
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
+            sx={EllipsisTextSx}
           >
             {value || "-"}
           </Typography>

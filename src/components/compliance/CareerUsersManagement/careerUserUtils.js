@@ -384,8 +384,149 @@ export const transformCitizenshipData = (citizenshipValue, citizenshipMap = {}) 
 
   // Try to find by label
   const entry = Object.entries(citizenshipMap).find(
-    ([key, value]) => value.toLowerCase() === String(citizenshipValue).toLowerCase()
+    ([, value]) => value.toLowerCase() === String(citizenshipValue).toLowerCase()
   );
 
   return entry ? entry[0] : citizenshipValue;
+};
+
+/**
+ * Build career user payload as FormData for API submission
+ * @param {Object} formValues - Form values from react-hook-form
+ * @param {string} companyId - Company ID
+ * @param {string|null} userId - User ID for edit mode
+ * @param {string} createdByName - Name of the user creating/updating
+ * @returns {FormData} - FormData object ready for API submission
+ */
+export const buildCareerUserPayload = (formValues, companyId, userId = null, createdByName = "") => {
+  const payload = new FormData();
+
+  const empHistoryPayload = (formValues.emp_history || []).map((item) => ({
+    emp_history_details: item.emp_history_details || "",
+    emp_history_start_date: item.emp_history_start_date
+      ? dayjs(item.emp_history_start_date).format("YYYY-MM-DD")
+      : "",
+    emp_history_end_date: item.emp_history_end_date
+      ? dayjs(item.emp_history_end_date).format("YYYY-MM-DD")
+      : "",
+    emp_history_duration: item.emp_history_duration || "",
+  }));
+
+  const payloadData = {
+    user_name: `${formValues.first_name} ${formValues.last_name}`,
+    company_id: companyId,
+    role_id: formValues.role,
+
+    first_name: formValues.first_name || "",
+    middle_name: formValues.middle_name || "",
+    last_name: formValues.last_name || "",
+    gender: formValues.gender,
+
+    dob: formValues.dob
+      ? new Date(formValues.dob).toISOString().split("T")[0]
+      : "",
+
+    citizenship: formValues.citizenship || 1,
+    employment_type: formValues.employment_type || 1,
+
+    email: formValues.email || "",
+    phone: formValues.phone?.replace(/\D/g, "") || "",
+    emergency_contact_number:
+      formValues.alternate_contact_number?.replace(/\D/g, "") || "",
+    total_years_of_experince: formValues.total_years_of_experince,
+
+    primary_address: JSON.stringify({
+      street: formValues.address_line1 || "",
+      city: formValues.city || "",
+      state: formValues.states || "",
+      zipcode: formValues.zip_code || "",
+      country: formValues.country || "",
+    }),
+
+    secondary_address: JSON.stringify({
+      street: formValues.secondary_address_line || "",
+      city: formValues.secondary_city || "",
+      state: formValues.secondary_states || "",
+      country: formValues.secondary_country || "",
+      zipcode: formValues.secondary_zip_code || "",
+    }),
+
+    hire_date: formValues.hire_date
+      ? new Date(formValues.hire_date).toISOString().split("T")[0]
+      : "",
+
+    status_id: formValues.status || 1,
+
+    termination_date: formValues.termination_date
+      ? new Date(formValues.termination_date).toISOString().split("T")[0]
+      : "",
+
+    last_drug_test: formValues.last_drug_test
+      ? new Date(formValues.last_drug_test).toISOString().split("T")[0]
+      : "",
+
+    ssn: formValues.ssn?.replace(/\D/g, "") || "",
+
+    language: Array.isArray(formValues.language)
+      ? formValues.language.join(",")
+      : formValues.language || "1",
+
+    contract_information:
+      formValues.employment_type === 2
+        ? formValues.contract_information || ""
+        : "",
+
+    emp_history: JSON.stringify(empHistoryPayload),
+
+    created_by: createdByName,
+  };
+
+  if (formValues.citizenship !== 1) {
+    payloadData.passport_number = formValues.passport_visa_number || "";
+    payloadData.passport_expiry_date = formValues.passport_visa_expiry
+      ? new Date(formValues.passport_visa_expiry)
+          .toISOString()
+          .split("T")[0]
+      : "";
+
+    payloadData.work_permit = formValues.work_permit
+      ? dayjs(formValues.work_permit).format("YYYY-MM-DD")
+      : "";
+
+    payloadData.country = formValues.citizenship_country || "";
+  }
+
+  Object.entries(payloadData).forEach(([key, value]) => {
+    payload.append(key, value ?? "");
+  });
+  
+  payload.append(
+    "deleted_document_ids",
+    JSON.stringify(formValues.deleted_document_ids || []),
+  );
+
+  if (userId) {
+    payload.append("user_id", userId);
+  }
+
+  const profilePicFiles = formValues.profile_photo || [];
+  if (profilePicFiles.length > 0) {
+    const profilePic = profilePicFiles[0];
+    if (profilePic instanceof File) {
+      payload.append("profile_pic", profilePic);
+    }
+  } else {
+    payload.append("profile_pic", "");
+  }
+
+  const medicalCardFiles = formValues.medical_document_files || [];
+  if (medicalCardFiles.length > 0) {
+    medicalCardFiles.forEach((file, index) => {
+      if (file instanceof File) {
+        payload.append(`file_${index + 1}`, file);
+      }
+    });
+  }
+
+  return payload;
 };

@@ -149,3 +149,22 @@ export const StepTextSx = (isActive) => (theme) => ({
     color: isActive ? theme.palette.brand.main : theme.palette.text.primary,
   },
 });
+
+export const ProfileCompletionContainerSx = {
+  minWidth: 300,
+};
+
+export const ProgressBarRowSx = {
+  display: "flex",
+  alignItems: "center",
+  gap: 1.5,
+};
+
+export const ProgressBarWrapperSx = {
+  flexGrow: 1,
+};
+
+export const CompletedIconSx = {
+  fontSize: 18,
+  color: "success.main",
+};

@@ -226,6 +226,15 @@ const CareerManagement = () => {
     // }
   };
 
+  const handleCancelConfirm = () => {
+    setConfirmOpen(false);
+    setDeleteRow(null);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
   const handleClick = () => {
     setLoading(true);
     setTimeout(() => {
@@ -279,17 +288,14 @@ const CareerManagement = () => {
           confirmText="Delete"
           cancelText="Cancel"
           onConfirm={confirmDelete}
-          onCancel={() => {
-            setConfirmOpen(false);
-            setDeleteRow(null);
-          }}
+          onCancel={handleCancelConfirm}
         />
 
         <CommonSnackbar
           open={snackbar.open}
           message={snackbar.message}
           severity={snackbar.severity}
-          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+          onClose={handleSnackbarClose}
         />
       </PageContainer>
     </>

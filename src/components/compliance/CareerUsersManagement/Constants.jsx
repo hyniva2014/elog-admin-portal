@@ -133,16 +133,6 @@ export const hasPermission = (permissions = {}, moduleKey = "", actionKey = "") 
   return modulePermissions === actionKey;
 };
 
-export const BreadcrumbText = styled(Typography)(({ theme }) => ({
-  fontSize: "15px",
-  color: theme.palette.text.secondary,
-}));
-
-export const BreadcrumbBold = styled("span")(({ theme }) => ({
-  fontWeight: 600,
-  color: theme.palette.text.primary,
-}));
-
 export const citizenshipMap = {
   US: 1,
   CA: 2,
@@ -155,3 +145,13 @@ export const languageMap = {
   es: 2,
   spanish: 2,
 };
+
+export const BreadcrumbText = styled(Typography)(({ theme }) => ({
+  fontSize: "15px",
+  color: theme.palette.text.secondary,
+}));
+
+export const BreadcrumbBold = styled("span")(({ theme }) => ({
+  fontWeight: 600,
+  color: theme.palette.text.primary,
+}));

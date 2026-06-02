@@ -22,12 +22,17 @@ import {
   StepListSx,
   StepItemSx,
   StepTextSx,
+  CompletedIconSx,
+  ProfileCompletionContainerSx,
+  ProgressBarWrapperSx,
+  ProgressBarRowSx,
 } from "./UserAddHeader.styled";
 
 const StatusIndicator = ({ item }) => (
   <Box sx={StatusItemSx(item.completed)}>
     {item.completed ? (
-      <DoneIcon sx={{ fontSize: 18, color: "success.main" }} />
+      // <DoneIcon sx={{ fontSize: 18, color: "success.main" }} />
+      <DoneIcon sx={CompletedIconSx} />
     ) : null}
     <Typography variant="body2" sx={StatusItemTextSx(item.completed)}>
       {item.label}
@@ -288,12 +293,13 @@ const UserAddHeader = ({
         {/* Profile Completion and Status Indicators in same row */}
         <Box sx={ProgressWrapperSx}>
           {/* Profile Completion Section */}
-          <Box sx={{ minWidth: 300 }}>
+          {/* <Box sx={{ minWidth: 300 }}> */}
+          <Box sx={ProfileCompletionContainerSx}>
             <Typography variant="body1" sx={ProgressTextSx}>
               Profile Completion
             </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-              <Box sx={{ flexGrow: 1 }}>
+            <Box sx={ProgressBarRowSx}>
+              <Box sx={ProgressBarWrapperSx}>
                 <LinearProgress
                   variant="determinate"
                   value={profileCompletion}
