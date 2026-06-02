@@ -1,23 +1,10 @@
 import { styled } from "@mui/material/styles";
-import { Box, Card, Button, Switch } from "@mui/material";
+import { Box, Card, Button, Switch, Divider, Typography } from "@mui/material";
 
-export const COLORS = {
-  primary: "#284495",
-  primaryHover: "#1d3577",
-  success: "#22C55E",
-  white: "#FFFFFF",
-  background: "#F8FAFC",
-  cardBackground: "#F6FBF6",
-  border: "#DDE5DC",
-  lightBorder: "#E5E7EB",
-  textPrimary: "#111827",
-  textSecondary: "#6B7280",
-};
-
-export const PageWrapper = styled(Box)(() => ({
-  background: COLORS.background,
+export const PageWrapper = styled(Box)(({ theme }) => ({
+  background: theme.palette.background.default,
   minHeight: "100vh",
-  marginTop: theme.spacing(2),
+  padding: 24,
 }));
 
 export const ContentWrapper = styled(Box)(({ theme }) => ({
@@ -34,8 +21,8 @@ export const TopFieldsWrapper = styled(Box)(({ theme }) => ({
 
 export const StyledCard = styled(Card)(({ theme }) => ({
   borderRadius: 14,
-  border: `1px solid ${COLORS.border}`,
-  background: COLORS.cardBackground,
+  border: `1px solid ${theme.palette.custom.border}`,
+  background: theme.palette.custom.cardBackground,
   boxShadow: "none",
   padding: theme.spacing(2.2),
   height: "100%",
@@ -43,105 +30,55 @@ export const StyledCard = styled(Card)(({ theme }) => ({
   flexDirection: "column",
 }));
 
-export const CardHeaderWrapper = styled(Box)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: theme.spacing(3),
-}));
-
-export const ModuleTitleWrapper = styled(Box)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  gap: theme.spacing(1),
-}));
-
-export const CountBadge = styled(Box)(() => ({
-  background: COLORS.primary,
-  color: COLORS.white,
-  padding: "4px 12px",
+export const CountBadge = styled(Box)(({ theme }) => ({
+  background: theme.palette.brand.main,
+  color: theme.palette.common.white,
+  padding: theme.spacing(1, 2),
   borderRadius: 8,
-  fontWeight: 700,
-  fontSize: 14,
-  minWidth: 52,
+  fontSize: 12,
+  fontWeight: 600,
+  minWidth: 60,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-}));
-
-export const PermissionListWrapper = styled(Box)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  gap: theme.spacing(2),
-  flex: 1,
 }));
 
 export const PermissionItem = styled(Box)(({ theme }) => ({
-  border: `1px solid ${COLORS.lightBorder}`,
-  borderRadius: 10,
-  padding: theme.spacing(1.8),
-  background: COLORS.white,
-}));
-
-export const PermissionContent = styled(Box)(() => ({
   display: "flex",
-  alignItems: "center",
   justifyContent: "space-between",
+  alignItems: "center",
+  border: `1px solid ${theme.palette.custom.lightBorder}`,
+  borderRadius: 8,
+  padding: theme.spacing(1.5, 2),
+  backgroundColor: theme.palette.custom.lightGreen,
 }));
 
-export const StyledSwitch = styled(Switch)(() => ({
+export const PermissionTitle = styled(Typography)(({ theme }) => ({
+  fontSize: 14,
+  fontWeight: 500,
+  color: theme.palette.text.primary,
+}));
+
+export const PermissionDescription = styled(Typography)(({ theme }) => ({
+  fontSize: 12,
+  color: theme.palette.text.secondary,
+}));
+
+export const StyledSwitch = styled(Switch)(({ theme }) => ({
   "& .MuiSwitch-switchBase.Mui-checked": {
-    color: COLORS.success,
+    color: theme.palette.success.main,
   },
 
   "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-    backgroundColor: COLORS.success,
-    opacity: 1,
+    backgroundColor: theme.palette.success.main,
   },
 }));
 
-export const CardFooterWrapper = styled(Box)(({ theme }) => ({
-  display: "flex",
-  gap: theme.spacing(2),
-  marginTop: theme.spacing(3),
-}));
-
-export const OutlineButton = styled(Button)(() => ({
-  borderRadius: 8,
-  textTransform: "none",
-  height: 44,
-}));
-
-export const PrimaryButton = styled(Button)(() => ({
-  borderRadius: 8,
-  textTransform: "none",
-  height: 44,
-  background: COLORS.primary,
-
-  "&:hover": {
-    background: COLORS.primaryHover,
-  },
-}));
-
-export const FooterWrapper = styled(Box)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  gap: theme.spacing(2),
-  marginTop: theme.spacing(4),
-  paddingBottom: theme.spacing(3),
-}));
-
-export const FooterCancelButton = styled(Button)(() => ({
+export const FooterSaveButton = styled(Button)(({ theme }) => ({
   minWidth: 180,
   textTransform: "none",
-}));
-
-export const FooterSaveButton = styled(Button)(() => ({
-  minWidth: 180,
-  textTransform: "none",
-  background: COLORS.primary,
-
+  background: theme.palette.brand.main,
   "&:hover": {
-    background: COLORS.primaryHover,
+    background: theme.palette.brand.dark,
   },
 }));

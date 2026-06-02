@@ -1,19 +1,6 @@
 import { styled } from "@mui/material/styles";
 import { Box, Button, Card, Divider, Switch, Typography } from "@mui/material";
 
-export const COLORS = {
-  primary: "#284495",
-  primaryHover: "#1d3577",
-  success: "#22C55E",
-  white: "#FFFFFF",
-  background: "#F8FAFC",
-  border: "#E5E7EB",
-  lightGreen: "#00C24E0D",
-  textPrimary: "#111827",
-  textSecondary: "#6B7280",
-  mutedText: "#9CA3AF",
-};
-
 export const TopFieldsWrapper = styled(Box)(({ theme }) => ({
   display: "flex",
   gap: theme.spacing(2),
@@ -55,13 +42,12 @@ export const CancelButton = styled(Button)(() => ({
   textTransform: "none",
 }));
 
-export const SaveButton = styled(Button)(() => ({
+export const SaveButton = styled(Button)(({ theme }) => ({
   minWidth: 180,
   textTransform: "none",
-  backgroundColor: COLORS.primary,
-
+  backgroundColor: theme.palette.brand.main,
   "&:hover": {
-    backgroundColor: COLORS.primaryHover,
+    backgroundColor: theme.palette.brand.dark,
   },
 }));
 
@@ -72,30 +58,32 @@ export const CardHeader = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
-export const PageWrapper = styled(Box)(() => ({
-  background: COLORS.background,
+export const PageWrapper = styled(Box)(({ theme }) => ({
+  background: theme.palette.background.default,
   minHeight: "100vh",
   padding: 24,
 }));
 
-export const PageTitle = styled(Typography)(() => ({
+export const PageTitle = styled(Typography)(({ theme }) => ({
   fontSize: 32,
   fontWeight: 700,
-  color: COLORS.textPrimary,
+  color: theme.palette.text.primary,
 }));
 
 export const PageSubtitle = styled(Typography)(({ theme }) => ({
-  color: COLORS.textSecondary,
+  color: theme.palette.text.secondary,
   marginBottom: theme.spacing(4),
 }));
 
 export const PermissionCard = styled(Card, {
   shouldForwardProp: (prop) => prop !== "isenabled",
-})(({ isenabled }) => ({
+})(({ theme, isenabled }) => ({
   width: "100%",
   borderRadius: 12,
-  border: `1px solid ${COLORS.border}`,
-  backgroundColor: isenabled ? COLORS.lightGreen : COLORS.white,
+  border: `1px solid ${theme.palette.custom.lightBorder}`,
+  backgroundColor: isenabled
+    ? theme.palette.custom.lightGreen
+    : theme.palette.common.white,
   boxShadow: "none",
   display: "flex",
   flexDirection: "column",
@@ -110,8 +98,8 @@ export const CardContentWrapper = styled(Box)(({ theme }) => ({
 }));
 
 export const CountBadge = styled(Box)(({ theme }) => ({
-  backgroundColor: COLORS.primary,
-  color: COLORS.white,
+  backgroundColor: theme.palette.brand.main,
+  color: theme.palette.common.white,
   padding: theme.spacing(1, 2),
   borderRadius: 8,
   fontSize: 12,
@@ -141,30 +129,30 @@ export const PermissionItem = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  border: `1px solid ${COLORS.border}`,
+  border: `1px solid ${theme.palette.custom.lightBorder}`,
   borderRadius: 8,
   padding: theme.spacing(1.5, 2),
-  backgroundColor: COLORS.lightGreen,
+  backgroundColor: theme.palette.custom.lightGreen,
 }));
 
-export const PermissionTitle = styled(Typography)(() => ({
+export const PermissionTitle = styled(Typography)(({ theme }) => ({
   fontSize: 14,
   fontWeight: 500,
-  color: COLORS.textPrimary,
+  color: theme.palette.text.primary,
 }));
 
-export const PermissionDescription = styled(Typography)(() => ({
+export const PermissionDescription = styled(Typography)(({ theme }) => ({
   fontSize: 12,
-  color: COLORS.textSecondary,
+  color: theme.palette.text.secondary,
 }));
 
-export const StyledSwitch = styled(Switch)(() => ({
+export const StyledSwitch = styled(Switch)(({ theme }) => ({
   "& .MuiSwitch-switchBase.Mui-checked": {
-    color: COLORS.success,
+    color: theme.palette.success.main,
   },
 
   "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-    backgroundColor: COLORS.success,
+    backgroundColor: theme.palette.success.main,
   },
 }));
 
@@ -183,39 +171,34 @@ export const CardFooter = styled(Box)(({ theme }) => ({
 
 export const FooterActionButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== "disabledbutton",
-})(({ disabledbutton }) => ({
+})(({ theme, disabledbutton }) => ({
   textTransform: "none",
-  backgroundColor: COLORS.white,
-  color: disabledbutton ? COLORS.mutedText : COLORS.textSecondary,
-  borderColor: COLORS.border,
+  backgroundColor: theme.palette.common.white,
+  color: disabledbutton
+    ? theme.palette.custom.mutedText
+    : theme.palette.text.secondary,
+  borderColor: theme.palette.custom.lightBorder,
   height: 42,
   borderRadius: 8,
 }));
 
-export const ModuleTitle = styled(Typography)(
-  () => ({
-    fontSize: "16px",
-    fontWeight: 600,
-    color: COLORS.textPrimary,
-    lineHeight: "24px",
-  }),
-);
+export const ModuleTitle = styled(Typography)(({ theme }) => ({
+  fontSize: "16px",
+  fontWeight: 600,
+  color: theme.palette.text.primary,
+  lineHeight: "24px",
+}));
 
-export const Container = styled(Box)(
-  ({ theme }) => ({
-    padding: theme.spacing(3),
-    backgroundColor:
-      theme.palette.background.default,
-    minHeight: "100vh",
-  }),
-);
+export const Container = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(3),
+  backgroundColor: theme.palette.background.default,
+  minHeight: "100vh",
+}));
 
-export const Title = styled(Typography)(
-  ({ theme }) => ({
-    fontSize: "28px",
-    fontWeight: 700,
-    color: theme.palette.text.primary,
-    lineHeight: "36px",
-    marginBottom: theme.spacing(1),
-  }),
-);
+export const Title = styled(Typography)(({ theme }) => ({
+  fontSize: "28px",
+  fontWeight: 700,
+  color: theme.palette.text.primary,
+  lineHeight: "36px",
+  marginBottom: theme.spacing(1),
+}));

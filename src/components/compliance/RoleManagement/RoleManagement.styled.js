@@ -1,21 +1,8 @@
 import { styled } from "@mui/material/styles";
 import { Box, Button, Typography, Avatar, IconButton } from "@mui/material";
 
-export const COLORS = {
-  primary: "#284495",
-  primaryHover: "#1d3577",
-  white: "#FFFFFF",
-  background: "#F8FAFC",
-  border: "#E5E7EB",
-  textPrimary: "#111827",
-  textSecondary: "#6B7280",
-  mutedText: "#9CA3AF",
-  success: "#16A34A",
-  danger: "#DC2626",
-};
-
 export const Container = styled(Box)(({ theme }) => ({
-  backgroundColor: COLORS.background,
+  backgroundColor: theme.palette.background.default,
   padding: theme.spacing(3),
   borderRadius: 10,
   minHeight: "100vh",
@@ -29,30 +16,29 @@ export const Header = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(3),
 }));
 
-export const Title = styled(Typography)(() => ({
+export const Title = styled(Typography)(({ theme }) => ({
   fontSize: 28,
   fontWeight: 700,
-  color: COLORS.textPrimary,
+  color: theme.palette.text.primary,
 }));
 
 export const Subtitle = styled(Typography)(({ theme }) => ({
-  color: COLORS.textSecondary,
+  color: theme.palette.text.secondary,
   marginTop: theme.spacing(0.5),
 }));
 
 export const RoleCount = styled(Typography)(({ theme }) => ({
-  color: COLORS.mutedText,
+  color: theme.palette.custom.mutedText,
   marginTop: theme.spacing(0.8),
 }));
 
-export const AddButton = styled(Button)(() => ({
-  backgroundColor: COLORS.primary,
+export const AddButton = styled(Button)(({ theme }) => ({
+  backgroundColor: theme.palette.brand.main,
   textTransform: "none",
   borderRadius: 8,
   padding: "10px 20px",
-
   "&:hover": {
-    backgroundColor: COLORS.primaryHover,
+    backgroundColor: theme.palette.brand.dark,
   },
 }));
 
@@ -60,18 +46,27 @@ export const RoleRow = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
-  backgroundColor: COLORS.white,
-  border: `1px solid ${COLORS.border}`,
+  backgroundColor: theme.palette.common.white,
+  border: `1px solid ${theme.palette.custom.lightBorder}`,
   borderRadius: 10,
   padding: "18px 22px",
   marginBottom: theme.spacing(2),
+  gap: theme.spacing(2),
+  flexWrap: "wrap",
+  [theme.breakpoints.down("md")]: {
+    alignItems: "flex-start",
+  },
 }));
 
 export const LeftSection = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   gap: theme.spacing(2),
-  width: "40%",
+  flex: 2,
+  minWidth: 0,
+  [theme.breakpoints.down("sm")]: {
+    width: "100%",
+  },
 }));
 
 export const RoleIcon = styled(Avatar)(() => ({
@@ -79,37 +74,44 @@ export const RoleIcon = styled(Avatar)(() => ({
   height: 52,
 }));
 
-export const RoleTitle = styled(Typography)(() => ({
+export const RoleTitle = styled(Typography)(({ theme }) => ({
   fontSize: 18,
   fontWeight: 700,
-  color: COLORS.textPrimary,
+  color: theme.palette.text.primary,
+  wordBreak: "break-word",
 }));
 
 export const RoleDescription = styled(Typography)(({ theme }) => ({
-  color: COLORS.textSecondary,
+  color: theme.palette.text.secondary,
   marginTop: theme.spacing(0.5),
+  wordBreak: "break-word",
+  overflowWrap: "break-word",
 }));
 
-export const ColumnCenter = styled(Box)(() => ({
-  width: "20%",
+export const ColumnCenter = styled(Box)(({ theme }) => ({
+  flex: 1,
+  minWidth: 80,
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
+  [theme.breakpoints.down("sm")]: {
+    justifyContent: "flex-start",
+  },
 }));
 
-export const ClickableUsersCount = styled(Typography)(() => ({
-  color: COLORS.primary,
+export const ClickableUsersCount = styled(Typography)(({ theme }) => ({
+  color: theme.palette.brand.main,
   fontWeight: 600,
   cursor: "pointer",
 }));
 
-export const ActiveStatusText = styled(Typography)(() => ({
-  color: COLORS.success,
+export const ActiveStatusText = styled(Typography)(({ theme }) => ({
+  color: theme.palette.success.main,
   fontWeight: 600,
 }));
 
-export const InactiveStatusText = styled(Typography)(() => ({
-  color: COLORS.danger,
+export const InactiveStatusText = styled(Typography)(({ theme }) => ({
+  color: theme.palette.custom.dangerRed,
   fontWeight: 600,
 }));
 
@@ -117,8 +119,13 @@ export const Actions = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   gap: theme.spacing(1),
-  width: "20%",
   justifyContent: "flex-end",
+  minWidth: 80,
+  [theme.breakpoints.down("sm")]: {
+    width: "100%",
+    justifyContent: "flex-start",
+    marginTop: theme.spacing(1),
+  },
 }));
 
 export const ViewButton = styled(IconButton)(() => ({

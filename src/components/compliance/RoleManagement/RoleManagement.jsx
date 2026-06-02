@@ -3,21 +3,29 @@ import { Box } from "@mui/material";
 import { useServices } from "../../../services/services";
 import RoleCard from "./RoleCard";
 import RoleManagementForm from "./RoleManagementForm";
+import { useTheme } from "@mui/material/styles";
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonLoading from "../../../common/CommonLoading";
 import CommonSnackbar from "../../../common/CommonSnackbar";
+
+import {
+  fetchRolesApi,
+  fetchRoleByIdApi,
+  saveRoleApi,
+} from "./RolePermissionsApi";
+
 import {
   Container,
   Header,
   Title,
   Subtitle,
   AddButton,
-  COLORS,
 } from "./RoleManagement.styled";
 
 const RoleManagement = () => {
   const { fetchApi, createApi } = useServices();
-  const { loading, setLoading, LoadingContainer } = CommonLoading();
+  const theme = useTheme();
+  const { setLoading, LoadingContainer } = CommonLoading();
   const [roles, setRoles] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [defaultValues, setDefaultValues] = useState({
@@ -36,9 +44,7 @@ const RoleManagement = () => {
   const handleSnackbar = useCallback((message, severity = "info") => {
     setSnackbar({
       open: true,
-
       message,
-
       severity,
     });
   }, []);
@@ -46,12 +52,9 @@ const RoleManagement = () => {
   const handleSnackbarClose = useCallback(() => {
     setSnackbar((prev) => ({
       ...prev,
-
       open: false,
     }));
   }, []);
-
-  // ---------------- Fetch Roles ----------------
 
   useEffect(() => {
     fetchRoles();
@@ -61,11 +64,7 @@ const RoleManagement = () => {
     try {
       setLoading(true);
 
-      const response = await fetchApi(
-        "/masteradmin/role/get-roles?is_superuser=1",
-      );
-
-      const apiRoles = response?.body?.Roles || [];
+      const apiRoles = await fetchRolesApi(fetchApi);
 
       setRoles(apiRoles);
     } catch (error) {
@@ -81,11 +80,7 @@ const RoleManagement = () => {
     try {
       setLoading(true);
 
-      const response = await fetchApi(
-        `/masteradmin/role/get-roles?is_superuser=1&role_id=${roleId}`,
-      );
-
-      const roleDetails = response?.body?.Roles;
+      const roleDetails = await fetchRoleByIdApi(fetchApi, roleId);
 
       setDefaultValues({
         id: roleDetails?.id,
@@ -116,9 +111,7 @@ const RoleManagement = () => {
 
     setDefaultValues({
       title: "",
-
       description: "",
-
       status: 1,
     });
 
@@ -138,9 +131,7 @@ const RoleManagement = () => {
 
     setDefaultValues({
       title: "",
-
       description: "",
-
       status: 1,
     });
   }, []);
@@ -165,17 +156,13 @@ const RoleManagement = () => {
         payload.role_id = formValues.id;
       }
 
-      const response = await createApi(
-        payload,
-        "/masteradmin/roles/create-or-update-role",
-      );
+      const response = await saveRoleApi(createApi, payload);
 
       if (response?.statusCode === 200 || response?.statusCode === 201) {
         handleSnackbar(
           formValues.id
             ? "Role updated successfully"
             : "Role created successfully",
-
           "success",
         );
 
@@ -185,7 +172,6 @@ const RoleManagement = () => {
       } else {
         handleSnackbar(
           response?.body?.message || "Something went wrong",
-
           "warning",
         );
       }
@@ -212,7 +198,7 @@ const RoleManagement = () => {
       description: role.description,
       users: role.user_count,
       status: role.status === 1 ? "Active" : "Inactive",
-      color: COLORS.primary,
+      color: theme.palette.brand.main,
     };
 
     return <RoleCard key={role.id} role={roleData} onEdit={handleRoleEdit} />;
@@ -225,17 +211,22 @@ const RoleManagement = () => {
   return (
     <>
       <LoadingContainer />
+
       <Container>
         <Header>
           <Box>
             <Title>Roles Overview</Title>
+
             <Subtitle>Quick view of all roles and their access levels</Subtitle>
           </Box>
+
           <AddButton variant="contained" onClick={handleAddRole}>
             Add Role
           </AddButton>
         </Header>
+
         <Box>{roleCards}</Box>
+
         <CommonDialogForm
           open={openDialog}
           onCancel={handleCloseDialog}
@@ -253,6 +244,7 @@ const RoleManagement = () => {
             />
           }
         />
+
         <CommonSnackbar
           open={snackbar.open}
           message={snackbar.message}

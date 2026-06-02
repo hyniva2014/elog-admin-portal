@@ -65,7 +65,7 @@ const RoleManagementForm = ({
     ));
   };
 
-  const handleStatusChange = (event) => {
+  const handleStatusChange = (field) => (event) => {
     field.onChange(Number(event.target.value));
   };
 
@@ -86,7 +86,7 @@ const RoleManagementForm = ({
               fullWidth
               size="small"
               value={field.value ?? ""}
-              onChange={handleStatusChange}
+              onChange={handleStatusChange(field)}
               error={!!errors.status}
               helperText={errors.status?.message}
             >

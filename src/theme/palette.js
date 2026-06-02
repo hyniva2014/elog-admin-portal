@@ -3,27 +3,39 @@
  * File Name: palette.ts
  * Author: Coderthemes
  */
+
 import { darken, lighten } from "@mui/material";
+
 export const getColorVariants = (color, contrastText) => {
   return {
     lighter: lighten(color, 0.6),
+
     light: lighten(color, 0.35),
+
     main: color,
+
     dark: darken(color, 0.35),
+
     darker: darken(color, 0.6),
-    contrastText: contrastText
+
+    contrastText,
   };
 };
-const paletteTheme = themeMode => {
-  //Light Palette
+
+const paletteTheme = (themeMode) => {
   let palette = {
     mode: "light",
+
     tonalOffset: 0.2,
+
     contrastThreshold: 3,
+
     common: {
       white: "#fff",
-      black: "#000"
+
+      black: "#000",
     },
+
     grey: {
       50: "#f8f8f8",
       100: "#f4f6fa",
@@ -35,83 +47,92 @@ const paletteTheme = themeMode => {
       700: "#444d57",
       800: "#3f4650",
       900: "#3a444b",
-      A100: "#f1f1f1",
-      A200: "#e3eaef",
-      A400: "#ced4da",
-      A700: "#444d57"
     },
+
     primary: getColorVariants("#3e60d5", "#fff"),
+
     sidebar: getColorVariants("#284394", "#fff"),
+
     secondary: getColorVariants("#6c757d", "#fff"),
+
     success: getColorVariants("#26c362", "#fff"),
+
     info: getColorVariants("#3FC6FC", "#fff"),
+
     warning: getColorVariants("#fdb906", "#fff"),
+
     error: getColorVariants("#ff0a0a", "#fff"),
+
     light: getColorVariants("#eef2f7", "#6c757d"),
+
     dark: getColorVariants("#313a46", "#fff"),
+
     brand: getColorVariants("#284495", "#fff"),
+
     custom: {
       blue: "#2563EB",
+
       errorRed: "#d32f2f",
+
+      lightBorder: "#E5E7EB",
+
+      border: "#DDE5DC",
+
+      cardBackground: "#F6FBF6",
+
+      hoverBackground: "#F3F4F6",
+
+      mutedText: "#9CA3AF",
+
+      lightGreen: "#00C24E0D",
+
+      successGreen: "#22C55E",
+
+      dangerRed: "#DC2626",
     },
+
     background: {
       paper: "#fff",
-      default: "#f2f4f7"
+
+      default: "#F8FAFC",
     },
-    action: {},
+
     text: {
-      primary: "#001930",
-      secondary: "#50555c",
-      disabled: "#82878c"
+      primary: "#111827",
+
+      secondary: "#6B7280",
+
+      disabled: "#82878c",
     },
-    divider: "#dee2e6"
+
+    divider: "#dee2e6",
   };
-  if (themeMode == "dark") {
+
+  if (themeMode === "dark") {
     palette = {
       ...palette,
+
       mode: "dark",
-      grey: {
-        50: "#23282d",
-        100: "#2d3741",
-        200: "#3f4650",
-        300: "#444d57",
-        400: "#818e9e",
-        500: "#aab8c5",
-        600: "#ced4da",
-        700: "#dee2e6",
-        800: "#e3eaef",
-        900: "#f1f1f1",
-        A100: "#3a444b",
-        A200: "#3f4650",
-        A400: "#818e9e",
-        A700: "#dee2e6"
-      },
-      primary: getColorVariants("#3e60d5", "#fff"),
-      sidebar: getColorVariants("#284394", "#fff"),
-      secondary: getColorVariants("#6c757d", "#fff"),
-      success: getColorVariants("#26c362", "#fff"),
-      info: getColorVariants("#3FC6FC", "#fff"),
-      warning: getColorVariants("#fdb906", "#fff"),
-      error: getColorVariants("#ff0a0a", "#fff"),
-      light: getColorVariants("#464f5b", "#f1f1f1"),
-      dark: getColorVariants("#f1f1f1", "#000"),
-      brand: getColorVariants("#284495", "#fff"),
-      custom: {
-        blue: "#2563EB",
-        errorRed: "#d32f2f",
-      },
+
       background: {
         paper: "#1e2328",
-        default: "#171c21"
+
+        default: "#171c21",
       },
+
       text: {
         primary: "#ebedf0",
+
         secondary: "#c8c8c8",
-        disabled: "#8c9196"
+
+        disabled: "#8c9196",
       },
-      divider: "#3d454f"
+
+      divider: "#3d454f",
     };
   }
+
   return palette;
 };
+
 export default paletteTheme;

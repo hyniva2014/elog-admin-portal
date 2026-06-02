@@ -5,7 +5,7 @@ export const fetchRoleDetailsApi = async (
 ) => {
   try {
     const response = await fetchApi(
-      `/user/get-roles?company_id=${companyId}&role_id=${roleId}`,
+      `/masteradmin/role/get-roles?is_superuser=1&role_id=${roleId}`,
     );
 
     return response?.body?.Roles;
@@ -22,7 +22,7 @@ export const syncRolePermissionsApi = async (
   try {
     const response = await createApi(
       payload,
-      "/roles/sync-permissions",
+      "/masteradmin/roles/sync-permissions",
     );
 
     return response;

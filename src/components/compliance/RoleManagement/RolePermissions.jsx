@@ -1,8 +1,17 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Grid, Typography } from "@mui/material";
+import { Grid } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import { useServices } from "../../../services/services";
 import CommonLoading from "../../../common/CommonLoading";
+import CommonTextField from "../../../common/CommonTextField";
+import CommonSnackbar from "../../../common/CommonSnackbar";
+import PermissionCardItem from "./PermissionCardItem";
+
+import {
+  fetchRoleDetailsApi,
+  syncRolePermissionsApi,
+} from "./RolePermissionsApi";
+
 import {
   PageWrapper,
   PageTitle,
@@ -14,44 +23,33 @@ import {
   FooterWrapper,
   CancelButton,
   SaveButton,
-  CardHeader,
-  PermissionCard,
-  CardContentWrapper,
-  CountBadge,
-  PermissionsWrapper,
-  PermissionsList,
-  PermissionItem,
-  PermissionTitle,
-  PermissionDescription,
-  StyledSwitch,
-  StyledDivider,
-  CardFooter,
-  FooterActionButton,
-  ModuleTitle,
 } from "./RolePermissions.styled";
-
-import CommonTextField from "../../../common/CommonTextField";
-import CommonSnackbar from "../../../common/CommonSnackbar";
-import PermissionCardItem from "./PermissionCardItem";
 
 const RolePermissions = () => {
   const { roleId } = useParams();
 
   const navigate = useNavigate();
+
+  const { fetchApi, createApi } = useServices();
+
+  const { setLoading, LoadingContainer } = CommonLoading();
+
+  const [roleData, setRoleData] = useState(null);
+
+  const [groupedPermissions, setGroupedPermissions] = useState({});
+
+  const [permissionState, setPermissionState] = useState({});
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
-  const { fetchApi, createApi } = useServices();
-  const { setLoading, LoadingContainer } = CommonLoading();
-  const [roleData, setRoleData] = useState(null);
-  const [groupedPermissions, setGroupedPermissions] = useState({});
-  const [permissionState, setPermissionState] = useState({});
 
   const roleName = roleData?.name || "-";
+
   const roleDescription = roleData?.description || "-";
-  
+
   useEffect(() => {
     let isMounted = true;
 
@@ -63,15 +61,11 @@ const RolePermissions = () => {
       try {
         setLoading(true);
 
-        const response = await fetchApi(
-          `/masteradmin/role/get-roles?is_superuser=1&role_id=${roleId}`,
-        );
+        const roleDetails = await fetchRoleDetailsApi(fetchApi, 1, roleId);
 
-        if (!isMounted) {
+        if (!isMounted || !roleDetails) {
           return;
         }
-
-        const roleDetails = response?.body?.Roles;
 
         setRoleData(roleDetails);
 
@@ -117,7 +111,9 @@ const RolePermissions = () => {
       const updated = {
         ...prev,
       };
+
       updated[module][permissionIndex] = !updated[module][permissionIndex];
+
       return updated;
     });
   };
@@ -125,7 +121,6 @@ const RolePermissions = () => {
   const handleEnableAll = (module) => {
     setPermissionState((prev) => ({
       ...prev,
-
       [module]: groupedPermissions[module]?.map(() => true),
     }));
   };
@@ -133,16 +128,33 @@ const RolePermissions = () => {
   const handleDisableAll = (module) => {
     setPermissionState((prev) => ({
       ...prev,
-
       [module]: groupedPermissions[module]?.map(() => false),
     }));
   };
 
+  const handleSnackbar = useCallback((message, severity = "info") => {
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    });
+  }, []);
+
+  const handleSnackbarClose = useCallback(() => {
+    setSnackbar((prev) => ({
+      ...prev,
+      open: false,
+    }));
+  }, []);
+
   const handleSave = async () => {
     try {
       setLoading(true);
+
       const enabledPermissions = [];
+
       const disabledPermissions = [];
+
       Object.keys(groupedPermissions).forEach((module) => {
         groupedPermissions[module]?.forEach((permission, idx) => {
           if (permissionState[module]?.[idx]) {
@@ -160,10 +172,7 @@ const RolePermissions = () => {
         disabled_permission_ids: disabledPermissions,
       };
 
-      const response = await createApi(
-        payload,
-        "/masteradmin/roles/sync-permissions",
-      );
+      const response = await syncRolePermissionsApi(createApi, payload);
 
       if (response?.statusCode === 200) {
         handleSnackbar(
@@ -189,21 +198,6 @@ const RolePermissions = () => {
     }
   };
 
-  const handleSnackbar = useCallback((message, severity = "info") => {
-    setSnackbar({
-      open: true,
-      message,
-      severity,
-    });
-  }, []);
-
-  const handleSnackbarClose = useCallback(() => {
-    setSnackbar((prev) => ({
-      ...prev,
-      open: false,
-    }));
-  }, []);
-
   const getToggleHandler = useCallback(
     (module, idx) => () => {
       handleToggle(module, idx);
@@ -215,14 +209,14 @@ const RolePermissions = () => {
     (module) => () => {
       handleEnableAll(module);
     },
-    [],
+    [groupedPermissions],
   );
 
   const getDisableAllHandler = useCallback(
     (module) => () => {
       handleDisableAll(module);
     },
-    [],
+    [groupedPermissions],
   );
 
   const handleCancel = () => {
