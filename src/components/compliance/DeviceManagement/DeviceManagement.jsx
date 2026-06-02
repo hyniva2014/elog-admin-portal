@@ -139,7 +139,6 @@ const DeviceManagement = () => {
           searchKey={data.search}
           summaryCards={dynamicSummaryCards}
           handleClick={handleClick}
-          isAssignDeviceEnabled={selectedRows.length > 0}
         />
         <CommonDataGrid
           columnsData={columns}
@@ -151,9 +150,6 @@ const DeviceManagement = () => {
           }}
           setData={setData}
           paginationMode="server"
-          checkboxSelection
-          onRowSelectionModelChange={handleRowSelectionChange}
-          isRowSelectable={isDeviceSelectable}
           getRowHeight={() => "auto"}
         />
       </PageContainer>
