@@ -1,9 +1,3 @@
-export const fetchCarriers = async (fetchApi, params = {}) => {
-  const query = new URLSearchParams(params).toString();
-  const response = await fetchApi(`/masteradmin/external-fleet/carriers?${query}`);
-  return response?.body?.carriers ?? null;
-};
-
 export const formatUsdot = (value) => {
   if (!value) return value;
   return value.replace(/\D/g, "").slice(0, 8);

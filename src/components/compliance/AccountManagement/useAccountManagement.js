@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { AccountManagementRowData } from "./CommonRowColumnUtils";
-import { fetchCarriers } from "./utils";
 
 export const useAccountManagement = (
   companyId,
@@ -343,7 +342,9 @@ export const useAccountManagement = (
           ...(carrier_name && { carrier_name }),
           ...(carrier_id && { carrier_id }),
         };
-        const result = await fetchCarriers(fetchApi, params);
+        const query = new URLSearchParams(params).toString();
+        const response = await fetchApi(`/masteradmin/external-fleet/carriers?${query}`);
+        const result = response?.body?.carriers ?? null;
         if (carrier_id) return result && !Array.isArray(result) ? result : null;
         return Array.isArray(result) ? result : [];
       } catch (err) {

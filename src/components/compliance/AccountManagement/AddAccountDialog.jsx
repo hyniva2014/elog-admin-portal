@@ -260,11 +260,9 @@ const AddAccountDialog = ({
       <DialogFormContainer>
         <Grid container spacing={2}>
           <CarrierNameAutocomplete
-            control={control}
-            errors={errors}
+            formProps={{ control, errors }}
+            carrierProps={{ fetchCarrierOptions, onCarrierSelect: handleCarrierSelect }}
             disabled={isFieldDisabled}
-            fetchCarrierOptions={fetchCarrierOptions}
-            onCarrierSelect={handleCarrierSelect}
           />
 
           <FormFieldsSection

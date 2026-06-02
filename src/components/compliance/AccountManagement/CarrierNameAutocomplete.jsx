@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Grid } from "@mui/material";
-import { Controller } from "react-hook-form";
+import { useController } from "react-hook-form";
+import useDebounce from "./useDebounce";
 import CommonTextField from "../../../common/CommonTextField";
 import {
   AutocompleteWrapper,
@@ -12,17 +13,6 @@ import {
 
 const MIN_SEARCH_LENGTH = 3;
 const DEBOUNCE_DELAY_MS = 300;
-
-const useDebounce = (value, delay) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(timer);
-  }, [value, delay]);
-
-  return debouncedValue;
-};
 
 const CarrierSuggestionItem = ({ carrier, index, highlightedIndex, onSelect, onHighlight }) => {
   const handleMouseDown = useCallback(() => onSelect(carrier), [onSelect, carrier]);
@@ -61,12 +51,12 @@ const SuggestionsList = ({ suggestions, loadingState, highlightedIndex, onSelect
 };
 
 const CarrierNameAutocomplete = ({
-  control,
-  errors,
+  formProps: { control, errors },
+  carrierProps: { fetchCarrierOptions, onCarrierSelect },
   disabled,
-  fetchCarrierOptions,
-  onCarrierSelect,
 }) => {
+  const { field } = useController({ name: "carrierName", control });
+
   const suggestionsRef = useRef([]);
   const suppressNextLoadRef = useRef(false);
   const [inputValue, setInputValue] = useState("");
@@ -165,13 +155,11 @@ const CarrierNameAutocomplete = ({
     setHighlightedIndex(index);
   }, []);
 
-  const fieldRef = useRef(null);
-
   const handleChange = useCallback((event) => {
     const value = event.target.value;
-    fieldRef.current?.onChange(value);
+    field.onChange(value);
     setInputValue(value);
-  }, []);
+  }, [field]);
 
   const handleFocus = useCallback(() => {
     if (
@@ -184,44 +172,34 @@ const CarrierNameAutocomplete = ({
 
   return (
     <Grid item xs={12} sm={6}>
-      <Controller
-        name="carrierName"
-        control={control}
-        render={({ field }) => {
-          fieldRef.current = field;
+      <AutocompleteWrapper ref={wrapperRef}>
+        <CommonTextField
+          {...field}
+          label="Carrier Name"
+          required
+          disabled={disabled}
+          error={!!errors.carrierName}
+          helperText={errors.carrierName?.message}
+          fullWidth
+          size="small"
+          autoComplete="off"
+          onChange={handleChange}
+          onFocus={handleFocus}
+          onKeyDown={handleKeyDown}
+        />
 
-          return (
-            <AutocompleteWrapper ref={wrapperRef}>
-              <CommonTextField
-                {...field}
-                label="Carrier Name"
-                required
-                disabled={disabled}
-                error={!!errors.carrierName}
-                helperText={errors.carrierName?.message}
-                fullWidth
-                size="small"
-                autoComplete="off"
-                onChange={handleChange}
-                onFocus={handleFocus}
-                onKeyDown={handleKeyDown}
-              />
-
-              {showDropdown && (
-                <SuggestionsDropdown>
-                  <SuggestionsList
-                    suggestions={suggestions}
-                    loadingState={loadingState}
-                    highlightedIndex={highlightedIndex}
-                    onSelect={handleSelectCarrier}
-                    onMouseEnter={handleHighlight}
-                  />
-                </SuggestionsDropdown>
-              )}
-            </AutocompleteWrapper>
-          );
-        }}
-      />
+        {showDropdown && (
+          <SuggestionsDropdown>
+            <SuggestionsList
+              suggestions={suggestions}
+              loadingState={loadingState}
+              highlightedIndex={highlightedIndex}
+              onSelect={handleSelectCarrier}
+              onMouseEnter={handleHighlight}
+            />
+          </SuggestionsDropdown>
+        )}
+      </AutocompleteWrapper>
     </Grid>
   );
 };

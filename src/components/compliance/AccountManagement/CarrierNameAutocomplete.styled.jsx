@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import styled from "@emotion/styled";
 
-export const AutocompleteWrapper = styled(Box)(() => ({
+export const AutocompleteWrapper = styled(Box)(({ theme }) => ({
   position: "relative",
   width: "100%",
 }));
