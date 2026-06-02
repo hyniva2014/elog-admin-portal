@@ -34,8 +34,6 @@ const renderStatusOptions = () => {
   ));
 };
 
-
-
 const DeviceAssetManagementForm = ({
   formId,
   defaultValues,
@@ -57,7 +55,7 @@ const DeviceAssetManagementForm = ({
     defaultValues: defaultValues || initialValues,
   });
   const [modelOptions, setModelOptions] = useState([]);
-   const { fetchApi } = useServices();
+  const { fetchApi } = useServices();
 
   useEffect(() => {
     reset(defaultValues || initialValues);
@@ -73,7 +71,7 @@ const DeviceAssetManagementForm = ({
       if (response?.statusCode === 200) {
         const formattedOptions = (response?.body?.data || []).map((item) => ({
           label: item.model_name,
-          value: item.model_name,
+          value: item.device_model_id,
         }));
 
         setModelOptions(formattedOptions);
