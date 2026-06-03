@@ -22,13 +22,14 @@ const assignAssetSchema = yup.object().shape({
 
 const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange, }) => {
   const dispatch = useDispatch();
-  const { models: modelOptions, isLoading: modelsLoading } = useSelector(
-    (state) => state.deviceModelsSlice
-  );
+  // const { models: modelOptions, isLoading: modelsLoading } = useSelector(
+  //   (state) => state.deviceModelsSlice
+  // );
   
   const [availableCount, setAvailableCount] = useState(null);
   const [stockMessage, setStockMessage] = useState("");
   const [deviceIds, setDeviceIds] = useState([]);
+  const [modelOptions, setModelOptions] = useState([]);
   const checkTimer = useRef(null);
   const { fetchApi } = useServices();
   const { control, handleSubmit, reset, watch } = useForm({
@@ -40,13 +41,31 @@ const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange
   });
 
   // Fetch device models from Redux on mount
-  useEffect(() => {
-    // Only fetch if not already loaded or if stale (older than 5 minutes)
-    const state = dispatch(fetchDeviceModels());
-    return () => {
-      // Optional: cleanup if needed
+  // useEffect(() => {
+  //   // Only fetch if not already loaded or if stale (older than 5 minutes)
+  //   const state = dispatch(fetchDeviceModels());
+  //   return () => {
+  //     // Optional: cleanup if needed
+  //   };
+  // }, [dispatch]);
+  const fetchDeviceModels = async () => {
+      try {
+        const response = await fetchApi("/masteradmin/get-device-model-dropdown");
+        if (response?.statusCode === 200) {
+          const formattedOptions = (response?.body?.data || []).map((item) => ({
+            label: item.model_name,
+            value: item.device_model_id,
+          }));
+  
+          setModelOptions(formattedOptions);
+        }
+      } catch (error) {
+        console.error("Failed to fetch model dropdown", error);
+      }
     };
-  }, [dispatch]);
+    useEffect(() => {
+      fetchDeviceModels();
+    }, []);
 
   const watchedNumber = watch("numberOfDevices");
 
@@ -101,7 +120,7 @@ const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange
         clearTimeout(checkTimer.current);
       }
     };
-  }, [watchedNumber, fetchApi, onStockStatusChange]);
+  }, [watchedNumber]);
 
   const handleFormSubmit = useCallback(
     (data) => {
