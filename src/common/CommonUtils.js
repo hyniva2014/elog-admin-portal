@@ -26,6 +26,21 @@ export const formatDateRange = (start, end, variant = "single-or-range") => {
   }
 };
 
+export const getFormattedDateTime = (timestamp) => {
+  if (!timestamp) return { date: "-", time: "-" };
+
+  const localTimestamp = typeof timestamp === "string"
+    ? timestamp.replace(/(Z|[+-]\d{2}:\d{2})$/, "")
+    : timestamp;
+
+  const d = dayjs(localTimestamp);
+  if (!d.isValid()) return { date: "-", time: "-" };
+  return {
+    date: d.format("MMM DD, YYYY"),
+    time: d.format("hh:mm A"),
+  };
+};
+
 export const buildSummaryCards = (apiBody = {}, config = {}) => {
   return Object.entries(config)
     .filter(([key]) => key in apiBody)
@@ -180,4 +195,5 @@ export const getSelectedDevices = (selectedIds) => {
     .filter((row) => selectedIds.includes(row.id))
     .map((row) => ({
       device_id: row.id,
-    }));};
+    }));
+};

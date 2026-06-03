@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { getFormattedDateTime } from "../../../common/CommonUtils";
 import eyeIcon from "../../../assets/images/svg/eyeicon.png";
 import DevicesIcon from "@mui/icons-material/Devices";
 import WifiIcon from "@mui/icons-material/Wifi";
@@ -205,32 +206,29 @@ export const getDeviceStatus = (status) =>
   DEVICE_STATUS_MAP[Number(status)] || "-";
 
 export const transformDeviceData = (data = []) =>
-  data.map((item) => ({
-    id: item.device_id,
-    deviceId: item.device_id,
-    carrierId: item.carrier_id ?? "-",
-    carrierName: item.carrier_name ?? "-",
-    deviceModel: item.device_model_name ?? "-",
-    serialNumber: item.serial_number ?? "-",
-    truckNumber: item.truck_number ?? "-",
-    latitude: item.latitude ?? "-",
-    longitude: item.longitude ?? "-",
-    ignition: item.ignition ?? "-",
-    speed: item.speed ?? 0,
-    createdDate: item.created_at
-      ? dayjs(item.created_at).format("MMM DD, YYYY")
-      : "-",
-    createdTime: item.created_at
-      ? dayjs(item.created_at).format("hh:mm A")
-      : "-",
-    updatedDate: item.updated_at
-      ? dayjs(item.updated_at).format("MMM DD, YYYY")
-      : "-",
-    updatedTime: item.updated_at
-      ? dayjs(item.updated_at).format("hh:mm A")
-      : "-",
-    status: getDeviceStatus(item.status),
-  }));
+  data.map((item) => {
+    const createdInfo = getFormattedDateTime(item.created_at);
+    const updatedInfo = getFormattedDateTime(item.updated_at);
+    
+    return {
+      id: item.device_id,
+      deviceId: item.device_id,
+      carrierId: item.carrier_id ?? "-",
+      carrierName: item.carrier_name ?? "-",
+      deviceModel: item.device_model_name ?? "-",
+      serialNumber: item.serial_number ?? "-",
+      truckNumber: item.truck_number ?? "-",
+      latitude: item.latitude ?? "-",
+      longitude: item.longitude ?? "-",
+      ignition: item.ignition ?? "-",
+      speed: item.speed ?? 0,
+      createdDate: createdInfo.date,
+      createdTime: createdInfo.time,
+      updatedDate: updatedInfo.date,
+      updatedTime: updatedInfo.time,
+      status: getDeviceStatus(item.status),
+    };
+  });
 
 export const DEVICE_SUMMARY_CARDS = {
   totalDevices: {

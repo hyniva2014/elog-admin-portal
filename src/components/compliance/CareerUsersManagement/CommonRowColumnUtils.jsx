@@ -7,7 +7,7 @@ import trashDark from "../../../assets/images/svg/trashdark.png";
 import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { USER_STATUS, USER_STATUS_COL_CONFIG } from "./Constants";
-import { formatDateTime } from "../../../common/CommonUtils";
+import { getFormattedDateTime } from "../../../common/CommonUtils";
 import {
   EllipsisTextSx,
   getActionButtonSx,
@@ -215,7 +215,7 @@ export const UserManagementTableData = (
     const statusCode = Number(item.status_id) || Number(item.status);
     const rawStatus = USER_STATUS[statusCode] || "-";
 
-    const created = formatDateTime(item.created_at);
+    const created = getFormattedDateTime(item.created_at);
     const statusLabel =
       rawStatus?.trim()?.toUpperCase() === "ACTIVE"
         ? "Active"

@@ -61,9 +61,10 @@ export const CancelEditButton = styled(Button)(({ theme }) => ({
 
 export const StatusTypography = styled(Typography)(({ value }) => {
   let color = COLORS.textPrimary;
-  if (value === "Assigned") color = COLORS.success;
-  else if (value === "In Stock") color = COLORS.warning;
+  if (value === "Assigned") color = COLORS.warning;
+  else if (value === "In Stock") color = COLORS.success;
   else if (value === "Allocated") color = COLORS.orange;
+  else if (value === "Out of Service") color = COLORS.error;
   return { color, fontWeight: 600 };
 });
 

@@ -3,6 +3,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import dayjs from "dayjs";
 import { defaultColumnProps, getStickyColumnProps } from "./Constants";
+import { getFormattedDateTime } from "../../../common/CommonUtils";
 import {
   StatusText,
   AddressCellText,
@@ -223,6 +224,9 @@ export const AccountManagementRowData = (response = []) => {
       email: secondaryContactEmail,
     } = secondaryContact || {};
 
+    const createdInfo = getFormattedDateTime(createdAt);
+    const updatedInfo = getFormattedDateTime(updatedAt);
+
     return {
       id: company_id,
       carrierId: company_id ?? "-",
@@ -241,10 +245,10 @@ export const AccountManagementRowData = (response = []) => {
       tollFree: tollFree || "-",
       fax: fax || "-",
       maxDevices: maxDevices || "-",
-      createdDate: createdAt ? dayjs(createdAt).format("MMM DD, YYYY") : "-",
-      createdTime: createdAt ? dayjs(createdAt).format("hh:mm A") : "-",
-      updatedDate: updatedAt ? dayjs(updatedAt).format("MMM DD, YYYY") : "-",
-      updatedTime: updatedAt ? dayjs(updatedAt).format("hh:mm A") : "-",
+      createdDate: createdInfo.date,
+      createdTime: createdInfo.time,
+      updatedDate: updatedInfo.date,
+      updatedTime: updatedInfo.time,
       status: statusName || "-",
     };
   });

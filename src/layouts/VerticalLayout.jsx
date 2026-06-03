@@ -19,7 +19,7 @@ const Footer = lazy(() => import("@src/layouts/Footer"));
 const VerticalLayout = ({ children }) => {
   const { settings } = useLayoutContext();
   return (
-    <LayoutRoot>
+    <div>
       <Suspense fallback={<div />}>
         <LeftSideBar />
       </Suspense>
@@ -40,7 +40,7 @@ const VerticalLayout = ({ children }) => {
           <RightSideBar />
         </Suspense>
       </MainContent>
-    </LayoutRoot>
+    </div>
   );
 };
 export default VerticalLayout;
