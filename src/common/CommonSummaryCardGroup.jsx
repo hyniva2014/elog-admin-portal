@@ -32,6 +32,8 @@ const CommonSummaryCardGroup = ({
           icon={card.icon}
           showAccentBar={showAccentBar}
           layout={layout}
+          showViewAll={card.showViewAll}
+          onViewAll={card.onViewAll}
         />
       ))}
     </Box>

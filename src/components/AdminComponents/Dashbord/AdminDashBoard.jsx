@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { PageContainer } from "../component.styled";
@@ -25,6 +25,7 @@ import DateRangeSelector from "./DateRangeSelector";
 import { useDashboardMetrics } from "../../../hooks";
 import { buildSummaryCards } from "../../../common/CommonUtils";
 import CommonLoading from "../../../common/CommonLoading";
+import { useNavigate } from "react-router-dom";
 
 const getTodayRange = () => {
   const today = new Date();
@@ -50,19 +51,75 @@ const AdminDashboard = () => {
 
   const { dashboardMetrics } = useDashboardMetrics(selectedRange, setLoading);
 
+  const navigate = useNavigate();
+  const handleAccountManagementNavigation = useCallback(() => {
+    navigate("/account-management");
+  }, [navigate]);
+
+  const handleDeviceManagementNavigation = useCallback(() => {
+    navigate("/device-management");
+  }, [navigate]);
+  const handleOpenIncidentsNavigation = useCallback(() => {
+    navigate("/open-incidents");
+  }, [navigate]);
+  const CARD_CONFIG = {
+    total_carriers: {
+      showViewAll: true,
+    },
+    active_devices: {
+      showViewAll: true,
+    },
+    open_incidents: {
+      showViewAll: true,
+    },
+  };
+  const navigationHandlers = useMemo(
+    () => ({
+      total_carriers: handleAccountManagementNavigation,
+      active_devices: handleDeviceManagementNavigation,
+      open_incidents: handleOpenIncidentsNavigation,
+    }),
+    [
+      handleAccountManagementNavigation,
+      handleDeviceManagementNavigation,
+      handleOpenIncidentsNavigation,
+    ],
+  );
+  const getDashboardCard = useCallback(
+    (card) => {
+      const config = CARD_CONFIG[card.id];
+
+      return {
+        ...card,
+        showViewAll: config?.showViewAll ?? false,
+        onViewAll: navigationHandlers[card.id],
+      };
+    },
+    [navigationHandlers],
+  );
   const handleDateChange = (data) => {
     setSelectedRange(data);
   };
 
-  const summaryCards = useMemo(() => {
-    return buildSummaryCards(dashboardMetrics || {}, Device_Metrics_Cards);
-  }, [dashboardMetrics]);
+  // const summaryCards = useMemo(() => {
+  //   return buildSummaryCards(dashboardMetrics || {}, Device_Metrics_Cards);
+  // }, [dashboardMetrics]);
+
+  const getSummaryCards = useCallback(() => {
+    const cards = buildSummaryCards(
+      dashboardMetrics || {},
+      Device_Metrics_Cards,
+    );
+
+    return cards.map(getDashboardCard);
+  }, [dashboardMetrics, getDashboardCard]);
+
+  const summaryCards = useMemo(getSummaryCards, [getSummaryCards]);
 
   const dateLabel =
     selectedRange.period === "Today"
       ? selectedRange.date
       : `${selectedRange.startDate} - ${selectedRange.endDate}`;
-
   return (
     <PageContainer>
       <LoadingContainer />
