@@ -27,7 +27,7 @@ const UserManagement = () => {
     rows: [],
     total: 0,
     page: 1,
-    pageSize: 20,
+    pageSize: 25,
     search: "",
     company_id: "",
     role_id: "",

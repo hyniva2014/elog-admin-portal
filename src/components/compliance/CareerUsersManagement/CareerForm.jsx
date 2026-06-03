@@ -163,7 +163,7 @@ const CareerForm = () => {
   const { setLoading, LoadingContainer } = CommonLoading();
   const [formData, setFormData] = useState({});
   //   const [mode, setMode] = useState("add");
-  const [mode, setMode] = useState(userId ? "edit" : "add");
+  // const [mode, setMode] = useState(userId ? "edit" : "add");
   const [loading, setLoadingState] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -180,6 +180,8 @@ const CareerForm = () => {
     documents: false,
   });
   const [profileCompletion, setProfileCompletion] = useState(0);
+  const mode = userId ? "edit" : "add";
+
   const [editMode, setEditMode] = useState(mode === "add");
 
   const handleDiscard = () => {
@@ -220,7 +222,7 @@ const CareerForm = () => {
   const canUpdate = true;
   const breadcrumbs = [
     { label: "Compliance", path: "/compliance" },
-    { label: "Career Users Management", path: "/career-users" },
+    { label: "Platform Users", path: "/career-users" },
     { label: userId ? "Career User View" : "Add Career User" },
   ];
 
@@ -351,7 +353,7 @@ const CareerForm = () => {
 
         ssn: formatSSN(data.ssn || ""),
 
-        role: data.role_id || "",
+        role: data.role || "",
 
         language:
           typeof data.language === "string"
@@ -452,7 +454,7 @@ const CareerForm = () => {
   };
 
   const handleBack = () => {
-    navigate("/career-users");
+    navigate("/platform-users");
   };
 
   const handleSnackbarClose = () => {

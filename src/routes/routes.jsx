@@ -845,7 +845,7 @@ const adminRoutes = [
     ),
   },
   {
-    path: "/user-management",
+    path: "/career-users",
     element: (
       <LoadComponent
         component={lazy(
@@ -856,7 +856,7 @@ const adminRoutes = [
     ),
   },
   {
-    path: "/career-users",
+    path: "/platform-users",
     element: (
       <LoadComponent
         component={lazy(
@@ -867,21 +867,23 @@ const adminRoutes = [
     ),
   },
   {
-    path: "/career-users/add",
+    path: "/platform-users/add",
     element: (
       <LoadComponent
         component={lazy(
-          () => import("../components/compliance/CareerUsersManagement/CareerForm"),
+          () =>
+            import("../components/compliance/CareerUsersManagement/CareerForm"),
         )}
       />
     ),
   },
   {
-    path: "/career-users/edit/:userId",
+    path: "/platform-users/edit/:userId",
     element: (
       <LoadComponent
         component={lazy(
-          () => import("../components/compliance/CareerUsersManagement/CareerForm"),
+          () =>
+            import("../components/compliance/CareerUsersManagement/CareerForm"),
         )}
       />
     ),
@@ -902,8 +904,7 @@ const adminRoutes = [
     element: (
       <LoadComponent
         component={lazy(
-          () =>
-            import("../components/compliance/RequestDevice/RequestDevice"),
+          () => import("../components/compliance/RequestDevice/RequestDevice"),
         )}
       />
     ),

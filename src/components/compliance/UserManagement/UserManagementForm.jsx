@@ -144,7 +144,7 @@ const UserManagementForm = ({
     let isMounted = true;
     const fetchRoles = async () => {
       if (!companyId) {
-        setRoleOptions([]);
+        setRoleOptions((prev) => (prev.length === 0 ? prev : []));
         return;
       }
       try {
@@ -172,7 +172,9 @@ const UserManagementForm = ({
         setRoleOptions(options);
       } catch (err) {
         console.error("Failed to fetch roles", err);
-        if (isMounted) setRoleOptions([]);
+        if (isMounted) {
+          setRoleOptions((prev) => (prev.length === 0 ? prev : []));
+        }
       }
     };
     fetchRoles();

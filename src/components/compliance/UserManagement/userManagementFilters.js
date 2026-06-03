@@ -10,11 +10,6 @@ export const FILTER_STATUS_OPTIONS = [
 
 export const getUserManagementFilters = (companyOptions = []) => [
   {
-    label: "User Profile",
-    dataKey: "role_id",
-    options: FILTER_USER_PROFILE_OPTIONS,
-  },
-  {
     label: "All Carrier",
     dataKey: "company_id",
     options: companyOptions,

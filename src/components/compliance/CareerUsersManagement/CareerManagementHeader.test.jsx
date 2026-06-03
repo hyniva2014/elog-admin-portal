@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-} from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import CareerManagementHeader from "./CareerManagementHeader";
 
@@ -24,36 +19,23 @@ jest.mock("../../../services/services", () => ({
   }),
 }));
 
-jest.mock(
-  "../../../common/CommonPageHeader",
-  () => (props) => (
-    <div data-testid="page-header">
-      <span>{props.title}</span>
-      {props.rightContent}
-    </div>
-  ),
-);
+jest.mock("../../../common/CommonPageHeader", () => (props) => (
+  <div data-testid="page-header">
+    <span>{props.title}</span>
+    {props.rightContent}
+  </div>
+));
 
-jest.mock(
-  "../../../common/CommonFilters",
-  () => (props) => (
-    <div data-testid="common-filters">
-      Filters
-      <span data-testid="filters-count">
-        {props.filters?.length}
-      </span>
-    </div>
-  ),
-);
+jest.mock("../../../common/CommonFilters", () => (props) => (
+  <div data-testid="common-filters">
+    Filters
+    <span data-testid="filters-count">{props.filters?.length}</span>
+  </div>
+));
 
-jest.mock(
-  "../../../common/CommonSummaryCardGroup",
-  () => (props) => (
-    <div data-testid="summary-cards">
-      {props.cards?.length || 0}
-    </div>
-  ),
-);
+jest.mock("../../../common/CommonSummaryCardGroup", () => (props) => (
+  <div data-testid="summary-cards">{props.cards?.length || 0}</div>
+));
 
 const createStore = () =>
   createMockStore({
@@ -89,10 +71,7 @@ const renderComponent = (props = {}) => {
 
   return render(
     <Provider store={store}>
-      <CareerManagementHeader
-        {...defaultProps}
-        {...props}
-      />
+      <CareerManagementHeader {...defaultProps} {...props} />
     </Provider>,
   );
 };
@@ -120,11 +99,7 @@ describe("CareerManagementHeader", () => {
   test("renders page title", () => {
     renderComponent();
 
-    expect(
-      screen.getByText(
-        "Career Users Management",
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Platform Users Management")).toBeInTheDocument();
   });
 
   test("renders add career user button", () => {
@@ -146,33 +121,25 @@ describe("CareerManagementHeader", () => {
       }),
     );
 
-    expect(mockAddData).toHaveBeenCalledTimes(
-      1,
-    );
+    expect(mockAddData).toHaveBeenCalledTimes(1);
   });
 
   test("renders summary cards", () => {
     renderComponent();
 
-    expect(
-      screen.getByTestId("summary-cards"),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("summary-cards")).toBeInTheDocument();
   });
 
   test("renders filters component", () => {
     renderComponent();
 
-    expect(
-      screen.getByTestId("common-filters"),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("common-filters")).toBeInTheDocument();
   });
 
   test("passes two filters to CommonFilters", () => {
     renderComponent();
 
-    expect(
-      screen.getByTestId("filters-count"),
-    ).toHaveTextContent("2");
+    expect(screen.getByTestId("filters-count")).toHaveTextContent("2");
   });
 
   test("calls users api on mount", async () => {
@@ -212,9 +179,7 @@ describe("CareerManagementHeader", () => {
       .spyOn(console, "error")
       .mockImplementation(() => {});
 
-    mockFetchApi.mockRejectedValue(
-      new Error("API Error"),
-    );
+    mockFetchApi.mockRejectedValue(new Error("API Error"));
 
     renderComponent();
 
@@ -228,22 +193,14 @@ describe("CareerManagementHeader", () => {
   test("renders page header component", () => {
     renderComponent();
 
-    expect(
-      screen.getByTestId("page-header"),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("page-header")).toBeInTheDocument();
   });
 
   test("renders summary cards count correctly", () => {
     renderComponent({
-      summaryCards: [
-        { id: 1 },
-        { id: 2 },
-        { id: 3 },
-      ],
+      summaryCards: [{ id: 1 }, { id: 2 }, { id: 3 }],
     });
 
-    expect(
-      screen.getByTestId("summary-cards"),
-    ).toHaveTextContent("3");
+    expect(screen.getByTestId("summary-cards")).toHaveTextContent("3");
   });
 });

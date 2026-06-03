@@ -17,7 +17,7 @@ const EmploymentDetailsSection = ({
   control,
   errors,
   editMode,
-  filteredRoles,
+  roles,
   selectedEmploymentType,
   selectedStatus,
   watch,
@@ -25,11 +25,12 @@ const EmploymentDetailsSection = ({
   const optionsMap = {
     DRIVER_STATUS_FORM,
     employment_type_options,
+    roles,
   };
 
   const additionalProps = {
     role: {
-      options: filteredRoles,
+      options: roles,
     },
     termination_date: {
       minDate: getTerminationMinDate(watch("hire_date")),

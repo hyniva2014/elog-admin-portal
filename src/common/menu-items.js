@@ -47,22 +47,21 @@ const MENU_ITEMS = [
       },
     ],
   },
-
   {
     key: "user-management",
     label: "User Management",
     icon: GroupIcon,
     children: [
       {
-        key: "career-users-management",
-        label: "Career Users Management",
-        url: "/career-users",
+        key: "platform-users-management",
+        label: "Platform Users",
+        url: "/platform-users",
         parentKey: "user-management",
       },
       {
-        key: "user-management",
-        label: "User Management",
-        url: "/user-management",
+        key: "career-users-management",
+        label: "Career Users",
+        url: "/career-users",
         parentKey: "user-management",
       },
       {

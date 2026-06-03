@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { countryCodeToName } from "./Constants";
 import dayjs from "dayjs";
 import { useSelector } from "react-redux";
+import { useServices } from "../../../services/services";
 import {
   ButtonContainer,
   CancelButton,
@@ -41,12 +42,12 @@ const getSubmitButtonText = (mode) => {
   return mode === "edit" ? "Update Career User" : "Add Career User";
 };
 
-const FormActionButtons = ({ editMode, handleCancelEdit, mode, canUpdate }) => {
+const FormActionButtons = ({ editMode, handleCancel, mode, canUpdate }) => {
   if (!editMode) return null;
 
   return (
     <ButtonContainer>
-      <CancelButton variant="outlined" onClick={handleCancelEdit}>
+      <CancelButton variant="outlined" onClick={handleCancel}>
         Cancel
       </CancelButton>
       <SubmitButton type="submit" variant="contained" disabled={!canUpdate}>
@@ -115,14 +116,32 @@ const CareerUserForm = ({
   const [loadingSecondaryStates, setLoadingSecondaryStates] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
   const deletedIdsRef = useRef([]);
-  //   const rolesOptions = useSelector((state) => state.userFilterSlice.roles);
-  const rolesOptions = useSelector(
-    (state) => state.userFilterSlice?.roles || [],
-  );
+  const { fetchApi } = useServices();
+  const [roles, setRoles] = useState([]);
 
-  const filteredRoles = rolesOptions.filter(
-    (role) => role.label?.toLowerCase() !== "driver",
-  );
+  useEffect(() => {
+    fetchRoles();
+  }, []);
+
+  const fetchRoles = async () => {
+    try {
+      const response = await fetchApi(
+        "/masteradmin/roles/get-all-superusers-roles",
+      );
+      if (response?.body?.roles) {
+        const formattedRoles = response.body.roles.map((r) => ({
+          value: r.role_id,
+          label: r.role_name,
+        }));
+        setRoles(formattedRoles);
+      }
+    } catch (err) {
+      console.error("Failed to fetch superuser roles", err);
+    }
+  };
+
+  console.log("roles:", roles);
+
   useEffect(() => {
     const existing = control._formValues.emp_history;
 
@@ -566,45 +585,66 @@ const CareerUserForm = ({
 
   useEffect(() => {}, [existingMedicalFiles]);
 
+  const handleCancel = useCallback(() => {
+    navigate("/platform-users");
+  }, [navigate]);
+
+  // const handleCancelEdit = useCallback(async () => {
+  //   if (mode === "edit" && formData && Object.keys(formData).length > 0) {
+  //     if (fetchUserData) {
+  //       await fetchUserData();
+  //     }
+  //     setDeletedDocumentIds([]);
+  //   } else {
+  //     reset({
+  //       language: [1],
+  //       emp_history: [
+  //         {
+  //           emp_history_details: "",
+  //           emp_history_start_date: null,
+  //           emp_history_end_date: null,
+  //           emp_history_duration: "",
+  //         },
+  //       ],
+  //     });
+  //     setFiles([]);
+  //     setExistingProfileFiles([]);
+  //     setExistingMedicalFiles([]);
+  //     setMedicalUploaded(false);
+  //     setImageUploaded(false);
+  //   }
+  //   setEditMode(false);
+  //   if (setEditMode) setEditMode(false);
+  // }, [
+  //   mode,
+  //   formData,
+  //   fetchUserData,
+  //   reset,
+  //   setEditMode,
+  //   setFiles,
+  //   setExistingProfileFiles,
+  //   setExistingMedicalFiles,
+  //   setMedicalUploaded,
+  //   setImageUploaded,
+  //   setDeletedDocumentIds,
+  // ]);
+
   const handleCancelEdit = useCallback(async () => {
+    if (mode === "add") {
+      navigate("/platform-users");
+      return;
+    }
+
     if (mode === "edit" && formData && Object.keys(formData).length > 0) {
       if (fetchUserData) {
         await fetchUserData();
       }
+
       setDeletedDocumentIds([]);
-    } else {
-      reset({
-        language: [1],
-        emp_history: [
-          {
-            emp_history_details: "",
-            emp_history_start_date: null,
-            emp_history_end_date: null,
-            emp_history_duration: "",
-          },
-        ],
-      });
-      setFiles([]);
-      setExistingProfileFiles([]);
-      setExistingMedicalFiles([]);
-      setMedicalUploaded(false);
-      setImageUploaded(false);
     }
+
     setEditMode(false);
-    if (setEditMode) setEditMode(false);
-  }, [
-    mode,
-    formData,
-    fetchUserData,
-    reset,
-    setEditMode,
-    setFiles,
-    setExistingProfileFiles,
-    setExistingMedicalFiles,
-    setMedicalUploaded,
-    setImageUploaded,
-    setDeletedDocumentIds,
-  ]);
+  }, [mode, navigate, formData, fetchUserData, setDeletedDocumentIds]);
 
   const handleDiscard = useCallback(() => {
     if (formData && Object.keys(formData).length > 0) {
@@ -783,14 +823,6 @@ const CareerUserForm = ({
     });
   };
 
-  useEffect(() => {
-    if (mode === "edit") {
-      setEditMode(false);
-    } else if (mode === "add") {
-      setEditMode(true);
-    }
-  }, [mode]);
-
   const companyId = useSelector(
     (state) =>
       state.loginSlice.loginDetails?.body?.data?.userdetails?.company_id,
@@ -809,7 +841,8 @@ const CareerUserForm = ({
   const selectedStatus = watch("status");
   const totalExperience = watch("total_years_of_experince");
 
-  const isEditModeWithData = mode === "edit" && formData && Object.keys(formData).length > 0;
+  const isEditModeWithData =
+    mode === "edit" && formData && Object.keys(formData).length > 0;
 
   const handleCitizenshipChange = useCallback(() => {
     if (selectedCitizenship === 1) {
@@ -1013,7 +1046,7 @@ const CareerUserForm = ({
         handleBack={handleBack}
         editMode={editMode}
         setEditMode={setEditMode}
-        handleCancelEdit={handleCancelEdit}
+        handleCancel={handleCancel}
         handleDiscard={handleDiscard}
         handleSaveChanges={handleSaveChanges}
         canUpdate={canUpdate}
@@ -1047,7 +1080,8 @@ const CareerUserForm = ({
         setMedicalUploaded={setMedicalUploaded}
         imageUploaded={imageUploaded}
         setImageUploaded={setImageUploaded}
-        filteredRoles={filteredRoles}
+        // filteredRoles={filteredRoles}
+        roles={roles}
         handleAddressChange={handleAddressChange}
         handleSecondaryAddressChange={handleSecondaryAddressChange}
         handleAddEmployment={handleAddEmployment}
@@ -1065,7 +1099,7 @@ const CareerUserForm = ({
 
       <FormActionButtons
         editMode={editMode}
-        handleCancelEdit={handleCancelEdit}
+        handleCancel={handleCancel}
         mode={mode}
         canUpdate={canUpdate}
       />

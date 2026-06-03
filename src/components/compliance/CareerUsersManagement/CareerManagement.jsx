@@ -196,7 +196,7 @@ const CareerManagement = () => {
   };
 
   const handleOpenEdit = async (row) => {
-    navigate(`/career-users/edit/${row.user_id}`);
+    navigate(`/platform-users/edit/${row.user_id}`);
   };
 
   const handleDeleteClick = (row) => {
@@ -238,7 +238,7 @@ const CareerManagement = () => {
   const handleClick = () => {
     setLoading(true);
     setTimeout(() => {
-      navigate("/career-users/add");
+      navigate("/platform-users/add");
     }, 300);
   };
 

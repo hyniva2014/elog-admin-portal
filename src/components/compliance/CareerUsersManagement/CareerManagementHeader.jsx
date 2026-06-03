@@ -6,7 +6,10 @@ import { useState, useEffect } from "react";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { useCareerUsers } from "../../../hooks";
 import { useSelector } from "react-redux";
-import { HeaderContainerSx, getAddButtonSx } from "./CareerManagementHeader.styled";
+import {
+  HeaderContainerSx,
+  getAddButtonSx,
+} from "./CareerManagementHeader.styled";
 
 const CareerManagementHeader = (props) => {
   const { data = [], setData, searchKey = {}, summaryCards, addData } = props;
@@ -23,7 +26,6 @@ const CareerManagementHeader = (props) => {
       loadUsers();
     }
   }, [companyId]);
-
 
   const canCreate = true;
 
@@ -56,8 +58,8 @@ const CareerManagementHeader = (props) => {
   return (
     <Box sx={HeaderContainerSx}>
       <CommonPageHeader
-        title="Career Users Management"
-        subtitle="Manage career users, view details and activity history"
+        title="Platform Users"
+        subtitle="Manage user accounts and permissions"
         addButton={true}
         rightContent={
           <Button
@@ -66,7 +68,7 @@ const CareerManagementHeader = (props) => {
             disabled={!canCreate}
             onClick={handleAddCareerUser}
           >
-            Add Career User
+            Add User
           </Button>
         }
       />
