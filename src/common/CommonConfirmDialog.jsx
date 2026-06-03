@@ -6,6 +6,11 @@ import {
   Button,
   Typography,
 } from "@mui/material";
+import {
+  DialogActionsSx,
+  ActionButtonSx,
+  MessageTypographySx,
+} from "./CommonConfirmDialog.styled";
 
 const CommonConfirmDialog = ({
   open,
@@ -15,31 +20,29 @@ const CommonConfirmDialog = ({
   cancelText = "Cancel",
   onConfirm,
   onCancel,
-}) => {
-  return (
-    <Dialog open={open} onClose={onCancel} maxWidth="xs" fullWidth>
-      <DialogTitle>{title}</DialogTitle>
+}) => (
+  <Dialog open={open} onClose={onCancel} maxWidth="xs" fullWidth>
+    <DialogTitle>{title}</DialogTitle>
 
-      <DialogContent>
-        <Typography fontSize={14}>{message}</Typography>
-      </DialogContent>
+    <DialogContent>
+      <Typography sx={MessageTypographySx}>{message}</Typography>
+    </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button variant="outlined" onClick={onCancel} sx={{ minWidth: 100 }}>
-          {cancelText}
-        </Button>
+    <DialogActions sx={DialogActionsSx}>
+      <Button variant="outlined" onClick={onCancel} sx={ActionButtonSx}>
+        {cancelText}
+      </Button>
 
-        <Button
-          variant="contained"
-          color="error"
-          onClick={onConfirm}
-          sx={{ minWidth: 100 }}
-        >
-          {confirmText}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
+      <Button
+        variant="contained"
+        color="error"
+        onClick={onConfirm}
+        sx={ActionButtonSx}
+      >
+        {confirmText}
+      </Button>
+    </DialogActions>
+  </Dialog>
+);
 
 export default CommonConfirmDialog;
