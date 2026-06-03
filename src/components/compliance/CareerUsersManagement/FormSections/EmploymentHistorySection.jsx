@@ -1,13 +1,30 @@
 import { Box, Grid } from "@mui/material";
-import CommonTextField from "../../../../common/CommonTextField";
-import CommonSingleDateSelector from "../../../../common/CommonSingleDateSelector";
 import { CategoryTitle } from "../CareerManagement.styled";
 import FormSection from "../HeaderComponents/FormSection";
 import { Button, IconButton } from "@mui/material";
-import { Controller } from "react-hook-form";
 import DeleteIcon from "@mui/icons-material/Delete";
 import dayjs from "dayjs";
 import { useCallback } from "react";
+import {
+  EMPLOYMENT_ENTRY_FIELDS,
+  EMPLOYMENT_HISTORY_FIELDS,
+} from "../Constants";
+import FormFieldsSection from "../FormFields/FormFieldsSection";
+
+const DeleteEmploymentButton = ({ index, handleRemoveClick, editMode }) => {
+  if (index === 0) return null;
+
+  return (
+    <IconButton
+      color="error"
+      data-index={index}
+      onClick={handleRemoveClick}
+      disabled={!editMode}
+    >
+      <DeleteIcon />
+    </IconButton>
+  );
+};
 
 const EmploymentHistoryEntry = ({
   index,
@@ -18,158 +35,89 @@ const EmploymentHistoryEntry = ({
   setValue,
   watch,
 }) => {
-  const handleRemoveClick = useCallback((event) => {
-    const selectedIndex = Number(event.currentTarget.dataset.index);
-    handleRemoveEmployment(selectedIndex);
-  }, [handleRemoveEmployment]);
+  const handleRemoveClick = useCallback(
+    (event) => {
+      const selectedIndex = Number(event.currentTarget.dataset.index);
+      handleRemoveEmployment(selectedIndex);
+    },
+    [handleRemoveEmployment],
+  );
+
+  const calculateDuration = (startDate, endDate) => {
+    const start = dayjs(startDate);
+    const end = dayjs(endDate);
+
+    if (!end.isAfter(start) && !end.isSame(start)) {
+      return "";
+    }
+
+    const years = end.diff(start, "year");
+    const months = end.diff(start.add(years, "year"), "month");
+    const days = end.diff(start.add(years, "year").add(months, "month"), "day");
+
+    return `${years}Y ${months}M ${days}D`;
+  };
+
+  const getEmploymentEntryFields = () => {
+    return EMPLOYMENT_ENTRY_FIELDS.map((fieldConfig) => ({
+      ...fieldConfig,
+      name: `emp_history.${index}.${fieldConfig.name}`,
+    }));
+  };
+
+  const additionalProps = {
+    [`emp_history.${index}.emp_history_start_date`]: {
+      maxDate: watch(`emp_history.${index}.emp_history_end_date`),
+      onChange: (value, field) => {
+        field.onChange(value);
+
+        const endDate = watch(`emp_history.${index}.emp_history_end_date`);
+
+        if (value && endDate) {
+          setValue(
+            `emp_history.${index}.emp_history_duration`,
+            calculateDuration(value, endDate),
+          );
+        }
+      },
+    },
+    [`emp_history.${index}.emp_history_end_date`]: {
+      minDate: watch(`emp_history.${index}.emp_history_start_date`),
+      onChange: (value, field) => {
+        field.onChange(value);
+
+        const startDate = watch(`emp_history.${index}.emp_history_start_date`);
+
+        if (startDate && value) {
+          setValue(
+            `emp_history.${index}.emp_history_duration`,
+            calculateDuration(startDate, value),
+          );
+        }
+      },
+    },
+  };
 
   return (
     <Grid container spacing={2} item={12} key={index}>
       <Grid item xs={12}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <CategoryTitle>Employment {index + 1}</CategoryTitle>
-          {index !== 0 && (
-            <IconButton
-              color="error"
-              data-index={index}
-              onClick={handleRemoveClick}
-              disabled={!editMode}
-            >
-              <DeleteIcon />
-            </IconButton>
-          )}
+          <DeleteEmploymentButton
+            index={index}
+            handleRemoveClick={handleRemoveClick}
+            editMode={editMode}
+          />
         </Box>
       </Grid>
 
-      <Grid item xs={12} sm={6} md={4}>
-        <Controller
-          name={`emp_history.${index}.emp_history_details`}
-          control={control}
-          render={({ field }) => (
-            <CommonTextField
-              label="Employer Details"
-              disabled={!editMode}
-              {...field}
-              error={!!errors?.emp_history?.[index]?.emp_history_details}
-              helperText={
-                errors?.emp_history?.[index]?.emp_history_details?.message
-              }
-            />
-          )}
-        />
-      </Grid>
-
-      <Grid item xs={12} sm={6} md={4}>
-        <Controller
-          name={`emp_history.${index}.emp_history_start_date`}
-          control={control}
-          render={({ field }) => (
-            <CommonSingleDateSelector
-              label="Start Date"
-              value={field.value ?? null}
-              disabled={!editMode}
-              onChange={(value) => {
-                field.onChange(value);
-
-                const to = watch(`emp_history.${index}.emp_history_end_date`);
-
-                if (value && to) {
-                  const start = dayjs(value);
-                  const end = dayjs(to);
-
-                  if (end.isAfter(start) || end.isSame(start)) {
-                    const years = end.diff(start, "year");
-                    const months = end.diff(start.add(years, "year"), "month");
-                    const days = end.diff(
-                      start.add(years, "year").add(months, "month"),
-                      "day",
-                    );
-
-                    const duration = `${years}Y ${months}M ${days}D`;
-
-                    setValue(
-                      `emp_history.${index}.emp_history_duration`,
-                      duration,
-                    );
-                  }
-                }
-              }}
-              maxDate={watch(`emp_history.${index}.emp_history_end_date`)}
-              error={!!errors?.emp_history?.[index]?.emp_history_start_date}
-              helperText={
-                errors?.emp_history?.[index]?.emp_history_start_date?.message
-              }
-              customSx={{
-                width: "100%",
-                minWidth: "unset",
-              }}
-            />
-          )}
-        />
-      </Grid>
-
-      <Grid item xs={12} sm={6} md={4}>
-        <Controller
-          name={`emp_history.${index}.emp_history_end_date`}
-          control={control}
-          render={({ field }) => (
-            <CommonSingleDateSelector
-              label="End Date"
-              value={field.value ?? null}
-              disabled={!editMode}
-              onChange={(value) => {
-                field.onChange(value);
-
-                const from = watch(`emp_history.${index}.emp_history_start_date`);
-
-                if (from && value) {
-                  const start = dayjs(from);
-                  const end = dayjs(value);
-
-                  if (end.isAfter(start) || end.isSame(start)) {
-                    const years = end.diff(start, "year");
-                    const months = end.diff(
-                      start.add(years, "year"),
-                      "month",
-                    );
-                    const days = end.diff(
-                      start.add(years, "year").add(months, "month"),
-                      "day",
-                    );
-
-                    const duration = `${years}Y ${months}M ${days}D`;
-                    setValue(
-                      `emp_history.${index}.emp_history_duration`,
-                      duration,
-                    );
-                  } else {
-                    setValue(`emp_history.${index}.emp_history_duration`, "");
-                  }
-                }
-              }}
-              minDate={watch(`emp_history.${index}.emp_history_start_date`)}
-              error={!!errors?.emp_history?.[index]?.emp_history_end_date}
-              helperText={
-                errors?.emp_history?.[index]?.emp_history_end_date?.message
-              }
-              customSx={{
-                width: "100%",
-                minWidth: "unset",
-              }}
-            />
-          )}
-        />
-      </Grid>
-
-      <Grid item xs={12} sm={6} md={4}>
-        <Controller
-          name={`emp_history.${index}.emp_history_duration`}
-          control={control}
-          render={({ field }) => (
-            <CommonTextField label="Duration" disabled {...field} />
-          )}
-        />
-      </Grid>
+      <FormFieldsSection
+        fields={getEmploymentEntryFields()}
+        control={control}
+        errors={errors}
+        disabled={!editMode}
+        additionalProps={additionalProps}
+      />
     </Grid>
   );
 };
@@ -207,35 +155,12 @@ const EmploymentHistorySection = ({
           </Box>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
-          <Controller
-            name="total_years_of_experince"
-            control={control}
-            render={({ field }) => (
-              <CommonTextField
-                label="Total Experience"
-                disabled={!editMode}
-                {...field}
-                onChange={(e) => {
-                  let value = e.target.value;
-                  value = value.replace(/[^0-9.]/g, "");
-                  const parts = value.split(".");
-                  if (parts.length > 2) {
-                    value = parts[0] + "." + parts.slice(1).join("");
-                  }
-                  if (parts.length === 2) {
-                    value = parts[0].slice(0, 2) + "." + parts[1].slice(0, 2);
-                  } else {
-                    value = value.slice(0, 2);
-                  }
-                  field.onChange(value);
-                }}
-                error={!!errors.total_years_of_experince}
-                helperText={errors.total_years_of_experince?.message}
-              />
-            )}
-          />
-        </Grid>
+        <FormFieldsSection
+          fields={EMPLOYMENT_HISTORY_FIELDS}
+          control={control}
+          errors={errors}
+          disabled={!editMode}
+        />
 
         {watch("emp_history")?.map((item, index) => (
           <EmploymentHistoryEntry

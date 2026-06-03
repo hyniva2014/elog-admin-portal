@@ -1,6 +1,5 @@
 import { styled, Typography } from "@mui/material";
 
-
 export const DRIVER_STATUS = {
   1: "Active",
   2: "Inactive",
@@ -82,6 +81,16 @@ export const formatZipCode = (value) => {
   return value.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
 };
 
+export const formatPassportVisa = (value) => {
+  if (!value) return value;
+  return value.replace(/[^A-Za-z0-9]/g, "").slice(0, 20);
+};
+
+export const formatCountryName = (value) => {
+  if (!value) return value;
+  return value.replace(/[^A-Za-z\s'-]/g, "").slice(0, 50);
+};
+
 export const RegistrationState = [
   { label: "USA", value: "USA" },
   { label: "Mexico", value: "MX" },
@@ -109,8 +118,11 @@ export const USER_STATUS = {
   2: "DEACTIVATE",
 };
 
-
-export const hasPermission = (permissions = {}, moduleKey = "", actionKey = "") => {
+export const hasPermission = (
+  permissions = {},
+  moduleKey = "",
+  actionKey = "",
+) => {
   if (!permissions || !moduleKey || !actionKey) return false;
 
   const modulePermissions =
@@ -125,8 +137,8 @@ export const hasPermission = (permissions = {}, moduleKey = "", actionKey = "") 
   if (typeof modulePermissions === "object") {
     return Boolean(
       modulePermissions[actionKey] ||
-        modulePermissions[actionKey.toLowerCase()] ||
-        modulePermissions[actionKey.toUpperCase()],
+      modulePermissions[actionKey.toLowerCase()] ||
+      modulePermissions[actionKey.toUpperCase()],
     );
   }
 
@@ -155,3 +167,196 @@ export const BreadcrumbBold = styled("span")(({ theme }) => ({
   fontWeight: 600,
   color: theme.palette.text.primary,
 }));
+
+// Field configuration arrays for form sections
+export const BASIC_INFO_FIELDS = [
+  {
+    name: "first_name",
+    label: "First Name",
+    required: true,
+    formatter: "name",
+  },
+  { name: "middle_name", label: "Middle Name", formatter: "name" },
+  { name: "last_name", label: "Last Name", required: true, formatter: "name" },
+  { name: "dob", label: "Date of Birth", required: true, type: "date" },
+  {
+    name: "language",
+    label: "Language",
+    required: true,
+    type: "multiselect",
+    options: "LANGUAGE_OPTIONS",
+  },
+  {
+    name: "gender",
+    label: "Gender",
+    required: true,
+    type: "autocomplete",
+    options: "genderOptions",
+  },
+  { name: "ssn", label: "SSN", required: true, formatter: "ssn" },
+  {
+    name: "last_drug_test",
+    label: "Last Drug Test",
+    required: true,
+    type: "date",
+  },
+  {
+    name: "citizenship",
+    label: "Citizenship",
+    required: true,
+    type: "autocomplete",
+    options: "citizenship_options",
+  },
+];
+
+export const PASSPORT_VISA_FIELDS = [
+  {
+    name: "passport_visa_number",
+    label: "Passport / Visa Number",
+    formatter: "passportVisa",
+    inputProps: { maxLength: 15 },
+  },
+  {
+    name: "passport_visa_expiry",
+    label: "Passport / Visa Expiry Date",
+    type: "date",
+    disablePast: true,
+  },
+];
+
+export const WORK_PERMIT_FIELDS = [
+  {
+    name: "work_permit",
+    label: "Work Permit Expiry Date",
+    type: "date",
+    disablePast: true,
+  },
+  {
+    name: "citizenship_country",
+    label: "Country",
+    formatter: "countryName",
+    condition: (selectedCitizenship) => selectedCitizenship === 4,
+  },
+];
+
+export const EMPLOYMENT_DETAILS_FIELDS = [
+  {
+    name: "role",
+    label: "Role",
+    required: true,
+    type: "autocomplete",
+    options: "filteredRoles",
+  },
+  { name: "hire_date", label: "Hire Date", required: true, type: "date" },
+  {
+    name: "status",
+    label: "Status",
+    required: true,
+    type: "autocomplete",
+    options: "DRIVER_STATUS_FORM",
+  },
+  {
+    name: "employment_type",
+    label: "Employment Type",
+    required: true,
+    type: "autocomplete",
+    options: "employment_type_options",
+  },
+  {
+    name: "termination_date",
+    label: "Termination Date",
+    type: "date",
+    condition: (context) => context?.selectedStatus === 2,
+  },
+  {
+    name: "contract_information",
+    label: "Contractor Information",
+    condition: (context) => context?.selectedEmploymentType === 2,
+  },
+];
+
+export const CONTACT_INFO_FIELDS = [
+  { name: "email", label: "Email", required: true, type: "email" },
+  {
+    name: "phone",
+    label: "Phone Number",
+    required: true,
+    formatter: "phone",
+    placeholder: "(XXX) XXX-XXXX",
+  },
+  {
+    name: "alternate_contact_number",
+    label: "Alternative Phone Number",
+    formatter: "phone",
+    placeholder: "(XXX) XXX-XXXX",
+  },
+];
+
+export const PRIMARY_ADDRESS_FIELDS = [
+  {
+    name: "address_line1",
+    label: "Address Line",
+    required: true,
+    type: "address",
+  },
+  { name: "city", label: "City", required: true, formatter: "name" },
+  {
+    name: "country",
+    label: "Country",
+    required: true,
+    type: "autocomplete",
+    options: "RegistrationState",
+  },
+  {
+    name: "states",
+    label: "State",
+    required: true,
+    type: "autocomplete",
+    options: "dynamicStates",
+  },
+  {
+    name: "zip_code",
+    label: "Zip Code",
+    required: true,
+    formatter: "zipCode",
+    inputProps: { maxLength: 10 },
+  },
+];
+
+export const SECONDARY_ADDRESS_FIELDS = [
+  { name: "secondary_address_line", label: "Address Line", type: "address" },
+  { name: "secondary_city", label: "City", formatter: "name" },
+  {
+    name: "secondary_country",
+    label: "Country",
+    type: "autocomplete",
+    options: "RegistrationState",
+  },
+  {
+    name: "secondary_states",
+    label: "State",
+    type: "autocomplete",
+    options: "secondaryDynamicStates",
+  },
+  {
+    name: "secondary_zip_code",
+    label: "Zip Code",
+    formatter: "zipCode",
+    inputProps: { maxLength: 10 },
+  },
+];
+
+export const EMPLOYMENT_HISTORY_FIELDS = [
+  {
+    name: "total_years_of_experince",
+    label: "Total Experience",
+    formatter: "experience",
+  },
+];
+
+export const EMPLOYMENT_ENTRY_FIELDS = [
+  { name: "emp_history_details", label: "Employer Details" },
+  { name: "emp_history_start_date", label: "Start Date", type: "date" },
+  { name: "emp_history_end_date", label: "End Date", type: "date" },
+  { name: "emp_history_duration", label: "Duration", disabled: true },
+];

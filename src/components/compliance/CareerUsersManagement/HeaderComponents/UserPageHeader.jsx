@@ -7,7 +7,45 @@ import {
   StatusChipSx,
   StatusDotSx,
   HeaderButtonsSx,
+  PageHeaderTitleSx,
 } from "./UserPageHeader.styled";
+
+const StatusChip = ({ statusLabel, isActive }) => {
+  if (!statusLabel) return null;
+
+  return (
+    <Box sx={StatusChipSx(isActive)}>
+      <Box sx={StatusDotSx(isActive)} />
+      {statusLabel}
+    </Box>
+  );
+};
+
+const EditActionButton = ({ canUpdate, handleStartEdit }) => (
+  <Button variant="contained" disabled={!canUpdate} onClick={handleStartEdit}>
+    Edit
+  </Button>
+);
+
+const CancelEditButton = ({ handleCancelEdit }) => (
+  <Button variant="outlined" onClick={handleCancelEdit}>
+    Cancel Edit
+  </Button>
+);
+
+const EditButtonSection = ({
+  mode,
+  editMode,
+  canUpdate,
+  handleStartEdit,
+  handleCancelEdit,
+}) => {
+  if (mode === "add") return null;
+  if (editMode) return <CancelEditButton handleCancelEdit={handleCancelEdit} />;
+  return (
+    <EditActionButton canUpdate={canUpdate} handleStartEdit={handleStartEdit} />
+  );
+};
 
 const UserPageHeader = ({
   handleBack,
@@ -33,44 +71,24 @@ const UserPageHeader = ({
 
   return (
     <Box sx={PageHeaderContainerSx}>
-      {/* LEFT SIDE */}
       <Box sx={PageHeaderLeftSx}>
-        {/* ✅ Back Button (black style like image) */}
         <Button variant="outlined" onClick={handleBack} sx={BackButtonSx}>
           ← Back
         </Button>
 
-        {/* Title */}
-        <Typography fontWeight={700} fontSize={17}>
-          Career User Details
-        </Typography>
+        <Typography sx={PageHeaderTitleSx}>Career User Details</Typography>
 
-        {/* ✅ Status Chip with Dot */}
-        {statusLabel && (
-          <Box sx={StatusChipSx(isActive)}>
-            {/* Dot */}
-            <Box sx={StatusDotSx(isActive)} />
-            {statusLabel}
-          </Box>
-        )}
+        <StatusChip statusLabel={statusLabel} isActive={isActive} />
       </Box>
 
-      {/* RIGHT SIDE */}
       <Box sx={HeaderButtonsSx}>
-        {mode !== "add" &&
-          (!editMode ? (
-            <Button
-              variant="contained"
-              disabled={!canUpdate}
-              onClick={handleStartEdit}
-            >
-              Edit
-            </Button>
-          ) : (
-            <Button variant="outlined" onClick={handleCancelEdit}>
-              Cancel Edit
-            </Button>
-          ))}
+        <EditButtonSection
+          mode={mode}
+          editMode={editMode}
+          canUpdate={canUpdate}
+          handleStartEdit={handleStartEdit}
+          handleCancelEdit={handleCancelEdit}
+        />
       </Box>
     </Box>
   );

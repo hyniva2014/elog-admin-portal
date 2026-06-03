@@ -82,39 +82,51 @@ const isImageFile = (fileName) => {
   return imageExtensions.includes(extension);
 };
 
+const getFileUrl = (file, isExisting) => {
+  if (isExisting) return file.url;
+  if (file instanceof File) return URL.createObjectURL(file);
+  return file;
+};
+
+const ImagePreview = ({ fileUrl, fileName, onPreview }) => (
+  <Box
+    component="img"
+    src={fileUrl}
+    alt={fileName}
+    sx={ImagePreviewSx}
+    data-file-url={fileUrl}
+    onClick={onPreview}
+  />
+);
+
+const FilePreview = ({ fileUrl, fileName, onPreview }) => (
+  <Box
+    component="div"
+    data-file-url={fileUrl}
+    onClick={onPreview}
+    sx={FilePreviewInnerSx}
+  >
+    {getFileIcon(fileName)}
+    <Typography variant="caption" sx={FileNameTypographySx}>
+      {fileName}
+    </Typography>
+  </Box>
+);
+
 const FilePreviewItem = ({ file, index, isExisting, onPreview, onRemove }) => {
   const fileName = file.name;
-  const fileUrl = isExisting
-    ? file.url
-    : file instanceof File
-      ? URL.createObjectURL(file)
-      : file;
+  const fileUrl = getFileUrl(file, isExisting);
   const isImage = isImageFile(fileName);
+
+  const previewContent = isImage ? (
+    <ImagePreview fileUrl={fileUrl} fileName={fileName} onPreview={onPreview} />
+  ) : (
+    <FilePreview fileUrl={fileUrl} fileName={fileName} onPreview={onPreview} />
+  );
 
   return (
     <Box sx={FilePreviewContainerSx}>
-      {isImage ? (
-        <Box
-          component="img"
-          src={fileUrl}
-          alt={fileName}
-          sx={ImagePreviewSx}
-          data-file-url={fileUrl}
-          onClick={onPreview}
-        />
-      ) : (
-        <Box
-          component="div"
-          data-file-url={fileUrl}
-          onClick={onPreview}
-          sx={FilePreviewInnerSx}
-        >
-          {getFileIcon(fileName)}
-          <Typography variant="caption" sx={FileNameTypographySx}>
-            {fileName}
-          </Typography>
-        </Box>
-      )}
+      {previewContent}
 
       <IconButton
         size="small"
@@ -267,80 +279,110 @@ const CommonFileUpload = ({
   const hasFiles = existingFiles?.length > 0 || files?.length > 0;
   const shouldHideUploadArea = hideUploadAreaWhenFilesExist && hasFiles;
 
-  return (
-    <>
-      {!shouldHideUploadArea && (
+  const FileTypeInfo = () => {
+    if (!showFileTypeInfo) return null;
+    return (
+      <Typography sx={UploadHintTextSx(size)}>
+        Supported formats: {getReadableFileTypes()}
+      </Typography>
+    );
+  };
+
+  const UploadArea = () => {
+    if (shouldHideUploadArea) return null;
+    return (
+      <Box
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        sx={getUploadAreaSx({ disabled, error, size })}
+      >
         <Box
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          sx={getUploadAreaSx({ disabled, error, size })}
-        >
-          <Box
-            component="input"
-            type="file"
-            accept={getAcceptString()}
-            multiple={multiple}
-            id={inputId}
-            sx={HiddenInputStyle}
-            onChange={handleChange}
-            disabled={disabled}
-          />
+          component="input"
+          type="file"
+          accept={getAcceptString()}
+          multiple={multiple}
+          id={inputId}
+          sx={HiddenInputStyle}
+          onChange={handleChange}
+          disabled={disabled}
+        />
 
-          <Box component="label" htmlFor={inputId} sx={LabelSx}>
-            <Box sx={UploadContentSx}>
-              <CloudUploadOutlinedIcon sx={UploadIconSx(size)} />
+        <Box component="label" htmlFor={inputId} sx={LabelSx}>
+          <Box sx={UploadContentSx}>
+            <CloudUploadOutlinedIcon sx={UploadIconSx(size)} />
 
-              <Box sx={UploadTextRowSx}>
-                <Typography sx={UploadPrimaryTextSx(size)}>
-                  Click to upload
-                </Typography>
-                <Typography sx={UploadSecondaryTextSx(size)}>
-                  or drag and drop
-                </Typography>
-              </Box>
-
-              {showFileTypeInfo && (
-                <Typography sx={UploadHintTextSx(size)}>
-                  Supported formats: {getReadableFileTypes()}
-                </Typography>
-              )}
+            <Box sx={UploadTextRowSx}>
+              <Typography sx={UploadPrimaryTextSx(size)}>
+                Click to upload
+              </Typography>
+              <Typography sx={UploadSecondaryTextSx(size)}>
+                or drag and drop
+              </Typography>
             </Box>
+
+            <FileTypeInfo />
           </Box>
         </Box>
-      )}
+      </Box>
+    );
+  };
 
-      {hasFiles && (
-        <Box sx={FilesWrapperSx(hasFiles, shouldHideUploadArea)}>
-          {existingFiles?.map((file, index) => (
-            <FilePreviewItem
-              key={`existing-${index}`}
-              file={file}
-              index={index}
-              isExisting
-              onPreview={handlePreviewClick}
-              onRemove={handleRemoveClick}
-            />
-          ))}
-          {files?.map((file, index) => (
-            <FilePreviewItem
-              key={`new-${index}`}
-              file={file}
-              index={index}
-              isExisting={false}
-              onPreview={handlePreviewClick}
-              onRemove={handleRemoveClick}
-            />
-          ))}
-        </Box>
-      )}
+  const ExistingFilesList = () => (
+    <>
+      {existingFiles?.map((file, index) => (
+        <FilePreviewItem
+          key={`existing-${index}`}
+          file={file}
+          index={index}
+          isExisting
+          onPreview={handlePreviewClick}
+          onRemove={handleRemoveClick}
+        />
+      ))}
+    </>
+  );
 
-      {error && helperText && (
-        <Box mt={1}>
-          <Typography variant="caption" sx={ErrorTextSx}>
-            {helperText}
-          </Typography>
-        </Box>
-      )}
+  const NewFilesList = () => (
+    <>
+      {files?.map((file, index) => (
+        <FilePreviewItem
+          key={`new-${index}`}
+          file={file}
+          index={index}
+          isExisting={false}
+          onPreview={handlePreviewClick}
+          onRemove={handleRemoveClick}
+        />
+      ))}
+    </>
+  );
+
+  const FilesContent = () => {
+    if (!hasFiles) return null;
+    return (
+      <Box sx={FilesWrapperSx(hasFiles, shouldHideUploadArea)}>
+        <ExistingFilesList />
+        <NewFilesList />
+      </Box>
+    );
+  };
+
+  const ErrorContent = () => {
+    if (!error || !helperText) return null;
+    return (
+      <Box mt={1}>
+        <Typography variant="caption" sx={ErrorTextSx}>
+          {helperText}
+        </Typography>
+      </Box>
+    );
+  };
+
+  return (
+    <>
+      <UploadArea />
+      <FilesContent />
+      <ErrorContent />
     </>
   );
 };

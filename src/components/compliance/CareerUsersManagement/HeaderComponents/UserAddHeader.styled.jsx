@@ -16,6 +16,12 @@ export const AddHeaderLeftSx = {
   gap: 2,
 };
 
+export const AddHeaderTitleSx = (theme) => ({
+  fontWeight: 600,
+  fontSize: "20px",
+  color: theme.palette.text.primary,
+});
+
 export const BackButtonSx = (theme) => ({
   color: theme.palette.text.primary,
   borderColor: theme.palette.divider,
@@ -41,7 +47,7 @@ export const BackIconSx = (theme) => ({
 export const ActiveStatusSx = (theme) => ({
   display: "flex",
   alignItems: "center",
-  gap: 0.5,
+  gap: 1,
   px: 1.5,
   py: 0.5,
   borderRadius: "16px",
@@ -55,7 +61,7 @@ export const ActiveStatusDotSx = (theme) => ({
   width: 6,
   height: 6,
   borderRadius: "50%",
-  backgroundColor: theme.palette.success.main,
+  backgroundColor: theme.palette.success.dark,
 });
 
 export const CardContainerSx = (theme) => ({
@@ -111,8 +117,12 @@ export const StatusItemSx = (completed) => (theme) => ({
   px: 2,
   py: 0.75,
   borderRadius: "999px",
-  backgroundColor: completed ? theme.palette.success.light : theme.palette.common.white,
-  border: completed ? `1px solid ${theme.palette.success.main}` : `1px solid ${theme.palette.divider}`,
+  backgroundColor: completed
+    ? theme.palette.success.light
+    : theme.palette.common.white,
+  border: completed
+    ? `1px solid ${theme.palette.success.main}`
+    : `1px solid ${theme.palette.divider}`,
 });
 
 export const StatusItemTextSx = (completed) => (theme) => ({

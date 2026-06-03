@@ -6,3 +6,7 @@ export const DialogActionsSx = {
 export const ActionButtonSx = {
   minWidth: 100,
 };
+
+export const MessageTypographySx = {
+  fontSize: 14,
+};

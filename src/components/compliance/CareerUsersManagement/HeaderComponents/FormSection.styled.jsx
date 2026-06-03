@@ -14,3 +14,12 @@ export const FormSectionHeaderSx = (theme) => ({
 export const FormSectionContentSx = (contentPadding) => (theme) => ({
   p: contentPadding ?? 2.5,
 });
+
+export const FormSectionTitleSx = (theme) => ({
+  fontWeight: 600,
+  color: theme.palette.text.primary,
+});
+
+export const FormSectionSubtitleSx = (theme) => ({
+  color: theme.palette.text.secondary,
+});

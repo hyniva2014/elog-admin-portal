@@ -26,6 +26,10 @@ export const RoleTextSx = {
   opacity: 0.8,
 };
 
+export const UserNameTextSx = {
+  fontWeight: 600,
+};
+
 export const TopHeaderRightSx = {
   display: "flex",
   gap: 4,

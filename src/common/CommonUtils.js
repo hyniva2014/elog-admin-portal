@@ -38,14 +38,6 @@ export const buildSummaryCards = (apiBody = {}, config = {}) => {
     }));
 };
 
-export const getSelectedDevices = (selectedIds) => {
-  return allRows
-    .filter((row) => selectedIds.includes(row.id))
-    .map((row) => ({
-      device_id: row.id,
-    }));
-};
-
 export const formatDuration = (duration = "") => {
   if (!duration) return "-";
 
@@ -154,9 +146,7 @@ export const formatSSN = (value) => {
   return `${ssn.slice(0, 3)}-${ssn.slice(3, 5)}-${ssn.slice(5, 9)}`;
 };
 
-
- 
- export const formatPhoneNumber = (phoneNumber) => {
+export const formatPhoneNumber = (phoneNumber) => {
   if (!phoneNumber) return "";
   const cleaned = String(phoneNumber).replace(/\D/g, "");
   const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
@@ -166,6 +156,22 @@ export const formatSSN = (value) => {
   return phoneNumber;
 };
 
-export const showFileValidationError = () => {
+export const showFileValidationError = (
+  type,
+  message,
+  maxSize,
+  formatFileSize,
+) => {
+  const maxSizeFormatted = formatFileSize(maxSize);
+  let errorMessage = "";
 
+  if (type === "invalid_type") {
+    errorMessage = message || "Invalid file type";
+  } else if (type === "oversized") {
+    errorMessage = `File size must be less than ${maxSizeFormatted}`;
+  } else {
+    errorMessage = "File validation failed";
+  }
+
+  alert(errorMessage);
 };

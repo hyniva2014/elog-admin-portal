@@ -54,3 +54,7 @@ export const StaticDatePickerSx = {
     mb: 0,
   },
 };
+
+export const PopoverContentBoxSx = {
+  p: 1,
+};

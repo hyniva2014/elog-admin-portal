@@ -28,6 +28,88 @@ const CareerFormStepItem = ({ step, active, index, onClick }) => (
     </StepLabel>
   </StepItem>
 );
+
+const CareerFormStepperSection = ({
+  mode,
+  steps,
+  activeStep,
+  handleStepClick,
+}) => {
+  if (mode === "add") return null;
+
+  return (
+    <CareerFormStepper>
+      <StepRow>
+        {steps.map((step, index) => (
+          <CareerFormStepItem
+            key={step.label}
+            step={step}
+            active={index === activeStep}
+            index={index}
+            onClick={handleStepClick}
+          />
+        ))}
+      </StepRow>
+    </CareerFormStepper>
+  );
+};
+
+const CareerFormHeaderSection = ({
+  mode,
+  formData,
+  handleSubmit,
+  handleBack,
+  breadcrumbs,
+  canUpdate,
+  editMode,
+  setEditMode,
+  fetchUserData,
+  activeStep,
+  setActiveStep,
+  sectionCompletion,
+  profileCompletion,
+  scrollContainerRef,
+  handleDiscard,
+  isEditMode,
+}) => {
+  return (
+    <>
+      {mode === "add" ? (
+        <UserAddHeader
+          handleBack={handleBack}
+          activeStep={activeStep}
+          setActiveStep={setActiveStep}
+          sectionCompletion={sectionCompletion}
+          profileCompletion={profileCompletion}
+          scrollContainerRef={scrollContainerRef}
+        />
+      ) : (
+        <CareerUserForm
+          formData={formData}
+          onSubmit={handleSubmit}
+          mode={mode}
+          handleBack={handleBack}
+          breadcrumbs={breadcrumbs}
+          canUpdate={canUpdate}
+          headerOnly={true}
+          editMode={editMode}
+          setEditMode={setEditMode}
+          fetchUserData={fetchUserData}
+        />
+      )}
+      {isEditMode && (
+        <UserTopHeader
+          data={formData}
+          editMode={editMode}
+          setEditMode={setEditMode}
+          handleDiscard={handleDiscard}
+          canUpdate={canUpdate}
+          mode={mode}
+        />
+      )}
+    </>
+  );
+};
 import CommonSnackbar from "../../../common/CommonSnackbar";
 import CommonBreadcrumb from "../../../common/CommonBreadcrumb";
 import dayjs from "dayjs";
@@ -63,7 +145,8 @@ const CareerForm = () => {
 
   const isEditMode = Boolean(userId);
   const navigate = useNavigate();
-  const { getCareerUserDetails, getCarrierList, saveCareerUser } = useCareerUsers();
+  const { getCareerUserDetails, getCarrierList, saveCareerUser } =
+    useCareerUsers();
   const { setLoading, LoadingContainer } = CommonLoading();
   const [formData, setFormData] = useState({});
   //   const [mode, setMode] = useState("add");
@@ -312,7 +395,12 @@ const CareerForm = () => {
     setLoadingState(true);
     setLoading(true);
     try {
-      const payload = buildCareerUserPayload(formValues, companyId, isEditMode ? userId : null, name);
+      const payload = buildCareerUserPayload(
+        formValues,
+        companyId,
+        isEditMode ? userId : null,
+        name,
+      );
 
       const response = await saveCareerUser(payload);
 
@@ -594,10 +682,21 @@ const CareerForm = () => {
     if (!stepId) return;
 
     const sectionElement = document.getElementById(stepId);
+    const scrollContainer = scrollContainerRef?.current;
+
+    if (sectionElement && scrollContainer) {
+      scrollContainer.scrollTo({
+        top: sectionElement.offsetTop - scrollContainer.offsetTop - 16,
+        behavior: "smooth",
+      });
+      setActiveStep(index);
+      return;
+    }
+
     if (sectionElement) {
       sectionElement.scrollIntoView({
         behavior: "smooth",
-        block: "start",
+        block: "nearest",
       });
       setActiveStep(index);
     }
@@ -608,56 +707,32 @@ const CareerForm = () => {
       <LoadingContainer />
       <CareerFormContainer>
         <CareerFormHeader>
-          {mode === "add" ? (
-            <UserAddHeader
-              handleBack={handleBack}
-              activeStep={activeStep}
-              setActiveStep={setActiveStep}
-              sectionCompletion={sectionCompletion}
-              profileCompletion={profileCompletion}
-              scrollContainerRef={scrollContainerRef}
-            />
-          ) : (
-            <CareerUserForm
-              formData={formData}
-              onSubmit={handleSubmit}
-              mode={mode}
-              handleBack={handleBack}
-              breadcrumbs={breadcrumbs}
-              canUpdate={canUpdate}
-              headerOnly={true}
-              editMode={editMode}
-              setEditMode={setEditMode}
-              fetchUserData={fetchUserData}
-            />
-          )}
-          {isEditMode && (
-            <UserTopHeader
-              data={formData}
-              editMode={editMode}
-              setEditMode={setEditMode}
-              handleDiscard={handleDiscard}
-              canUpdate={canUpdate}
-              mode={mode}
-            />
-          )}
+          <CareerFormHeaderSection
+            mode={mode}
+            formData={formData}
+            handleSubmit={handleSubmit}
+            handleBack={handleBack}
+            breadcrumbs={breadcrumbs}
+            canUpdate={canUpdate}
+            editMode={editMode}
+            setEditMode={setEditMode}
+            fetchUserData={fetchUserData}
+            activeStep={activeStep}
+            setActiveStep={setActiveStep}
+            sectionCompletion={sectionCompletion}
+            profileCompletion={profileCompletion}
+            scrollContainerRef={scrollContainerRef}
+            handleDiscard={handleDiscard}
+            isEditMode={isEditMode}
+          />
         </CareerFormHeader>
 
-        {mode !== "add" && (
-          <CareerFormStepper>
-            <StepRow>
-              {steps.map((step, index) => (
-                <CareerFormStepItem
-                  key={step.label}
-                  step={step}
-                  active={index === activeStep}
-                  index={index}
-                  onClick={handleStepClick}
-                />
-              ))}
-            </StepRow>
-          </CareerFormStepper>
-        )}
+        <CareerFormStepperSection
+          mode={mode}
+          steps={steps}
+          activeStep={activeStep}
+          handleStepClick={handleStepClick}
+        />
 
         <CareerFormContent ref={scrollContainerRef}>
           <CareerUserForm

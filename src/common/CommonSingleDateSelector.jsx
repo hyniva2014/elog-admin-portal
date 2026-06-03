@@ -10,6 +10,7 @@ import {
   getTextFieldSx,
   PopoverPaperSx,
   StaticDatePickerSx,
+  PopoverContentBoxSx,
 } from "./CommonSingleDateSelector.styled";
 
 dayjs.extend(customParseFormat);
@@ -45,31 +46,54 @@ const CommonSingleDateSelector = ({
       : today
     : minDate || undefined;
 
-  const formattedValue = internalValue
-    ? internalValue.format("DD/MM/YYYY")
-    : "";
-  const textFieldVariant = hideBorder ? "standard" : "outlined";
-  const textFieldLabel = hideBorder ? undefined : label;
-  const shouldOpenPopover =
-    typeof window !== "undefined" && window.Cypress ? undefined : openPopover;
-  const inputProps = hideBorder
-    ? {
+  const getFormattedValue = (value) => {
+    return value ? value.format("DD/MM/YYYY") : "";
+  };
+
+  const getTextFieldVariant = (hideBorder) => {
+    return hideBorder ? "standard" : "outlined";
+  };
+
+  const getTextFieldLabel = (hideBorder, label) => {
+    return hideBorder ? undefined : label;
+  };
+
+  const getShouldOpenPopover = () => {
+    return typeof window !== "undefined" && window.Cypress
+      ? undefined
+      : openPopover;
+  };
+
+  const formattedValue = getFormattedValue(internalValue);
+  const textFieldVariant = getTextFieldVariant(hideBorder);
+  const textFieldLabel = getTextFieldLabel(hideBorder, label);
+  const shouldOpenPopover = getShouldOpenPopover();
+
+  const calendarIcon = (
+    <IconButton size="small" onClick={openPopover}>
+      <CalendarMonthIcon sx={getCalendarIconSx(hideBorder)} />
+    </IconButton>
+  );
+
+  const getInputProps = (hideBorder, calendarIcon) => {
+    if (hideBorder) {
+      return {
         readOnly: true,
         disableUnderline: true,
-        endAdornment: (
-          <IconButton size="small" onClick={openPopover}>
-            <CalendarMonthIcon sx={getCalendarIconSx(hideBorder)} />
-          </IconButton>
-        ),
-      }
-    : {
-        readOnly: true,
-        endAdornment: (
-          <IconButton size="small" onClick={openPopover}>
-            <CalendarMonthIcon sx={getCalendarIconSx(hideBorder)} />
-          </IconButton>
-        ),
+        endAdornment: calendarIcon,
       };
+    }
+    return {
+      readOnly: true,
+      endAdornment: calendarIcon,
+    };
+  };
+
+  const inputProps = getInputProps(hideBorder, calendarIcon);
+
+  const getTextFieldOnClick = () => {
+    return shouldOpenPopover;
+  };
 
   function openPopover(event) {
     if (disabled) return;
@@ -109,7 +133,7 @@ const CommonSingleDateSelector = ({
           helperText={helperText}
           required={required}
           disabled={disabled}
-          onClick={shouldOpenPopover}
+          onClick={getTextFieldOnClick()}
           variant={textFieldVariant}
           InputProps={inputProps}
           sx={[getTextFieldSx(disabled), customSx]}
@@ -125,7 +149,7 @@ const CommonSingleDateSelector = ({
           anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
           PaperProps={{ sx: PopoverPaperSx }}
         >
-          <Box p={1}>
+          <Box sx={PopoverContentBoxSx}>
             <StaticDatePicker
               displayStaticWrapperAs="desktop"
               views={["year", "month", "day"]}

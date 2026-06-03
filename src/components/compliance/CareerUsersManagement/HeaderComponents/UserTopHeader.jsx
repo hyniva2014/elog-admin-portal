@@ -8,32 +8,46 @@ import {
   AvatarSx,
   RoleTextSx,
   TopHeaderRightSx,
+  UserNameTextSx,
 } from "./UserTopHeader.styled";
+
+const getRoleLabel = (rolesOptions, role) => {
+  return rolesOptions.find((item) => item.value === role)?.label || role || "-";
+};
+
+const getProfileImage = (profilePhoto) => {
+  if (typeof profilePhoto === "string") return profilePhoto;
+  return profilePhoto?.[0]?.file_url || "";
+};
+
+const getFormattedDate = (date) => {
+  if (!date) return "-";
+  return dayjs(date).format("DD/MM/YYYY");
+};
+
+const getInitials = (data) => {
+  return `${data.first_name?.[0] || ""}${data.last_name?.[0] || ""}`;
+};
 
 const UserTopHeader = ({ data }) => {
   const rolesOptions = useSelector(
     (state) => state.userFilterSlice?.roles || [],
   );
 
-  const roleLabel =
-    rolesOptions.find((item) => item.value === data.role)?.label ||
-    data.role ||
-    "-";
-  const profileImage =
-    typeof data?.profile_photo === "string"
-      ? data.profile_photo
-      : data?.profile_photo?.[0]?.file_url || "";
+  const roleLabel = getRoleLabel(rolesOptions, data.role);
+  const profileImage = getProfileImage(data?.profile_photo);
+  const userInitials = getInitials(data);
+  const hireDate = getFormattedDate(data?.hire_date);
+  const drugTestDate = getFormattedDate(data?.last_drug_test);
 
   return (
     <Box sx={TopHeaderSx}>
-      {/* LEFT: Avatar + Name */}
       <Box sx={TopHeaderLeftSx}>
         <Avatar src={profileImage} sx={AvatarSx}>
-          {data.first_name?.[0]}
-          {data.last_name?.[0]}
+          {userInitials}
         </Avatar>
         <Box>
-          <Typography fontWeight={600}>
+          <Typography sx={UserNameTextSx}>
             {data.first_name} {data.last_name}
           </Typography>
           <Typography variant="body2" sx={RoleTextSx}>
@@ -44,21 +58,8 @@ const UserTopHeader = ({ data }) => {
 
       {/* RIGHT: Dates */}
       <Box sx={TopHeaderRightSx}>
-        <DateBlock
-          label="Hire Date"
-          value={
-            data?.hire_date ? dayjs(data.hire_date).format("DD/MM/YYYY") : "-"
-          }
-        />
-        <DateBlock
-          label="Drug Test"
-          value={
-            data?.last_drug_test
-              ? dayjs(data.last_drug_test).format("DD/MM/YYYY")
-              : "-"
-          }
-          highlight
-        />
+        <DateBlock label="Hire Date" value={hireDate} />
+        <DateBlock label="Drug Test" value={drugTestDate} highlight />
       </Box>
     </Box>
   );

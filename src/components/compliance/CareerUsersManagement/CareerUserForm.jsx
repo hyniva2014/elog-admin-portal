@@ -9,11 +9,9 @@ import {
 import { Close as CloseIcon } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  countryCodeToName,
-} from "./Constants";
+import { countryCodeToName } from "./Constants";
 import dayjs from "dayjs";
 import { useSelector } from "react-redux";
 import {
@@ -37,6 +35,47 @@ const debounce = (func, delay) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func.apply(null, args), delay);
   };
+};
+
+const FormActionButtons = ({ editMode, handleCancelEdit, mode, canUpdate }) => {
+  if (!editMode) return null;
+
+  return (
+    <ButtonContainer>
+      <CancelButton variant="outlined" onClick={handleCancelEdit}>
+        Cancel
+      </CancelButton>
+      <SubmitButton type="submit" variant="contained" disabled={!canUpdate}>
+        {mode === "edit" ? "Update Career User" : "Add Career User"}
+      </SubmitButton>
+    </ButtonContainer>
+  );
+};
+
+const ImagePreviewModalWrapper = ({
+  showImagePreview,
+  previewImage,
+  handlePreviewModalClick,
+  stopPreviewContainerPropagation,
+  handleClosePreview,
+}) => {
+  if (!showImagePreview) return null;
+
+  return (
+    <ImagePreviewModal onClick={handlePreviewModalClick}>
+      <ImagePreviewContainer onClick={stopPreviewContainerPropagation}>
+        <ClosePreviewButton onClick={handleClosePreview}>
+          <CloseIcon />
+        </ClosePreviewButton>
+      </ImagePreviewContainer>
+      <Box
+        component="img"
+        src={previewImage}
+        alt="Profile Photo Preview"
+        sx={PreviewImageSx}
+      />
+    </ImagePreviewModal>
+  );
 };
 
 const CareerUserForm = ({
@@ -64,31 +103,22 @@ const CareerUserForm = ({
   const [showEmploymentHistory, setShowEmploymentHistory] = useState(true);
   const [dynamicStates, setDynamicStates] = useState([]);
 
-  const handlePreviewModalClick = (event) => {
-    if (event.target === event.currentTarget) {
-      handleClosePreview();
-    }
-  };
-
-  const stopPreviewContainerPropagation = (event) => {
+  const stopPreviewContainerPropagation = useCallback((event) => {
     event.stopPropagation();
-  };
+  }, []);
   const [loadingStates, setLoadingStates] = useState(false);
   const [secondaryDynamicStates, setSecondaryDynamicStates] = useState([]);
   const [loadingSecondaryStates, setLoadingSecondaryStates] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
   const deletedIdsRef = useRef([]);
-//   const rolesOptions = useSelector((state) => state.userFilterSlice.roles);
-const rolesOptions = useSelector(
-  (state) => state.userFilterSlice?.roles || [],
-);
+  //   const rolesOptions = useSelector((state) => state.userFilterSlice.roles);
+  const rolesOptions = useSelector(
+    (state) => state.userFilterSlice?.roles || [],
+  );
 
-//   const filteredRoles = rolesOptions?.filter(
-//     (role) => role.label.toLowerCase() !== "driver",
-//   );
-const filteredRoles = rolesOptions.filter(
-  (role) => role.label?.toLowerCase() !== "driver",
-);
+  const filteredRoles = rolesOptions.filter(
+    (role) => role.label?.toLowerCase() !== "driver",
+  );
   useEffect(() => {
     const existing = control._formValues.emp_history;
 
@@ -162,13 +192,13 @@ const filteredRoles = rolesOptions.filter(
     }
   }, [selectedSecondaryCountry]);
 
-//   useEffect(() => {
-//     if (selectedSecondaryCountry) {
-//       setValue("secondary_states", "");
-//     }
-//   }, [selectedSecondaryCountry, setValue]);
+  //   useEffect(() => {
+  //     if (selectedSecondaryCountry) {
+  //       setValue("secondary_states", "");
+  //     }
+  //   }, [selectedSecondaryCountry, setValue]);
 
-  const handleAddEmployment = () => {
+  const handleAddEmployment = useCallback(() => {
     setShowEmploymentHistory(true);
 
     const current = control._formValues.emp_history || [];
@@ -181,15 +211,18 @@ const filteredRoles = rolesOptions.filter(
     };
 
     setValue("emp_history", [...current, newItem]);
-  };
+  }, [control, setValue]);
 
-  const handleRemoveEmployment = (index) => {
-    const current = watch("emp_history") || [];
+  const handleRemoveEmployment = useCallback(
+    (index) => {
+      const current = watch("emp_history") || [];
 
-    const updated = current.filter((_, i) => i !== index);
+      const updated = current.filter((_, i) => i !== index);
 
-    setValue("emp_history", updated);
-  };
+      setValue("emp_history", updated);
+    },
+    [watch, setValue],
+  );
 
   const loadStatesByCountry = async (countryCode, isSecondary = false) => {
     if (isSecondary) {
@@ -329,7 +362,7 @@ const filteredRoles = rolesOptions.filter(
         ? dayjs(data.termination_date)
         : null,
       contract_information: data.contract_information || "",
-      medical_document_files: [], 
+      medical_document_files: [],
       emp_history: Array.isArray(data.emp_history)
         ? data.emp_history.map((item) => ({
             emp_history_details: item.emp_history_details || "",
@@ -414,7 +447,7 @@ const filteredRoles = rolesOptions.filter(
       const primaryAddress = formData.primary_address || {};
       const secondaryAddress = formData.secondary_address || {};
 
-    //   reset(prepareFormResetData(formData));
+      //   reset(prepareFormResetData(formData));
       const resetData = {
         first_name: formData.first_name || "",
         middle_name: formData.middle_name || "",
@@ -500,7 +533,7 @@ const filteredRoles = rolesOptions.filter(
 
         contract_information: formData.contract_information || "",
 
-        medical_document_files: [], 
+        medical_document_files: [],
 
         emp_history: Array.isArray(formData.emp_history)
           ? formData.emp_history.map((item) => ({
@@ -533,17 +566,15 @@ const filteredRoles = rolesOptions.filter(
       } else {
         setExistingProfileFiles([]);
       }
-       setTimeout(() => {
+      setTimeout(() => {
         setIsInitializing(false);
       }, 100);
-
     }
   }, [formData, mode, reset]);
 
-  useEffect(() => {
-  }, [existingMedicalFiles]);
+  useEffect(() => {}, [existingMedicalFiles]);
 
-  const handleCancelEdit = async () => {
+  const handleCancelEdit = useCallback(async () => {
     console.log("handleCancelEdit called", { mode, formData, fetchUserData });
     if (mode === "edit" && formData && Object.keys(formData).length > 0) {
       if (fetchUserData) {
@@ -574,9 +605,21 @@ const filteredRoles = rolesOptions.filter(
     }
     setEditMode(false);
     if (setEditMode) setEditMode(false);
-  };
+  }, [
+    mode,
+    formData,
+    fetchUserData,
+    reset,
+    setEditMode,
+    setFiles,
+    setExistingProfileFiles,
+    setExistingMedicalFiles,
+    setMedicalUploaded,
+    setImageUploaded,
+    setDeletedDocumentIds,
+  ]);
 
-  const handleDiscard = () => {
+  const handleDiscard = useCallback(() => {
     if (formData && Object.keys(formData).length > 0) {
       reset(prepareFormResetData(formData));
       setDeletedDocumentIds([]);
@@ -655,12 +698,23 @@ const filteredRoles = rolesOptions.filter(
       setImageUploaded(false);
     }
     setEditMode(false);
-  };
+  }, [
+    formData,
+    reset,
+    prepareFormResetData,
+    setDeletedDocumentIds,
+    setFiles,
+    setExistingProfileFiles,
+    setExistingMedicalFiles,
+    setMedicalUploaded,
+    setImageUploaded,
+    setEditMode,
+  ]);
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = useCallback(() => {
     handleSubmit(submitHandler)();
     setEditMode(false);
-  };
+  }, [handleSubmit, setEditMode]);
 
   const submitHandler = (data) => {
     const errors = {};
@@ -806,7 +860,7 @@ const filteredRoles = rolesOptions.filter(
     }
   }, [selectedEmploymentType, setValue]);
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     setShowImagePreview(true);
     const currentImage = control._formValues.profile_photo || [];
     const newImage = {
@@ -814,32 +868,44 @@ const filteredRoles = rolesOptions.filter(
       url: "",
     };
     setValue("profile_photo", [...currentImage, newImage]);
-  };
+  }, [control, setValue]);
 
-  const handleImagePreview = (imageUrl) => {
+  const handleImagePreview = useCallback((imageUrl) => {
     setPreviewImage(imageUrl);
     setShowImagePreview(true);
-  };
+  }, []);
 
-  const handleClosePreview = () => {
+  const handleClosePreview = useCallback(() => {
     setShowImagePreview(false);
     setPreviewImage(null);
-  };
+  }, []);
 
-  const handleRemoveExistingFile = (file, index) => {
-    const updatedFiles = [...existingMedicalFiles];
-    updatedFiles.splice(index, 1);
-    setExistingMedicalFiles(updatedFiles);
+  const handlePreviewModalClick = useCallback(
+    (event) => {
+      if (event.target === event.currentTarget) {
+        handleClosePreview();
+      }
+    },
+    [handleClosePreview],
+  );
 
-    const id = file.document_id || file.id;
+  const handleRemoveExistingFile = useCallback(
+    (file, index) => {
+      const updatedFiles = [...existingMedicalFiles];
+      updatedFiles.splice(index, 1);
+      setExistingMedicalFiles(updatedFiles);
 
-    if (id) {
-      deletedIdsRef.current = [...deletedIdsRef.current, id];
-      setDeletedDocumentIds(deletedIdsRef.current);
-    }
+      const id = file.document_id || file.id;
 
-    console.log("DELETED IDS REF:", deletedIdsRef.current);
-  };
+      if (id) {
+        deletedIdsRef.current = [...deletedIdsRef.current, id];
+        setDeletedDocumentIds(deletedIdsRef.current);
+      }
+
+      console.log("DELETED IDS REF:", deletedIdsRef.current);
+    },
+    [existingMedicalFiles, setDeletedDocumentIds],
+  );
   const handleAddressChange = debounce(async (address) => {
     if (address && address.length > 3) {
       try {
@@ -909,46 +975,49 @@ const filteredRoles = rolesOptions.filter(
     console.log("Deleted IDs:", deletedDocumentIds);
   }, [deletedDocumentIds]);
 
-  const handleSameAddressToggle = (checked) => {
-    if (checked) {
-      const primaryCountry = watch("country");
-      const primaryState = watch("states");
+  const handleSameAddressToggle = useCallback(
+    (checked) => {
+      if (checked) {
+        const primaryCountry = watch("country");
+        const primaryState = watch("states");
 
-      setValue("secondary_address_line", watch("address_line1"));
-      setValue("secondary_city", watch("city"));
-      setValue("secondary_country", primaryCountry);
-      setValue("secondary_zip_code", watch("zip_code"));
+        setValue("secondary_address_line", watch("address_line1"));
+        setValue("secondary_city", watch("city"));
+        setValue("secondary_country", primaryCountry);
+        setValue("secondary_zip_code", watch("zip_code"));
 
-      if (primaryCountry) {
-        loadStatesByCountry(primaryCountry, true);
+        if (primaryCountry) {
+          loadStatesByCountry(primaryCountry, true);
+        }
+
+        setTimeout(() => {
+          setValue("secondary_states", primaryState);
+        }, 100);
+
+        clearErrors([
+          "secondary_address_line",
+          "secondary_city",
+          "secondary_states",
+          "secondary_country",
+          "secondary_zip_code",
+        ]);
+      } else {
+        setValue("secondary_address_line", "");
+        setValue("secondary_city", "");
+        setValue("secondary_states", "");
+        setValue("secondary_country", "");
+        setValue("secondary_zip_code", "");
+        clearErrors([
+          "secondary_address_line",
+          "secondary_city",
+          "secondary_states",
+          "secondary_country",
+          "secondary_zip_code",
+        ]);
       }
-
-      setTimeout(() => {
-        setValue("secondary_states", primaryState);
-      }, 100);
-
-      clearErrors([
-        "secondary_address_line",
-        "secondary_city",
-        "secondary_states",
-        "secondary_country",
-        "secondary_zip_code",
-      ]);
-    } else {
-      setValue("secondary_address_line", "");
-      setValue("secondary_city", "");
-      setValue("secondary_states", "");
-      setValue("secondary_country", "");
-      setValue("secondary_zip_code", "");
-      clearErrors([
-        "secondary_address_line",
-        "secondary_city",
-        "secondary_states",
-        "secondary_country",
-        "secondary_zip_code",
-      ]);
-    }
-  };
+    },
+    [watch, setValue, clearErrors, loadStatesByCountry],
+  );
 
   if (headerOnly) {
     return (
@@ -1006,32 +1075,20 @@ const filteredRoles = rolesOptions.filter(
         handleSameAddressToggle={handleSameAddressToggle}
       />
 
-      {editMode && (
-        <ButtonContainer>
-          <CancelButton variant="outlined" onClick={handleCancelEdit}>
-            Cancel
-          </CancelButton>
-          <SubmitButton type="submit" variant="contained" disabled={!canUpdate}>
-            {mode === "edit" ? "Update Career User" : "Add Career User"}
-          </SubmitButton>
-        </ButtonContainer>
-      )}
+      <FormActionButtons
+        editMode={editMode}
+        handleCancelEdit={handleCancelEdit}
+        mode={mode}
+        canUpdate={canUpdate}
+      />
 
-      {showImagePreview && (
-        <ImagePreviewModal onClick={handlePreviewModalClick}>
-          <ImagePreviewContainer onClick={stopPreviewContainerPropagation}>
-            <ClosePreviewButton onClick={handleClosePreview}>
-              <CloseIcon />
-            </ClosePreviewButton>
-          </ImagePreviewContainer>
-          <Box
-            component="img"
-            src={previewImage}
-            alt="Profile Photo Preview"
-            sx={PreviewImageSx}
-          />
-        </ImagePreviewModal>
-      )}
+      <ImagePreviewModalWrapper
+        showImagePreview={showImagePreview}
+        previewImage={previewImage}
+        handlePreviewModalClick={handlePreviewModalClick}
+        stopPreviewContainerPropagation={stopPreviewContainerPropagation}
+        handleClosePreview={handleClosePreview}
+      />
     </form>
   );
 };

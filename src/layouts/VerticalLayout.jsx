@@ -6,7 +6,12 @@
 
 import { Suspense, lazy } from "react";
 import { useLayoutContext } from "@src/states";
-import { ContentWrapper, MainContent, LoadingProgress } from "./VerticalLayout.styles";
+import {
+  ContentWrapper,
+  MainContent,
+  LoadingProgress,
+  LayoutRoot,
+} from "./VerticalLayout.styles";
 const LeftSideBar = lazy(() => import("@src/layouts/LeftSideBar"));
 const RightSideBar = lazy(() => import("@src/layouts/RightSideBar"));
 const Topbar = lazy(() => import("@src/layouts/Topbar"));
@@ -14,7 +19,7 @@ const Footer = lazy(() => import("@src/layouts/Footer"));
 const VerticalLayout = ({ children }) => {
   const { settings } = useLayoutContext();
   return (
-    <div>
+    <LayoutRoot>
       <Suspense fallback={<div />}>
         <LeftSideBar />
       </Suspense>
@@ -35,7 +40,7 @@ const VerticalLayout = ({ children }) => {
           <RightSideBar />
         </Suspense>
       </MainContent>
-    </div>
+    </LayoutRoot>
   );
 };
 export default VerticalLayout;

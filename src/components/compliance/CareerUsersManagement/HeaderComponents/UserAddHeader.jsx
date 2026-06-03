@@ -6,6 +6,7 @@ import {
   AddHeaderContainerSx,
   AddHeaderTopSx,
   AddHeaderLeftSx,
+  AddHeaderTitleSx,
   BackButtonSx,
   BackIconSx,
   ActiveStatusSx,
@@ -28,15 +29,36 @@ import {
   ProgressBarRowSx,
 } from "./UserAddHeader.styled";
 
+const FORM_STEPS = [
+  { label: "Basic Info", number: 1, id: "basic-information" },
+  { label: "Contact Info", number: 2, id: "contact-information" },
+  { label: "Employment", number: 3, id: "employment-details" },
+  { label: "Prior History", number: 4, id: "prior-employment-history" },
+  { label: "Documents", number: 5, id: "upload-documentation" },
+];
+
+const STATUS_SECTIONS = [
+  { key: "basic", label: "Basic" },
+  { key: "contact", label: "Contact Info" },
+  { key: "employment", label: "Employment" },
+  { key: "history", label: "History" },
+  { key: "documents", label: "Documents" },
+];
+
 const StatusIndicator = ({ item }) => (
   <Box sx={StatusItemSx(item.completed)}>
-    {item.completed ? (
-      // <DoneIcon sx={{ fontSize: 18, color: "success.main" }} />
-      <DoneIcon sx={CompletedIconSx} />
-    ) : null}
+    {item.completed ? <DoneIcon sx={CompletedIconSx} /> : null}
     <Typography variant="body2" sx={StatusItemTextSx(item.completed)}>
       {item.label}
     </Typography>
+  </Box>
+);
+
+const StatusIndicatorsList = ({ statusItems }) => (
+  <Box sx={StatusItemsSx}>
+    {statusItems.map((item) => (
+      <StatusIndicator key={item.label} item={item} />
+    ))}
   </Box>
 );
 
@@ -59,6 +81,20 @@ const UserAddHeaderStep = ({ step, active, onClick, index }) => {
   );
 };
 
+const StepperList = ({ steps, activeStep, handleStepClick }) => (
+  <Box sx={StepListSx}>
+    {steps.map((step, index) => (
+      <UserAddHeaderStep
+        key={step.label}
+        step={step}
+        active={index === activeStep}
+        index={index}
+        onClick={handleStepClick}
+      />
+    ))}
+  </Box>
+);
+
 const UserAddHeader = ({
   handleBack,
   activeStep = 0,
@@ -67,16 +103,12 @@ const UserAddHeader = ({
   profileCompletion = 0,
   scrollContainerRef,
 }) => {
-  const steps = useMemo(
-    () => [
-      { label: "Basic Info", number: 1, id: "basic-information" },
-      { label: "Contact Info", number: 2, id: "contact-information" },
-      { label: "Employment", number: 3, id: "employment-details" },
-      { label: "Prior History", number: 4, id: "prior-employment-history" },
-      { label: "Documents", number: 5, id: "upload-documentation" },
-    ],
-    [],
-  );
+  const steps = useMemo(() => FORM_STEPS, []);
+
+  const statusItems = STATUS_SECTIONS.map((section) => ({
+    label: section.label,
+    completed: sectionCompletion[section.key] || false,
+  }));
 
   useEffect(() => {
     const handleFocus = (event) => {
@@ -106,7 +138,6 @@ const UserAddHeader = ({
         const stepIndex = steps.findIndex((s) => s.id === sectionId);
 
         if (stepIndex !== -1 && setActiveStep) {
-          // setActiveStep(stepIndex);
           if (stepIndex !== activeStep) {
             setActiveStep(stepIndex);
           }
@@ -114,7 +145,6 @@ const UserAddHeader = ({
       }
     };
 
-    // Attach to document with capture phase
     document.addEventListener("focusin", handleFocus, true);
 
     return () => {
@@ -150,17 +180,12 @@ const UserAddHeader = ({
           const viewportCenter = windowHeight / 2;
           const distanceFromCenter = Math.abs(sectionCenter - viewportCenter);
 
-          // Improved scoring: give more weight to sections that are visible
-          // and penalize less for distance, especially for sections with minimal height
           let score = visibility * 1000 - distanceFromCenter;
 
-          // Bonus for sections that are at or near the bottom of the scrollable area
-          // This helps highlight the last section (Documents) even if it has minimal height
           if (rect.bottom >= windowHeight - 100) {
             score += 500;
           }
 
-          // Additional bonus for the last step if it's visible at all
           if (index === steps.length - 1 && visibleHeight > 0) {
             score += 300;
           }
@@ -190,7 +215,6 @@ const UserAddHeader = ({
       }, 100);
     };
 
-    // Function to attach scroll listener
     const attachScrollListener = () => {
       const scrollContainer = scrollContainerRef?.current;
       if (scrollContainer) {
@@ -206,7 +230,6 @@ const UserAddHeader = ({
       }
     };
 
-    // Function to detach scroll listener
     const detachScrollListener = () => {
       const scrollContainer = scrollContainerRef?.current;
       if (scrollContainer) {
@@ -217,10 +240,8 @@ const UserAddHeader = ({
       }
     };
 
-    // Initial attachment
     attachScrollListener();
 
-    // Re-attach when scroll container ref changes
     const checkRefInterval = setInterval(() => {
       const scrollContainer = scrollContainerRef?.current;
       if (scrollContainer) {
@@ -244,28 +265,31 @@ const UserAddHeader = ({
     };
   }, [steps, setActiveStep, scrollContainerRef]);
 
-  // Handle click on stepper item to scroll to section
-  const handleStepClick = useCallback((stepId, index) => {
-    const sectionElement = document.getElementById(stepId);
-    if (sectionElement && setActiveStep) {
-      sectionElement.scrollIntoView({ behavior: "smooth", block: "start" });
-      setActiveStep(index);
-    }
-  }, [setActiveStep]);
+  const handleStepClick = useCallback(
+    (stepId, index) => {
+      const sectionElement = document.getElementById(stepId);
+      const scrollContainer = scrollContainerRef?.current;
 
-  const statusItems = [
-    { label: "Basic", completed: sectionCompletion.basic || false },
-    { label: "Contact Info", completed: sectionCompletion.contact || false },
-    { label: "Employment", completed: sectionCompletion.employment || false },
-    { label: "History", completed: sectionCompletion.history || false },
-    { label: "Documents", completed: sectionCompletion.documents || false },
-  ];
+      if (sectionElement && scrollContainer && setActiveStep) {
+        scrollContainer.scrollTo({
+          top: sectionElement.offsetTop - scrollContainer.offsetTop - 16,
+          behavior: "smooth",
+        });
+        setActiveStep(index);
+        return;
+      }
+
+      if (sectionElement && setActiveStep) {
+        sectionElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        setActiveStep(index);
+      }
+    },
+    [scrollContainerRef, setActiveStep],
+  );
 
   return (
     <Box sx={AddHeaderContainerSx}>
-      {/* Header Section with Back Button and Title */}
       <Box sx={AddHeaderTopSx}>
-        {/* Left Side - Back Button and Title */}
         <Box sx={AddHeaderLeftSx}>
           <Button
             variant="outlined"
@@ -276,11 +300,8 @@ const UserAddHeader = ({
             Back
           </Button>
 
-          <Typography fontWeight={600} fontSize="20px" color="text.primary">
-            Add User
-          </Typography>
+          <Typography sx={AddHeaderTitleSx}>Add User</Typography>
 
-          {/* Active Status Indicator */}
           <Box sx={ActiveStatusSx}>
             <Box sx={ActiveStatusDotSx} />
             Active
@@ -288,12 +309,8 @@ const UserAddHeader = ({
         </Box>
       </Box>
 
-      {/* Card Section with Profile Completion and Status Indicators */}
       <Box sx={CardContainerSx}>
-        {/* Profile Completion and Status Indicators in same row */}
         <Box sx={ProgressWrapperSx}>
-          {/* Profile Completion Section */}
-          {/* <Box sx={{ minWidth: 300 }}> */}
           <Box sx={ProfileCompletionContainerSx}>
             <Typography variant="body1" sx={ProgressTextSx}>
               Profile Completion
@@ -313,27 +330,17 @@ const UserAddHeader = ({
           </Box>
 
           {/* Status Indicators */}
-          <Box sx={StatusItemsSx}>
-            {statusItems.map((item) => (
-              <StatusIndicator key={item.label} item={item} />
-            ))}
-          </Box>
+          <StatusIndicatorsList statusItems={statusItems} />
         </Box>
       </Box>
 
       {/* Horizontal Text Stepper */}
       <Box sx={StepperWrapperSx}>
-        <Box sx={StepListSx}>
-          {steps.map((step, index) => (
-            <UserAddHeaderStep
-              key={step.label}
-              step={step}
-              active={index === activeStep}
-              index={index}
-              onClick={handleStepClick}
-            />
-          ))}
-        </Box>
+        <StepperList
+          steps={steps}
+          activeStep={activeStep}
+          handleStepClick={handleStepClick}
+        />
       </Box>
     </Box>
   );

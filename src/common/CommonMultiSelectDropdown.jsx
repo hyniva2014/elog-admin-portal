@@ -50,7 +50,12 @@ const CommonMultiSelectDropdown = ({
   );
 
   const renderAutocompleteOption = (props, option, { selected }) => (
-    <Box component="li" {...props} key={`${option.value}-${option.label}`} sx={OptionListItemSx}>
+    <Box
+      component="li"
+      {...props}
+      key={`${option.value}-${option.label}`}
+      sx={OptionListItemSx}
+    >
       <Checkbox checked={selected} sx={CheckboxIconSx} />
       {option.label}
     </Box>
@@ -75,10 +80,15 @@ const CommonMultiSelectDropdown = ({
     }
   };
 
+  const LoadingIndicator = () => {
+    if (!loading) return null;
+    return <CircularProgress color="inherit" size={20} />;
+  };
+
   const renderInputField = (params) => {
     const endAdornment = (
       <>
-        {loading ? <CircularProgress color="inherit" size={20} /> : null}
+        <LoadingIndicator />
         {params.InputProps.endAdornment}
       </>
     );

@@ -6,7 +6,11 @@ import {
   Button,
   Typography,
 } from "@mui/material";
-import { DialogActionsSx, ActionButtonSx } from "./CommonConfirmDialog.styled";
+import {
+  DialogActionsSx,
+  ActionButtonSx,
+  MessageTypographySx,
+} from "./CommonConfirmDialog.styled";
 
 const CommonConfirmDialog = ({
   open,
@@ -21,7 +25,7 @@ const CommonConfirmDialog = ({
     <DialogTitle>{title}</DialogTitle>
 
     <DialogContent>
-      <Typography fontSize={14}>{message}</Typography>
+      <Typography sx={MessageTypographySx}>{message}</Typography>
     </DialogContent>
 
     <DialogActions sx={DialogActionsSx}>

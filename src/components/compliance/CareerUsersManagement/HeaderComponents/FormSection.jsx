@@ -3,21 +3,33 @@ import {
   FormSectionContainerSx,
   FormSectionHeaderSx,
   FormSectionContentSx,
+  FormSectionTitleSx,
+  FormSectionSubtitleSx,
 } from "./FormSection.styled";
 
-const FormSection = ({ title, subtitle, children, padding = 2.5,
-  contentPadding, id,      }) => {
+const FormSectionSubtitle = ({ subtitle }) => {
+  if (!subtitle) return null;
+
+  return (
+    <Typography variant="caption" sx={FormSectionSubtitleSx}>
+      {subtitle}
+    </Typography>
+  );
+};
+
+const FormSection = ({
+  title,
+  subtitle,
+  children,
+  padding = 2.5,
+  contentPadding,
+  id,
+}) => {
   return (
     <Box id={id} sx={FormSectionContainerSx}>
       <Box sx={FormSectionHeaderSx}>
-        <Typography fontWeight={600} color="text.primary">
-          {title}
-        </Typography>
-        {subtitle && (
-          <Typography variant="caption" color="text.secondary">
-            {subtitle}
-          </Typography>
-        )}
+        <Typography sx={FormSectionTitleSx}>{title}</Typography>
+        <FormSectionSubtitle subtitle={subtitle} />
       </Box>
       <Divider />
       <Box sx={FormSectionContentSx(contentPadding ?? padding)}>{children}</Box>

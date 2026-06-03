@@ -68,97 +68,70 @@ describe("BasicInformationSection", () => {
   test("renders basic information section", () => {
     render(<TestWrapper selectedCitizenship={1} />);
 
-    expect(
-      screen.getByText("Basic Information")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Basic Information")).toBeInTheDocument();
   });
 
   test("renders image preview", () => {
     render(<TestWrapper selectedCitizenship={1} />);
 
-    expect(
-      screen.getByTestId("image-preview")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("image-preview")).toBeInTheDocument();
   });
 
   test("renders first name field", () => {
     render(<TestWrapper selectedCitizenship={1} />);
 
-    expect(
-      screen.getByTestId("First Name")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("First Name")).toBeInTheDocument();
   });
 
   test("renders last name field", () => {
     render(<TestWrapper selectedCitizenship={1} />);
 
-    expect(
-      screen.getByTestId("Last Name")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("Last Name")).toBeInTheDocument();
   });
 
   test("renders dob field", () => {
     render(<TestWrapper selectedCitizenship={1} />);
 
-    expect(
-      screen.getByTestId("Date of Birth *")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("Date of Birth *")).toBeInTheDocument();
   });
 
   test("renders citizenship dropdown", () => {
     render(<TestWrapper selectedCitizenship={1} />);
 
-    expect(
-      screen.getByTestId("Citizenship")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("Citizenship")).toBeInTheDocument();
   });
 
   test("renders passport fields for non-US citizenship", () => {
     render(<TestWrapper selectedCitizenship={2} />);
 
-    expect(
-      screen.getByTestId("Passport / Visa Number")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("Passport / Visa Number")).toBeInTheDocument();
 
     expect(
-      screen.getByTestId("Passport / Visa Expiry Date")
+      screen.getByTestId("Passport / Visa Expiry Date"),
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByTestId("Work Permit Expiry Date")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("Work Permit Expiry Date")).toBeInTheDocument();
   });
 
   test("does not render passport fields for US citizenship", () => {
     render(<TestWrapper selectedCitizenship={1} />);
 
     expect(
-      screen.queryByTestId("Passport / Visa Number")
+      screen.queryByTestId("Passport / Visa Number"),
     ).not.toBeInTheDocument();
   });
 
   test("renders citizenship country field when citizenship is Others", () => {
     render(<TestWrapper selectedCitizenship={4} />);
 
-    expect(
-      screen.getByTestId("Country")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("Country")).toBeInTheDocument();
   });
 
   test("all fields disabled when editMode is false", () => {
-    render(
-      <TestWrapper
-        selectedCitizenship={1}
-        editMode={false}
-      />
-    );
+    render(<TestWrapper selectedCitizenship={1} editMode={false} />);
 
-    expect(
-      screen.getByTestId("First Name")
-    ).toBeDisabled();
+    expect(screen.getByTestId("First Name")).toBeDisabled();
 
-    expect(
-      screen.getByTestId("Last Name")
-    ).toBeDisabled();
+    expect(screen.getByTestId("Last Name")).toBeDisabled();
   });
 });

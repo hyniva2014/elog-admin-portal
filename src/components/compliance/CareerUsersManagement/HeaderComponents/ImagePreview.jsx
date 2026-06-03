@@ -58,9 +58,6 @@ const ProfilePhotoPreview = ({
       const oversizedFile = oversizedFiles[0];
       const fileSizeInMB = (oversizedFile.size / (1024 * 1024)).toFixed(2);
       const errorMessage = `File size must be less than 2MB. ${oversizedFile.name} is ${fileSizeInMB}MB.`;
-      console.error(
-        `File too large: ${oversizedFile.name} (${fileSizeInMB}MB)`,
-      );
       return { valid: false, error: errorMessage };
     }
 
@@ -76,13 +73,35 @@ const ProfilePhotoPreview = ({
   };
 
   const hasFilesToShow = (field) => {
-    return uploaded || existingFiles.length > 0 || (Array.isArray(field.value) && field.value.length > 0);
+    return (
+      uploaded ||
+      existingFiles.length > 0 ||
+      (Array.isArray(field.value) && field.value.length > 0)
+    );
   };
 
   const getPreviewImageUrl = (field) => {
     const imageToShow = existingFiles[0] || (field.value && field.value[0]);
-    return imageToShow?.url ||
-      (imageToShow instanceof File ? URL.createObjectURL(imageToShow) : imageToShow) || "";
+    return (
+      imageToShow?.url ||
+      (imageToShow instanceof File
+        ? URL.createObjectURL(imageToShow)
+        : imageToShow) ||
+      ""
+    );
+  };
+
+  const shouldTriggerOCR = (files) => {
+    return (
+      (fieldName === "files" || fieldName.includes("additional_licenses")) &&
+      files[0] &&
+      setValue &&
+      onCDLExtracted
+    );
+  };
+
+  const isOCREligible = () => {
+    return fieldName === "files" || fieldName.includes("additional_licenses");
   };
 
   const handleFileUpload = async (files, field) => {
@@ -92,7 +111,8 @@ const ProfilePhotoPreview = ({
     if (!validation.valid) {
       setSnackbar({
         open: true,
-        message: "This image is larger than 2 MB. Try uploading a smaller image.",
+        message:
+          "This image is larger than 2 MB. Try uploading a smaller image.",
         severity: "error",
       });
 
@@ -109,23 +129,19 @@ const ProfilePhotoPreview = ({
       setUploaded(true);
       setExistingFiles([]);
 
-      if (
-        (fieldName === "files" || fieldName.includes("additional_licenses")) &&
-        files[0] &&
-        setValue &&
-        onCDLExtracted
-      ) {
+      if (shouldTriggerOCR(files)) {
         setIsOCRProcessing(true);
         setOcrProgress(0);
 
         try {
-          const extractedData = await extractCDLFromImage(files[0], (progress) => {
-            setOcrProgress(progress);
-          });
-          console.log("Extracted CDL data:", extractedData);
+          const extractedData = await extractCDLFromImage(
+            files[0],
+            (progress) => {
+              setOcrProgress(progress);
+            },
+          );
           onCDLExtracted(extractedData, fieldName);
         } catch (error) {
-          console.error("CDL OCR failed:", error);
         } finally {
           setIsOCRProcessing(false);
           setOcrProgress(0);
@@ -159,94 +175,110 @@ const ProfilePhotoPreview = ({
     }
   };
 
-  return (
-    <>
-      {!uploaded && existingFiles.length === 0 && (
-        <Box sx={PreviewContainerSx(fieldName)}>
-          <Typography variant="subtitle1" sx={PreviewLabelSx}>
-            {labelText}
+  const OCROverlay = () => {
+    if (!isOCRProcessing) return null;
+
+    return (
+      <Box sx={OcrOverlaySx}>
+        <CircularProgress size={24} />
+        <Typography variant="caption" sx={OcrCaptionSx}>
+          Extracting CDL data...
+        </Typography>
+        {ocrProgress > 0 && (
+          <Typography variant="caption" sx={OcrProgressSx}>
+            {ocrProgress}%
           </Typography>
+        )}
+      </Box>
+    );
+  };
 
-          <Controller
-            name={fieldName}
-            control={control}
-            render={({ field }) => {
-              const uploadFieldChange = (files) => handleFileUpload(files, field);
-              const removeFileHandler = (file, index) => handleRemoveExistingFile(file, index);
-
-              return (
-                <CommonFileUpload
-                  files={Array.isArray(field.value) ? field.value : []}
-                  existingFiles={existingFiles}
-                  onFileChange={uploadFieldChange}
-                  size="small"
-                  disabled={disabled}
-                  allowedFileTypes={[".jpg", ".jpeg", ".png"]}
-                  error={!!errors[fieldName] || !!fileSizeError}
-                  helperText={errors[fieldName]?.message}
-                  onRemoveExistingFile={removeFileHandler}
-                />
-              );
-            }}
-          />
-        </Box>
-      )}
+  const UploadSection = () => (
+    <Box sx={PreviewContainerSx(fieldName)}>
+      <Typography variant="subtitle1" sx={PreviewLabelSx}>
+        {labelText}
+      </Typography>
 
       <Controller
         name={fieldName}
         control={control}
         render={({ field }) => {
-          if (!hasFilesToShow(field)) {
-            return null;
-          }
-
-          const previewUrl = getPreviewImageUrl(field);
-          const previewLabel = getPreviewText();
-          const isOcrActive = isOCRProcessing &&
-            (fieldName === "files" || fieldName.includes("additional_licenses"));
-
-          const removeImageButtonClick = (event) => handleRemoveImageClick(event, field);
+          const uploadFieldChange = (files) => handleFileUpload(files, field);
+          const removeFileHandler = (file, index) =>
+            handleRemoveExistingFile(file, index);
 
           return (
-            <Box sx={PreviewContainerSx(fieldName)}>
-              <Typography variant="subtitle1" sx={PreviewSubtitleSx}>
-                {previewLabel}
-              </Typography>
-              <Box
-                sx={PreviewImageContainerSx(fieldName)}
-                data-preview-url={previewUrl}
-                onClick={handlePreviewClick}
-              >
-                <Box component="img" src={previewUrl} alt="Preview" sx={PreviewImageSx} />
-
-                {isOcrActive && (
-                  <Box sx={OcrOverlaySx}>
-                    <CircularProgress size={24} />
-                    <Typography variant="caption" sx={OcrCaptionSx}>
-                      Extracting CDL data...
-                    </Typography>
-                    {ocrProgress > 0 && (
-                      <Typography variant="caption" sx={OcrProgressSx}>
-                        {ocrProgress}%
-                      </Typography>
-                    )}
-                  </Box>
-                )}
-
-                <IconButton
-                  size="small"
-                  sx={RemoveImageButtonSx}
-                  onClick={removeImageButtonClick}
-                  disabled={disabled}
-                >
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            </Box>
+            <CommonFileUpload
+              files={Array.isArray(field.value) ? field.value : []}
+              existingFiles={existingFiles}
+              onFileChange={uploadFieldChange}
+              size="small"
+              disabled={disabled}
+              allowedFileTypes={[".jpg", ".jpeg", ".png"]}
+              error={!!errors[fieldName] || !!fileSizeError}
+              helperText={errors[fieldName]?.message}
+              onRemoveExistingFile={removeFileHandler}
+            />
           );
         }}
       />
+    </Box>
+  );
 
+  const PreviewSection = () => (
+    <Controller
+      name={fieldName}
+      control={control}
+      render={({ field }) => {
+        if (!hasFilesToShow(field)) {
+          return null;
+        }
+
+        const previewUrl = getPreviewImageUrl(field);
+        const previewLabel = getPreviewText();
+        const isOcrActive = isOCRProcessing && isOCREligible();
+
+        const removeImageButtonClick = (event) =>
+          handleRemoveImageClick(event, field);
+
+        return (
+          <Box sx={PreviewContainerSx(fieldName)}>
+            <Typography variant="subtitle1" sx={PreviewSubtitleSx}>
+              {previewLabel}
+            </Typography>
+            <Box
+              sx={PreviewImageContainerSx(fieldName)}
+              data-preview-url={previewUrl}
+              onClick={handlePreviewClick}
+            >
+              <Box
+                component="img"
+                src={previewUrl}
+                alt="Preview"
+                sx={PreviewImageSx}
+              />
+
+              {isOcrActive && <OCROverlay />}
+
+              <IconButton
+                size="small"
+                sx={RemoveImageButtonSx}
+                onClick={removeImageButtonClick}
+                disabled={disabled}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          </Box>
+        );
+      }}
+    />
+  );
+
+  return (
+    <>
+      {!uploaded && existingFiles.length === 0 && <UploadSection />}
+      <PreviewSection />
       <CommonSnackbar
         open={snackbar.open}
         autoHideDuration={3000}
