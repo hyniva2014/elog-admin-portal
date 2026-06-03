@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import dayjs from "dayjs";
 import { useServices } from "../services/services";
 import { REQUEST_DEVICE_ENDPOINTS } from "../components/compliance/RequestDevice/ApiEndpoints";
+import { getFormattedDateTime } from "../common/CommonUtils";
 
 const formatDate = (iso) => {
   return iso ? dayjs(iso).format("MMM DD, YYYY") : "-";
@@ -41,7 +42,13 @@ const transformRequestedDevicesData = (data = []) => {
       requestedDevices: requested_devices_count || "-",
       description: description || "-",
       requestedBy: requested_by_name || "-",
-      requestedOn: formatDate(requested_on || created_at || created_on),
+      // requestedOn: formatDate(requested_on || created_at || created_on),
+      requestedDate: getFormattedDateTime(
+        item.requested_on || item.created_at || item.created_on,
+      ).date,
+      requestedTime: getFormattedDateTime(
+        item.requested_on || item.created_at || item.created_on,
+      ).time,
       approvedBy: approved_by || "-",
       status: getStatusLabel(status),
     };

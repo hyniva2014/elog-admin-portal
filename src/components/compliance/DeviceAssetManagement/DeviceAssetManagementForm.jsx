@@ -20,9 +20,9 @@ const validationSchema = yup.object({
 const initialValues = {
   modelName: "",
   serialNumber: "",
-  imei: "",
+  imei_number: "",
   iccid: "",
-  bleMacAddress: "",
+  BLE_MAC_ADDRESS: "",
   status: "",
 };
 
@@ -128,13 +128,13 @@ const DeviceAssetManagementForm = ({
 
         <Grid item xs={12}>
           <CommonTextField
-            name="imei"
-            label="IMEI"
+            name="imei_number"
+            label="imei_number"
             register={register}
-            error={!!errors.imei}
-            helperText={errors.imei?.message}
+            error={!!errors.imei_number}
+            helperText={errors.imei_number?.message}
             disabled={isDisabled}
-            shrinkLabel={!!watch("imei")}
+            shrinkLabel={!!watch("imei_number")}
           />
         </Grid>
 
@@ -152,18 +152,18 @@ const DeviceAssetManagementForm = ({
 
         <Grid item xs={12}>
           <CommonTextField
-            name="bleMacAddress"
+            name="BLE_MAC_ADDRESS"
             label="BLE_MAC_ADDRESS"
             register={register}
-            error={!!errors.bleMacAddress}
-            helperText={errors.bleMacAddress?.message}
+            error={!!errors.BLE_MAC_ADDRESS}
+            helperText={errors.BLE_MAC_ADDRESS?.message}
             disabled={isDisabled}
-            shrinkLabel={!!watch("bleMacAddress")}
+            shrinkLabel={!!watch("BLE_MAC_ADDRESS")}
           />
         </Grid>
 
         {/* Status Dropdown */}
-        {isEditMode && (
+        {/* {isEditMode && (
           <Grid item xs={12}>
             <TextField
               select
@@ -177,7 +177,7 @@ const DeviceAssetManagementForm = ({
               {renderStatusOptions()}
             </TextField>
           </Grid>
-        )}
+        )} */}
       </Grid>
     </StyledForm>
   );

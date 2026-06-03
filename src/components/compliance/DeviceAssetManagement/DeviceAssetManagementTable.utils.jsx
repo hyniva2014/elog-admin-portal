@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { getFormattedDateTime } from "../../../common/CommonUtils";
 import { StatusTypography } from "./DeviceAssetManagement.styles";
 import DeviceAssetManagementActionButton from "./DeviceAssetManagementActionButton";
 import { Box, Typography } from "@mui/material";
@@ -14,13 +15,13 @@ const StatusCell = (params) => (
   </StatusTypography>
 );
 
-const ActionCell = (onView) => {
+const ActionCell = (onView, onDelete) => {
   return (params) => (
-    <DeviceAssetManagementActionButton row={params.row} onView={onView} />
+    <DeviceAssetManagementActionButton row={params.row} onView={onView} onDelete={onDelete} />
   );
 };
 
-export const getColumns = (onView) => [
+export const getColumns = (onView, onDelete) => [
   {
     field: "serialNumber",
     headerName: "Serial Number",
@@ -133,36 +134,34 @@ export const getColumns = (onView) => [
     headerAlign: "center",
     sortable: false,
     headerTooltip: true,
-    renderCell: ActionCell(onView),
+    renderCell: ActionCell(onView, onDelete),
   },
 ];
 
 export const transformDeviceAssetData = (apiData) => {
-  return apiData.map((item) => ({
-    id: item.device_id,
-    serialNumber: item.device_serial_number || "-",
-    deviceModel: item.device_model_name || "-",
-    imei: item.imei_number || "-",
-    iccId: item.iccid || "-",
-    BLE_MAC_ADDRESS: item.BLE_MAC_ADDRESS || "-",
-    createdDate: item.created_at
-      ? dayjs(item.created_at).format("MMM DD, YYYY")
-      : "-",
-    createdTime: item.created_at
-      ? dayjs(item.created_at).format("hh:mm A")
-      : "-",
-    updatedDate: item.updated_at
-      ? dayjs(item.updated_at).format("MMM DD, YYYY")
-      : "-",
-    updatedTime: item.updated_at
-      ? dayjs(item.updated_at).format("hh:mm A")
-      : "-",
-    status:
-      item.status === "2"
-        ? "Assigned"
-        : item.status === "1"
-          ? "Allocated"
-          : "In Stock",
+  return apiData.map((item) => {
+    const createdInfo = getFormattedDateTime(item.created_at);
+    const updatedInfo = getFormattedDateTime(item.updated_at);
+
+    return {
+      id: item.device_id,
+      serialNumber: item.device_serial_number || "-",
+      deviceModel: item.device_model_name || "-",
+      imei: item.imei_number || "-",
+      iccId: item.iccid || "-",
+      BLE_MAC_ADDRESS: item.BLE_MAC_ADDRESS || "-",
+      createdDate: createdInfo.date,
+      createdTime: createdInfo.time,
+      updatedDate: updatedInfo.date,
+      updatedTime: updatedInfo.time,
+      status:
+        item.status === "3"
+        ? "Out of Service"
+        : item.status === "2"
+          ? "Assigned"
+          : item.status === "1"
+            ? "Allocated"
+            : "In Stock",
     imeiNumber: item.imei_number || "-",
     firmware: item.firmware || "-",
     manufacturerName: item.manufacturer_name || "-",
@@ -171,7 +170,8 @@ export const transformDeviceAssetData = (apiData) => {
     hardwareVersion: item.hardware_version || "-",
     providerDeviceId: item.provider_device_id || "-",
     integrationType: item.integration_type || "-",
-    networkStatus: item.network_status || "-",
-    activationDate: item.activation_date || null,
-  }));
+      networkStatus: item.network_status || "-",
+      activationDate: item.activation_date || null,
+    };
+  });
 };

@@ -4,6 +4,7 @@ import { Box, IconButton, Typography } from "@mui/material";
 import { StatusText } from "./CommonRowColumnUtils.styled";
 import { USER_STATUS, USER_STATUS_COL_CONFIG } from "./Constants";
 import dayjs from "dayjs";
+import { getFormattedDateTime } from "../../../common/CommonUtils";
 
 const formatDate = (iso) => (iso ? dayjs(iso).format("DD-MM-YYYY") : "-");
 
@@ -121,30 +122,31 @@ export const UserManagementColumnData = [
   },
 ];
 
-export const mapUserToRow = (user) => ({
-  id: user.user_id,
-  user_id: user.user_id,
-  company_id: user.company_id ?? "",
-  role_id: user.role_id ?? "",
-  // status_id: user.status_id,
-  carrierId: user.company_id ?? "-",
-  carrierName: user.company_name ?? "-",
-  userProfile: user.role_name ?? user.user_profile ?? "-",
-  firstName: user.first_name ?? "-",
-  lastName: user.last_name ?? "-",
-  primaryContactEmail: user.email ?? "-",
-  createdDate: user.created_at
-    ? dayjs(user.created_at).format("MMM DD, YYYY")
-    : "-",
-  createdTime: user.created_at ? dayjs(user.created_at).format("hh:mm A") : "-",
-  updatedOn: user.updated_at || null,
-  updatedDate: user.updated_at
-    ? dayjs(user.updated_at).format("MMM DD, YYYY")
-    : "-",
-  updatedTime: user.updated_at ? dayjs(user.updated_at).format("hh:mm A") : "-",
-  status: USER_STATUS[String(user.status_id)] || user.status || "-",
-  status_id: user.status_id ?? "",
-  user_name: (
-    user.user_name ?? `${user.first_name ?? ""} ${user.last_name ?? ""}`
-  ).trim(),
-});
+export const mapUserToRow = (user) => {
+  const createdInfo = getFormattedDateTime(user.created_at);
+  const updatedInfo = getFormattedDateTime(user.updated_at);
+
+  return {
+    id: user.user_id,
+    user_id: user.user_id,
+    company_id: user.company_id ?? "",
+    role_id: user.role_id ?? "",
+    // status_id: user.status_id,
+    carrierId: user.company_id ?? "-",
+    carrierName: user.company_name ?? "-",
+    userProfile: user.role_name ?? user.user_profile ?? "-",
+    firstName: user.first_name ?? "-",
+    lastName: user.last_name ?? "-",
+    primaryContactEmail: user.email ?? "-",
+    createdDate: createdInfo.date,
+    createdTime: createdInfo.time,
+    updatedOn: user.updated_at || null,
+    updatedDate: updatedInfo.date,
+    updatedTime: updatedInfo.time,
+    status: USER_STATUS[String(user.status_id)] || user.status || "-",
+    status_id: user.status_id ?? "",
+    user_name: (
+      user.user_name ?? `${user.first_name ?? ""} ${user.last_name ?? ""}`
+    ).trim(),
+  };
+};

@@ -52,12 +52,12 @@ const DeviceAssetManagement = () => {
     deviceId: "",
     modelName: "",
     serialNumber: "",
-    imei: "",
+    imei_number: "",
     firmware: "",
     manufacturerName: "",
     simNumber: "",
     iccid: "",
-    bleMacAddress: "",
+    BLE_MAC_ADDRESS: "",
     hardwareVersion: "",
     providerDeviceId: "",
     integrationType: "",
@@ -161,12 +161,12 @@ const DeviceAssetManagement = () => {
       deviceId: "",
       modelName: "",
       serialNumber: "",
-      imei: "",
+      imei_number: "",
       firmware: "",
       manufacturerName: "",
       simNumber: "",
       iccid: "",
-      bleMacAddress: "",
+      BLE_MAC_ADDRESS: "",
       hardwareVersion: "",
       providerDeviceId: "",
       integrationType: "",
@@ -199,17 +199,17 @@ const DeviceAssetManagement = () => {
 
       const payload = {
         device_serial_number: formValues.serialNumber,
-        device_model_id: formValues.modelName,
-        status: formValues.status || "1",
+        device_model_id: Number(formValues.modelName),
+        status: formValues.status !== undefined && formValues.status !== "" ? String(formValues.status) : "1",
       };
-      if (formValues.imei?.trim()) {
-        payload.imei = formValues.imei.trim();
+      if (formValues.imei_number?.trim()) {
+        payload.imei_number = formValues.imei_number.trim();
       }
       if (formValues.iccid?.trim()) {
         payload.iccid = formValues.iccid.trim();
       }
-      if (formValues.bleMacAddress?.trim()) {
-        payload.ble_mac_address = formValues.bleMacAddress.trim();
+      if (formValues.BLE_MAC_ADDRESS?.trim()) {
+        payload.BLE_MAC_ADDRESS = formValues.BLE_MAC_ADDRESS.trim();
       }
       if (formValues.deviceId) {
         payload.device_id = formValues.deviceId;
@@ -256,22 +256,20 @@ const DeviceAssetManagement = () => {
         deviceId: deviceData?.device_id || "",
         modelName: deviceData?.device_model_id || "",
         serialNumber: deviceData?.device_serial_number || "",
-        imei: deviceData?.imei || "",
+        imei_number: deviceData?.imei_number || "",
         firmware: deviceData?.firmware || "",
         manufacturerName: deviceData?.manufacturer_name || "",
         simNumber: deviceData?.sim_number || "",
         iccid: deviceData?.iccid || "",
-        bleMacAddress: deviceData?.ble_mac_address || "",
+        BLE_MAC_ADDRESS: deviceData?.BLE_MAC_ADDRESS || "",
         hardwareVersion: deviceData?.hardware_version || "",
         providerDeviceId: deviceData?.provider_device_id || "",
         integrationType: deviceData?.integration_type || "",
         networkStatus: deviceData?.network_status || "",
         status:
-          deviceData?.status === 0 || deviceData?.status === "0"
-            ? "0"
-            : deviceData?.status === 1 || deviceData?.status === "1"
-              ? "1"
-              : "",
+          deviceData?.status !== undefined && deviceData?.status !== null
+            ? String(deviceData.status)
+            : "",
       });
 
       setIsAddModalOpen(true);
@@ -285,6 +283,63 @@ const DeviceAssetManagement = () => {
       handleSnackbar("Failed to fetch device details", "error");
     }
   };
+
+  const handleDeleteClick = useCallback(
+    async (row) => {
+      try {
+        setLoading(true);
+
+        const getResponse = await fetchApi(
+          `/masteradmin/get-eld-devices?device_id=${row.id}`,
+        );
+        const deviceData = getResponse?.body;
+
+        if (!deviceData) {
+          handleSnackbar("Failed to fetch device details", "error");
+          setLoading(false);
+          return;
+        }
+
+        const payload = {
+          device_id: deviceData.device_id,
+          device_serial_number: deviceData.device_serial_number,
+          device_model_id: deviceData.device_model_id,
+          status: 3,
+        };
+
+        if (deviceData.imei_number?.trim()) {
+          payload.imei_number = deviceData.imei_number.trim();
+        }
+        if (deviceData.iccid?.trim()) {
+          payload.iccid = deviceData.iccid.trim();
+        }
+        if (deviceData.BLE_MAC_ADDRESS?.trim()) {
+          payload.BLE_MAC_ADDRESS = deviceData.BLE_MAC_ADDRESS.trim();
+        }
+
+        const response = await createApi(
+          payload,
+          "/masteradmin/onboard-eld-device",
+        );
+
+        if (response?.statusCode === 200) {
+          handleSnackbar("Asset status updated to Out of Service", "success");
+          fetchDeviceAssets();
+        } else {
+          handleSnackbar(
+            response?.body?.message || "Failed to update asset status",
+            "error",
+          );
+        }
+      } catch (error) {
+        console.error("Delete Device Error:", error);
+        handleSnackbar("Unexpected error occurred", "error");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchApi, createApi, fetchDeviceAssets, handleSnackbar, setLoading],
+  );
 
   const handleBulkSubmit = async (formValues) => {
     try {
@@ -326,12 +381,12 @@ const DeviceAssetManagement = () => {
       deviceId: "",
       modelName: "",
       serialNumber: "",
-      imei: "",
+      imei_number: "",
       firmware: "",
       manufacturerName: "",
       simNumber: "",
       iccid: "",
-      bleMacAddress: "",
+      BLE_MAC_ADDRESS: "",
       hardwareVersion: "",
       providerDeviceId: "",
       integrationType: "",
@@ -342,12 +397,15 @@ const DeviceAssetManagement = () => {
     setIsEditing(false);
   }, []);
 
-  const handleSetMode = useCallback(() => {}, []);
+  const handleSetMode = useCallback(() => { }, []);
   const handleRowSelectionChange = (newSelection) => {
     setSelectedRows(newSelection);
   };
 
-  const columns = useMemo(() => getColumns(handleViewClick), [handleViewClick]);
+  const columns = useMemo(
+    () => getColumns(handleViewClick, handleDeleteClick),
+    [handleViewClick, handleDeleteClick]
+  );
 
   const gridData = {
     ...data,

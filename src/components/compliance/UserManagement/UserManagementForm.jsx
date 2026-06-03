@@ -7,8 +7,8 @@ import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonTextField from "../../../common/CommonTextField";
 import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdown";
 import { FormContainer } from "./UserManagementForm.styled";
-import { USER_PROFILE_OPTIONS } from "./Constants";
 import { EditHeaderButton } from "./UserManagementForm.styled";
+import { useServices } from "../../../services/services";
 
 const STATUS_OPTIONS = [
   { label: "Active", value: "1" },
@@ -74,6 +74,9 @@ const UserManagementForm = ({
   initialData = null,
   companyOptions = [],
 }) => {
+  const { fetchApi } = useServices();
+  const [roleOptions, setRoleOptions] = useState([]);
+
   const isViewMode = mode === "view";
 
   // Internal editing state — only relevant when mode === "view"
@@ -135,6 +138,50 @@ const UserManagementForm = ({
 
   const handleEditClick = useCallback(() => setIsEditing(true), []);
 
+  const companyId = watch("company_id");
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchRoles = async () => {
+      if (!companyId) {
+        setRoleOptions([]);
+        return;
+      }
+      try {
+        const response = await fetchApi(`/admin/user/get-roles?company_id=${companyId}`);
+        if (!isMounted) return;
+
+        let roles = [];
+        if (response?.body?.Roles) {
+          roles = response.body.Roles;
+        } else if (response?.body?.data) {
+          roles = response.body.data;
+        } else if (response?.data) {
+          roles = response.data;
+        } else if (Array.isArray(response?.body)) {
+          roles = response.body;
+        } else if (Array.isArray(response)) {
+          roles = response;
+        }
+
+        const options = roles.map((r) => ({
+          label: r.role_name || r.name || r.roleName || r.label || "Unknown",
+          value: String(r.role_id || r.id || r.value || ""),
+        }));
+
+        setRoleOptions(options);
+      } catch (err) {
+        console.error("Failed to fetch roles", err);
+        if (isMounted) setRoleOptions([]);
+      }
+    };
+    fetchRoles();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [companyId, fetchApi]);
+
   // Edit button shown in the dialog header (next to close icon)
   const editHeaderButton = isViewMode && !isEditing && (
     <EditHeaderButton
@@ -172,7 +219,7 @@ const UserManagementForm = ({
             name="role_id"
             label="User Profile"
             value={watch("role_id")}
-            options={USER_PROFILE_OPTIONS}
+            options={roleOptions}
             onChange={handleUserProfileChange}
             error={!!errors.role_id}
             helperText={errors.role_id?.message}

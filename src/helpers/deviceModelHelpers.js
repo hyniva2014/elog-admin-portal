@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { getFormattedDateTime } from "../common/CommonUtils";
 
 export const generateDeviceCode = (name) => {
   if (!name || typeof name !== "string") {
@@ -44,8 +45,12 @@ export const getStatusLabel = (value) => {
 };
 
 export const transformDeviceModelData = (apiData) =>
-  apiData.map((item) => ({
-    id: item.device_model_id,
+  apiData.map((item) => {
+    const createdInfo = getFormattedDateTime(item.created_at);
+    const updatedInfo = getFormattedDateTime(item.updated_at);
+
+    return {
+      id: item.device_model_id,
     modelCode: item.device_code || "-",
     deviceModelId: item.device_model_id,
     deviceCode: item.device_code || "",
@@ -55,18 +60,11 @@ export const transformDeviceModelData = (apiData) =>
     description: item.description || "-",
     supportsElogs:
       item.supports_elogs === 1 || item.supports_elogs === "1" ? 1 : 0,
-    createdDate: item.created_at
-      ? dayjs(item.created_at).format("MMM DD, YYYY")
-      : "-",
-    createdTime: item.created_at
-      ? dayjs(item.created_at).format("hh:mm A")
-      : "-",
-    updatedDate: item.updated_at
-      ? dayjs(item.updated_at).format("MMM DD, YYYY")
-      : "-",
-    updatedTime: item.updated_at
-      ? dayjs(item.updated_at).format("hh:mm A")
-      : "-",
-    status: item.status ?? 1,
-    statusLabel: getStatusLabel(item.status),
-  }));
+      createdDate: createdInfo.date,
+      createdTime: createdInfo.time,
+      updatedDate: updatedInfo.date,
+      updatedTime: updatedInfo.time,
+      status: item.status ?? 1,
+      statusLabel: getStatusLabel(item.status),
+    };
+  });

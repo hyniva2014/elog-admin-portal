@@ -1,5 +1,6 @@
-import { useCallback } from "react";
-import { IconButton } from "@mui/material";
+import React, { useCallback, useMemo } from "react";
+import eyeIcon from "../../../assets/images/svg/eyeicon.png";
+import { IconButton, useTheme, Box, Typography } from "@mui/material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { StatusText } from "./RequestDevice.styled";
 
@@ -62,6 +63,16 @@ export const columns = [
     headerName: "Requested On",
     flex: 1,
     headerTooltip: true,
+    renderCell: (params) => (
+      <Box>
+        <Typography fontSize={14} fontWeight={400}>
+          {params.row.requestedDate}
+        </Typography>
+        <Typography fontSize={14} fontWeight={400} color="#6E7079">
+          {params.row.requestedTime}
+        </Typography>
+      </Box>
+    ),
   },
   {
     field: "approvedBy",
@@ -103,4 +114,3 @@ export const DIALOG_CONFIG = {
     FORM_ID: "assign-asset-form",
   },
 };
-

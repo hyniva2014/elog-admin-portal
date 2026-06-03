@@ -18,10 +18,7 @@ const AccountManagementHeader = ({
         title="Account Management"
         subtitle="Manage carrier accounts and subscriptions"
         rightContent={
-          <AddAccountButton
-            variant="contained"
-            onClick={handleClick}
-          >
+          <AddAccountButton variant="contained" onClick={handleClick}>
             Add Account
           </AddAccountButton>
         }
@@ -33,16 +30,16 @@ const AccountManagementHeader = ({
         searchKey={searchKey}
         allowDateClear={true}
         filters={[
-          {
-            label: "Primary Name",
-            dataKey: "primaryContactName",
-            options: primaryContactOptions,
-          },
-          {
-            label: "Secondary Name",
-            dataKey: "secondaryContactName",
-            options: secondaryContactOptions,
-          },
+          // {
+          //   label: "Primary Name",
+          //   dataKey: "primaryContactName",
+          //   options: primaryContactOptions,
+          // },
+          // {
+          //   label: "Secondary Name",
+          //   dataKey: "secondaryContactName",
+          //   options: secondaryContactOptions,
+          // },
           {
             label: "All Carrier",
             dataKey: "companyId",
