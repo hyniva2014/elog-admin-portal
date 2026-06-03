@@ -889,6 +889,17 @@ const adminRoutes = [
     ),
   },
   {
+    path: "/open-incidents",
+    element: (
+      <LoadComponent
+      component={lazy(
+        () =>
+          import("../components/AdminComponents/Dashbord/OpenIncident"),
+      )}
+      />
+    ),
+  },    
+  {
     path: "/alert-center",
     element: (
       <LoadComponent

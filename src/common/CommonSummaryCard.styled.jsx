@@ -46,6 +46,7 @@ export const AccentBar = styled(Box, {
 
 export const ContentWrapper = styled(Box)(({ theme }) => ({
   marginLeft: theme.spacing(1),
+  width: "100%",
 }));
 
 export const ValueText = styled(Typography, {
@@ -64,11 +65,14 @@ export const CardContentWrapper = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "flex-start",
   gap: theme.spacing(1),
+  width: "100%",
 }));
 
 export const TextContainer = styled(Box)({
   display: "flex",
   flexDirection: "column",
+  width: "100%",
+  minWidth: 0,
 });
 
 export const TitleRow = styled(Box, {
@@ -77,6 +81,7 @@ export const TitleRow = styled(Box, {
   display: "flex",
   alignItems: "center",
   gap: theme.spacing(1),
+  width: "100%",
   marginBottom: isdashboard ? theme.spacing(1) : 0,
 }));
 
@@ -85,4 +90,19 @@ export const TitleText = styled(Typography)(({ theme }) => ({
   fontSize: 14,
   fontWeight: 400,
   color: theme.palette.text.secondary,
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+}));
+
+export const ViewAllText = styled(Typography)(({ theme }) => ({
+  fontSize: 12,
+  fontWeight: 600,
+  color: theme.palette.text.secondary,
+  cursor: "pointer",
+  textDecoration: "underline",
+  marginLeft: "auto",
+  // paddingLeft: theme.spacing(30),
+  whiteSpace: "nowrap",
+  flexShrink: 0,
 }));
