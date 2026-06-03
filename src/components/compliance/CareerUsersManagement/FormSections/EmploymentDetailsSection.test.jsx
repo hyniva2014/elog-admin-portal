@@ -68,10 +68,7 @@ const TestWrapper = (props) => {
       control={methods.control}
       errors={{}}
       editMode
-      filteredRoles={[
-        { label: "Admin", value: 1 },
-        { label: "User", value: 2 },
-      ]}
+      roles={roles}
       selectedEmploymentType={1}
       selectedStatus={1}
       watch={methods.watch}
@@ -84,121 +81,77 @@ describe("EmploymentDetailsSection", () => {
   test("renders section title", () => {
     render(<TestWrapper />);
 
-    expect(
-      screen.getByText("Employment Details")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Employment Details")).toBeInTheDocument();
   });
 
   test("renders section subtitle", () => {
     render(<TestWrapper />);
 
     expect(
-      screen.getByText("Carrier, dates and employment status")
+      screen.getByText("Carrier, dates and employment status"),
     ).toBeInTheDocument();
   });
 
   test("renders role dropdown", () => {
     render(<TestWrapper />);
 
-    expect(
-      screen.getByTestId("Role")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("Role")).toBeInTheDocument();
   });
 
   test("renders hire date field", () => {
     render(<TestWrapper />);
 
-    expect(
-      screen.getByTestId("Hire Date")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("Hire Date")).toBeInTheDocument();
   });
 
   test("renders status dropdown", () => {
     render(<TestWrapper />);
 
-    expect(
-      screen.getByTestId("Status")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("Status")).toBeInTheDocument();
   });
 
   test("renders employment type dropdown", () => {
     render(<TestWrapper />);
 
-    expect(
-      screen.getByTestId("Employment Type")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("Employment Type")).toBeInTheDocument();
   });
 
   test("shows termination date when status is inactive", () => {
-    render(
-      <TestWrapper
-        selectedStatus={2}
-      />
-    );
+    render(<TestWrapper selectedStatus={2} />);
 
-    expect(
-      screen.getByTestId("Termination Date *")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("Termination Date *")).toBeInTheDocument();
   });
 
   test("hides termination date when status is active", () => {
-    render(
-      <TestWrapper
-        selectedStatus={1}
-      />
-    );
+    render(<TestWrapper selectedStatus={1} />);
 
-    expect(
-      screen.queryByTestId("Termination Date *")
-    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId("Termination Date *")).not.toBeInTheDocument();
   });
 
   test("shows contractor information field when employment type is contractor", () => {
-    render(
-      <TestWrapper
-        selectedEmploymentType={2}
-      />
-    );
+    render(<TestWrapper selectedEmploymentType={2} />);
 
-    expect(
-      screen.getByTestId("Contractor Information")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("Contractor Information")).toBeInTheDocument();
   });
 
   test("hides contractor information field when employment type is employee", () => {
-    render(
-      <TestWrapper
-        selectedEmploymentType={1}
-      />
-    );
+    render(<TestWrapper selectedEmploymentType={1} />);
 
     expect(
-      screen.queryByTestId("Contractor Information")
+      screen.queryByTestId("Contractor Information"),
     ).not.toBeInTheDocument();
   });
 
   test("disables all fields when editMode is false", () => {
-    render(
-      <TestWrapper
-        editMode={false}
-      />
-    );
+    render(<TestWrapper editMode={false} />);
 
-    expect(
-      screen.getByTestId("Role")
-    ).toHaveTextContent("disabled");
+    expect(screen.getByTestId("Role")).toHaveTextContent("disabled");
 
-    expect(
-      screen.getByTestId("Hire Date")
-    ).toHaveTextContent("disabled");
+    expect(screen.getByTestId("Hire Date")).toHaveTextContent("disabled");
 
-    expect(
-      screen.getByTestId("Status")
-    ).toHaveTextContent("disabled");
+    expect(screen.getByTestId("Status")).toHaveTextContent("disabled");
 
-    expect(
-      screen.getByTestId("Employment Type")
-    ).toHaveTextContent("disabled");
+    expect(screen.getByTestId("Employment Type")).toHaveTextContent("disabled");
   });
 
   test("renders validation errors safely", () => {
@@ -208,11 +161,9 @@ describe("EmploymentDetailsSection", () => {
           role: { message: "Role is required" },
           hire_date: { message: "Hire Date is required" },
         }}
-      />
+      />,
     );
 
-    expect(
-      screen.getByTestId("Role")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("Role")).toBeInTheDocument();
   });
 });

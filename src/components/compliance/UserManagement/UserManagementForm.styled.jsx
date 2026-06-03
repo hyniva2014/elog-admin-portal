@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
 
 export const FormContainer = styled(Box)(({ theme }) => ({
-  marginTop: theme.spacing(1),
+  marginTop: theme.spacing(2),
 }));
 
 export const EditHeaderButton = styled(Button)(({ theme }) => ({

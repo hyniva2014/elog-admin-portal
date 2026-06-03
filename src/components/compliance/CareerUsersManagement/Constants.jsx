@@ -245,7 +245,7 @@ export const EMPLOYMENT_DETAILS_FIELDS = [
     label: "Role",
     required: true,
     type: "autocomplete",
-    options: "filteredRoles",
+    options: "roles",
   },
   { name: "hire_date", label: "Hire Date", required: true, type: "date" },
   {

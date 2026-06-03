@@ -17,12 +17,12 @@ const UserManagementHeader = (props) => {
     handleClick,
     companyOptions = [],
   } = props;
- const filters = getUserManagementFilters(companyOptions);
+  const filters = getUserManagementFilters(companyOptions);
   return (
     <HeaderContainer>
       <CommonPageHeader
-        title="User Management"
-        subtitle="Manage user accounts and permissions"
+        title="Carrier User"
+        subtitle="Manage career users, view details and activity history"
         rightContent={
           <AddUserButton variant="contained" onClick={handleClick}>
             Add User

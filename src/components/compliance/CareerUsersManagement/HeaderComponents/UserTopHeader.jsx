@@ -11,10 +11,6 @@ import {
   UserNameTextSx,
 } from "./UserTopHeader.styled";
 
-const getRoleLabel = (rolesOptions, role) => {
-  return rolesOptions.find((item) => item.value === role)?.label || role || "-";
-};
-
 const getProfileImage = (profilePhoto) => {
   if (typeof profilePhoto === "string") return profilePhoto;
   return profilePhoto?.[0]?.file_url || "";
@@ -30,11 +26,7 @@ const getInitials = (data) => {
 };
 
 const UserTopHeader = ({ data }) => {
-  const rolesOptions = useSelector(
-    (state) => state.userFilterSlice?.roles || [],
-  );
-
-  const roleLabel = getRoleLabel(rolesOptions, data.role);
+  const roleLabel = data.role;
   const profileImage = getProfileImage(data?.profile_photo);
   const userInitials = getInitials(data);
   const hireDate = getFormattedDate(data?.hire_date);
@@ -51,7 +43,7 @@ const UserTopHeader = ({ data }) => {
             {data.first_name} {data.last_name}
           </Typography>
           <Typography variant="body2" sx={RoleTextSx}>
-            {roleLabel}
+            {roleLabel || "No Role Assigned"}
           </Typography>
         </Box>
       </Box>

@@ -22,7 +22,7 @@ const useCareerUsers = () => {
         setError(null);
 
         const response = await fetchApi(
-          `/user/get-users-and-vehicles?company_id=${companyId}`,
+          `/masteradmin/superuser/get-all-superusers-list`,
         );
 
         const users = response?.body?.users || [];

@@ -22,19 +22,22 @@ import {
 const CreatedAtCell = ({ row }) => (
   <Box>
     <Typography sx={CreatedDateTypographySx}>{row.createdDate}</Typography>
-    <Typography sx={CreatedTimeTypographySx}>
-      {row.createdTime}
-    </Typography>
+    <Typography sx={CreatedTimeTypographySx}>{row.createdTime}</Typography>
   </Box>
 );
 
 const StatusCell = ({ value, row }) => (
-  <Typography sx={getStatusCellSx(row.statusColor)}>
-    {value}
-  </Typography>
+  <Typography sx={getStatusCellSx(row.statusColor)}>{value}</Typography>
 );
 
-const ActionsCell = ({ row, handleOpenEdit, handleDeleteClick, canDelete, eyeIcon, trashIcon }) => {
+const ActionsCell = ({
+  row,
+  handleOpenEdit,
+  handleDeleteClick,
+  canDelete,
+  eyeIcon,
+  trashIcon,
+}) => {
   const handleViewClick = useCallback(() => {
     handleOpenEdit(row);
   }, [handleOpenEdit, row]);
@@ -117,9 +120,7 @@ export const UserManagementTableData = (
       maxWidth: 220,
       headerTooltip: true,
       renderCell: ({ value }) => (
-        <Typography sx={RoleCellSx}>
-          {value || "-"}
-        </Typography>
+        <Typography sx={RoleCellSx}>{value || "-"}</Typography>
       ),
     },
     {
@@ -161,14 +162,14 @@ export const UserManagementTableData = (
       flex: 1,
       headerTooltip: true,
     },
-    {
-      field: "createdBy",
-      headerName: "Created By",
-      minWidth: 180,
-      maxWidth: 250,
-      flex: 1,
-      headerTooltip: true,
-    },
+    // {
+    //   field: "createdBy",
+    //   headerName: "Created By",
+    //   minWidth: 180,
+    //   maxWidth: 250,
+    //   flex: 1,
+    //   headerTooltip: true,
+    // },
     {
       field: "createdAt",
       headerName: "Created At",
