@@ -18,7 +18,7 @@ const assignAssetSchema = yup.object().shape({
     .min(1, "At least 1 device must be assigned"),
 });
 
-const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, isDisabled = false, onStockStatusChange, }) => {
+const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange, }) => {
   const [modelOptions, setModelOptions] = useState([]);
   const [availableCount, setAvailableCount] = useState(null);
   const [stockMessage, setStockMessage] = useState("");
@@ -144,7 +144,6 @@ const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, isDisabled = false,
       error={!!error}
       helperText={error?.message}
       required
-      disabled={isDisabled}
     />
   );
 
@@ -158,7 +157,6 @@ const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, isDisabled = false,
         error={!!error}
         helperText={error?.message}
         required
-        disabled={isDisabled}
       />
 
       {stockMessage ? (

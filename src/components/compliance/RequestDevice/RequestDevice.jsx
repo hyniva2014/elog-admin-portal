@@ -69,7 +69,6 @@ const RequestDevice = () => {
   const getRowHeight = () => "auto";
   const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
-  const [isAssignViewMode, setIsAssignViewMode] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [isStockAvailable, setIsStockAvailable] = useState(true);
   const [snackbar, setSnackbar] = useState({
@@ -98,7 +97,6 @@ const RequestDevice = () => {
       const response = await fetchApi(`/masteradmin/requested-devices?id=${row.id}`);
       if (response?.statusCode === 200) {
         const fullData = response?.body?.data || {};
-        const viewMode = row.status === "Approved";
         setSelectedRequest({
           ...row,
           ...fullData,
@@ -106,7 +104,6 @@ const RequestDevice = () => {
           requestedDevices: fullData.requested_devices_count || row.requestedDevices,
           company_id: fullData.company_id || row.company_id,
         });
-        setIsAssignViewMode(viewMode);
         setIsAssignDialogOpen(true);
       } else {
         showSnackbar("Failed to fetch request details", "error");
@@ -222,10 +219,8 @@ const RequestDevice = () => {
     total,
   };
 
-  const dialogTitle = isAssignViewMode ? "View Asset" : "Assign Asset";
-  const assignDialogSubmitHandler = isAssignViewMode
-    ? handleCloseAssignDialog
-    : handleAssignDialogSubmit;
+  const dialogTitle = "Assign Asset";
+  const assignDialogSubmitHandler = handleAssignDialogSubmit;
 
   return (
     <>
@@ -269,7 +264,7 @@ const RequestDevice = () => {
         title={dialogTitle}
         submitButtonText={"Assign Asset"}
         onSubmit={assignDialogSubmitHandler}
-        disableSubmit={isAssignViewMode || !isStockAvailable}
+        disableSubmit={!isStockAvailable}
         onCancel={handleCloseAssignDialog}
         onClose={handleCloseAssignDialog}
         formId="assign-asset-form"
@@ -281,7 +276,6 @@ const RequestDevice = () => {
             }}
             onSubmit={submitAssignAsset}
             setSubmitRef={assignSubmitRef}
-            isDisabled={isAssignViewMode}
             onStockStatusChange={setIsStockAvailable}
           />
         }

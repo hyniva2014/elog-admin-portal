@@ -16,22 +16,24 @@ const StatusCell = ({ value }) => {
 const ActionCell = (params) => {
   const { row, colDef } = params;
   const theme = useTheme();
+  const isApproved = row.status === "Approved";
 
   const handleClick = useCallback(() => {
-    colDef.onView?.(row);
-  }, [row, colDef]);
+    if (!isApproved) {
+      colDef.onView?.(row);
+    }
+  }, [row, colDef, isApproved]);
 
-  if (row.status === "Pending") {
-    return (
-      <IconButton size="small" color="primary" onClick={handleClick}>
-        <AssignmentIcon fontSize="small" />
-      </IconButton>
-    );
-  }
 
   return (
-    <IconButton size="small" color="primary" onClick={handleClick}>
-      <img src={eyeIcon} alt="view" width={16} height={16} />
+    <IconButton
+      size="small"
+      color="primary"
+      onClick={handleClick}
+      disabled={isApproved}
+    >
+      {/* <img src={eyeIcon} alt="view" width={16} height={16} /> */}
+      <AssignmentIcon fontSize="small" />
     </IconButton>
   );
 };
