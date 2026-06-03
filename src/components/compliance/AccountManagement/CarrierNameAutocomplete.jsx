@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Grid } from "@mui/material";
 import { useController } from "react-hook-form";
-import useDebounce from "./useDebounce";
 import CommonTextField from "../../../common/CommonTextField";
+import { useCarrierAutocomplete } from "./useCarrierAutocomplete";
 import {
   AutocompleteWrapper,
   SuggestionsDropdown,
@@ -10,9 +10,6 @@ import {
   SuggestionText,
   LoadingText,
 } from "./CarrierNameAutocomplete.styled";
-
-const MIN_SEARCH_LENGTH = 3;
-const DEBOUNCE_DELAY_MS = 300;
 
 const CarrierSuggestionItem = ({ itemProps: { carrier, index, highlightedIndex }, handlers: { onSelect, onHighlight } }) => {
   const handleMouseDown = useCallback(() => onSelect(carrier), [onSelect, carrier]);
@@ -53,119 +50,51 @@ const CarrierNameAutocomplete = ({
   disabled,
 }) => {
   const { field } = useController({ name: "carrierName", control });
-
-  const suggestionsRef = useRef([]);
-  const suppressNextLoadRef = useRef(false);
-  const [inputValue, setInputValue] = useState("");
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [suggestions, setSuggestions] = useState([]);
-  const [loadingState, setLoadingState] = useState(false);
-  const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const wrapperRef = useRef(null);
 
-  const debouncedInput = useDebounce(inputValue, DEBOUNCE_DELAY_MS);
-
-  const loadSuggestions = useCallback(
-    async (searchTerm) => {
-      if (suppressNextLoadRef.current) {
-        suppressNextLoadRef.current = false;
-        return;
-      }
-
-      if (searchTerm.length < MIN_SEARCH_LENGTH) {
-        setSuggestions([]);
-        suggestionsRef.current = [];
-        setShowDropdown(false);
-        return;
-      }
-
-      setLoadingState(true);
-      setShowDropdown(true);
-
-      const results = await fetchCarrierOptions({ carrier_name: searchTerm });
-
-      suggestionsRef.current = results;
-      setSuggestions(results);
-      setHighlightedIndex(-1);
-      setLoadingState(false);
-    },
-    [fetchCarrierOptions],
-  );
-
-  useEffect(() => {
-    loadSuggestions(debouncedInput);
-  }, [debouncedInput, loadSuggestions]);
+  const {
+    inputValue,
+    showDropdown,
+    suggestions,
+    loadingState,
+    highlightedIndex,
+    handleChange,
+    handleFocus,
+    handleKeyDown,
+    handleHighlight,
+    handleSelectCarrier,
+    closeDropdown,
+  } = useCarrierAutocomplete(fetchCarrierOptions);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        setShowDropdown(false);
+        closeDropdown();
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [closeDropdown]);
 
-  const handleSelectCarrier = useCallback(
+  const handleInputChange = useCallback(
+    (event) => {
+      const value = event.target.value;
+      field.onChange(value);
+      handleChange(value);
+    },
+    [field, handleChange],
+  );
+
+  const handleCarrierSelect = useCallback(
     async (carrier) => {
-      suppressNextLoadRef.current = true;
-      setShowDropdown(false);
-      setSuggestions([]);
-      setInputValue(carrier.carrier_name);
-
-      const fullDetails = await fetchCarrierOptions({ carrier_id: carrier.carrier_id });
-
+      const fullDetails = await handleSelectCarrier(carrier);
       if (fullDetails) {
         onCarrierSelect(fullDetails);
       }
     },
-    [fetchCarrierOptions, onCarrierSelect],
+    [handleSelectCarrier, onCarrierSelect],
   );
-
-  const handleKeyDown = useCallback(
-    (event) => {
-      if (!showDropdown) return;
-
-      if (event.key === "ArrowDown") {
-        event.preventDefault();
-        setHighlightedIndex((prev) =>
-          prev < suggestionsRef.current.length - 1 ? prev + 1 : prev,
-        );
-      } else if (event.key === "ArrowUp") {
-        event.preventDefault();
-        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0));
-      } else if (event.key === "Enter" && highlightedIndex >= 0) {
-        event.preventDefault();
-        const selected = suggestionsRef.current[highlightedIndex];
-        if (selected) {
-          handleSelectCarrier(selected);
-        }
-      } else if (event.key === "Escape") {
-        setShowDropdown(false);
-      }
-    },
-    [showDropdown, highlightedIndex, handleSelectCarrier],
-  );
-
-  const handleHighlight = useCallback((index) => {
-    setHighlightedIndex(index);
-  }, []);
-
-  const handleChange = useCallback((event) => {
-    const value = event.target.value;
-    field.onChange(value);
-    setInputValue(value);
-  }, [field]);
-
-  const handleFocus = useCallback(() => {
-    if (
-      inputValue.length >= MIN_SEARCH_LENGTH &&
-      suggestionsRef.current.length > 0
-    ) {
-      setShowDropdown(true);
-    }
-  }, [inputValue]);
 
   return (
     <Grid item xs={12} sm={6}>
@@ -180,7 +109,7 @@ const CarrierNameAutocomplete = ({
           fullWidth
           size="small"
           autoComplete="off"
-          onChange={handleChange}
+          onChange={handleInputChange}
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
         />
@@ -189,7 +118,7 @@ const CarrierNameAutocomplete = ({
           <SuggestionsDropdown>
             <SuggestionsList
               listProps={{ suggestions, loadingState, highlightedIndex }}
-              handlers={{ onSelect: handleSelectCarrier, onMouseEnter: handleHighlight }}
+              handlers={{ onSelect: handleCarrierSelect, onMouseEnter: handleHighlight }}
             />
           </SuggestionsDropdown>
         )}
