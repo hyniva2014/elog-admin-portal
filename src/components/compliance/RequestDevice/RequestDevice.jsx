@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import CommonDataGrid from "../../../common/CommonDataGrid";
 import CommonSnackbar from "../../../common/CommonSnackbar";
@@ -7,11 +7,10 @@ import CommonLoading from "../../../common/CommonLoading";
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import RequestDeviceHeader from "./RequestDeviceHeader";
 import RequestDeviceForm from "./RequestDeviceForm";
-// import AssignAssetForm from "./AssignAssetForm";
-import { columns, statusOptions } from "./Constants";
-import { useRequestDevices } from "../../../hooks/useRequestDevices";
-import { useServices } from "../../../services/services";
 import AssignAssetForm from "./AssignAssetForm";
+import { columns, statusOptions, DIALOG_CONFIG } from "./Constants";
+import { useRequestDevices } from "../../../hooks/useRequestDevices";
+import { useRequestDeviceManager } from "../../../hooks/useRequestDeviceManager";
 
 const RequestDevice = () => {
   const { setLoading, LoadingContainer } = CommonLoading();
@@ -27,6 +26,30 @@ const RequestDevice = () => {
     fromDate: null,
     toDate: null,
   });
+
+  const userDetails = useSelector(
+    (state) => state.loginSlice.loginDetails?.body?.data?.userdetails,
+  );
+
+  const {
+    isRequestDialogOpen,
+    isAssignDialogOpen,
+    selectedRequest,
+    isStockAvailable,
+    setIsStockAvailable,
+    submitRef,
+    assignSubmitRef,
+    handleOpenRequestDialog,
+    handleCloseRequestDialog,
+    handleOpenAssignDialog,
+    handleCloseAssignDialog,
+    submitRequestDevice,
+    submitAssignAsset,
+    handleDialogSubmit,
+    handleAssignDialogSubmit,
+    snackbar,
+    handleSnackbarClose,
+  } = useRequestDeviceManager(userDetails, setLoading, fetchRequestedDevices);
 
   useEffect(() => {
     setLoading(isLoading);
@@ -48,9 +71,10 @@ const RequestDevice = () => {
     data.fromDate,
     data.toDate,
     data.search,
+    fetchRequestedDevices,
   ]);
 
-  const handleDataChange = (updateOrFn) => {
+  const handleDataChange = useCallback((updateOrFn) => {
     if (typeof updateOrFn === "function") {
       setData(updateOrFn);
     } else {
@@ -64,146 +88,9 @@ const RequestDevice = () => {
         toDate: updateOrFn.toDate ?? prev.toDate,
       }));
     }
-  };
+  }, []);
 
-  const getRowHeight = () => "auto";
-  const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
-  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState(null);
-  const [isStockAvailable, setIsStockAvailable] = useState(true);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
-  const submitRef = useRef(null);
-  const assignSubmitRef = useRef(null);
-  const { createApi, fetchApi } = useServices();
-  const userDetails = useSelector(
-    (state) => state.loginSlice.loginDetails?.body?.data?.userdetails,
-  );
-
-  const handleOpenRequestDialog = () => {
-    setIsRequestDialogOpen(true);
-  };
-
-  const handleCloseRequestDialog = () => {
-    setIsRequestDialogOpen(false);
-  };
-
-  const handleOpenAssignDialog = async (row) => {
-    try {
-      setLoading(true);
-      const response = await fetchApi(`/masteradmin/requested-devices?id=${row.id}`);
-      if (response?.statusCode === 200) {
-        const fullData = response?.body?.data || {};
-        setSelectedRequest({
-          ...row,
-          ...fullData,
-          status: row.status,
-          requestedDevices: fullData.requested_devices_count || row.requestedDevices,
-          company_id: fullData.company_id || row.company_id,
-        });
-        setIsAssignDialogOpen(true);
-      } else {
-        showSnackbar("Failed to fetch request details", "error");
-      }
-    } catch (error) {
-      console.error("Error fetching request details:", error);
-      showSnackbar("Failed to fetch request details", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCloseAssignDialog = () => {
-    setSelectedRequest(null);
-    setIsAssignDialogOpen(false);
-    setIsStockAvailable(true);
-  };
-
-  const showSnackbar = (message, severity = "success") => {
-    setSnackbar({ open: true, message, severity });
-  };
-
-  const handleSnackbarClose = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
-  };
-
-  const submitRequestDevice = async (values) => {
-    try {
-      setLoading(true);
-      const endUrl = "/admin/requested-device/create";
-      const payload = {
-        company_id: userDetails?.company_id,
-        requested_devices_count: Number(values.numberOfDevices),
-        description: values.description?.trim(),
-        requested_by: userDetails?.user_id,
-      };
-
-      const response = await createApi(payload, endUrl);
-      if (response?.statusCode === 200) {
-        showSnackbar(
-          response?.body?.data?.message ||
-            "Device request submitted successfully",
-          "success",
-        );
-        setIsRequestDialogOpen(false);
-        return;
-      }
-
-      showSnackbar(
-        response?.body?.message ||
-          response?.body?.data?.message ||
-          "Failed to submit request",
-        "error",
-      );
-    } catch (error) {
-      console.error("Request Device submit error:", error);
-      showSnackbar("Failed to submit request", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDialogSubmit = () => {
-    submitRef.current?.();
-  };
-
-  const handleAssignDialogSubmit = () => {
-    assignSubmitRef.current?.();
-  };
-
-  const submitAssignAsset = async (values) => {
-    try {
-      setLoading(true);
-      const companyId = selectedRequest?.company_id || userDetails?.company_id;
-      const payload = {
-        company_id: companyId,
-        device_ids: values.deviceIds || [],
-      };
-      const response = await createApi(payload, "/masteradmin/assign-devices");
-      if (response?.statusCode === 200) {
-        showSnackbar(
-          response?.body?.data?.message || "Devices assigned successfully",
-          "success",
-        );
-        setIsAssignDialogOpen(false);
-        return;
-      }
-      showSnackbar(
-        response?.body?.message ||
-          response?.body?.data?.message ||
-          "Failed to assign devices",
-        "error",
-      );
-    } catch (error) {
-      console.error("Assign asset submit error:", error);
-      showSnackbar("Failed to assign asset", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const getRowHeight = useCallback(() => "auto", []);
 
   const columnsWithAssign = columns.map((col) =>
     col.field === "action"
@@ -218,9 +105,6 @@ const RequestDevice = () => {
     ...data,
     total,
   };
-
-  const dialogTitle = "Assign Asset";
-  const assignDialogSubmitHandler = handleAssignDialogSubmit;
 
   return (
     <>
@@ -245,12 +129,12 @@ const RequestDevice = () => {
 
       <CommonDialogForm
         open={isRequestDialogOpen}
-        title="Request Devices"
-        submitButtonText="Request Devices"
+        title={DIALOG_CONFIG.REQUEST_DEVICE.TITLE}
+        submitButtonText={DIALOG_CONFIG.REQUEST_DEVICE.SUBMIT_TEXT}
         onSubmit={handleDialogSubmit}
         onCancel={handleCloseRequestDialog}
         onClose={handleCloseRequestDialog}
-        formId="request-device-form"
+        formId={DIALOG_CONFIG.REQUEST_DEVICE.FORM_ID}
         content={
           <RequestDeviceForm
             formData={{}}
@@ -261,13 +145,13 @@ const RequestDevice = () => {
       />
       <CommonDialogForm
         open={isAssignDialogOpen}
-        title={dialogTitle}
-        submitButtonText={"Assign Asset"}
-        onSubmit={assignDialogSubmitHandler}
+        title={DIALOG_CONFIG.ASSIGN_ASSET.TITLE}
+        submitButtonText={DIALOG_CONFIG.ASSIGN_ASSET.SUBMIT_TEXT}
+        onSubmit={handleAssignDialogSubmit}
         disableSubmit={!isStockAvailable}
         onCancel={handleCloseAssignDialog}
         onClose={handleCloseAssignDialog}
-        formId="assign-asset-form"
+        formId={DIALOG_CONFIG.ASSIGN_ASSET.FORM_ID}
         content={
           <AssignAssetForm
             formData={{

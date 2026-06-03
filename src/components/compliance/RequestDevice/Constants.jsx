@@ -1,29 +1,24 @@
-import React, { useCallback, useMemo } from "react";
-import eyeIcon from "../../../assets/images/svg/eyeicon.png";
-import { IconButton, useTheme } from "@mui/material";
+import { useCallback } from "react";
+import { IconButton } from "@mui/material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
-import dayjs from "dayjs";
 import { StatusText } from "./RequestDevice.styled";
-
-const formatDate = (iso) => {
-  return iso ? dayjs(iso).format("MMM DD, YYYY") : "-";
-};
 
 const StatusCell = ({ value }) => {
   return <StatusText status={value}>{value || "-"}</StatusText>;
 };
 
+// Status checking utility - exported for reuse
+export const isRequestApproved = (status) => status === "Approved";
+
 const ActionCell = (params) => {
   const { row, colDef } = params;
-  const theme = useTheme();
-  const isApproved = row.status === "Approved";
+  const isApproved = isRequestApproved(row.status);
 
   const handleClick = useCallback(() => {
     if (!isApproved) {
       colDef.onView?.(row);
     }
   }, [row, colDef, isApproved]);
-
 
   return (
     <IconButton
@@ -32,7 +27,6 @@ const ActionCell = (params) => {
       onClick={handleClick}
       disabled={isApproved}
     >
-      {/* <img src={eyeIcon} alt="view" width={16} height={16} /> */}
       <AssignmentIcon fontSize="small" />
     </IconButton>
   );
@@ -95,4 +89,18 @@ export const statusOptions = [
   { label: "Pending", value: "1" },
   { label: "Approved", value: "0" },
 ];
+
+// Dialog configuration constants
+export const DIALOG_CONFIG = {
+  REQUEST_DEVICE: {
+    TITLE: "Request Devices",
+    SUBMIT_TEXT: "Request Devices",
+    FORM_ID: "request-device-form",
+  },
+  ASSIGN_ASSET: {
+    TITLE: "Assign Asset",
+    SUBMIT_TEXT: "Assign Asset",
+    FORM_ID: "assign-asset-form",
+  },
+};
 

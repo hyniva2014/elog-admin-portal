@@ -5,31 +5,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import CommonTextField from "../../../common/CommonTextField";
 import { FormContainer } from "./RequestDeviceForm.styled";
 
-const renderNumberOfDevicesField = ({ field, fieldState: { error } }) => (
-  <CommonTextField
-    value={field.value}
-    onChange={field.onChange}
-    label="Add Number of devices"
-    type="number"
-    error={!!error}
-    helperText={error?.message}
-    required
-  />
-);
-
-const renderDescriptionField = ({ field, fieldState: { error } }) => (
-  <CommonTextField
-    value={field.value}
-    onChange={field.onChange}
-    label="Description"
-    multiline
-    rows={3}
-    error={!!error}
-    helperText={error?.message}
-    required
-  />
-);
-
 const requestDeviceSchema = yup.object().shape({
   numberOfDevices: yup
     .number()
@@ -48,11 +23,42 @@ const RequestDeviceForm = ({ formData, onSubmit, setSubmitRef }) => {
     },
   });
 
+  const renderNumberOfDevicesField = useCallback(
+    ({ field, fieldState: { error } }) => (
+      <CommonTextField
+        value={field.value}
+        onChange={field.onChange}
+        label="Add Number of devices"
+        type="number"
+        error={!!error}
+        helperText={error?.message}
+        required
+      />
+    ),
+    []
+  );
+
+  const renderDescriptionField = useCallback(
+    ({ field, fieldState: { error } }) => (
+      <CommonTextField
+        value={field.value}
+        onChange={field.onChange}
+        label="Description"
+        multiline
+        rows={3}
+        error={!!error}
+        helperText={error?.message}
+        required
+      />
+    ),
+    []
+  );
+
   const handleFormSubmit = useCallback(
     (data) => {
       onSubmit(data);
     },
-    [onSubmit],
+    [onSubmit]
   );
 
   useEffect(() => {

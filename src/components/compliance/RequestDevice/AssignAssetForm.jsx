@@ -6,7 +6,6 @@ import CommonTextField from "../../../common/CommonTextField";
 import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdown";
 import { FormContainer } from "./RequestDeviceForm.styled";
 import { useServices } from "../../../services/services";
-import { Typography } from "@mui/material";
 import { AvailableCountText, StockMessageText } from "./RequestDevice.styled";
 
 const assignAssetSchema = yup.object().shape({
@@ -33,7 +32,7 @@ const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange
     },
   });
 
-  const fetchDeviceModels = async () => {
+  const fetchDeviceModels = useCallback(async () => {
     try {
       const response = await fetchApi("/masteradmin/get-device-model-dropdown");
       if (response?.statusCode === 200) {
@@ -47,11 +46,11 @@ const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange
     } catch (error) {
       console.error("Failed to fetch model dropdown", error);
     }
-  };
+  }, [fetchApi]);
 
   useEffect(() => {
     fetchDeviceModels();
-  }, []);
+  }, [fetchDeviceModels]);
 
   const watchedNumber = watch("numberOfDevices");
 
@@ -103,7 +102,7 @@ const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange
         clearTimeout(checkTimer.current);
       }
     };
-  }, [watchedNumber]);
+  }, [watchedNumber, fetchApi, onStockStatusChange]);
 
   const handleFormSubmit = useCallback(
     (data) => {
@@ -112,7 +111,7 @@ const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange
         deviceIds,
       });
     },
-    [onSubmit, deviceIds],
+    [onSubmit, deviceIds]
   );
 
   useEffect(() => {
@@ -135,36 +134,42 @@ const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange
     }
   }, [handleSubmit, handleFormSubmit, setSubmitRef]);
 
-  const renderModelNameField = ({ field, fieldState: { error } }) => (
-    <CommonAutocompleteDropdown
-      label="Model Name"
-      value={field.value}
-      options={modelOptions}
-      onChange={field.onChange}
-      error={!!error}
-      helperText={error?.message}
-      required
-    />
-  );
-
-  const renderNumberOfDevicesField = ({ field, fieldState: { error } }) => (
-    <>
-      <CommonTextField
+  const renderModelNameField = useCallback(
+    ({ field, fieldState: { error } }) => (
+      <CommonAutocompleteDropdown
+        label="Model Name"
         value={field.value}
+        options={modelOptions}
         onChange={field.onChange}
-        label="No of devices"
-        type="number"
         error={!!error}
         helperText={error?.message}
         required
       />
+    ),
+    [modelOptions]
+  );
 
-      {stockMessage ? (
-        <StockMessageText>{stockMessage}</StockMessageText>
-      ) : availableCount !== null ? (
-        <AvailableCountText>Available: {availableCount}</AvailableCountText>
-      ) : null}
-    </>
+  const renderNumberOfDevicesField = useCallback(
+    ({ field, fieldState: { error } }) => (
+      <>
+        <CommonTextField
+          value={field.value}
+          onChange={field.onChange}
+          label="No of devices"
+          type="number"
+          error={!!error}
+          helperText={error?.message}
+          required
+        />
+
+        {stockMessage ? (
+          <StockMessageText>{stockMessage}</StockMessageText>
+        ) : availableCount !== null ? (
+          <AvailableCountText>Available: {availableCount}</AvailableCountText>
+        ) : null}
+      </>
+    ),
+    [stockMessage, availableCount]
   );
 
   return (
