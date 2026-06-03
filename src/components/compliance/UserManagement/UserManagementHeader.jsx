@@ -21,7 +21,7 @@ const UserManagementHeader = (props) => {
   return (
     <HeaderContainer>
       <CommonPageHeader
-        title="Carrier User"
+        title="Carrier Users"
         subtitle="Manage career users, view details and activity history"
         rightContent={
           <AddUserButton variant="contained" onClick={handleClick}>
