@@ -140,7 +140,7 @@ const CareerUserForm = ({
     }
   };
 
-  console.log("roles:", roles);
+  // console.log("roles:", roles);
 
   useEffect(() => {
     const existing = control._formValues.emp_history;
@@ -1046,8 +1046,9 @@ const CareerUserForm = ({
         handleBack={handleBack}
         editMode={editMode}
         setEditMode={setEditMode}
-        handleCancel={handleCancel}
-        handleDiscard={handleDiscard}
+        handleCancelEdit={handleDiscard}
+        // handleCancel={handleCancel}
+        // handleDiscard={handleDiscard}
         handleSaveChanges={handleSaveChanges}
         canUpdate={canUpdate}
         formData={formData}
