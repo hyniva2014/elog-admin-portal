@@ -4,12 +4,12 @@ export const CURRENT_YEAR = new Date().getFullYear().toString();
 
 export const AVAILABLE_YEARS = [
   "Last 6 months",
-  ...Array.from({ length: 5 }, (_, index) => String(CURRENT_YEAR - index)),
+  ...Array.from({ length: 5 }, (_, index) => String(CURRENT_YEAR - index - 1)),
 ];
 
 export const CHART_TITLE = "Carrier Growth Trend";
 export const DATA_KEY = "value";
-export const X_AXIS_KEY = "monthName";
+export const X_AXIS_KEY = "xAxisLabel";
 export const CHART_HEIGHT = 360;
 
 const MONTH_NAMES = [
@@ -40,10 +40,13 @@ export const getTrendArray = (trend = {}) => {
       const [year, month] = monthKey.split("-");
       const monthIndex = Number(month) - 1;
 
+      const monthLabel = MONTH_NAMES[monthIndex] ?? monthKey;
+
       return {
         monthKey,
         year,
-        monthName: MONTH_NAMES[monthIndex] ?? monthKey,
+        monthName: `${monthLabel} ${year}`, // Changed
+        xAxisLabel: `${monthLabel} ${year}`,
         monthIndex,
         value: Number(metrics.total_carriers ?? metrics.count ?? 0),
         Total: Number(metrics.total_carriers ?? 0),
@@ -90,11 +93,15 @@ export const getVisibleTrendData = (trendEntries, selectedYear) => {
         date.getMonth() + 1,
       ).padStart(2, "0")}`;
 
+      const monthLabel = MONTH_NAMES[date.getMonth()];
+
       return (
         trendEntries.find((item) => item.monthKey === monthKey) || {
           monthKey,
           year: String(date.getFullYear()),
-          monthName: MONTH_NAMES[date.getMonth()],
+          monthName: `${monthLabel} ${date.getFullYear()}`,
+          xAxisLabel: `${monthLabel} ${date.getFullYear()}`,
+
           value: 0,
           Total: 0,
           newAddition: 0,
@@ -112,6 +119,7 @@ export const getVisibleTrendData = (trendEntries, selectedYear) => {
         monthKey,
         year: selectedYear,
         monthName,
+        xAxisLabel: `${monthName} ${selectedYear}`,
         value: 0,
         Total: 0,
         newAddition: 0,

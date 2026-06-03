@@ -20,15 +20,7 @@ import {
   getChartStyles,
 } from "./IncidentDistribution.styles";
 import { getIncidentChartOptions } from "./IncidentDistribution.config";
-
-const CATEGORIES = ["Mar 28", "Mar 29", "Mar 30", "Mar 31", "Apr 1", "Apr 2", "Apr 3", "Apr 4"];
-
-const INCIDENT_SERIES = [
-  { name: "ELD device Issue",            color: "#FE5429", data: [2, 3, 2, 4, 3, 2, 3, 2] },
-  { name: "Web - Compliance Management", color: "#2563EB", data: [2, 2, 1, 2, 3, 2, 2, 2] },
-  { name: "Mobile - Driver Log",         color: "#E20021", data: [2, 2, 1, 2, 2, 1, 2, 2] },
-  { name: "Fleet Management",            color: "#30C151", data: [3, 2, 4, 3, 2, 3, 2, 3] },
-];
+import useIncidentDistribution from "../../../hooks/useIncidentDistribution";
 
 // ─── Sub-component ────────────────────────────────────────────────────────────
 
@@ -58,31 +50,47 @@ const IncidentDistribution = () => {
 
   const CHART_STYLES = getChartStyles(theme);
 
+  // State for filters
   const [incidentScope, setIncidentScope] = useState("all");
   const [period, setPeriod] = useState("7d");
+
+  // API hook - following CarrierGrowthTrend pattern
+  const { incidentDistribution, loading } = useIncidentDistribution(period, incidentScope);
 
   // ── Named handlers ──────────────────────────────────────────────────────────
   const handleIncidentChange = (e) => setIncidentScope(e.target.value);
   const handlePeriodChange = (e) => setPeriod(e.target.value);
 
-  // ── Series / colors ─────────────────────────────────────────────────────────
+  // ── Series / colors from API data ──────────────────────────────────────────
   const series = useMemo(
-    () => INCIDENT_SERIES.map(({ name, data }) => ({ name, data })),
-    [],
+    () => incidentDistribution?.series?.map(({ name, data }) => ({ name, data })) || [],
+    [incidentDistribution],
   );
 
-  const colors = useMemo(() => INCIDENT_SERIES.map((s) => s.color), []);
+  const colors = useMemo(
+    () => incidentDistribution?.series?.map((s) => s.color) || [],
+    [incidentDistribution],
+  );
+
+  const categories = useMemo(
+    () => incidentDistribution?.categories || [],
+    [incidentDistribution],
+  );
+
+  const dateRange = useMemo(
+    () => incidentDistribution?.dateRange || "No data available",
+    [incidentDistribution],
+  );
 
   // ── Chart options (extracted to config file) ────────────────────────────────
   const chartOptions = useMemo(
-    () => getIncidentChartOptions(theme, colors, CHART_STYLES, CATEGORIES),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [colors, theme.typography.fontFamily],
+    () => getIncidentChartOptions(theme, colors, CHART_STYLES, categories),
+    [colors, theme, CHART_STYLES, categories],
   );
 
-  // ── Pre-computed legend rows ─────────────────────────────────────────────────
-  const topLegendItems    = INCIDENT_SERIES.slice(0, 3);
-  const bottomLegendItems = INCIDENT_SERIES.slice(3);
+  // ── Pre-computed legend items ───────────────────────────────────────────────
+  const topLegendItems = incidentDistribution?.series?.slice(0, 3) || [];
+  const bottomLegendItems = incidentDistribution?.series?.slice(3) || [];
 
   return (
     <CardContainer variant="outlined">
@@ -93,7 +101,7 @@ const IncidentDistribution = () => {
               Incident Distribution
             </ChartTitle>
             <ChartSubtitle variant="body2">
-              Mar 28, 2026 – Apr 4, 2026
+              {dateRange}
             </ChartSubtitle>
           </TitleBox>
 
@@ -108,7 +116,7 @@ const IncidentDistribution = () => {
               >
                 <MenuItem value="all">All Incident</MenuItem>
                 <MenuItem value="open">Open only</MenuItem>
-                <MenuItem value="critical">Critical</MenuItem>
+                <MenuItem value="resolved">Resolved</MenuItem>
               </Select>
             </FilterControl>
             <PeriodControl size="small">
@@ -129,7 +137,7 @@ const IncidentDistribution = () => {
 
         <ChartWrapper>
           <ReactApexChart
-            key={chartHeight}
+            key={`${chartHeight}-${period}`}
             type="bar"
             height={chartHeight}
             series={series}
@@ -137,10 +145,12 @@ const IncidentDistribution = () => {
           />
         </ChartWrapper>
 
-        <LegendGrid>
-          {renderLegendRow(topLegendItems)}
-          {renderLegendRow(bottomLegendItems)}
-        </LegendGrid>
+        {series.length > 0 && (
+          <LegendGrid>
+            {topLegendItems.length > 0 && renderLegendRow(topLegendItems)}
+            {bottomLegendItems.length > 0 && renderLegendRow(bottomLegendItems)}
+          </LegendGrid>
+        )}
       </StyledCardContent>
     </CardContainer>
   );

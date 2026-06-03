@@ -51,9 +51,9 @@ const RequestDevice = () => {
     handleSnackbarClose,
   } = useRequestDeviceManager(userDetails, setLoading, fetchRequestedDevices);
 
-  useEffect(() => {
-    setLoading(isLoading);
-  }, [isLoading, setLoading]);
+  // useEffect(() => {
+  //   setLoading(isLoading);
+  // }, [isLoading, setLoading]);
 
   useEffect(() => {
     fetchRequestedDevices({
@@ -71,7 +71,7 @@ const RequestDevice = () => {
     data.fromDate,
     data.toDate,
     data.search,
-    fetchRequestedDevices,
+    
   ]);
 
   const handleDataChange = useCallback((updateOrFn) => {

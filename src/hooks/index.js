@@ -11,3 +11,4 @@ export { default as useDeviceLifecycle } from "./useDeviceLifecycle";
 export { default as useDashboardMetrics } from "./useDashboardMetrics";
 export { default as useCarrierGrowthTrend } from "./useCarrierGrowthTrend";
 export { default as useCareerUsers } from "./useCareerUsers";
+export { default as useIncidentDistribution } from "./useIncidentDistribution";

@@ -9,7 +9,7 @@ import {
 } from "recharts";
 
 import { useMemo, useState } from "react";
-import { useTheme, MenuItem } from "@mui/material";
+import { useTheme, useMediaQuery, MenuItem } from "@mui/material";
 
 import {
   ChartContainer,
@@ -51,6 +51,7 @@ const CarrierGrowthTrend = () => {
   const theme = useTheme();
 
   const chartLineColor = theme.palette.primary.main;
+  const downSm = useMediaQuery(theme.breakpoints.down("sm"));
 
   const trendData = useMemo(() => {
     const parsedTrend = getTrendArray(carrierGrowthTrend || {});
@@ -62,6 +63,34 @@ const CarrierGrowthTrend = () => {
     () => formatSubtitle(trendData, selectedYear),
     [trendData, selectedYear],
   );
+
+  const renderXAxisTick = ({ x, y, payload }) => {
+    const [month, year] = String(payload.value).split(" ");
+    const mainFontSize = downSm ? 10 : 12;
+    const yearFontSize = downSm ? 8 : 10;
+
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text
+          x={0}
+          y={0}
+          dy={16}
+          textAnchor="middle"
+          fill={theme.palette.text.secondary}
+          fontSize={mainFontSize}
+        >
+          <tspan x={0} dy={0} fontWeight={600}>
+            {month}
+          </tspan>
+          {year ? (
+            <tspan x={0} dy={yearFontSize + 4} fontSize={yearFontSize}>
+              {year}
+            </tspan>
+          ) : null}
+        </text>
+      </g>
+    );
+  };
 
   const handleYearChange = (event) => {
     setSelectedYear(event.target.value);
@@ -96,7 +125,7 @@ const CarrierGrowthTrend = () => {
         <LineChart data={trendData}>
           <CartesianGrid strokeDasharray="3 3" />
 
-          <XAxis dataKey={X_AXIS_KEY} />
+          <XAxis dataKey={X_AXIS_KEY} tick={renderXAxisTick} />
 
           <YAxis />
 
