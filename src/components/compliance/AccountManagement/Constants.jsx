@@ -3,6 +3,10 @@ export const STATUS_OPTIONS = [
   { label: "Inactive", value: "2" },
 ];
 
+export const MIN_SEARCH_LENGTH = 3;
+export const DEBOUNCE_DELAY_MS = 300;
+export const SELECTION_SUPPRESSION_MS = 1000;
+
 export const defaultPageSize = 25;
 
 export const defaultColumnProps = {

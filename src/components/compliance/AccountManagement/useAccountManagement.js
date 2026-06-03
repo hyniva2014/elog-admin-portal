@@ -335,21 +335,32 @@ export const useAccountManagement = (
     }
   }, []);
 
-  const fetchCarrierOptions = useCallback(
+    const fetchCarrierOptions = useCallback(
     async ({ carrier_name, carrier_id } = {}) => {
+      const shouldShowLoader = Boolean(carrier_id);
+
+      if (shouldShowLoader) {
+        setLoading(true);
+      }
       try {
         const params = {
           ...(carrier_name && { carrier_name }),
           ...(carrier_id && { carrier_id }),
         };
         const query = new URLSearchParams(params).toString();
-        const response = await fetchApi(`/masteradmin/external-fleet/carriers?${query}`);
+        const response = await fetchApi(
+          `/masteradmin/external-fleet/carriers?${query}`,
+        );
         const result = response?.body?.carriers ?? null;
         if (carrier_id) return result && !Array.isArray(result) ? result : null;
         return Array.isArray(result) ? result : [];
       } catch (err) {
         console.error("Error fetching carriers:", err);
         return carrier_id ? null : [];
+      } finally {
+        if (shouldShowLoader) {
+          setLoading(false);
+        }
       }
     },
     [fetchApi],
