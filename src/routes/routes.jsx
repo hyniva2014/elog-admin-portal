@@ -856,6 +856,37 @@ const adminRoutes = [
     ),
   },
   {
+    path: "/career-users",
+    element: (
+      <LoadComponent
+        component={lazy(
+          () =>
+            import("../components/compliance/CareerUsersManagement/CareerManagement"),
+        )}
+      />
+    ),
+  },
+  {
+    path: "/career-users/add",
+    element: (
+      <LoadComponent
+        component={lazy(
+          () => import("../components/compliance/CareerUsersManagement/CareerForm"),
+        )}
+      />
+    ),
+  },
+  {
+    path: "/career-users/edit/:userId",
+    element: (
+      <LoadComponent
+        component={lazy(
+          () => import("../components/compliance/CareerUsersManagement/CareerForm"),
+        )}
+      />
+    ),
+  },
+  {
     path: "/alert-center",
     element: (
       <LoadComponent
