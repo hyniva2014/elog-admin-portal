@@ -15,3 +15,14 @@ export const StatusText = styled(Typography, {
   fontSize: 14,
   fontWeight: 500,
 }));
+
+export const StockMessageText = styled(Typography)(({ theme }) => ({
+  color: theme.palette.error.main,
+  marginTop: theme.spacing(1),
+  fontWeight: 600,
+}));
+
+export const AvailableCountText = styled(Typography)(({ theme }) => ({
+  color: theme.palette.text.secondary,
+  marginTop: theme.spacing(1),
+}));

@@ -34,7 +34,9 @@ const CommonPageHeader = ({
   onExport,
   rightContent,
   addButton,
+  addButtonText,
   handleClick,
+  showExport = true,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -49,7 +51,11 @@ const CommonPageHeader = ({
   }, []);
 
   const handleExportSelect = useCallback(
-    (type) => {
+    (event) => {
+      const type = event.currentTarget.dataset.type;
+      if (!type) {
+        return;
+      }
       onExport?.(type);
       handleMenuClose();
     },
@@ -60,7 +66,8 @@ const CommonPageHeader = ({
     return EXPORT_OPTIONS.map((option) => (
       <MenuItem
         key={option.value}
-        onClick={() => handleExportSelect(option.value)}
+        data-type={option.value}
+        onClick={handleExportSelect}
       >
         {option.label}
       </MenuItem>
@@ -73,34 +80,38 @@ const CommonPageHeader = ({
         <ActionContainer>
           {addButton && (
             <HeaderButton variant="contained" onClick={handleClick}>
-              Add
+              {addButtonText || "Add"}
             </HeaderButton>
           )}
 
-          <HeaderButton
-            variant="contained"
-            endIcon={<KeyboardArrowDownIcon />}
-            onClick={handleMenuOpen}
-          >
-            Export
-          </HeaderButton>
+          {showExport && (
+            <HeaderButton
+              variant="contained"
+              endIcon={<KeyboardArrowDownIcon />}
+              onClick={handleMenuOpen}
+            >
+              Export
+            </HeaderButton>
+          )}
         </ActionContainer>
 
-        <Menu
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleMenuClose}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "right",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-        >
-          {renderExportMenuItems()}
-        </Menu>
+        {showExport && (
+          <Menu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleMenuClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+          >
+            {renderExportMenuItems()}
+          </Menu>
+        )}
       </>
     );
   };

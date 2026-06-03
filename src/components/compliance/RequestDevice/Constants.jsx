@@ -1,36 +1,33 @@
-import React, { useCallback, useMemo } from "react";
-import eyeIcon from "../../../assets/images/svg/eyeicon.png";
-import { IconButton, useTheme } from "@mui/material";
+import { useCallback } from "react";
+import { IconButton } from "@mui/material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
-import dayjs from "dayjs";
 import { StatusText } from "./RequestDevice.styled";
-
-const formatDate = (iso) => {
-  return iso ? dayjs(iso).format("MMM DD, YYYY") : "-";
-};
 
 const StatusCell = ({ value }) => {
   return <StatusText status={value}>{value || "-"}</StatusText>;
 };
 
-const ActionCell = ({ row, colDef }) => {
-  const theme = useTheme();
+// Status checking utility - exported for reuse
+export const isRequestApproved = (status) => status === "Approved";
+
+const ActionCell = (params) => {
+  const { row, colDef } = params;
+  const isApproved = isRequestApproved(row.status);
 
   const handleClick = useCallback(() => {
-    colDef.onView?.(row);
-  }, [row, colDef]);
-
-  if (row.status === "Pending") {
-    return (
-      <IconButton size="small" color="primary">
-        <AssignmentIcon fontSize="small" />
-      </IconButton>
-    );
-  }
+    if (!isApproved) {
+      colDef.onView?.(row);
+    }
+  }, [row, colDef, isApproved]);
 
   return (
-    <IconButton size="small" color="primary" onClick={handleClick}>
-      <img src={eyeIcon} alt="view" width={16} height={16} />
+    <IconButton
+      size="small"
+      color="primary"
+      onClick={handleClick}
+      disabled={isApproved}
+    >
+      <AssignmentIcon fontSize="small" />
     </IconButton>
   );
 };
@@ -90,5 +87,20 @@ export const columns = [
 
 export const statusOptions = [
   { label: "Pending", value: "1" },
-  { label: "Approved", value: "2" },
+  { label: "Approved", value: "0" },
 ];
+
+// Dialog configuration constants
+export const DIALOG_CONFIG = {
+  REQUEST_DEVICE: {
+    TITLE: "Request Devices",
+    SUBMIT_TEXT: "Request Devices",
+    FORM_ID: "request-device-form",
+  },
+  ASSIGN_ASSET: {
+    TITLE: "Assign Asset",
+    SUBMIT_TEXT: "Assign Asset",
+    FORM_ID: "assign-asset-form",
+  },
+};
+

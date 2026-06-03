@@ -47,6 +47,7 @@ const CommonAutocompleteDropdown = ({
       options={uniqueOptions}
       filterOptions={filter}
       value={selectedOption}
+      openOnFocus
       renderOption={(props, option) => {
         return (
           <li {...props} key={`${option.value}-${option.label}`}>
