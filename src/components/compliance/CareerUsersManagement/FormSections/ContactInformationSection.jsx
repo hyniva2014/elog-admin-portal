@@ -12,6 +12,11 @@ import { Controller } from "react-hook-form";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import FormField from "./FormField";
 import FormFieldsSection from "../FormFields/FormFieldsSection";
+
+const getStateOptions = (selectedCountry, dynamicStates) => {
+  return selectedCountry ? dynamicStates : [];
+};
+
 const ContactInformationSection = ({
   control,
   errors,
@@ -60,7 +65,7 @@ const ContactInformationSection = ({
       },
     },
     states: {
-      options: selectedCountry ? dynamicStates : [],
+      options: getStateOptions(selectedCountry, dynamicStates),
       loading: loadingStates,
       onChange: (newValue, field) => {
         field.onChange(newValue);
@@ -84,7 +89,7 @@ const ContactInformationSection = ({
       },
     },
     secondary_states: {
-      options: selectedSecondaryCountry ? secondaryDynamicStates : [],
+      options: getStateOptions(selectedSecondaryCountry, secondaryDynamicStates),
       loading: loadingSecondaryStates,
     },
   };

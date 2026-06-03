@@ -11,19 +11,20 @@ import {
 } from "../Constants";
 import FormFieldsSection from "../FormFields/FormFieldsSection";
 
+const DeleteButton = ({ handleRemoveClick, editMode }) => (
+  <IconButton
+    color="error"
+    onClick={handleRemoveClick}
+    disabled={!editMode}
+  >
+    <DeleteIcon />
+  </IconButton>
+);
+
 const DeleteEmploymentButton = ({ index, handleRemoveClick, editMode }) => {
   if (index === 0) return null;
 
-  return (
-    <IconButton
-      color="error"
-      data-index={index}
-      onClick={handleRemoveClick}
-      disabled={!editMode}
-    >
-      <DeleteIcon />
-    </IconButton>
-  );
+  return <DeleteButton handleRemoveClick={handleRemoveClick} editMode={editMode} />;
 };
 
 const EmploymentHistoryEntry = ({
@@ -122,6 +123,35 @@ const EmploymentHistoryEntry = ({
   );
 };
 
+const EmploymentHistoryEntriesList = ({
+  empHistory,
+  control,
+  errors,
+  editMode,
+  handleRemoveEmployment,
+  setValue,
+  watch,
+}) => {
+  if (!empHistory) return null;
+
+  return (
+    <>
+      {empHistory.map((item, index) => (
+        <EmploymentHistoryEntry
+          key={index}
+          index={index}
+          control={control}
+          errors={errors}
+          editMode={editMode}
+          handleRemoveEmployment={handleRemoveEmployment}
+          setValue={setValue}
+          watch={watch}
+        />
+      ))}
+    </>
+  );
+};
+
 const EmploymentHistorySection = ({
   control,
   watch,
@@ -131,6 +161,8 @@ const EmploymentHistorySection = ({
   handleRemoveEmployment,
   setValue,
 }) => {
+  const empHistory = watch("emp_history");
+
   return (
     <FormSection
       id="prior-employment-history"
@@ -148,7 +180,7 @@ const EmploymentHistorySection = ({
 
             <Button
               onClick={handleAddEmployment}
-              disabled={!editMode || (watch("emp_history")?.length || 0) >= 3}
+              disabled={!editMode || (empHistory?.length || 0) >= 3}
             >
               Add Employment
             </Button>
@@ -162,18 +194,15 @@ const EmploymentHistorySection = ({
           disabled={!editMode}
         />
 
-        {watch("emp_history")?.map((item, index) => (
-          <EmploymentHistoryEntry
-            key={index}
-            index={index}
-            control={control}
-            errors={errors}
-            editMode={editMode}
-            handleRemoveEmployment={handleRemoveEmployment}
-            setValue={setValue}
-            watch={watch}
-          />
-        ))}
+        <EmploymentHistoryEntriesList
+          empHistory={empHistory}
+          control={control}
+          errors={errors}
+          editMode={editMode}
+          handleRemoveEmployment={handleRemoveEmployment}
+          setValue={setValue}
+          watch={watch}
+        />
       </Grid>
     </FormSection>
   );

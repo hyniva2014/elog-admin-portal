@@ -76,6 +76,10 @@ export const RemoveImageButtonSx = (theme) => ({
   },
 });
 
+export const CloseIconSx = {
+  fontSize: "small",
+};
+
 export const PreviewBackIconSx = (theme) => ({
   fontSize: 20,
   color: theme.palette.text.primary,

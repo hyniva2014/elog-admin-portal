@@ -72,9 +72,9 @@ const CareerFormHeaderSection = ({
   handleDiscard,
   isEditMode,
 }) => {
-  return (
-    <>
-      {mode === "add" ? (
+  const HeaderContent = () => {
+    if (mode === "add") {
+      return (
         <UserAddHeader
           handleBack={handleBack}
           activeStep={activeStep}
@@ -83,30 +83,43 @@ const CareerFormHeaderSection = ({
           profileCompletion={profileCompletion}
           scrollContainerRef={scrollContainerRef}
         />
-      ) : (
-        <CareerUserForm
-          formData={formData}
-          onSubmit={handleSubmit}
-          mode={mode}
-          handleBack={handleBack}
-          breadcrumbs={breadcrumbs}
-          canUpdate={canUpdate}
-          headerOnly={true}
-          editMode={editMode}
-          setEditMode={setEditMode}
-          fetchUserData={fetchUserData}
-        />
-      )}
-      {isEditMode && (
-        <UserTopHeader
-          data={formData}
-          editMode={editMode}
-          setEditMode={setEditMode}
-          handleDiscard={handleDiscard}
-          canUpdate={canUpdate}
-          mode={mode}
-        />
-      )}
+      );
+    }
+
+    return (
+      <CareerUserForm
+        formData={formData}
+        onSubmit={handleSubmit}
+        mode={mode}
+        handleBack={handleBack}
+        breadcrumbs={breadcrumbs}
+        canUpdate={canUpdate}
+        headerOnly={true}
+        editMode={editMode}
+        setEditMode={setEditMode}
+        fetchUserData={fetchUserData}
+      />
+    );
+  };
+
+  const EditModeHeader = () => {
+    if (!isEditMode) return null;
+    return (
+      <UserTopHeader
+        data={formData}
+        editMode={editMode}
+        setEditMode={setEditMode}
+        handleDiscard={handleDiscard}
+        canUpdate={canUpdate}
+        mode={mode}
+      />
+    );
+  };
+
+  return (
+    <>
+      <HeaderContent />
+      <EditModeHeader />
     </>
   );
 };
@@ -247,7 +260,7 @@ const CareerForm = () => {
           const carrier = carriers.find((c) => c.carrier_id == data.carrier_id);
           carrierName = carrier?.carrier_name || "";
         } catch (error) {
-          console.error("Error fetching carrier name:", error);
+          // Error fetching carrier name
         }
       }
 
@@ -379,7 +392,6 @@ const CareerForm = () => {
 
       setFormData(processedData);
     } catch (error) {
-      console.error("Error fetching user data:", error);
       setSnackbar({
         open: true,
         message: "Error loading user data",
@@ -424,7 +436,6 @@ const CareerForm = () => {
         });
       }
     } catch (err) {
-      console.error(err);
       const errorMessage =
         err?.body?.message ||
         err?.message ||
@@ -612,18 +623,12 @@ const CareerForm = () => {
         scrollContainer.addEventListener("scroll", handleScroll, {
           passive: true,
         });
-        console.log(
-          "User edit mode: Attached scroll listener to scroll container",
-        );
       } else {
         window.addEventListener("scroll", handleScroll, { passive: true });
         document.addEventListener("scroll", handleScroll, {
           passive: true,
           capture: true,
         });
-        console.log(
-          "User edit mode: Attached scroll listener to window/document",
-        );
       }
     };
 

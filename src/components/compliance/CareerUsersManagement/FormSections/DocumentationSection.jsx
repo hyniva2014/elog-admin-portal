@@ -6,6 +6,10 @@ const DOCUMENTATION_FIELDS = [
   { name: "medical_document_files", type: "file", xs: 12, sm: 6, md: 12 },
 ];
 
+const getRemoveHandler = (editMode, handleRemoveExistingFile) => {
+  return editMode ? handleRemoveExistingFile : undefined;
+};
+
 const DocumentationSection = ({
   control,
   errors,
@@ -28,7 +32,7 @@ const DocumentationSection = ({
       onPreview: handleImagePreview,
       maxSize: 10 * 1024 * 1024,
       allowedFileTypes: [".pdf", ".jpg", ".jpeg", ".png"],
-      onRemoveExistingFile: editMode ? handleRemoveExistingFile : undefined,
+      onRemoveExistingFile: getRemoveHandler(editMode, handleRemoveExistingFile),
     },
   };
 

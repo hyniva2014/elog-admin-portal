@@ -45,9 +45,14 @@ const STATUS_SECTIONS = [
   { key: "documents", label: "Documents" },
 ];
 
+const StatusDoneIcon = ({ completed }) => {
+  if (!completed) return null;
+  return <DoneIcon sx={CompletedIconSx} />;
+};
+
 const StatusIndicator = ({ item }) => (
   <Box sx={StatusItemSx(item.completed)}>
-    {item.completed ? <DoneIcon sx={CompletedIconSx} /> : null}
+    <StatusDoneIcon completed={item.completed} />
     <Typography variant="body2" sx={StatusItemTextSx(item.completed)}>
       {item.label}
     </Typography>

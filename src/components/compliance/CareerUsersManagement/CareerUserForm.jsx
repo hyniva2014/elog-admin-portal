@@ -37,6 +37,10 @@ const debounce = (func, delay) => {
   };
 };
 
+const getSubmitButtonText = (mode) => {
+  return mode === "edit" ? "Update Career User" : "Add Career User";
+};
+
 const FormActionButtons = ({ editMode, handleCancelEdit, mode, canUpdate }) => {
   if (!editMode) return null;
 
@@ -46,7 +50,7 @@ const FormActionButtons = ({ editMode, handleCancelEdit, mode, canUpdate }) => {
         Cancel
       </CancelButton>
       <SubmitButton type="submit" variant="contained" disabled={!canUpdate}>
-        {mode === "edit" ? "Update Career User" : "Add Career User"}
+        {getSubmitButtonText(mode)}
       </SubmitButton>
     </ButtonContainer>
   );
@@ -235,7 +239,6 @@ const CareerUserForm = ({
       const countryName = countryCodeToName[countryCode];
 
       if (!countryName) {
-        console.warn("Invalid country code:", countryCode);
         if (isSecondary) {
           setSecondaryDynamicStates([]);
         } else {
@@ -260,7 +263,6 @@ const CareerUserForm = ({
       const data = await response.json();
 
       if (!data?.data?.states) {
-        console.error("Invalid API response:", data);
         if (isSecondary) {
           setSecondaryDynamicStates([]);
         } else {
@@ -280,7 +282,6 @@ const CareerUserForm = ({
         setDynamicStates(states);
       }
     } catch (error) {
-      console.error("Error fetching states:", error);
       if (isSecondary) {
         setSecondaryDynamicStates([]);
       } else {
@@ -386,15 +387,9 @@ const CareerUserForm = ({
     if (mode === "edit" && formData && Object.keys(formData).length > 0) {
       setIsInitializing(true);
       setFiles([]);
-      console.log("Medical files from API:", {
-        medical_files: formData.medical_files,
-        documents: formData.documents,
-        allKeys: Object.keys(formData),
-      });
 
       if (formData?.medical_files?.length || formData?.documents?.length) {
         const medicalFiles = formData.medical_files || formData.documents || [];
-        console.log("Processing medical files:", medicalFiles);
         const processedFiles = medicalFiles
           .map((file) => {
             let fileName = "";
@@ -434,12 +429,9 @@ const CareerUserForm = ({
           })
           .filter((file) => file.url);
 
-        console.log("Processed medical files for preview:", processedFiles);
-        console.log("Setting existingMedicalFiles to:", processedFiles);
         setExistingMedicalFiles(processedFiles);
         setMedicalUploaded(true);
       } else {
-        console.log("No medical files found, clearing existing files");
         setExistingMedicalFiles([]);
         setMedicalUploaded(false);
       }
@@ -575,14 +567,9 @@ const CareerUserForm = ({
   useEffect(() => {}, [existingMedicalFiles]);
 
   const handleCancelEdit = useCallback(async () => {
-    console.log("handleCancelEdit called", { mode, formData, fetchUserData });
     if (mode === "edit" && formData && Object.keys(formData).length > 0) {
       if (fetchUserData) {
-        console.log("Calling fetchUserData...");
         await fetchUserData();
-        console.log("fetchUserData completed");
-      } else {
-        console.log("fetchUserData is not defined");
       }
       setDeletedDocumentIds([]);
     } else {
@@ -822,10 +809,9 @@ const CareerUserForm = ({
   const selectedStatus = watch("status");
   const totalExperience = watch("total_years_of_experince");
 
-  useEffect(() => {
-    const isEditModeWithData =
-      mode === "edit" && formData && Object.keys(formData).length > 0;
+  const isEditModeWithData = mode === "edit" && formData && Object.keys(formData).length > 0;
 
+  const handleCitizenshipChange = useCallback(() => {
     if (selectedCitizenship === 1) {
       if (!isEditModeWithData) {
         setValue("passport_visa_number", "");
@@ -852,7 +838,11 @@ const CareerUserForm = ({
       clearErrors("work_permit");
       clearErrors("country");
     }
-  }, [selectedCitizenship, setValue, clearErrors, mode, formData]);
+  }, [selectedCitizenship, isEditModeWithData, setValue, clearErrors]);
+
+  useEffect(() => {
+    handleCitizenshipChange();
+  }, [handleCitizenshipChange]);
 
   useEffect(() => {
     if (selectedEmploymentType !== 2) {
@@ -901,8 +891,6 @@ const CareerUserForm = ({
         deletedIdsRef.current = [...deletedIdsRef.current, id];
         setDeletedDocumentIds(deletedIdsRef.current);
       }
-
-      console.log("DELETED IDS REF:", deletedIdsRef.current);
     },
     [existingMedicalFiles, setDeletedDocumentIds],
   );
@@ -929,10 +917,10 @@ const CareerUserForm = ({
         } else {
         }
       } catch (error) {
-        console.error("Address geocoding failed:", error);
+        // Error handling without console statement
       }
     } else {
-      console.log("Address too short or empty, skipping geocoding");
+      // Address too short, skipping geocoding
     }
   }, 500);
 
@@ -964,15 +952,15 @@ const CareerUserForm = ({
         } else {
         }
       } catch (error) {
-        console.error("Address geocoding failed:", error);
+        // Error handling without console statement
       }
     } else {
-      console.log("Address too short or empty, skipping geocoding");
+      // Address too short, skipping geocoding
     }
   }, 500);
 
   useEffect(() => {
-    console.log("Deleted IDs:", deletedDocumentIds);
+    // Track deleted document IDs
   }, [deletedDocumentIds]);
 
   const handleSameAddressToggle = useCallback(

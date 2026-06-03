@@ -21,7 +21,12 @@ import {
   OcrCaptionSx,
   OcrProgressSx,
   RemoveImageButtonSx,
+  CloseIconSx,
 } from "./ImagePreview.styled";
+
+const getFileValue = (value) => {
+  return Array.isArray(value) ? value : [];
+};
 
 const ProfilePhotoPreview = ({
   control,
@@ -80,15 +85,15 @@ const ProfilePhotoPreview = ({
     );
   };
 
+  const getImageUrl = (imageToShow) => {
+    if (imageToShow?.url) return imageToShow.url;
+    if (imageToShow instanceof File) return URL.createObjectURL(imageToShow);
+    return imageToShow || "";
+  };
+
   const getPreviewImageUrl = (field) => {
     const imageToShow = existingFiles[0] || (field.value && field.value[0]);
-    return (
-      imageToShow?.url ||
-      (imageToShow instanceof File
-        ? URL.createObjectURL(imageToShow)
-        : imageToShow) ||
-      ""
-    );
+    return getImageUrl(imageToShow);
   };
 
   const shouldTriggerOCR = (files) => {
@@ -209,7 +214,7 @@ const ProfilePhotoPreview = ({
 
           return (
             <CommonFileUpload
-              files={Array.isArray(field.value) ? field.value : []}
+              files={getFileValue(field.value)}
               existingFiles={existingFiles}
               onFileChange={uploadFieldChange}
               size="small"
@@ -266,7 +271,7 @@ const ProfilePhotoPreview = ({
                 onClick={removeImageButtonClick}
                 disabled={disabled}
               >
-                <CloseIcon fontSize="small" />
+                <CloseIcon sx={CloseIconSx} />
               </IconButton>
             </Box>
           </Box>

@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { useCareerUsers } from "../../../hooks";
 import { useSelector } from "react-redux";
+import { HeaderContainerSx, getAddButtonSx } from "./CareerManagementHeader.styled";
 
 const CareerManagementHeader = (props) => {
   const { data = [], setData, searchKey = {}, summaryCards, addData } = props;
@@ -23,15 +24,8 @@ const CareerManagementHeader = (props) => {
     }
   }, [companyId]);
 
-  
-  const canCreate = true;
 
-  const addButtonSx = {
-    color: "common.white",
-    backgroundColor: "brand.main",
-    opacity: canCreate ? 1 : 0.5,
-    cursor: canCreate ? "pointer" : "not-allowed",
-  };
+  const canCreate = true;
 
   const handleAddCareerUser = (event) => {
     if (!canCreate) {
@@ -55,19 +49,19 @@ const CareerManagementHeader = (props) => {
       const options = await getDriverOptions(companyId);
       setDriverOptions(options);
     } catch (err) {
-      console.error("User list error", err);
+      // Error handling without console statement
     }
   };
 
   return (
-    <Box sx={{ mb: 2 }}>
+    <Box sx={HeaderContainerSx}>
       <CommonPageHeader
         title="Career Users Management"
         subtitle="Manage career users, view details and activity history"
         addButton={true}
         rightContent={
           <Button
-            sx={addButtonSx}
+            sx={getAddButtonSx(canCreate)}
             variant="contained"
             disabled={!canCreate}
             onClick={handleAddCareerUser}

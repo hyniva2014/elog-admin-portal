@@ -41,10 +41,8 @@ const CommonMultiSelectDropdown = ({
       index === self.findIndex((t) => t?.value === opt?.value),
   );
 
-  // Ensure value is an array
   const normalizedValue = Array.isArray(value) ? value : [];
 
-  // Map value array to selected options
   const selectedOptions = uniqueOptions.filter((opt) =>
     normalizedValue.includes(opt.value),
   );

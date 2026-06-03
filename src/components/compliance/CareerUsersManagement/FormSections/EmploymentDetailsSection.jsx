@@ -1,5 +1,3 @@
-// sections/EmploymentDetailsSection.jsx
-
 import { Grid } from "@mui/material";
 import FormSection from "../HeaderComponents/FormSection";
 import { Controller } from "react-hook-form";
@@ -10,6 +8,10 @@ import {
   EMPLOYMENT_DETAILS_FIELDS,
 } from "../Constants";
 import FormFieldsSection from "../FormFields/FormFieldsSection";
+
+const getTerminationMinDate = (hireDate) => {
+  return hireDate ? dayjs(hireDate).add(1, "day") : dayjs().startOf("day");
+};
 
 const EmploymentDetailsSection = ({
   control,
@@ -30,9 +32,7 @@ const EmploymentDetailsSection = ({
       options: filteredRoles,
     },
     termination_date: {
-      minDate: watch("hire_date")
-        ? dayjs(watch("hire_date")).add(1, "day")
-        : dayjs().startOf("day"),
+      minDate: getTerminationMinDate(watch("hire_date")),
     },
   };
 

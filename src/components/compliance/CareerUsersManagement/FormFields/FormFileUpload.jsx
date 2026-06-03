@@ -7,6 +7,10 @@ const getNestedError = (errors, name) => {
   return name.split(".").reduce((current, key) => current?.[key], errors);
 };
 
+const getFileValue = (value) => {
+  return Array.isArray(value) ? value : [];
+};
+
 const FormFileUpload = ({
   name,
   control,
@@ -32,7 +36,7 @@ const FormFileUpload = ({
 
           return (
             <CommonFileUpload
-              files={Array.isArray(field.value) ? field.value : []}
+              files={getFileValue(field.value)}
               existingFiles={existingFiles}
               onFileChange={(files) => {
                 field.onChange(files);

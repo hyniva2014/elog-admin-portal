@@ -8,19 +8,28 @@ import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { USER_STATUS, USER_STATUS_COL_CONFIG } from "./Constants";
 import { formatDateTime } from "../../../common/CommonUtils";
-import { EllipsisTextSx, getActionButtonSx } from "./CommonRowColumnUtils.styled";
+import {
+  EllipsisTextSx,
+  getActionButtonSx,
+  CreatedDateTypographySx,
+  CreatedTimeTypographySx,
+  getStatusCellSx,
+  UserNameTypographySx,
+  RoleCellSx,
+  EmailTypographySx,
+} from "./CommonRowColumnUtils.styled";
 
 const CreatedAtCell = ({ row }) => (
   <Box>
-    <Typography fontSize={14}>{row.createdDate}</Typography>
-    <Typography fontSize={14} color="text.secondary">
+    <Typography sx={CreatedDateTypographySx}>{row.createdDate}</Typography>
+    <Typography sx={CreatedTimeTypographySx}>
       {row.createdTime}
     </Typography>
   </Box>
 );
 
 const StatusCell = ({ value, row }) => (
-  <Typography sx={{ color: row.statusColor, fontWeight: 400 }}>
+  <Typography sx={getStatusCellSx(row.statusColor)}>
     {value}
   </Typography>
 );
@@ -82,10 +91,7 @@ export const UserManagementTableData = (
       headerClassName: "sticky-col-left-1",
       renderCell: ({ value }) => (
         <Tooltip title={value || ""} placement="right">
-          <Typography
-            fontSize={13}
-            sx={EllipsisTextSx}
-          >
+          <Typography sx={[UserNameTypographySx, EllipsisTextSx]}>
             {value || "-"}
           </Typography>
         </Tooltip>
@@ -111,7 +117,7 @@ export const UserManagementTableData = (
       maxWidth: 220,
       headerTooltip: true,
       renderCell: ({ value }) => (
-        <Typography fontSize={13} sx={{ textTransform: "capitalize" }}>
+        <Typography sx={RoleCellSx}>
           {value || "-"}
         </Typography>
       ),
@@ -125,11 +131,7 @@ export const UserManagementTableData = (
       headerTooltip: true,
       renderCell: ({ value }) => (
         <Tooltip title={value || ""} placement="right">
-          <Typography
-            fontSize={13}
-            color="text.secondary"
-            sx={EllipsisTextSx}
-          >
+          <Typography sx={[EmailTypographySx, EllipsisTextSx]}>
             {value || "-"}
           </Typography>
         </Tooltip>

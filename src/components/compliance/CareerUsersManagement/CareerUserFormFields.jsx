@@ -136,7 +136,6 @@ export const geocodeAddress = async (address) => {
       return null;
     }
   } catch (error) {
-    console.error("Error in geocodeAddress:", error);
     return null;
   }
 };

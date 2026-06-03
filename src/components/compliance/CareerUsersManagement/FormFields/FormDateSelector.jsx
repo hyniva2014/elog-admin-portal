@@ -8,6 +8,14 @@ const getNestedError = (errors, name) => {
   return name.split(".").reduce((current, key) => current?.[key], errors);
 };
 
+const getLabel = (label, required) => {
+  return required ? `${label} *` : label;
+};
+
+const getOnChangeHandler = (onChange, field) => {
+  return onChange ? (value) => onChange(value, field) : field.onChange;
+};
+
 const FormDateSelector = ({
   name,
   label,
@@ -36,11 +44,9 @@ const FormDateSelector = ({
           const error = getNestedError(errors, name);
           const dateSelectorProps = {
             ...field,
-            label: required ? `${label} *` : label,
+            label: getLabel(label, required),
             value: field.value || null,
-            onChange: onChange
-              ? (value) => onChange(value, field)
-              : field.onChange,
+            onChange: getOnChangeHandler(onChange, field),
             hideBorder: false,
             disabled,
             error: !!error,

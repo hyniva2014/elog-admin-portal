@@ -3,6 +3,21 @@ import { Grid } from "@mui/material";
 import { Controller } from "react-hook-form";
 import CommonAutocompleteDropdown from "../../../../common/CommonAutocompleteDropdown";
 
+const getShrinkLabel = (shrinkLabel, value) => {
+  return shrinkLabel !== undefined ? shrinkLabel : Boolean(value);
+};
+
+const getHandleChange = (onChange, name, field) => {
+  return (newValue) => {
+    if (onChange) {
+      onChange(newValue, field);
+    } else {
+      const result = { [name]: newValue };
+      field.onChange(result[name]);
+    }
+  };
+};
+
 const FormAutocomplete = ({
   name,
   label,
@@ -28,14 +43,7 @@ const FormAutocomplete = ({
         name={name}
         control={control}
         render={({ field }) => {
-          const handleChange = (newValue) => {
-            if (onChange) {
-              onChange(newValue, field);
-            } else {
-              const result = { [name]: newValue };
-              field.onChange(result[name]);
-            }
-          };
+          const handleChange = getHandleChange(onChange, name, field);
 
           const autocompleteProps = {
             label,
@@ -51,8 +59,7 @@ const FormAutocomplete = ({
             loading,
             error: !!errors[name],
             helperText: errors[name]?.message,
-            shrinkLabel:
-              shrinkLabel !== undefined ? shrinkLabel : Boolean(field.value),
+            shrinkLabel: getShrinkLabel(shrinkLabel, field.value),
             ...restProps,
           };
 
