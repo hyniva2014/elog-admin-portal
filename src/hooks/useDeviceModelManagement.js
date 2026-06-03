@@ -27,7 +27,7 @@ const useDeviceModelManagement = () => {
   const [data, setData] = useState({
     total: 0,
     page: 1,
-    pageSize: 10,
+    pageSize: 25,
     search: "",
     model: "",
     sortModel: [],

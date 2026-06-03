@@ -1,9 +1,10 @@
 import dayjs from "dayjs";
 import { StatusTypography } from "./DeviceAssetManagement.styles";
 import DeviceAssetManagementActionButton from "./DeviceAssetManagementActionButton";
+import { Box, Typography } from "@mui/material";
 
 export const formatDate = (value) =>
-  value ? dayjs(value).format("MMM DD, YYYY") : "-";
+  value ? dayjs(value).format("MMM DD, YYYY hh:mm A") : "-";
 
 export const getRowHeight = () => "auto";
 
@@ -83,7 +84,16 @@ export const getColumns = (onView) => [
     align: "center",
     headerAlign: "center",
     headerTooltip: true,
-    renderCell: (params) => formatDate(params.value),
+    renderCell: (params) => (
+      <Box>
+        <Typography fontSize={14} fontWeight={400}>
+          {params.row.createdDate}
+        </Typography>
+        <Typography fontSize={14} fontWeight={400} color="#6E7079">
+          {params.row.createdTime}
+        </Typography>
+      </Box>
+    ),
   },
 
   {
@@ -93,7 +103,16 @@ export const getColumns = (onView) => [
     align: "center",
     headerAlign: "center",
     headerTooltip: true,
-    renderCell: (params) => formatDate(params.value),
+    renderCell: (params) => (
+      <Box>
+        <Typography fontSize={14} fontWeight={400}>
+          {params.row.updatedDate}
+        </Typography>
+        <Typography fontSize={14} fontWeight={400} color="#6E7079">
+          {params.row.updatedTime}
+        </Typography>
+      </Box>
+    ),
   },
 
   {
@@ -126,8 +145,18 @@ export const transformDeviceAssetData = (apiData) => {
     imei: item.imei_number || "-",
     iccId: item.iccid || "-",
     BLE_MAC_ADDRESS: item.BLE_MAC_ADDRESS || "-",
-    createdOn: item.created_at || null,
-    updatedOn: item.updated_at || null,
+    createdDate: item.created_at
+      ? dayjs(item.created_at).format("MMM DD, YYYY")
+      : "-",
+    createdTime: item.created_at
+      ? dayjs(item.created_at).format("hh:mm A")
+      : "-",
+    updatedDate: item.updated_at
+      ? dayjs(item.updated_at).format("MMM DD, YYYY")
+      : "-",
+    updatedTime: item.updated_at
+      ? dayjs(item.updated_at).format("hh:mm A")
+      : "-",
     status:
       item.status === "2"
         ? "Assigned"

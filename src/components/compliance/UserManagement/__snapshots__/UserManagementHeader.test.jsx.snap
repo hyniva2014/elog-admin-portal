@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`UserManagementHeader matches snapshot 1`] = `
+<div>
+  <div
+    class="MuiBox-root css-k4eprn"
+  >
+    <div>
+      <div>
+        User Management
+      </div>
+      <div>
+        Manage user accounts and permissions
+      </div>
+      <button
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary css-1wiwul4-MuiButtonBase-root-MuiButton-root"
+        tabindex="0"
+        type="button"
+      >
+        Add User
+        <span
+          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+        />
+      </button>
+    </div>
+    <div
+      class="MuiBox-root css-ktfaw3"
+    >
+      <div
+        data-testid="summary-cards"
+      >
+        [{"id":"total_users","title":"Total Users","value":"10"}]
+      </div>
+    </div>
+    <div
+      data-testid="common-filters"
+    >
+      Filters Component
+      <div>
+        [{"label":"User Profile","dataKey":"role_id"}]
+      </div>
+    </div>
+  </div>
+</div>
+`;

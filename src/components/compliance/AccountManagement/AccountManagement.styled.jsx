@@ -25,7 +25,10 @@ export const GridContainer = styled(Box)(() => ({
 export const StatusText = styled(Typography, {
   shouldForwardProp: (prop) => prop !== "accountStatus",
 })(({ accountStatus, theme }) => ({
-  color: accountStatus === "Active" ? theme.palette.success.main : theme.palette.error.main,
+  color:
+    accountStatus === "Active"
+      ? theme.palette.success.main
+      : theme.palette.error.main,
   fontSize: 13,
   fontWeight: 400,
 }));
@@ -44,7 +47,7 @@ export const actionIconSx = {
 export const DialogFormContainer = styled(Box)(() => ({
   paddingLeft: 16,
   paddingRight: 16,
-  paddingTop: 12,
+  paddingTop: 24,
   paddingBottom: 8,
 }));
 

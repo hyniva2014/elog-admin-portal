@@ -5,8 +5,8 @@ export const StyledAutocomplete = styled(Autocomplete)(({ theme }) => ({
   width: "100%",
 
   "& .MuiInputBase-root": {
-    // minHeight: 40,
-    fontSize: 14,
+    height: 36,
+    fontSize: 13,
     backgroundColor: theme.palette.common.white,
   },
 
