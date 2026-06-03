@@ -7,8 +7,10 @@ const formatDate = (iso) => {
 };
 
 const STATUS_LABELS = {
-  1: "Pending",
-  2: "Approved",
+  0: "Pending",
+  1: "Approved",
+  3: "REJECTED",
+  4: "PARTIAL_APPROVED",
 };
 
 const getStatusLabel = (status) => STATUS_LABELS[status] || status || "-";
@@ -16,6 +18,7 @@ const getStatusLabel = (status) => STATUS_LABELS[status] || status || "-";
 const transformRequestedDevicesData = (data = []) => {
   return data.map((item, index) => ({
     id: item.id || index,
+    company_id: item.company_id || item.carrier_id || null,
     carrierName: item.company_name || item.carrier_name || "-",
     requestedDevices: item.requested_devices_count || "-",
     description: item.description || "-",

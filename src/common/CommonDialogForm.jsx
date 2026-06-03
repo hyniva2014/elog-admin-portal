@@ -32,6 +32,7 @@ const CommonDialogForm = ({
   maxWidth = "sm",
   headerActions,
   isEditing = false,
+  disableSubmit = false,
 }) => {
   const theme = useTheme();
   const styles = dialogStyles(theme);
@@ -94,7 +95,7 @@ const CommonDialogForm = ({
         fullWidth
         form={formId}
         onClick={onSubmit}
-        disabled={loading}
+        disabled={loading || disableSubmit}
         sx={styles.submitButton}
       >
         {submitLabel}

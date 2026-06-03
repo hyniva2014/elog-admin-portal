@@ -34,7 +34,9 @@ const CommonPageHeader = ({
   onExport,
   rightContent,
   addButton,
+  addButtonText,
   handleClick,
+  showExport = true,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -73,34 +75,38 @@ const CommonPageHeader = ({
         <ActionContainer>
           {addButton && (
             <HeaderButton variant="contained" onClick={handleClick}>
-              Add
+              {addButtonText || "Add"}
             </HeaderButton>
           )}
 
-          <HeaderButton
-            variant="contained"
-            endIcon={<KeyboardArrowDownIcon />}
-            onClick={handleMenuOpen}
-          >
-            Export
-          </HeaderButton>
+          {showExport && (
+            <HeaderButton
+              variant="contained"
+              endIcon={<KeyboardArrowDownIcon />}
+              onClick={handleMenuOpen}
+            >
+              Export
+            </HeaderButton>
+          )}
         </ActionContainer>
 
-        <Menu
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleMenuClose}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "right",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-        >
-          {renderExportMenuItems()}
-        </Menu>
+        {showExport && (
+          <Menu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleMenuClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+          >
+            {renderExportMenuItems()}
+          </Menu>
+        )}
       </>
     );
   };

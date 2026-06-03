@@ -2,7 +2,13 @@ import CommonPageHeader from "../../../common/CommonPageHeader";
 import CommonFilters from "../../../common/CommonFilters";
 import { HeaderContainer } from "./RequestDevice.styled";
 
-const RequestDeviceHeader = ({ data, setData, searchKey, statusOptions }) => {
+const RequestDeviceHeader = ({
+  data,
+  setData,
+  searchKey,
+  statusOptions,
+  handleRequestDeviceClick,
+}) => {
   const requestDeviceFilters = (statusOptions) => [
     {
       label: "All Status",
@@ -13,7 +19,13 @@ const RequestDeviceHeader = ({ data, setData, searchKey, statusOptions }) => {
 
   return (
     <HeaderContainer>
-      <CommonPageHeader title="Requested Devices" rightContent={null} />
+      <CommonPageHeader
+        title="Requested Devices"
+        addButton={true}
+        addButtonText="Request Device"
+        handleClick={handleRequestDeviceClick}
+        showExport={false}
+      />
       <CommonFilters
         data={data}
         setData={setData}

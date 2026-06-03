@@ -13,7 +13,8 @@ const StatusCell = ({ value }) => {
   return <StatusText status={value}>{value || "-"}</StatusText>;
 };
 
-const ActionCell = ({ row, colDef }) => {
+const ActionCell = (params) => {
+  const { row, colDef } = params;
   const theme = useTheme();
 
   const handleClick = useCallback(() => {
@@ -22,7 +23,7 @@ const ActionCell = ({ row, colDef }) => {
 
   if (row.status === "Pending") {
     return (
-      <IconButton size="small" color="primary">
+      <IconButton size="small" color="primary" onClick={handleClick}>
         <AssignmentIcon fontSize="small" />
       </IconButton>
     );
@@ -90,5 +91,6 @@ export const columns = [
 
 export const statusOptions = [
   { label: "Pending", value: "1" },
-  { label: "Approved", value: "2" },
+  { label: "Approved", value: "0" },
 ];
+
