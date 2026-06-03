@@ -51,7 +51,11 @@ const CommonPageHeader = ({
   }, []);
 
   const handleExportSelect = useCallback(
-    (type) => {
+    (event) => {
+      const type = event.currentTarget.dataset.type;
+      if (!type) {
+        return;
+      }
       onExport?.(type);
       handleMenuClose();
     },
@@ -62,7 +66,8 @@ const CommonPageHeader = ({
     return EXPORT_OPTIONS.map((option) => (
       <MenuItem
         key={option.value}
-        onClick={() => handleExportSelect(option.value)}
+        data-type={option.value}
+        onClick={handleExportSelect}
       >
         {option.label}
       </MenuItem>

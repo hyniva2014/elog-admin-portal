@@ -140,7 +140,7 @@ const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange
       label="Model Name"
       value={field.value}
       options={modelOptions}
-      onChange={(value) => field.onChange(value)}
+      onChange={field.onChange}
       error={!!error}
       helperText={error?.message}
       required
@@ -151,7 +151,7 @@ const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange
     <>
       <CommonTextField
         value={field.value}
-        onChange={(e) => field.onChange(e.target.value)}
+        onChange={field.onChange}
         label="No of devices"
         type="number"
         error={!!error}

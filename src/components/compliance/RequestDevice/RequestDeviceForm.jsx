@@ -8,7 +8,7 @@ import { FormContainer } from "./RequestDeviceForm.styled";
 const renderNumberOfDevicesField = ({ field, fieldState: { error } }) => (
   <CommonTextField
     value={field.value}
-    onChange={(e) => field.onChange(e.target.value)}
+    onChange={field.onChange}
     label="Add Number of devices"
     type="number"
     error={!!error}
@@ -20,7 +20,7 @@ const renderNumberOfDevicesField = ({ field, fieldState: { error } }) => (
 const renderDescriptionField = ({ field, fieldState: { error } }) => (
   <CommonTextField
     value={field.value}
-    onChange={(e) => field.onChange(e.target.value)}
+    onChange={field.onChange}
     label="Description"
     multiline
     rows={3}
