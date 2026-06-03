@@ -18,7 +18,7 @@ export const ContentWrapper = styled("div")(({ theme }) => {
     paddingTop: "16px",
     flex: 1,
     minHeight: 0,
-    overflow: "hidden",
+    overflow: "auto",
     boxSizing: "border-box",
   };
 });

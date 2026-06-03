@@ -18,7 +18,8 @@ jest.mock("../../../services/services", () => ({
   }),
 }));
 
-jest.mock("../../../common/CommonTextField", () => (props) => (
+// Mock CommonTextField component
+const MockCommonTextField = (props) => (
   <div>
     <input
       data-testid={props.label}
@@ -28,26 +29,44 @@ jest.mock("../../../common/CommonTextField", () => (props) => (
     />
     {props.error && <span>{props.helperText}</span>}
   </div>
-));
+);
 
-jest.mock("../../../common/CommonAutocompleteDropdown", () => (props) => (
-  <div>
-    <select
-      data-testid="Model Name"
-      value={props.value}
-      onChange={(e) => props.onChange(e.target.value)}
-      disabled={props.disabled}
-    >
-      <option value="">Select</option>
-      {props.options?.map((opt) => (
-        <option key={opt.value} value={opt.value}>
-          {opt.label}
-        </option>
-      ))}
-    </select>
-    {props.error && <span>{props.helperText}</span>}
-  </div>
-));
+jest.mock("../../../common/CommonTextField", () => MockCommonTextField);
+
+// Mock option component for dropdown
+const MockOption = ({ option }) => (
+  <option key={option.value} value={option.value}>
+    {option.label}
+  </option>
+);
+
+// Mock CommonAutocompleteDropdown component
+const MockCommonAutocompleteDropdown = (props) => {
+  const { value, options = [], onChange, disabled, error, helperText } = props;
+  
+  const handleChange = (e) => {
+    onChange(e.target.value);
+  };
+  
+  return (
+    <div>
+      <select
+        data-testid="Model Name"
+        value={value}
+        onChange={handleChange}
+        disabled={disabled}
+      >
+        <option value="">Select</option>
+        {options.map((opt) => (
+          <MockOption key={opt.value} option={opt} />
+        ))}
+      </select>
+      {error && <span>{helperText}</span>}
+    </div>
+  );
+};
+
+jest.mock("../../../common/CommonAutocompleteDropdown", () => MockCommonAutocompleteDropdown);
 
 describe("AssignAssetForm", () => {
   const mockSubmit = jest.fn();

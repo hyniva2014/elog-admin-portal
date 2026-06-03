@@ -1,5 +1,6 @@
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useCallback, useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import CommonTextField from "../../../common/CommonTextField";
@@ -7,6 +8,8 @@ import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdo
 import { FormContainer } from "./RequestDeviceForm.styled";
 import { useServices } from "../../../services/services";
 import { AvailableCountText, StockMessageText } from "./RequestDevice.styled";
+import { REQUEST_DEVICE_ENDPOINTS } from "./ApiEndpoints";
+import { fetchDeviceModels } from "../../../store/deviceModelsSlice";
 
 const assignAssetSchema = yup.object().shape({
   modelName: yup.string().required("Model name is required"),
@@ -18,7 +21,11 @@ const assignAssetSchema = yup.object().shape({
 });
 
 const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange, }) => {
-  const [modelOptions, setModelOptions] = useState([]);
+  const dispatch = useDispatch();
+  const { models: modelOptions, isLoading: modelsLoading } = useSelector(
+    (state) => state.deviceModelsSlice
+  );
+  
   const [availableCount, setAvailableCount] = useState(null);
   const [stockMessage, setStockMessage] = useState("");
   const [deviceIds, setDeviceIds] = useState([]);
@@ -32,25 +39,14 @@ const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange
     },
   });
 
-  const fetchDeviceModels = useCallback(async () => {
-    try {
-      const response = await fetchApi("/masteradmin/get-device-model-dropdown");
-      if (response?.statusCode === 200) {
-        const formattedOptions = (response?.body?.data || []).map((item) => ({
-          label: item.model_name,
-          value: item.model_name,
-        }));
-
-        setModelOptions(formattedOptions);
-      }
-    } catch (error) {
-      console.error("Failed to fetch model dropdown", error);
-    }
-  }, [fetchApi]);
-
+  // Fetch device models from Redux on mount
   useEffect(() => {
-    fetchDeviceModels();
-  }, [fetchDeviceModels]);
+    // Only fetch if not already loaded or if stale (older than 5 minutes)
+    const state = dispatch(fetchDeviceModels());
+    return () => {
+      // Optional: cleanup if needed
+    };
+  }, [dispatch]);
 
   const watchedNumber = watch("numberOfDevices");
 
@@ -72,17 +68,20 @@ const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange
 
     checkTimer.current = setTimeout(async () => {
       try {
-        const endUrl = `/masteradmin/check-device-stock?requested_devices_count=${count}`;
+        const endUrl = `${REQUEST_DEVICE_ENDPOINTS.CHECK_DEVICE_STOCK}?requested_devices_count=${count}`;
         const resp = await fetchApi(endUrl);
-        const body = resp?.body || {};
-        setAvailableCount(body.available_count ?? null);
-        setStockMessage(body.message || "");
-        setDeviceIds(Array.isArray(body.device_id) ? body.device_id : []);
+        const { body = {} } = resp || {};
+        const { available_count, message = "", device_id } = body;
+        
+        setAvailableCount(available_count ?? null);
+        setStockMessage(message);
+        setDeviceIds(Array.isArray(device_id) ? device_id : []);
+        
         // Determine if stock is sufficient. Prefer available_count when provided,
         // otherwise infer from returned device_id array length.
-        const available = body.available_count;
-        const ids = Array.isArray(body.device_id) ? body.device_id : [];
-        const sufficient = typeof available === "number" ? available >= count : ids.length >= count;
+        const ids = Array.isArray(device_id) ? device_id : [];
+        const sufficient = typeof available_count === "number" ? available_count >= count : ids.length >= count;
+        
         if (typeof onStockStatusChange === "function") {
           onStockStatusChange(sufficient);
         }
@@ -116,9 +115,10 @@ const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange
 
   useEffect(() => {
     if (formData && Object.keys(formData).length > 0) {
+      const { modelName = "", numberOfDevices = "" } = formData;
       reset({
-        modelName: formData.modelName || "",
-        numberOfDevices: formData.numberOfDevices || "",
+        modelName,
+        numberOfDevices,
       });
     } else {
       reset({
@@ -133,6 +133,18 @@ const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange
       setSubmitRef.current = handleSubmit(handleFormSubmit);
     }
   }, [handleSubmit, handleFormSubmit, setSubmitRef]);
+
+  const renderStockStatus = useCallback(() => {
+    if (stockMessage) {
+      return <StockMessageText>{stockMessage}</StockMessageText>;
+    }
+    
+    if (availableCount !== null) {
+      return <AvailableCountText>Available: {availableCount}</AvailableCountText>;
+    }
+    
+    return null;
+  }, [stockMessage, availableCount]);
 
   const renderModelNameField = useCallback(
     ({ field, fieldState: { error } }) => (
@@ -161,15 +173,10 @@ const AssignAssetForm = ({ formData, onSubmit, setSubmitRef, onStockStatusChange
           helperText={error?.message}
           required
         />
-
-        {stockMessage ? (
-          <StockMessageText>{stockMessage}</StockMessageText>
-        ) : availableCount !== null ? (
-          <AvailableCountText>Available: {availableCount}</AvailableCountText>
-        ) : null}
+        {renderStockStatus()}
       </>
     ),
-    [stockMessage, availableCount]
+    [renderStockStatus]
   );
 
   return (

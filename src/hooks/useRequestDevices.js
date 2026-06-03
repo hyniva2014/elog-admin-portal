@@ -1,6 +1,7 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback } from "react";
 import dayjs from "dayjs";
 import { useServices } from "../services/services";
+import { REQUEST_DEVICE_ENDPOINTS } from "../components/compliance/RequestDevice/ApiEndpoints";
 
 const formatDate = (iso) => {
   return iso ? dayjs(iso).format("MMM DD, YYYY") : "-";
@@ -9,26 +10,42 @@ const formatDate = (iso) => {
 const STATUS_LABELS = {
   0: "Pending",
   1: "Approved",
-  3: "REJECTED",
-  4: "PARTIAL_APPROVED",
+  2: "REJECTED",
+  3: "PARTIAL_APPROVED",
 };
 
 const getStatusLabel = (status) => STATUS_LABELS[status] || status || "-";
 
 const transformRequestedDevicesData = (data = []) => {
-  return data.map((item, index) => ({
-    id: item.id || index,
-    company_id: item.company_id || item.carrier_id || null,
-    carrierName: item.company_name || item.carrier_name || "-",
-    requestedDevices: item.requested_devices_count || "-",
-    description: item.description || "-",
-    requestedBy: item.requested_by_name || "-",
-    requestedOn: formatDate(
-      item.requested_on || item.created_at || item.created_on,
-    ),
-    approvedBy: item.approved_by || "-",
-    status: getStatusLabel(item.status),
-  }));
+  return data.map((item, index) => {
+    const {
+      id,
+      company_id,
+      carrier_id,
+      company_name,
+      carrier_name,
+      requested_devices_count,
+      description,
+      requested_by_name,
+      requested_on,
+      created_at,
+      created_on,
+      approved_by,
+      status,
+    } = item;
+
+    return {
+      id: id || index,
+      company_id: company_id || carrier_id || null,
+      carrierName: company_name || carrier_name || "-",
+      requestedDevices: requested_devices_count || "-",
+      description: description || "-",
+      requestedBy: requested_by_name || "-",
+      requestedOn: formatDate(requested_on || created_at || created_on),
+      approvedBy: approved_by || "-",
+      status: getStatusLabel(status),
+    };
+  });
 };
 
 export const useRequestDevices = () => {
@@ -60,7 +77,7 @@ export const useRequestDevices = () => {
           .filter(Boolean)
           .join("&");
 
-        const endUrl = `/masteradmin/requested-devices?${queryParams}`;
+        const endUrl = `${REQUEST_DEVICE_ENDPOINTS.GET_REQUESTED_DEVICES}?${queryParams}`;
 
         const response = await fetchApi(endUrl);
         const apiData = response?.body?.data || [];

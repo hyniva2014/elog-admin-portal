@@ -2,18 +2,25 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import RequestDeviceForm from "./RequestDeviceForm";
 
-jest.mock("../../../common/CommonTextField", () => (props) => (
-  <div>
-    <label>{props.label}</label>
-    <input
-      data-testid={props.label}
-      value={props.value || ""}
-      onChange={props.onChange}
-      type={props.type || "text"}
-    />
-    {props.error && <span>{props.helperText}</span>}
-  </div>
-));
+// Mock CommonTextField component
+const MockCommonTextField = (props) => {
+  const { label, value, onChange, type, error, helperText } = props;
+  
+  return (
+    <div>
+      <label>{label}</label>
+      <input
+        data-testid={label}
+        value={value || ""}
+        onChange={onChange}
+        type={type || "text"}
+      />
+      {error && <span>{helperText}</span>}
+    </div>
+  );
+};
+
+jest.mock("../../../common/CommonTextField", () => MockCommonTextField);
 
 describe("RequestDeviceForm", () => {
   const mockSubmit = jest.fn();

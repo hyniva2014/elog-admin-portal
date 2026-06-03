@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { useServices } from "../services/services";
+import { REQUEST_DEVICE_ENDPOINTS } from "../components/compliance/RequestDevice/ApiEndpoints";
 
 /**
  * Custom hook to manage request device operations
@@ -40,20 +41,23 @@ export const useRequestDeviceManager = (userDetails, setLoading, fetchRequestedD
     async (row) => {
       try {
         setLoading(true);
-        const response = await fetchApi(`/masteradmin/requested-devices?id=${row.id}`);
-        if (response?.statusCode === 200) {
-          const fullData = response?.body?.data || {};
-          setSelectedRequest({
-            ...row,
-            ...fullData,
-            status: row.status,
-            requestedDevices: fullData.requested_devices_count || row.requestedDevices,
-            company_id: fullData.company_id || row.company_id,
-          });
-          setIsAssignDialogOpen(true);
-        } else {
+        const response = await fetchApi(`${REQUEST_DEVICE_ENDPOINTS.GET_REQUESTED_DEVICES}?id=${row.id}`);
+        
+        // Guard clause: early return on failure
+        if (response?.statusCode !== 200) {
           showSnackbar("Failed to fetch request details", "error");
+          return;
         }
+        
+        const fullData = response?.body?.data || {};
+        setSelectedRequest({
+          ...row,
+          ...fullData,
+          status: row.status,
+          requestedDevices: fullData.requested_devices_count || row.requestedDevices,
+          company_id: fullData.company_id || row.company_id,
+        });
+        setIsAssignDialogOpen(true);
       } catch (error) {
         console.error("Error fetching request details:", error);
         showSnackbar("Failed to fetch request details", "error");
@@ -72,33 +76,37 @@ export const useRequestDeviceManager = (userDetails, setLoading, fetchRequestedD
 
   const submitRequestDevice = useCallback(
     async (values) => {
+      const { numberOfDevices, description } = values;
+      const { company_id, user_id } = userDetails || {};
+      
       try {
         setLoading(true);
-        const endUrl = "/admin/requested-device/create";
         const payload = {
-          company_id: userDetails?.company_id,
-          requested_devices_count: Number(values.numberOfDevices),
-          description: values.description?.trim(),
-          requested_by: userDetails?.user_id,
+          company_id,
+          requested_devices_count: Number(numberOfDevices),
+          description: description?.trim(),
+          requested_by: user_id,
         };
 
-        const response = await createApi(payload, endUrl);
-        if (response?.statusCode === 200) {
+        const response = await createApi(payload, REQUEST_DEVICE_ENDPOINTS.CREATE_REQUEST);
+        
+        // Guard clause: early return on failure
+        if (response?.statusCode !== 200) {
           showSnackbar(
-            response?.body?.data?.message || "Device request submitted successfully",
-            "success"
+            response?.body?.message ||
+              response?.body?.data?.message ||
+              "Failed to submit request",
+            "error"
           );
-          setIsRequestDialogOpen(false);
-          fetchRequestedDevices();
           return;
         }
-
+        
         showSnackbar(
-          response?.body?.message ||
-            response?.body?.data?.message ||
-            "Failed to submit request",
-          "error"
+          response?.body?.data?.message || "Device request submitted successfully",
+          "success"
         );
+        setIsRequestDialogOpen(false);
+        fetchRequestedDevices();
       } catch (error) {
         console.error("Request Device submit error:", error);
         showSnackbar("Failed to submit request", "error");
@@ -111,29 +119,34 @@ export const useRequestDeviceManager = (userDetails, setLoading, fetchRequestedD
 
   const submitAssignAsset = useCallback(
     async (values) => {
+      const { deviceIds = [] } = values;
+      const companyId = selectedRequest?.company_id || userDetails?.company_id;
+      
       try {
         setLoading(true);
-        const companyId = selectedRequest?.company_id || userDetails?.company_id;
         const payload = {
           company_id: companyId,
-          device_ids: values.deviceIds || [],
+          device_ids: deviceIds,
         };
-        const response = await createApi(payload, "/masteradmin/assign-devices");
-        if (response?.statusCode === 200) {
+        const response = await createApi(payload, REQUEST_DEVICE_ENDPOINTS.ASSIGN_DEVICES);
+        
+        // Guard clause: early return on failure
+        if (response?.statusCode !== 200) {
           showSnackbar(
-            response?.body?.data?.message || "Devices assigned successfully",
-            "success"
+            response?.body?.message ||
+              response?.body?.data?.message ||
+              "Failed to assign devices",
+            "error"
           );
-          setIsAssignDialogOpen(false);
-          fetchRequestedDevices();
           return;
         }
+        
         showSnackbar(
-          response?.body?.message ||
-            response?.body?.data?.message ||
-            "Failed to assign devices",
-          "error"
+          response?.body?.data?.message || "Devices assigned successfully",
+          "success"
         );
+        setIsAssignDialogOpen(false);
+        fetchRequestedDevices();
       } catch (error) {
         console.error("Assign asset submit error:", error);
         showSnackbar("Failed to assign asset", "error");
