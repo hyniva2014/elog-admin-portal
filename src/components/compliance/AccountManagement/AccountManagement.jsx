@@ -146,12 +146,22 @@ const AccountManagement = () => {
 
   const handleConfirmDelete = useCallback(
     async (reason) => {
+      if (!reason?.trim()) {
+        handleSnackbar("Deactivation reason is required.", "error");
+        return;
+      }
+
       if (companyToDelete) {
-        await handleDeleteAccount(companyToDelete, reason);
+        await handleDeleteAccount(companyToDelete, reason.trim());
         handleCloseDeleteConfirm();
       }
     },
-    [companyToDelete, handleDeleteAccount, handleCloseDeleteConfirm],
+    [
+      companyToDelete,
+      handleDeleteAccount,
+      handleCloseDeleteConfirm,
+      handleSnackbar,
+    ],
   );
 
   const transformCompanyToFormData = useCallback((company) => {

@@ -17,7 +17,7 @@ export const Header = styled(Box)(({ theme }) => ({
 }));
 
 export const Title = styled(Typography)(({ theme }) => ({
-  fontSize: 28,
+  fontSize: 20,
   fontWeight: 700,
   color: theme.palette.text.primary,
 }));
@@ -35,8 +35,8 @@ export const RoleCount = styled(Typography)(({ theme }) => ({
 export const AddButton = styled(Button)(({ theme }) => ({
   backgroundColor: theme.palette.brand.main,
   textTransform: "none",
-  borderRadius: 8,
-  padding: "10px 20px",
+  borderRadius: 5,
+  padding: "8px 20px",
   "&:hover": {
     backgroundColor: theme.palette.brand.dark,
   },
