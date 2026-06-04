@@ -7,8 +7,15 @@ import {
 } from "./RolePermissions.styled";
 
 const PermissionList = ({ module, permissions, permissionState, onToggle }) => {
+  const enabledCount = permissionState[module]?.filter(Boolean).length || 0;
+
+  const totalCount = permissions?.length || 0;
+
+  const allEnabled = enabledCount === totalCount;
+
   const permissionItems = permissions?.map((permission, idx) => (
-    <PermissionItem key={permission.id}>
+    
+    <PermissionItem key={idx} isenabled={allEnabled}>
       <div>
         <PermissionTitle>{permission.action}</PermissionTitle>
 
@@ -23,6 +30,7 @@ const PermissionList = ({ module, permissions, permissionState, onToggle }) => {
       />
     </PermissionItem>
   ));
+
   return <PermissionsList>{permissionItems}</PermissionsList>;
 };
 

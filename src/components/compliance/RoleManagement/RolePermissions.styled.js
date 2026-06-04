@@ -79,15 +79,24 @@ export const PermissionCard = styled(Card, {
   shouldForwardProp: (prop) => prop !== "isenabled",
 })(({ theme, isenabled }) => ({
   width: "100%",
+
   borderRadius: 12,
+
   border: `1px solid ${theme.palette.custom.lightBorder}`,
+
   backgroundColor: isenabled
     ? theme.palette.custom.lightGreen
     : theme.palette.common.white,
+
   boxShadow: "none",
+
   display: "flex",
+
   flexDirection: "column",
+
   minHeight: 520,
+
+  transition: "background-color 0.3s ease",
 }));
 
 export const CardContentWrapper = styled(Box)(({ theme }) => ({
@@ -104,7 +113,7 @@ export const CountBadge = styled(Box)(({ theme }) => ({
   borderRadius: 8,
   fontSize: 12,
   fontWeight: 600,
-  minWidth: 60,
+  minWidth: 20,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -125,14 +134,26 @@ export const PermissionsList = styled(Box)(({ theme }) => ({
   gap: theme.spacing(1.5),
 }));
 
-export const PermissionItem = styled(Box)(({ theme }) => ({
+export const PermissionItem = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "isenabled",
+})(({ theme, isenabled }) => ({
   display: "flex",
+
   justifyContent: "space-between",
+
   alignItems: "center",
+
   border: `1px solid ${theme.palette.custom.lightBorder}`,
+
   borderRadius: 8,
+
   padding: theme.spacing(1.5, 2),
-  backgroundColor: theme.palette.custom.lightGreen,
+
+  backgroundColor: isenabled
+    ? theme.palette.custom.lightGreen
+    : theme.palette.common.white,
+
+  transition: "all 0.3s ease",
 }));
 
 export const PermissionTitle = styled(Typography)(({ theme }) => ({
@@ -178,8 +199,11 @@ export const FooterActionButton = styled(Button, {
     ? theme.palette.custom.mutedText
     : theme.palette.text.secondary,
   borderColor: theme.palette.custom.lightBorder,
-  height: 42,
-  borderRadius: 8,
+  height: 32,
+  borderRadius: 5,
+  "&:hover": {
+    backgroundColor: theme.palette.brand.dark,
+  },
 }));
 
 export const ModuleTitle = styled(Typography)(({ theme }) => ({
