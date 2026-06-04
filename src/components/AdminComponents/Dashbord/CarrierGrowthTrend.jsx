@@ -36,7 +36,6 @@ import {
   formatSubtitle,
 } from "./CarrierGrowthTrend.utils";
 
-
 const CarrierGrowthTrend = () => {
   const DEFAULT_OPTION = "Last 6 months";
 
@@ -46,7 +45,6 @@ const CarrierGrowthTrend = () => {
     selectedYear === "Last 6 months" ? CURRENT_YEAR : selectedYear;
 
   const { carrierGrowthTrend } = useCarrierGrowthTrend(apiYear);
-
 
   const theme = useTheme();
 
@@ -74,7 +72,7 @@ const CarrierGrowthTrend = () => {
         <text
           x={0}
           y={0}
-          dy={16}
+          dy={24}
           textAnchor="middle"
           fill={theme.palette.text.secondary}
           fontSize={mainFontSize}
@@ -125,7 +123,12 @@ const CarrierGrowthTrend = () => {
         <LineChart data={trendData}>
           <CartesianGrid strokeDasharray="3 3" />
 
-          <XAxis dataKey={X_AXIS_KEY} tick={renderXAxisTick} />
+          <XAxis
+            dataKey={X_AXIS_KEY}
+            tick={renderXAxisTick}
+            tickMargin={12}
+            interval={0}
+          />
 
           <YAxis />
 

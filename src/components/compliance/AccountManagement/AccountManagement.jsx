@@ -110,7 +110,16 @@ const AccountManagement = () => {
     setCompanyToDelete(null);
   }, []);
 
-  const { buildFetchUrl, fetchData, handleCreateAccount, handleViewAccount, handleDeleteAccount, fetchContactsDropdown, fetchCompaniesDropdown, fetchCarrierOptions } = useAccountManagement(
+  const {
+    buildFetchUrl,
+    fetchData,
+    handleCreateAccount,
+    handleViewAccount,
+    handleDeleteAccount,
+    fetchContactsDropdown,
+    fetchCompaniesDropdown,
+    fetchCarrierOptions,
+  } = useAccountManagement(
     companyId,
     primaryContactName,
     secondaryContactName,
@@ -128,15 +137,18 @@ const AccountManagement = () => {
     setDialogMode,
     setSelectedCompany,
     fetchApi,
-    createApi
+    createApi,
   );
 
-  const handleConfirmDelete = useCallback(async () => {
-    if (companyToDelete) {
-      await handleDeleteAccount(companyToDelete);
-      handleCloseDeleteConfirm();
-    }
-  }, [companyToDelete, handleDeleteAccount, handleCloseDeleteConfirm]);
+  const handleConfirmDelete = useCallback(
+    async (reason) => {
+      if (companyToDelete) {
+        await handleDeleteAccount(companyToDelete, reason);
+        handleCloseDeleteConfirm();
+      }
+    },
+    [companyToDelete, handleDeleteAccount, handleCloseDeleteConfirm],
+  );
 
   const transformCompanyToFormData = useCallback((company) => {
     if (!company) return null;
@@ -158,8 +170,16 @@ const AccountManagement = () => {
     } = company;
 
     const { street } = address || {};
-    const { name: primaryContactName, phone: primaryContactNumber, email: primaryContactEmail } = contact || {};
-    const { name: secondaryContactName, phone: secondaryContactNumber, email: secondaryContactEmail } = secondaryContact || {};
+    const {
+      name: primaryContactName,
+      phone: primaryContactNumber,
+      email: primaryContactEmail,
+    } = contact || {};
+    const {
+      name: secondaryContactName,
+      phone: secondaryContactNumber,
+      email: secondaryContactEmail,
+    } = secondaryContact || {};
 
     return {
       carrierName: companyName || "",
@@ -183,11 +203,14 @@ const AccountManagement = () => {
   }, []);
 
   const columns = useMemo(
-    () => AccountManagementColumnsData(handleViewAccount, handleOpenDeleteConfirm),
+    () =>
+      AccountManagementColumnsData(handleViewAccount, handleOpenDeleteConfirm),
     [handleViewAccount, handleOpenDeleteConfirm],
   );
 
-  const initialFormData = selectedCompany ? transformCompanyToFormData(selectedCompany) : null;
+  const initialFormData = selectedCompany
+    ? transformCompanyToFormData(selectedCompany)
+    : null;
 
   useEffect(() => {
     setLoading(isLoading);
@@ -271,10 +294,11 @@ const AccountManagement = () => {
 
       <CommonConfirmDialog
         open={isDeleteConfirmOpen}
-        title="Inactive Account"
-        message={`Are you sure you want to Inactive ${companyToDelete?.carrierName || ""}?`}
-        confirmText="Inactive"
+        title="Deactivate Account"
+        message={`Are you sure you want to deactivate ${companyToDelete?.carrierName || ""}?`}
+        confirmText="Deactivate"
         cancelText="Cancel"
+        showReasonField={true}
         onConfirm={handleConfirmDelete}
         onCancel={handleCloseDeleteConfirm}
       />

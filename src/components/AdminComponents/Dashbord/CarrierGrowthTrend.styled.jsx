@@ -5,8 +5,8 @@ export const ChartContainer = styled(Paper, {
   shouldForwardProp: (prop) => prop !== "chartheight",
 })(({ chartheight, theme }) => ({
   padding: "16px",
-  paddingTop: "8px",
-  paddingBottom: "8px",
+  // paddingTop: "8px",
+  // paddingBottom: "8px",
   border: `1px solid ${theme.palette.grey[200]}`,
   borderRadius: "16px",
   height: chartheight || 360,
@@ -39,7 +39,6 @@ export const ChartHeader = styled(Box)(() => ({
   gap: "16px",
   marginBottom: "16px",
 }));
-
 
 export const ChartSubtitle = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary,
@@ -83,6 +82,3 @@ export const YearSelect = styled(TextField)({
   minWidth: 100,
   maxWidth: 120,
 });
-
-
-
