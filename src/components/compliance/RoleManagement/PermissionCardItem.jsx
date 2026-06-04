@@ -34,7 +34,7 @@ const PermissionCardItem = ({
 
   const isAllDisabled = enabledCount === 0;
 
-  const permissionCardEnabled = isAllEnabled ? 1 : 0;
+  const permissionCardEnabled = enabledCount === totalCount;
 
   const enableAllDisabled = isAllEnabled ? 1 : 0;
 

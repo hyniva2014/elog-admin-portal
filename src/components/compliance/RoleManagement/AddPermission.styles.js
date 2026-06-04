@@ -43,14 +43,18 @@ export const CountBadge = styled(Box)(({ theme }) => ({
   justifyContent: "center",
 }));
 
-export const PermissionItem = styled(Box)(({ theme }) => ({
+export const PermissionItem = styled(Card, {
+  shouldForwardProp: (prop) => prop !== "isenabled",
+})(({ theme, isenabled }) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
   border: `1px solid ${theme.palette.custom.lightBorder}`,
   borderRadius: 8,
   padding: theme.spacing(1.5, 2),
-  backgroundColor: theme.palette.custom.lightGreen,
+  backgroundColor: isenabled
+    ? theme.palette.custom.lightGreen
+    : theme.palette.common.white,
 }));
 
 export const PermissionTitle = styled(Typography)(({ theme }) => ({
