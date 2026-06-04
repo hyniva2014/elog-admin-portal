@@ -1,35 +1,95 @@
-/**
- * Builds the HTML string for the ApexCharts custom tooltip.
- * Kept in a dedicated utility to separate template generation from component logic.
- */
-export const buildTooltipHtml = ({ series, dataPointIndex, w, CHART_STYLES }) => {
-  const category = w.globals.labels[dataPointIndex];
-  const total = series.reduce((sum, s) => sum + (s[dataPointIndex] ?? 0), 0);
+import { Bar } from "recharts";
 
-  const rows = w.globals.seriesNames
-    .map((name, i) => {
-      const val = series[i][dataPointIndex];
-      if (val == null || val === 0) return "";
-      const color = w.globals.colors[i];
-      return `
-        <div style="display:flex;align-items:center;gap:${CHART_STYLES.tooltipRowGap};padding:${CHART_STYLES.tooltipRowPadding};">
-          <span style="width:${CHART_STYLES.tooltipDotSize};height:${CHART_STYLES.tooltipDotSize};border-radius:50%;background:${color};flex-shrink:0;display:inline-block;"></span>
-          <span style="color:${CHART_STYLES.tooltipLabelColor};font-size:${CHART_STYLES.tooltipLabelFontSize};flex:1;">${name}:</span>
-          <span style="color:${CHART_STYLES.tooltipValueColor};font-weight:${CHART_STYLES.tooltipValueFontWeight};font-size:${CHART_STYLES.tooltipValueFontSize};">${val}</span>
-        </div>`;
-    })
-    .join("");
+// Chart Configuration
+export const getChartConfig = (isMobile) => ({
+  chartHeight: isMobile ? 220 : 250,
+  barMaxSize: isMobile ? 30 : 40,
+  xAxisFontSize: isMobile ? 10 : 11,
+  yAxisFontSize: 12,
+  labelFontSize: isMobile ? 10 : 12,
+  chartMargins: {
+    top: 10,
+    right: 20,
+    left: 10,
+    bottom: 10,
+  },
+  tooltipCursor: false,
+});
 
-  return `
-    <div style="background:${CHART_STYLES.tooltipBg};border:1px solid ${CHART_STYLES.tooltipBorder};border-radius:${CHART_STYLES.tooltipBorderRadius};padding:${CHART_STYLES.tooltipPadding};box-shadow:${CHART_STYLES.tooltipShadow};min-width:${CHART_STYLES.tooltipMinWidth};">
-      <div style="font-weight:${CHART_STYLES.tooltipCategoryFontWeight};font-size:${CHART_STYLES.tooltipCategoryFontSize};color:${CHART_STYLES.tooltipCategoryColor};margin-bottom:${CHART_STYLES.tooltipCategoryMarginBottom};padding-bottom:${CHART_STYLES.tooltipCategoryPaddingBottom};border-bottom:1px solid ${CHART_STYLES.tooltipDivider};">
-        ${category}
-      </div>
-      ${rows}
-      <div style="display:flex;align-items:center;gap:${CHART_STYLES.tooltipRowGap};padding:${CHART_STYLES.tooltipTotalPaddingTop} 0 0;margin-top:${CHART_STYLES.tooltipTotalMarginTop};border-top:1px solid ${CHART_STYLES.tooltipDivider};">
-        <span style="width:${CHART_STYLES.tooltipDotSize};height:${CHART_STYLES.tooltipDotSize};flex-shrink:0;display:inline-block;"></span>
-        <span style="color:${CHART_STYLES.tooltipLabelColor};font-size:${CHART_STYLES.tooltipLabelFontSize};flex:1;font-weight:${CHART_STYLES.tooltipTotalFontWeight};">Total:</span>
-        <span style="color:${CHART_STYLES.tooltipValueColor};font-weight:${CHART_STYLES.tooltipValueFontWeight};font-size:${CHART_STYLES.tooltipValueFontSize};">${total}</span>
-      </div>
-    </div>`;
+// Bar Radius Helper
+export const getBarRadius = (index, totalBars) => {
+  const isLastBar = index === totalBars - 1;
+  return isLastBar ? [4, 4, 0, 0] : [0, 0, 0, 0];
 };
+
+// Filter Options
+export const incidentOptions = [
+  { value: "all", label: "All Incident" },
+  { value: "open", label: "Open Only" },
+  { value: "resolved", label: "Resolved" },
+];
+
+export const periodOptions = [
+  { value: "7d", label: "7 Days" },
+  { value: "30d", label: "30 Days" },
+  { value: "90d", label: "90 Days" },
+];
+
+// Legend Helpers
+export const splitLegendItems = (series) => {
+  const topLegendItems = series?.slice(0, 3) || [];
+  const bottomLegendItems = series?.slice(3) || [];
+  return { topLegendItems, bottomLegendItems };
+};
+
+// Chart Data Transformer
+export const transformChartData = (incidentDistribution, categories) => {
+  if (!incidentDistribution?.series?.length) return [];
+
+  return categories.map((category, index) => {
+    const row = {
+      name: category,
+      total: 0,
+    };
+
+    incidentDistribution.series.forEach((item) => {
+      const value = item.data[index] || 0;
+      row[item.name] = value;
+      row.total += value;
+    });
+
+    return row;
+  });
+};
+
+// Bar Renderer Factory (returns configuration, not JSX)
+export const getBarConfigs = (series, barMaxSize) => {
+  return series?.map((item, index) => ({
+    key: item.name,
+    dataKey: item.name,
+    stackId: "a",
+    fill: item.color,
+    maxBarSize: barMaxSize,
+    radius: getBarRadius(index, series.length),
+  })) || [];
+};
+
+
+export const getIncidentColors = (theme) => ({
+  HOS: theme.palette.error.main,
+  LOGS: theme.palette.error.dark,
+  DVIR: theme.palette.success.main,
+  DOT: theme.palette.warning.main,
+  ACCIDENT: theme.palette.secondary.main,
+  TEAM_DRIVER: theme.palette.info.main,
+  PROFILE: theme.palette.grey[600],
+  COMPLIANCE_DASHBOARD: theme.palette.primary.main,
+  VIOLATIONS: theme.palette.error.main,
+  DOCUMENT_CENTER: theme.palette.info.dark,
+  OPERATION_CENTER: theme.palette.success.dark,
+  HOS_SETTINGS: theme.palette.warning.dark,
+  ROLES: theme.palette.secondary.dark,
+  USERS: theme.palette.info.light,
+  REPORT_INCIDENT: theme.palette.error.light,
+  REPORTS: theme.palette.primary.dark,
+});

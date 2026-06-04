@@ -122,8 +122,11 @@ export const PeriodControl = styled(FormControl)(({ theme }) => ({
   },
 }));
 
+
 export const ChartWrapper = styled(Box)({
   width: "100%",
+  height: 260,
+  flexGrow: 1,
   minWidth: 0,
 });
 
@@ -131,41 +134,101 @@ export const LegendGrid = styled(Box)({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  gap: "20px",
-  marginTop: 16,
-  paddingLeft: 8,
-  paddingRight: 8,
+  gap: "16px",
+  marginTop: "24px",
 });
 
 export const LegendRow = styled(Box)({
   display: "flex",
-  flexDirection: "row",
-  alignItems: "center",
   justifyContent: "center",
-  gap: "24px",
+  gap: "60px",
   flexWrap: "wrap",
 });
 
 export const LegendItem = styled(Box)({
   display: "flex",
   alignItems: "center",
-  gap: "6px",
-  minWidth: 0,
+  gap: "8px",
 });
 
 export const LegendDot = styled(Box, {
   shouldForwardProp: (prop) => prop !== "dotcolor",
 })(({ dotcolor }) => ({
-  width: 10,
-  height: 10,
+  width: 12,
+  height: 12,
+  borderRadius: "50%",
+  background: dotcolor,
+}));
+
+export const LegendLabel = styled(Typography)(({ theme }) => ({
+  fontSize: "12px",
+  color: theme.palette.text.primary,
+}));
+
+
+
+export const TooltipContainer = styled(Box)({
+  padding: "16px",
+  borderRadius: "14px",
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(4px)",
+  boxShadow: "0px 4px 16px rgba(0,0,0,0.15)",
+  minWidth: "180px",
+});
+
+export const TooltipTitle = styled(Typography)({
+  fontSize: "16px",
+  fontWeight: 600,
+  color: "#000",
+  marginBottom: "8px",
+});
+
+export const TooltipRow = styled(Box)({
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+  marginBottom: "8px",
+});
+
+export const TooltipDot = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "dotcolor",
+})(({ dotcolor }) => ({
+  width: "12px",
+  height: "12px",
   borderRadius: "50%",
   backgroundColor: dotcolor,
   flexShrink: 0,
 }));
 
-export const LegendLabel = styled(Typography)(({ theme }) => ({
-  fontSize: "12px",
-  color: theme.palette.text.secondary,
-  lineHeight: 1.4,
-  wordBreak: "break-word",
+export const TooltipLabel = styled(Typography)({
+  fontSize: "14px",
+  fontWeight: 500,
+});
+
+export const TooltipFooter = styled(Box)({
+  marginTop: "8px",
+  paddingTop: "8px",
+  borderTop: "1px solid rgba(0,0,0,0.12)",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+});
+
+export const TooltipFooterLabel = styled(Typography)({
+  fontSize: "14px",
+  fontWeight: 600,
+});
+
+export const TooltipFooterValue = styled(Typography)({
+  fontSize: "14px",
+  fontWeight: 700,
+});
+
+
+
+export const NoDataBox = styled(Box)(({ theme }) => ({
+  color: theme.palette.text.disabled,
+  fontSize: "14px",
+  textAlign: "center",
+  marginTop: "60px",
 }));
