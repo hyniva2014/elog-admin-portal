@@ -12,16 +12,16 @@ const INCIDENT_TYPE_MAPPING = {
   DVIR: "DVIR",
   DOT: "DOT",
   ACCIDENT: "ACCIDENT",
-  TEAM_DRIVER: "TEAM_DRIVER",
+  TEAM_DRIVER: "TEAM DRIVER",
   PROFILE: "PROFILE",
   COMPLIANCE_DASHBOARD: "Web - Compliance Management",
   VIOLATIONS: "VIOLATIONS",
-  DOCUMENT_CENTER: "DOCUMENT_CENTER",
-  OPERATION_CENTER: "OPERATION_CENTER",
-  HOS_SETTINGS: "HOS_SETTINGS",
+  DOCUMENT_CENTER: "DOCUMENT CENTER",
+  OPERATION_CENTER: "OPERATION CENTER",
+  HOS_SETTINGS: "HOS SETTINGS",
   ROLES: "ROLES",
   USERS: "USERS",
-  REPORT_INCIDENT: "REPORT_INCIDENT",
+  REPORT_INCIDENT: "REPORT INCIDENT",
   REPORTS: "REPORTS",
 };
 
@@ -29,21 +29,36 @@ const INCIDENT_TYPE_MAPPING = {
  * Color mapping for each incident type
  */
 const INCIDENT_COLORS = {
-  "Mobile - Driver Log": "#E20021",
-  "Web - Compliance Management": "#2563EB",
-  "HOS": "#FE5429",
-  "DVIR": "#30C151",
-  "DOT": "#FF9800",
-  "ACCIDENT": "#9C27B0",
-  "TEAM_DRIVER": "#00BCD4",
-  "VIOLATIONS": "#F44336",
+  HOS: "#FE5429",
+  LOGS: "#E20021",
+  DVIR: "#30C151",
+  DOT: "#FF9800",
+  ACCIDENT: "#9C27B0",
+  TEAM_DRIVER: "#00BCD4",
+  PROFILE: "#6C757D",
+  COMPLIANCE_DASHBOARD: "#2563EB",
+  VIOLATIONS: "#F44336",
+  DOCUMENT_CENTER: "#17A2B8",
+  OPERATION_CENTER: "#28A745",
+  HOS_SETTINGS: "#FD7E14",
+  ROLES: "#6F42C1",
+  USERS: "#20C997",
+  REPORT_INCIDENT: "#DC3545",
+  REPORTS: "#007BFF",
 };
 
+// Reverse mapping for display name lookup
+const INCIDENT_COLORS_BY_DISPLAY_NAME = Object.keys(INCIDENT_TYPE_MAPPING).reduce((acc, key) => {
+  acc[INCIDENT_TYPE_MAPPING[key]] = INCIDENT_COLORS[key];
+  return acc;
+}, {});
+
 /**
- * Get color for an incident type, with fallback
+ * Get color for an incident type, accepts either key or display name
  */
-const getIncidentColor = (displayName) => {
-  return INCIDENT_COLORS[displayName] || "#757575";
+const getIncidentColor = (value) => {
+  // Try as key first, then as display name
+  return INCIDENT_COLORS[value] || INCIDENT_COLORS_BY_DISPLAY_NAME[value] || "#757575";
 };
 
 /**
