@@ -230,64 +230,26 @@ export const useAccountManagement = (
       setLoading(true);
 
       try {
-        const endUrl = `/masteradmin/get-companies?company_id=${row.id}`;
-        const response = await fetchApi(endUrl);
+        const payload = {
+          company_id: row.id,
+          deactivation_reason: reason,
+        };
 
-        if (response?.statusCode === 200 && response?.body?.data) {
-          const responseData = response?.body?.data;
-          const records = responseData?.data
-            ? Array.isArray(responseData.data)
-              ? responseData.data
-              : [responseData.data]
-            : responseData
-              ? Array.isArray(responseData)
-                ? responseData
-                : [responseData]
-              : [];
-          const company = records[0];
+        const response = await createApi(
+          payload,
+          "/masteradmin/delete-company",
+        );
 
-          if (company) {
-            const payload = {
-              company_id: company.company_id,
-              companyName: company.companyName,
-              dotNumber: company.dotNumber,
-              mcNumber: company.mcNumber || null,
-              ein: company.ein || null,
-              company_code: company.companyName.substring(0, 4).toUpperCase(),
-              maxDevices: company.maxDevices,
-              website: company.website || null,
-              tollFree: company.tollFree || null,
-              fax: company.fax || null,
-              status_id: "2",
-              address: company.address,
-              contact: company.contact,
-              secondaryContact: company.secondaryContact,
-              deactivation_reason: reason,
-            };
+        if (response?.statusCode === 200 || response?.statusCode === 201) {
+          handleSnackbar(
+            response?.body?.message || "Account deactivated successfully.",
+            "success",
+          );
 
-            const updateUrl = `/masteradmin/onboard-company`;
-            const updateResponse = await createApi(payload, updateUrl);
-
-            if (
-              updateResponse?.statusCode === 200 ||
-              updateResponse?.statusCode === 201
-            ) {
-              handleSnackbar(
-                `${company.companyName} account deactivated successfully.`,
-                "success",
-              );
-              fetchData();
-            } else {
-              handleSnackbar(
-                updateResponse?.body?.message ||
-                  "Failed to deactivate account.",
-                "error",
-              );
-            }
-          }
+          fetchData();
         } else {
           handleSnackbar(
-            "Failed to fetch company details for deactivation.",
+            response?.body?.message || "Failed to deactivate account.",
             "error",
           );
         }
@@ -301,9 +263,8 @@ export const useAccountManagement = (
         setLoading(false);
       }
     },
-    [setLoading, fetchApi, createApi, fetchData, handleSnackbar],
+    [setLoading, createApi, fetchData, handleSnackbar],
   );
-
   const fetchCompaniesDropdown = useCallback(async () => {
     try {
       const response = await fetchApi("/masteradmin/dropdown/companies");
