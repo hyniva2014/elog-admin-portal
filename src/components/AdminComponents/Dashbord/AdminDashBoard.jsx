@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { PageContainer } from "../component.styled";
@@ -20,12 +20,14 @@ import {
   DateRangeText,
   HeaderSubtitle,
 } from "./AlertCenter.styles";
-import { alerts, Device_Metrics_Cards } from "./AdminConstant";
+import { Device_Metrics_Cards } from "./AdminConstant";
 import DateRangeSelector from "./DateRangeSelector";
 import { useDashboardMetrics } from "../../../hooks";
 import { buildSummaryCards } from "../../../common/CommonUtils";
 import CommonLoading from "../../../common/CommonLoading";
 import { useNavigate } from "react-router-dom";
+import { useServices } from "../../../services/services";
+import { useAlertCenter } from "./useAlertCenter";
 
 const getTodayRange = () => {
   const today = new Date();
@@ -51,40 +53,62 @@ const AdminDashboard = () => {
 
   const { dashboardMetrics } = useDashboardMetrics(selectedRange, setLoading);
 
+  const [alertData, setAlertData] = useState({
+    alerts: [],
+    isLoading: false,
+  });
+
+  const { fetchApi } = useServices();
+
+  const { fetchData: fetchAlerts } = useAlertCenter(setAlertData, fetchApi);
+
+  useEffect(() => {
+    fetchAlerts();
+  }, []);
+
   const navigate = useNavigate();
+
   const handleAccountManagementNavigation = useCallback(() => {
-    navigate("/account-management");
+    navigate("/account-management", {
+      state: {
+        statusId: "1",
+      },
+    });
   }, [navigate]);
 
   const handleDeviceManagementNavigation = useCallback(() => {
-    navigate("/device-management");
+    navigate("/device-management", {
+      state: {
+        status: "2",
+      },
+    });
   }, [navigate]);
+
   const handleOpenIncidentsNavigation = useCallback(() => {
     navigate("/open-incidents");
   }, [navigate]);
-  const CARD_CONFIG = {
-    total_carriers: {
-      showViewAll: true,
-    },
-    active_devices: {
-      showViewAll: true,
-    },
-    open_incidents: {
-      showViewAll: true,
-    },
-  };
-  const navigationHandlers = useMemo(
-    () => ({
-      total_carriers: handleAccountManagementNavigation,
-      active_devices: handleDeviceManagementNavigation,
-      open_incidents: handleOpenIncidentsNavigation,
-    }),
-    [
-      handleAccountManagementNavigation,
-      handleDeviceManagementNavigation,
-      handleOpenIncidentsNavigation,
-    ],
-  );
+
+  const CARD_CONFIG = useMemo(() => {
+    return {
+      total_carriers: {
+        showViewAll: true,
+        onViewAll: handleAccountManagementNavigation,
+      },
+      active_devices: {
+        showViewAll: true,
+        onViewAll: handleDeviceManagementNavigation,
+      },
+      open_incidents: {
+        showViewAll: true,
+        onViewAll: handleOpenIncidentsNavigation,
+      },
+    };
+  }, [
+    handleAccountManagementNavigation,
+    handleDeviceManagementNavigation,
+    handleOpenIncidentsNavigation,
+  ]);
+
   const getDashboardCard = useCallback(
     (card) => {
       const config = CARD_CONFIG[card.id];
@@ -92,10 +116,10 @@ const AdminDashboard = () => {
       return {
         ...card,
         showViewAll: config?.showViewAll ?? false,
-        onViewAll: navigationHandlers[card.id],
+        onViewAll: config?.onViewAll,
       };
     },
-    [navigationHandlers],
+    [CARD_CONFIG],
   );
   const handleDateChange = (data) => {
     setSelectedRange(data);
@@ -148,7 +172,11 @@ const AdminDashboard = () => {
         </ChartGrid>
 
         <AlertGrid item xs={12} md={5}>
-          <CommonAlertCenter title="Alert Center" alerts={alerts} />
+          <CommonAlertCenter
+            title="Alert Center"
+            alerts={alertData.alerts}
+            isLoading={alertData.isLoading}
+          />
         </AlertGrid>
 
         <IncidentGrid item xs={12} md={6}>

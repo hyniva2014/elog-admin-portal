@@ -16,12 +16,15 @@ import {
   getSelectedDevices,
 } from "../../../common/CommonUtils";
 import AssignDevicesToCarriers from "./AssignDevicesToCarriers";
+import { useLocation } from "react-router-dom";
 
 const isDeviceSelectable = (params) => {
   return params.row.status?.toLowerCase() === "unassigned";
 };
 
 const DeviceManagement = () => {
+  const location = useLocation();
+  const defaultStatus = location.state?.status;
   const { fetchApi, createApi } = useServices();
   const { setLoading, LoadingContainer } = CommonLoading();
 
@@ -34,7 +37,8 @@ const DeviceManagement = () => {
     page: 1,
     pageSize: 25,
     search: "",
-    status: "",
+    // status: "",
+    status: defaultStatus || "",
     truckNumber: "",
     carrierId: "",
     fromDate: null,
