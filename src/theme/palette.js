@@ -68,7 +68,7 @@ const paletteTheme = (themeMode) => {
     dark: getColorVariants("#313a46", "#fff"),
 
     brand: getColorVariants("#284495", "#fff"),
-
+    avatarGrey: "#9b9b9b",    
     custom: {
       blue: "#2563EB",
 

@@ -21,6 +21,7 @@ import {
   Subtitle,
   AddButton,
 } from "./RoleManagement.styled";
+import { PageContainer } from "../../../common/PageContainer";
 
 const RoleManagement = () => {
   const { fetchApi, createApi } = useServices();
@@ -211,11 +212,11 @@ const RoleManagement = () => {
   return (
     <>
       <LoadingContainer />
+      <PageContainer>
 
-      <Container>
         <Header>
           <Box>
-            <Title>Roles Overview</Title>
+            <Title variant="inherit">Roles Overview</Title>
 
             <Subtitle>Quick view of all roles and their access levels</Subtitle>
           </Box>
@@ -251,7 +252,7 @@ const RoleManagement = () => {
           severity={snackbar.severity}
           onClose={handleSnackbarClose}
         />
-      </Container>
+      </PageContainer>
     </>
   );
 };
