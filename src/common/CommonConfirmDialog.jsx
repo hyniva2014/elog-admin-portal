@@ -5,12 +5,14 @@ import {
   DialogActions,
   Button,
   Typography,
+  TextField,
 } from "@mui/material";
 import {
   DialogActionsSx,
   ActionButtonSx,
   MessageTypographySx,
 } from "./CommonConfirmDialog.styled";
+import { useEffect, useState } from "react";
 
 const CommonConfirmDialog = ({
   open,
@@ -20,29 +22,57 @@ const CommonConfirmDialog = ({
   cancelText = "Cancel",
   onConfirm,
   onCancel,
-}) => (
-  <Dialog open={open} onClose={onCancel} maxWidth="xs" fullWidth>
-    <DialogTitle>{title}</DialogTitle>
+  showReasonField = false,
+}) => {
+  const [reason, setReason] = useState("");
 
-    <DialogContent>
-      <Typography sx={MessageTypographySx}>{message}</Typography>
-    </DialogContent>
+  useEffect(() => {
+    if (!open) {
+      setReason("");
+    }
+  }, [open]);
 
-    <DialogActions sx={DialogActionsSx}>
-      <Button variant="outlined" onClick={onCancel} sx={ActionButtonSx}>
-        {cancelText}
-      </Button>
+  const handleConfirm = () => {
+    onConfirm(reason);
+    setReason("");
+  };
 
-      <Button
-        variant="contained"
-        color="error"
-        onClick={onConfirm}
-        sx={ActionButtonSx}
-      >
-        {confirmText}
-      </Button>
-    </DialogActions>
-  </Dialog>
-);
+  return (
+    <Dialog open={open} onClose={onCancel} maxWidth="xs" fullWidth>
+      <DialogTitle>{title}</DialogTitle>
+
+      <DialogContent>
+        <Typography sx={MessageTypographySx}>{message}</Typography>
+
+        {showReasonField && (
+          <TextField
+            fullWidth
+            multiline
+            minRows={3}
+            margin="normal"
+            label="Reason for Deactivation"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+          />
+        )}
+      </DialogContent>
+
+      <DialogActions sx={DialogActionsSx}>
+        <Button variant="outlined" onClick={onCancel} sx={ActionButtonSx}>
+          {cancelText}
+        </Button>
+
+        <Button
+          variant="contained"
+          color="error"
+          onClick={handleConfirm}
+          sx={ActionButtonSx}
+        >
+          {confirmText}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 export default CommonConfirmDialog;

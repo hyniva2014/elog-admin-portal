@@ -226,7 +226,7 @@ export const useAccountManagement = (
   );
 
   const handleDeleteAccount = useCallback(
-    async (row) => {
+    async (row, reason) => {
       setLoading(true);
 
       try {
@@ -262,6 +262,7 @@ export const useAccountManagement = (
               address: company.address,
               contact: company.contact,
               secondaryContact: company.secondaryContact,
+              deactivation_reason: reason,
             };
 
             const updateUrl = `/masteradmin/onboard-company`;
@@ -335,7 +336,7 @@ export const useAccountManagement = (
     }
   }, []);
 
-    const fetchCarrierOptions = useCallback(
+  const fetchCarrierOptions = useCallback(
     async ({ carrier_name, carrier_id } = {}) => {
       const shouldShowLoader = Boolean(carrier_id);
 
