@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useServices } from "../../../services/services";
 import RoleCard from "./RoleCard";
 import RoleManagementForm from "./RoleManagementForm";
@@ -20,6 +20,8 @@ import {
   Title,
   Subtitle,
   AddButton,
+  CancelEditButton,
+  FormEditButton,
 } from "./RoleManagement.styled";
 import { PageContainer } from "../../../common/PageContainer";
 
@@ -95,7 +97,7 @@ const RoleManagement = () => {
 
       setIsEditMode(true);
 
-      setIsEditing(true);
+      setIsEditing(false);
 
       setOpenDialog(true);
     } catch (error) {
@@ -192,6 +194,14 @@ const RoleManagement = () => {
     [handleEditRole],
   );
 
+  const handleEnableEdit = useCallback(() => {
+    setIsEditing(true);
+  }, []);
+
+  const handleCancelEdit = useCallback(() => {
+    setIsEditing(false);
+  }, []);
+
   const roleCards = roles.map((role) => {
     const roleData = {
       id: role.id,
@@ -209,11 +219,28 @@ const RoleManagement = () => {
 
   const submitButtonLabel = isEditMode ? "Update" : "Save";
 
+  const headerActions = isEditMode ? (
+    !isEditing ? (
+      <FormEditButton variant="outlined" onClick={handleEnableEdit} size="small">
+        Edit
+      </FormEditButton>
+    ) : (
+      <CancelEditButton
+        variant="outlined"
+        onClick={handleCancelEdit}
+        size="small"
+      >
+        Cancel Edit
+      </CancelEditButton>
+    )
+  ) : null;
+
+  const disableSubmit = isEditMode && !isEditing;
+
   return (
     <>
       <LoadingContainer />
       <PageContainer>
-
         <Header>
           <Box>
             <Title variant="inherit">Roles Overview</Title>
@@ -235,6 +262,9 @@ const RoleManagement = () => {
           title={pageTitle}
           formId="role-form"
           submitButtonText={submitButtonLabel}
+          isEditing={isEditing}
+          disableSubmit={disableSubmit}
+          headerActions={headerActions}
           content={
             <RoleManagementForm
               formId="role-form"
