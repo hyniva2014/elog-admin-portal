@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import CommonDataGrid from "../../../common/CommonDataGrid";
 import CommonSnackbar from "../../../common/CommonSnackbar";
@@ -51,9 +51,9 @@ const RequestDevice = () => {
     handleSnackbarClose,
   } = useRequestDeviceManager(userDetails, setLoading, fetchRequestedDevices);
 
-  // useEffect(() => {
-  //   setLoading(isLoading);
-  // }, [isLoading, setLoading]);
+  useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading, setLoading]);
 
   useEffect(() => {
     fetchRequestedDevices({
@@ -71,7 +71,6 @@ const RequestDevice = () => {
     data.fromDate,
     data.toDate,
     data.search,
-    
   ]);
 
   const handleDataChange = useCallback((updateOrFn) => {
@@ -105,6 +104,21 @@ const RequestDevice = () => {
     ...data,
     total,
   };
+
+  const assignFormData = useMemo(
+    () => ({
+      modelName: selectedRequest?.modelName || "",
+      numberOfDevices:
+        selectedRequest?.requestedDevices ||
+        selectedRequest?.requested_devices_count ||
+        "",
+    }),
+    [
+      selectedRequest?.modelName,
+      selectedRequest?.requestedDevices,
+      selectedRequest?.requested_devices_count,
+    ],
+  );
 
   return (
     <>
@@ -154,10 +168,7 @@ const RequestDevice = () => {
         formId={DIALOG_CONFIG.ASSIGN_ASSET.FORM_ID}
         content={
           <AssignAssetForm
-            formData={{
-              modelName: selectedRequest?.modelName || "",
-              numberOfDevices: selectedRequest?.requestedDevices || selectedRequest?.requested_devices_count || "",
-            }}
+            formData={assignFormData}
             onSubmit={submitAssignAsset}
             setSubmitRef={assignSubmitRef}
             onStockStatusChange={setIsStockAvailable}

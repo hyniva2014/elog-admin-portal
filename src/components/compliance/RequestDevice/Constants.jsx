@@ -44,6 +44,8 @@ export const columns = [
     field: "requestedDevices",
     headerName: "Requested Devices",
     flex: 1,
+    align: "center",
+    headerAlign: "center",
     headerTooltip: true,
   },
   {

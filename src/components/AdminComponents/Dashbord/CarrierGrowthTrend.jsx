@@ -17,6 +17,7 @@ import {
   ChartTitle,
   ChartSubtitle,
   YearSelect,
+  ChartWrapper,
 } from "./CarrierGrowthTrend.styled";
 
 import ChartCustomTooltip from "./ChartCustomTooltip";
@@ -34,8 +35,8 @@ import {
   getTrendArray,
   getVisibleTrendData,
   formatSubtitle,
+  LINE_CHART_MARGIN,
 } from "./CarrierGrowthTrend.utils";
-
 
 const CarrierGrowthTrend = () => {
   const DEFAULT_OPTION = "Last 6 months";
@@ -46,7 +47,6 @@ const CarrierGrowthTrend = () => {
     selectedYear === "Last 6 months" ? CURRENT_YEAR : selectedYear;
 
   const { carrierGrowthTrend } = useCarrierGrowthTrend(apiYear);
-
 
   const theme = useTheme();
 
@@ -74,7 +74,7 @@ const CarrierGrowthTrend = () => {
         <text
           x={0}
           y={0}
-          dy={16}
+          dy={24}
           textAnchor="middle"
           fill={theme.palette.text.secondary}
           fontSize={mainFontSize}
@@ -120,30 +120,38 @@ const CarrierGrowthTrend = () => {
           ))}
         </YearSelect>
       </ChartHeader>
+      <ChartWrapper>
+        <ResponsiveContainer width="100%" height={260}>
+          <LineChart data={trendData} margin={LINE_CHART_MARGIN}>
+            <CartesianGrid strokeDasharray="3 3" />
 
-      <ResponsiveContainer width="100%" height={260}>
-        <LineChart data={trendData}>
-          <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey={X_AXIS_KEY}
+              tick={renderXAxisTick}
+              tickMargin={12}
+              interval={0}
+            />
 
-          <XAxis dataKey={X_AXIS_KEY} tick={renderXAxisTick} />
+            <YAxis />
 
-          <YAxis />
+            <Tooltip
+              content={<ChartCustomTooltip tooltipKeys={TooltipKeys} />}
+            />
 
-          <Tooltip content={<ChartCustomTooltip tooltipKeys={TooltipKeys} />} />
-
-          <Line
-            type="monotone"
-            dataKey={DATA_KEY}
-            stroke={chartLineColor}
-            strokeWidth={3}
-            dot={{
-              r: 5,
-              fill: chartLineColor,
-            }}
-            activeDot={{ r: 7 }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+            <Line
+              type="monotone"
+              dataKey={DATA_KEY}
+              stroke={chartLineColor}
+              strokeWidth={3}
+              dot={{
+                r: 5,
+                fill: chartLineColor,
+              }}
+              activeDot={{ r: 7 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </ChartWrapper>
     </ChartContainer>
   );
 };

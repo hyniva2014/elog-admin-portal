@@ -233,7 +233,7 @@ export const transformDeviceData = (data = []) =>
 export const DEVICE_SUMMARY_CARDS = {
   totalDevices: {
     id: "totalDevices",
-    title: "Total Active Devices",
+    title: "Total Devices",
     accentcolor: "brand",
     icon: <DevicesIcon fontSize="small" color="brand" />,
   },

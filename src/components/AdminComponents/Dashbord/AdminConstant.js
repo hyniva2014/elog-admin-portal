@@ -59,41 +59,47 @@ export const Device_Metrics_Cards = {
 //   },
 // ];
 
-export const alerts = [
-  {
-    id: "alert-eld-device-issue",
-    title: "ELD device Issue",
-    company: "Swift Transportation",
-    truck: "TRK-256",
-    serial: "SN-ABC12345",
-    location1: "30.250661",
-    location2: "-97.735925",
-    date: "13/05/2026",
-    color: "#EF4444",
-  },
-  {
-    id: "alert-incident-2301",
-    title: "Incident #INC-2301 requires attention",
-    company: "Schneider National",
-    truck: "TRK-256",
-    serial: "SN-ABC12345",
-    location1: "32.345664",
-    location2: "-73.834832",
-    date: "03/05/2026",
-    color: "#F59E0B",
-  },
-  {
-    id: "alert-new-devices",
-    title: "12 new devices assigned",
-    company: "Schneider National",
-    truck: "TRK-256",
-    serial: "SN-ABC12345",
-    location1: "31.787654",
-    location2: "-72.128374",
-    date: "12/05/2026",
-    color: "#3B82F6",
-  },
-];
+// export const alerts = [
+//   {
+//     id: "alert-eld-device-issue",
+//     title: "ELD device Issue",
+//     company: "Swift Transportation",
+//     truck: "TRK-256",
+//     serial: "SN-ABC12345",
+//     location1: "30.250661",
+//     location2: "-97.735925",
+//     date: "13/05/2026",
+//     color: "#EF4444",
+//   },
+//   {
+//     id: "alert-incident-2301",
+//     title: "Incident #INC-2301 requires attention",
+//     company: "Schneider National",
+//     truck: "TRK-256",
+//     serial: "SN-ABC12345",
+//     location1: "32.345664",
+//     location2: "-73.834832",
+//     date: "03/05/2026",
+//     color: "#F59E0B",
+//   },
+//   {
+//     id: "alert-new-devices",
+//     title: "12 new devices assigned",
+//     company: "Schneider National",
+//     truck: "TRK-256",
+//     serial: "SN-ABC12345",
+//     location1: "31.787654",
+//     location2: "-72.128374",
+//     date: "12/05/2026",
+//     color: "#3B82F6",
+//   },
+// ];
+
+export const ALERT_STATUS_COLORS = {
+  1: "#F59E0B",
+  2: "#EF4444",
+  3: "#3B82F6",
+};
 
 export const TooltipKeys = [
   {

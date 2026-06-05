@@ -5,6 +5,7 @@ import { PageContainer } from "../../../common/PageContainer";
 import CommonLoading from "../../../common/CommonLoading";
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonSnackbar from "../../../common/CommonSnackbar";
+import CommonConfirmDialog from "../../../common/CommonConfirmDialog";
 import DeviceAssetManagementHeader from "./DeviceAssetManagementHeader";
 import DeviceAssetManagementForm from "./DeviceAssetManagementForm";
 import { EditButton, CancelEditButton } from "./DeviceAssetManagement.styles";
@@ -68,6 +69,8 @@ const DeviceAssetManagement = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [deviceToDelete, setDeviceToDelete] = useState(null);
 
   const handleBulkClick = useCallback(() => {
     setIsBulkModalOpen(true);
@@ -284,62 +287,73 @@ const DeviceAssetManagement = () => {
     }
   };
 
-  const handleDeleteClick = useCallback(
-    async (row) => {
-      try {
-        setLoading(true);
+  const handleDeleteClick = useCallback((row) => {
+    setDeviceToDelete(row);
+    setIsDeleteConfirmOpen(true);
+  }, []);
 
-        const getResponse = await fetchApi(
-          `/masteradmin/get-eld-devices?device_id=${row.id}`,
-        );
-        const deviceData = getResponse?.body;
+  const handleCloseDeleteConfirm = useCallback(() => {
+    setIsDeleteConfirmOpen(false);
+    setDeviceToDelete(null);
+  }, []);
 
-        if (!deviceData) {
-          handleSnackbar("Failed to fetch device details", "error");
-          setLoading(false);
-          return;
-        }
+  const handleConfirmDelete = useCallback(async () => {
+    if (!deviceToDelete) return;
 
-        const payload = {
-          device_id: deviceData.device_id,
-          device_serial_number: deviceData.device_serial_number,
-          device_model_id: deviceData.device_model_id,
-          status: 3,
-        };
+    try {
+      setLoading(true);
 
-        if (deviceData.imei_number?.trim()) {
-          payload.imei_number = deviceData.imei_number.trim();
-        }
-        if (deviceData.iccid?.trim()) {
-          payload.iccid = deviceData.iccid.trim();
-        }
-        if (deviceData.BLE_MAC_ADDRESS?.trim()) {
-          payload.BLE_MAC_ADDRESS = deviceData.BLE_MAC_ADDRESS.trim();
-        }
+      const getResponse = await fetchApi(
+        `/masteradmin/get-eld-devices?device_id=${deviceToDelete.id}`,
+      );
+      const deviceData = getResponse?.body;
 
-        const response = await createApi(
-          payload,
-          "/masteradmin/onboard-eld-device",
-        );
-
-        if (response?.statusCode === 200) {
-          handleSnackbar("Asset status updated to Out of Service", "success");
-          fetchDeviceAssets();
-        } else {
-          handleSnackbar(
-            response?.body?.message || "Failed to update asset status",
-            "error",
-          );
-        }
-      } catch (error) {
-        console.error("Delete Device Error:", error);
-        handleSnackbar("Unexpected error occurred", "error");
-      } finally {
+      if (!deviceData) {
+        handleSnackbar("Failed to fetch device details", "error");
         setLoading(false);
+        handleCloseDeleteConfirm();
+        return;
       }
-    },
-    [fetchApi, createApi, fetchDeviceAssets, handleSnackbar, setLoading],
-  );
+
+      const payload = {
+        device_id: deviceData.device_id,
+        device_serial_number: deviceData.device_serial_number,
+        device_model_id: deviceData.device_model_id,
+        status: 3,
+      };
+
+      if (deviceData.imei_number?.trim()) {
+        payload.imei_number = deviceData.imei_number.trim();
+      }
+      if (deviceData.iccid?.trim()) {
+        payload.iccid = deviceData.iccid.trim();
+      }
+      if (deviceData.BLE_MAC_ADDRESS?.trim()) {
+        payload.BLE_MAC_ADDRESS = deviceData.BLE_MAC_ADDRESS.trim();
+      }
+
+      const response = await createApi(
+        payload,
+        "/masteradmin/onboard-eld-device",
+      );
+
+      if (response?.statusCode === 200) {
+        handleSnackbar("Asset status updated to Out of Service", "success");
+        fetchDeviceAssets();
+      } else {
+        handleSnackbar(
+          response?.body?.message || "Failed to update asset status",
+          "error",
+        );
+      }
+    } catch (error) {
+      console.error("Delete Device Error:", error);
+      handleSnackbar("Unexpected error occurred", "error");
+    } finally {
+      setLoading(false);
+      handleCloseDeleteConfirm();
+    }
+  }, [deviceToDelete, fetchApi, createApi, fetchDeviceAssets, handleSnackbar, setLoading, handleCloseDeleteConfirm]);
 
   const handleBulkSubmit = async (formValues) => {
     try {
@@ -568,6 +582,16 @@ const DeviceAssetManagement = () => {
         handleCancel={handleAssignCancel}
         handleSubmit={handleAssignSubmit}
         loading={false}
+      />
+
+      <CommonConfirmDialog
+        open={isDeleteConfirmOpen}
+        title="Delete Asset"
+        message={`Are you sure you want to delete ${deviceToDelete?.serialNumber || "this asset"}?`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCloseDeleteConfirm}
       />
     </>
   );
