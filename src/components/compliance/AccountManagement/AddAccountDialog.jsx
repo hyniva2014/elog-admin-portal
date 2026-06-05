@@ -21,6 +21,7 @@ import {
   CARRIER_FIELD_MAP,
   PRIMARY_CONTACT_FIELDS,
   SECONDARY_CONTACT_FIELDS,
+  DEACTIVATION_FIELDS,
 } from "./Constants";
 import FormSelect from "./FormSelect";
 import FormFieldsSection from "./FormFieldsSection";
@@ -136,6 +137,12 @@ const validationSchema = yup.object({
     .nullable(),
 
   status: yup.string().oneOf(["1", "2"]),
+  reasonForDeactivation: yup.string().when("status", {
+  is: "2",
+  then: (schema) =>
+    schema.required("Reason for Deactivation is required"),
+  otherwise: (schema) => schema.notRequired(),
+  }),
 });
 
 const defaultValues = {
@@ -154,6 +161,7 @@ const defaultValues = {
   secondaryContactName: "",
   secondaryContactNumber: "",
   secondaryContactEmail: "",
+  reasonForDeactivation: "",
   status: "1",
 };
 
@@ -183,6 +191,7 @@ const AddAccountDialog = ({
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
@@ -196,6 +205,8 @@ const AddAccountDialog = ({
       reset(initialData);
     }
   }, [open, reset, initialData]);
+
+  const selectedStatus = watch("status");
 
   const shouldShowStatusField = mode !== "add";
   const dialogTitle = DIALOG_TITLES[mode] ?? DIALOG_TITLES.add;
@@ -261,7 +272,10 @@ const AddAccountDialog = ({
         <Grid container spacing={2}>
           <CarrierNameAutocomplete
             formProps={{ control, errors }}
-            carrierProps={{ fetchCarrierOptions, onCarrierSelect: handleCarrierSelect }}
+            carrierProps={{
+              fetchCarrierOptions,
+              onCarrierSelect: handleCarrierSelect,
+            }}
             disabled={isFieldDisabled}
           />
 
@@ -307,6 +321,26 @@ const AddAccountDialog = ({
             errors={errors}
             disabled={isFieldDisabled}
           />
+
+          {selectedStatus === "2" && (
+            <>
+              <Grid item xs={12}>
+                <SecondarySectionHeader>
+                  Reason for Deactivation
+                </SecondarySectionHeader>
+                <Divider />
+              </Grid>
+
+              <Grid item xs={12}>
+                <FormFieldsSection
+                  fields={DEACTIVATION_FIELDS}
+                  control={control}
+                  errors={errors}
+                  disabled={isFieldDisabled}
+                />
+              </Grid>
+            </>
+          )}
         </Grid>
       </DialogFormContainer>
     </form>
