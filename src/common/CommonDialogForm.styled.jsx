@@ -86,7 +86,7 @@ export const BUTTON_LABELS = {
 export const DialogPaperSx = (theme) => ({
   background: "rgba(255, 255, 255, 0.78)",
   backdropFilter: "blur(4px)",
-  border: `1.5px solid ${theme.palette.primary.main}`,
+  // border: `1.5px solid ${theme.palette.primary.main}`,
   borderRadius: "14px",
   boxShadow: theme.shadows[1],
 });
