@@ -1,6 +1,5 @@
 import { Bar } from "recharts";
 
-// Chart Configuration
 export const getChartConfig = (isMobile) => ({
   chartHeight: isMobile ? 220 : 250,
   barMaxSize: isMobile ? 30 : 40,
@@ -16,13 +15,11 @@ export const getChartConfig = (isMobile) => ({
   tooltipCursor: false,
 });
 
-// Bar Radius Helper
 export const getBarRadius = (index, totalBars) => {
   const isLastBar = index === totalBars - 1;
   return isLastBar ? [4, 4, 0, 0] : [0, 0, 0, 0];
 };
 
-// Filter Options
 export const incidentOptions = [
   { value: "all", label: "All Incident" },
   { value: "open", label: "Open Only" },
@@ -52,9 +49,9 @@ export const transformChartData = (incidentDistribution, categories) => {
       total: 0,
     };
 
-    incidentDistribution.series.forEach((item) => {
-      const value = item.data[index] || 0;
-      row[item.name] = value;
+    incidentDistribution.series.forEach(({ data, name }) => {
+      const value = data[index] || 0;
+      row[name] = value;
       row.total += value;
     });
 
@@ -64,32 +61,41 @@ export const transformChartData = (incidentDistribution, categories) => {
 
 // Bar Renderer Factory (returns configuration, not JSX)
 export const getBarConfigs = (series, barMaxSize) => {
-  return series?.map((item, index) => ({
-    key: item.name,
-    dataKey: item.name,
-    stackId: "a",
-    fill: item.color,
-    maxBarSize: barMaxSize,
-    radius: getBarRadius(index, series.length),
-  })) || [];
+  return (
+    series?.map(({ name, color }, index) => ({
+      key: name,
+      dataKey: name,
+      stackId: "a",
+      fill: color,
+      maxBarSize: barMaxSize,
+      radius: getBarRadius(index, series.length),
+    })) || []
+  );
 };
 
 
-export const getIncidentColors = (theme) => ({
-  HOS: theme.palette.error.main,
-  LOGS: theme.palette.error.dark,
-  DVIR: theme.palette.success.main,
-  DOT: theme.palette.warning.main,
-  ACCIDENT: theme.palette.secondary.main,
-  TEAM_DRIVER: theme.palette.info.main,
-  PROFILE: theme.palette.grey[600],
-  COMPLIANCE_DASHBOARD: theme.palette.primary.main,
-  VIOLATIONS: theme.palette.error.main,
-  DOCUMENT_CENTER: theme.palette.info.dark,
-  OPERATION_CENTER: theme.palette.success.dark,
-  HOS_SETTINGS: theme.palette.warning.dark,
-  ROLES: theme.palette.secondary.dark,
-  USERS: theme.palette.info.light,
-  REPORT_INCIDENT: theme.palette.error.light,
-  REPORTS: theme.palette.primary.dark,
-});
+import { useTheme } from "@mui/material/styles";
+
+// export default function useIncidentDistribution(period, incidentScope) {
+//   const theme = useTheme();
+
+//   const INCIDENT_COLORS = {
+//     HOS: theme.palette.error.main,
+//     LOGS: theme.palette.error.dark,
+//     DVIR: theme.palette.success.main,
+//     DOT: theme.palette.warning.main,
+//     ACCIDENT: theme.palette.secondary.main,
+//     TEAM_DRIVER: theme.palette.info.main,
+//     PROFILE: theme.palette.grey[600],
+//     COMPLIANCE_DASHBOARD: theme.palette.primary.main,
+//     VIOLATIONS: theme.palette.error.main,
+//     DOCUMENT_CENTER: theme.palette.info.dark,
+//     OPERATION_CENTER: theme.palette.success.dark,
+//     HOS_SETTINGS: theme.palette.warning.dark,
+//     ROLES: theme.palette.secondary.dark,
+//     USERS: theme.palette.success.light,
+//     REPORT_INCIDENT: theme.palette.error.dark,
+//     REPORTS: theme.palette.primary.dark,
+//   };
+
+// }
