@@ -35,6 +35,12 @@ const ActionCell = (params) => {
 
 export const columns = [
   {
+    field: "id",
+    headerName: "ID",
+    flex: 1,
+    headerTooltip: true,
+  },
+  {
     field: "carrierName",
     headerName: "Carrier Name",
     flex: 1,
@@ -99,8 +105,8 @@ export const columns = [
 ];
 
 export const statusOptions = [
-  { label: "Pending", value: "1" },
-  { label: "Approved", value: "0" },
+  { label: "Pending", value: "0" },
+  { label: "Approved", value: "1" },
 ];
 
 // Dialog configuration constants
@@ -116,3 +122,4 @@ export const DIALOG_CONFIG = {
     FORM_ID: "assign-asset-form",
   },
 };
+export const CONFIRMATION_DIALOG_TITLE = "Device Allocation Confirmation";
