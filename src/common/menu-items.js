@@ -41,7 +41,7 @@ const MENU_ITEMS = [
       },
       {
         key: "request-device",
-        label: "Request Device",
+        label: "Request Devices",
         url: "/request-device",
         parentKey: "device-management",
       },
@@ -59,9 +59,9 @@ const MENU_ITEMS = [
         parentKey: "user-management",
       },
       {
-        key: "career-users-management",
-        label: "Career Users",
-        url: "/career-users",
+        key: "carrier-users-management",
+        label: "Carrier Users",
+        url: "/carrier-users",
         parentKey: "user-management",
       },
       {
