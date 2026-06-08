@@ -31,6 +31,14 @@ export const ChartWrapper = styled(Box)({
   width: "100%",
   position: "relative",
   display: "block",
+
+  "& *:focus": {
+    outline: "none !important",
+  },
+
+  "& *:focus-visible": {
+    outline: "none !important",
+  },
 });
 export const ChartHeader = styled(Box)(() => ({
   display: "flex",

@@ -9,6 +9,7 @@ import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdo
 import { FormContainer } from "./UserManagementForm.styled";
 import { EditHeaderButton } from "./UserManagementForm.styled";
 import { useServices } from "../../../services/services";
+import { USER_PROFILE_OPTIONS } from "./Constants";
 
 const STATUS_OPTIONS = [
   { label: "Active", value: "1" },
@@ -140,49 +141,49 @@ const UserManagementForm = ({
 
   const companyId = watch("company_id");
 
-  useEffect(() => {
-    let isMounted = true;
-    const fetchRoles = async () => {
-      if (!companyId) {
-        setRoleOptions((prev) => (prev.length === 0 ? prev : []));
-        return;
-      }
-      try {
-        const response = await fetchApi(`/admin/user/get-roles?company_id=${companyId}`);
-        if (!isMounted) return;
+  // useEffect(() => {
+  //   let isMounted = true;
+  //   const fetchRoles = async () => {
+  //     if (!companyId) {
+  //       setRoleOptions((prev) => (prev.length === 0 ? prev : []));
+  //       return;
+  //     }
+  //     try {
+  //       const response = await fetchApi(`/admin/user/get-roles?company_id=${companyId}`);
+  //       if (!isMounted) return;
 
-        let roles = [];
-        if (response?.body?.Roles) {
-          roles = response.body.Roles;
-        } else if (response?.body?.data) {
-          roles = response.body.data;
-        } else if (response?.data) {
-          roles = response.data;
-        } else if (Array.isArray(response?.body)) {
-          roles = response.body;
-        } else if (Array.isArray(response)) {
-          roles = response;
-        }
+  //       let roles = [];
+  //       if (response?.body?.Roles) {
+  //         roles = response.body.Roles;
+  //       } else if (response?.body?.data) {
+  //         roles = response.body.data;
+  //       } else if (response?.data) {
+  //         roles = response.data;
+  //       } else if (Array.isArray(response?.body)) {
+  //         roles = response.body;
+  //       } else if (Array.isArray(response)) {
+  //         roles = response;
+  //       }
 
-        const options = roles.map((r) => ({
-          label: r.role_name || r.name || r.roleName || r.label || "Unknown",
-          value: String(r.role_id || r.id || r.value || ""),
-        }));
+  //       const options = roles.map((r) => ({
+  //         label: r.role_name || r.name || r.roleName || r.label || "Unknown",
+  //         value: String(r.role_id || r.id || r.value || ""),
+  //       }));
 
-        setRoleOptions(options);
-      } catch (err) {
-        console.error("Failed to fetch roles", err);
-        if (isMounted) {
-          setRoleOptions((prev) => (prev.length === 0 ? prev : []));
-        }
-      }
-    };
-    fetchRoles();
+  //       setRoleOptions(options);
+  //     } catch (err) {
+  //       console.error("Failed to fetch roles", err);
+  //       if (isMounted) {
+  //         setRoleOptions((prev) => (prev.length === 0 ? prev : []));
+  //       }
+  //     }
+  //   };
+  //   fetchRoles();
 
-    return () => {
-      isMounted = false;
-    };
-  }, [companyId, fetchApi]);
+  //   return () => {
+  //     isMounted = false;
+  //   };
+  // }, [companyId, fetchApi]);
 
   // Edit button shown in the dialog header (next to close icon)
   const editHeaderButton = isViewMode && !isEditing && (
@@ -221,7 +222,8 @@ const UserManagementForm = ({
             name="role_id"
             label="User Profile"
             value={watch("role_id")}
-            options={roleOptions}
+            // options={roleOptions}
+            options={USER_PROFILE_OPTIONS}
             onChange={handleUserProfileChange}
             error={!!errors.role_id}
             helperText={errors.role_id?.message}
@@ -229,22 +231,6 @@ const UserManagementForm = ({
             disabled={isReadOnly}
           />
         </Grid>
-
-        {isViewMode && (
-          <Grid item xs={12}>
-            <CommonAutocompleteDropdown
-              name="status_id"
-              label="Status"
-              value={watch("status_id")}
-              options={STATUS_OPTIONS}
-              onChange={handleStatusChange}
-              error={!!errors.status_id}
-              helperText={errors.status_id?.message}
-              required={!isReadOnly}
-              disabled={isReadOnly}
-            />
-          </Grid>
-        )}
 
         <Grid item xs={12}>
           <CommonTextField
@@ -284,7 +270,21 @@ const UserManagementForm = ({
             shrinkLabel={!!watch("email")}
           />
         </Grid>
-
+        {isViewMode && (
+          <Grid item xs={12}>
+            <CommonAutocompleteDropdown
+              name="status_id"
+              label="Status"
+              value={watch("status_id")}
+              options={STATUS_OPTIONS}
+              onChange={handleStatusChange}
+              error={!!errors.status_id}
+              helperText={errors.status_id?.message}
+              required={!isReadOnly}
+              disabled={isReadOnly}
+            />
+          </Grid>
+        )}
         {/* Password fields — only shown when adding a new user */}
         {!isViewMode && (
           <>

@@ -137,3 +137,10 @@ export const formatSubtitle = (trendEntries, selectedYear) => {
 
   return `${first.monthName} - ${last.monthName}`;
 };
+
+export const LINE_CHART_MARGIN = {
+  top: 5,
+  right: 30,
+  left: 0,
+  bottom: 10,
+};

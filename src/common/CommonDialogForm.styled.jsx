@@ -82,3 +82,16 @@ export const BUTTON_LABELS = {
   SAVING: "Saving...",
   CANCEL: "Cancel",
 };
+
+export const DialogPaperSx = (theme) => ({
+  background: "rgba(255, 255, 255, 0.78)",
+  backdropFilter: "blur(4px)",
+  // border: `1.5px solid ${theme.palette.primary.main}`,
+  borderRadius: "14px",
+  boxShadow: theme.shadows[1],
+});
+
+export const DialogBackdropSx = {
+  background: "transparent",
+  // backdropFilter: "blur(1px)",
+};

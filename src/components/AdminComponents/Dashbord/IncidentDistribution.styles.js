@@ -1,5 +1,6 @@
 import { styled } from "@mui/material/styles";
 import { Box, Card, CardContent, Typography, Stack, FormControl } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 export const getChartStyles = (theme) => ({
   axisLabelColor:   theme.palette.text.secondary,
@@ -122,50 +123,138 @@ export const PeriodControl = styled(FormControl)(({ theme }) => ({
   },
 }));
 
+
 export const ChartWrapper = styled(Box)({
   width: "100%",
+  height: 260,
+  flexGrow: 1,
   minWidth: 0,
 });
 
-export const LegendGrid = styled(Box)({
+export const LegendGrid = styled(Box)(({ theme }) => ({
+  width: "100%",
   display: "flex",
   flexDirection: "column",
-  alignItems: "center",
-  gap: "20px",
-  marginTop: 16,
-  paddingLeft: 8,
-  paddingRight: 8,
-});
+  gap: "8px",
+}));
 
-export const LegendRow = styled(Box)({
-  display: "flex",
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "24px",
-  flexWrap: "wrap",
-});
+export const LegendRow = styled(Box)(({ theme }) => ({
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+  gap: "16px",
+  padding: "8px",
+  width: "100%",
+  [theme.breakpoints.down("sm")]: {
+    gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+    gap: "12px",
+  },
+}));
 
 export const LegendItem = styled(Box)({
   display: "flex",
   alignItems: "center",
-  gap: "6px",
-  minWidth: 0,
+  gap: "8px",
+  width: "100%", // Take full width of grid cell
+  minWidth: 0, // Allow text truncation if needed
 });
 
 export const LegendDot = styled(Box, {
   shouldForwardProp: (prop) => prop !== "dotcolor",
 })(({ dotcolor }) => ({
-  width: 10,
-  height: 10,
+  width: 12,
+  height: 12,
+  borderRadius: "50%",
+  background: dotcolor,
+}));
+
+export const LegendLabel = styled(Typography)(({ theme }) => ({
+  fontSize: "12px",
+  color: theme.palette.text.primary,
+}));
+
+
+
+export const TooltipContainer = styled(Box)(({ theme }) => ({
+  padding: "16px",
+  borderRadius: "14px",
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(4px)",
+  boxShadow: theme.shadows[1],
+  minWidth: "180px",
+}));
+
+export const TooltipTitle = styled(Typography)(({ theme }) => ({
+  fontSize: "16px",
+  fontWeight: 600,
+  color: theme.palette.text.primary,
+  marginBottom: "8px",
+}));
+
+export const TooltipRow = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+  marginBottom: "8px",
+}));
+
+export const TooltipDot = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "dotcolor",
+})(({ dotcolor }) => ({
+  width: "12px",
+  height: "12px",
   borderRadius: "50%",
   backgroundColor: dotcolor,
   flexShrink: 0,
 }));
 
-export const LegendLabel = styled(Typography)(({ theme }) => ({
-  fontSize: "12px",
-  color: theme.palette.text.secondary,
-  lineHeight: 1.4,
-  wordBreak: "break-word",
+export const TooltipLabel = styled(Typography)({
+  fontSize: "14px",
+  fontWeight: 500,
+});
+
+export const TooltipFooter = styled(Box)(({ theme }) =>({
+  marginTop: "8px",
+  paddingTop: "8px",
+  borderTop: `1px solid ${theme.palette.divider}`,
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
 }));
+
+export const TooltipFooterLabel = styled(Typography)({
+  fontSize: "14px",
+  fontWeight: 600,
+});
+
+export const TooltipFooterValue = styled(Typography) ({
+  fontSize: "14px",
+  fontWeight: 700,
+});
+
+
+export const NoDataBox = styled(Box)(({ theme }) => ({
+  color: theme.palette.text.disabled,
+  fontSize: "14px",
+  textAlign: "center",
+  marginTop: "60px",
+}));
+
+
+export const getIncidentColors = (theme) => ({
+  HOS: theme.palette.error.main,
+  "Mobile - Driver Log": theme.palette.error.dark,
+  DVIR: theme.palette.success.main,
+  DOT: theme.palette.warning.main,
+  ACCIDENT: theme.palette.secondary.main,
+  "TEAM DRIVER": theme.palette.info.main,
+  PROFILE: theme.palette.grey[600],
+  "Web - Compliance Management": theme.palette.primary.main,
+  VIOLATIONS: theme.palette.error.light,
+  "DOCUMENT CENTER": theme.palette.info.dark,
+  "OPERATION CENTER": theme.palette.success.dark,
+  "HOS SETTINGS": theme.palette.warning.dark,
+  ROLES: theme.palette.secondary.dark,
+  USERS: theme.palette.success.light,
+  "REPORT INCIDENT": theme.palette.error.main,
+  REPORTS: theme.palette.primary.dark,
+});

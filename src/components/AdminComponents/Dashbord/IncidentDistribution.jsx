@@ -1,6 +1,23 @@
 import { useMemo, useState } from "react";
-import { InputLabel, MenuItem, Select, useMediaQuery, useTheme } from "@mui/material";
-import ReactApexChart from "react-apexcharts";
+
+import {
+  InputLabel,
+  MenuItem,
+  Select,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+} from "recharts";
+
 import {
   CardContainer,
   StyledCardContent,
@@ -17,140 +34,249 @@ import {
   LegendItem,
   LegendDot,
   LegendLabel,
-  getChartStyles,
+  NoDataBox,
+  getIncidentColors,
 } from "./IncidentDistribution.styles";
-import { getIncidentChartOptions } from "./IncidentDistribution.config";
+
 import useIncidentDistribution from "../../../hooks/useIncidentDistribution";
 
-// ─── Sub-component ────────────────────────────────────────────────────────────
+import CustomTooltip from "./IncidentDistributionTooltip";
+
+import {
+  getChartConfig,
+  incidentOptions,
+  periodOptions,
+  splitLegendItems,
+  transformChartData,
+  getBarConfigs,
+} from "./IncidentDistribution.utils";
 
 const ChartLegendItem = ({ seriesItem }) => (
-  <LegendItem key={seriesItem.name}>
+  <LegendItem>
     <LegendDot dotcolor={seriesItem.color} />
     <LegendLabel>{seriesItem.name}</LegendLabel>
   </LegendItem>
 );
 
-// ─── Legend row helper ────────────────────────────────────────────────────────
 
-const renderLegendRow = (items) => (
-  <LegendRow>
-    {items.map((s) => (
-      <ChartLegendItem key={s.name} seriesItem={s} />
-    ))}
-  </LegendRow>
-);
+const ChartBars = ({ barConfigs }) => {
+  return barConfigs.map((config) => <Bar key={config.key} {...config} />);
+};
 
-// ─── Component ────────────────────────────────────────────────────────────────
+const LegendItems = ({ items }) => {
+  return items.map((item) => (
+    <ChartLegendItem key={item.name} seriesItem={item} />
+  ));
+};
 
 const IncidentDistribution = () => {
   const theme = useTheme();
-  const downSm = useMediaQuery(theme.breakpoints.down("sm"));
-  const chartHeight = downSm ? 200 : 240;
+  const incidentColors = useMemo(() => getIncidentColors(theme), [theme]);
 
-  const CHART_STYLES = getChartStyles(theme);
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // State for filters
   const [incidentScope, setIncidentScope] = useState("all");
+
   const [period, setPeriod] = useState("7d");
 
-  // API hook - following CarrierGrowthTrend pattern
-  const { incidentDistribution, loading } = useIncidentDistribution(period, incidentScope);
+  const { incidentDistribution, loading } = useIncidentDistribution(
+    period,
 
-  // ── Named handlers ──────────────────────────────────────────────────────────
-  const handleIncidentChange = (e) => setIncidentScope(e.target.value);
-  const handlePeriodChange = (e) => setPeriod(e.target.value);
+    incidentScope,
+  );
+  const seriesWithColors =
+    incidentDistribution?.series?.map((item) => ({
+      ...item,
+      color: incidentColors[item.name] || theme.palette.grey[500],
+    })) || [];
 
-  // ── Series / colors from API data ──────────────────────────────────────────
-  const series = useMemo(
-    () => incidentDistribution?.series?.map(({ name, data }) => ({ name, data })) || [],
-    [incidentDistribution],
+  const handleIncidentChange = (e) => {
+    setIncidentScope(e.target.value);
+  };
+
+  const handlePeriodChange = (e) => {
+    setPeriod(e.target.value);
+  };
+
+  const categories = incidentDistribution?.categories || [];
+
+  const dateRange =
+    incidentDistribution?.dateRange?.replaceAll(",", "") || "No data available";
+
+
+  const chartData = useMemo(
+    () => transformChartData(incidentDistribution, categories),
+
+    [incidentDistribution, categories],
   );
 
-  const colors = useMemo(
-    () => incidentDistribution?.series?.map((s) => s.color) || [],
-    [incidentDistribution],
+  const chartConfig = getChartConfig(isMobile);
+
+  const hasData = chartData.length > 0;
+
+  const isLoading = loading;
+
+  const isEmpty = !hasData && !isLoading;
+
+
+  const { topLegendItems, bottomLegendItems } =
+    splitLegendItems(seriesWithColors);
+
+
+  const barConfigs = getBarConfigs(seriesWithColors, chartConfig.barMaxSize);
+
+
+  const renderLegendSection = () => {
+    if (!hasData || isLoading || !incidentDistribution?.series?.length) {
+      return null;
+    }
+
+    const hasTopLegend = topLegendItems.length > 0;
+
+    const hasBottomLegend = bottomLegendItems.length > 0;
+
+    return (
+      <LegendGrid>
+        {hasTopLegend && (
+          <LegendRow>
+            <LegendItems items={topLegendItems} />
+          </LegendRow>
+        )}
+
+        {hasBottomLegend && (
+          <LegendRow>
+            <LegendItems items={bottomLegendItems} />
+          </LegendRow>
+        )}
+      </LegendGrid>
+    );
+  };
+
+
+  const renderIncidentFilter = () => (
+    <FilterControl size="small" fullWidth={isMobile}>
+      <InputLabel id="incident-filter-label">Incident</InputLabel>
+
+      <Select
+        labelId="incident-filter-label"
+        label="Incident"
+        value={incidentScope}
+        onChange={handleIncidentChange}
+        disabled={isLoading}
+      >
+        <MenuItem value="all">All Incident</MenuItem>
+        <MenuItem value="open">Open Only</MenuItem>
+        <MenuItem value="resolved">Resolved</MenuItem>
+      </Select>
+    </FilterControl>
   );
 
-  const categories = useMemo(
-    () => incidentDistribution?.categories || [],
-    [incidentDistribution],
+  const renderPeriodFilter = () => (
+    <PeriodControl size="small" fullWidth={isMobile}>
+      <InputLabel id="period-label">Period</InputLabel>
+
+      <Select
+        labelId="period-label"
+        label="Period"
+        value={period}
+        onChange={handlePeriodChange}
+        disabled={isLoading}
+      >
+        <MenuItem value="7d">7 Days</MenuItem>
+        <MenuItem value="30d">30 Days</MenuItem>
+        <MenuItem value="90d">90 Days</MenuItem>
+      </Select>
+    </PeriodControl>
   );
 
-  const dateRange = useMemo(
-    () => incidentDistribution?.dateRange || "No data available",
-    [incidentDistribution],
-  );
 
-  // ── Chart options (extracted to config file) ────────────────────────────────
-  const chartOptions = useMemo(
-    () => getIncidentChartOptions(theme, colors, CHART_STYLES, categories),
-    [colors, theme, CHART_STYLES, categories],
-  );
+  const renderChartContent = () => {
+    if (isLoading) {
+      return <NoDataBox>Loading incident data...</NoDataBox>;
+    }
 
-  // ── Pre-computed legend items ───────────────────────────────────────────────
-  const topLegendItems = incidentDistribution?.series?.slice(0, 3) || [];
-  const bottomLegendItems = incidentDistribution?.series?.slice(3) || [];
+    if (isEmpty) {
+      return <NoDataBox>No incident data available</NoDataBox>;
+    }
+
+    if (hasData) {
+      return (
+        <ResponsiveContainer width="100%" height={chartConfig.chartHeight}>
+          <BarChart data={chartData} margin={chartConfig.chartMargins}>
+            <CartesianGrid
+              stroke={theme.palette.divider}
+              strokeDasharray="4 4"
+              vertical={false}
+            />
+
+            <XAxis
+              dataKey="name"
+              tick={{
+                fill: theme.palette.text.secondary,
+
+                fontSize: chartConfig.xAxisFontSize,
+              }}
+            />
+
+            <YAxis
+              tick={{
+                fill: theme.palette.text.secondary,
+
+                fontSize: chartConfig.yAxisFontSize,
+              }}
+              axisLine={{
+                stroke: theme.palette.divider,
+              }}
+              label={{
+                value: "Incident Distribution",
+
+                angle: -90,
+
+                position: "insideLeft",
+
+                style: {
+                  fill: theme.palette.text.secondary,
+
+                  fontSize: chartConfig.labelFontSize,
+
+                  textAnchor: "middle",
+                },
+              }}
+            />
+
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={chartConfig.tooltipCursor}
+            />
+
+            <ChartBars barConfigs={barConfigs} />
+          </BarChart>
+        </ResponsiveContainer>
+      );
+    }
+
+    return null;
+  };
 
   return (
     <CardContainer variant="outlined">
       <StyledCardContent>
         <HeaderStack>
           <TitleBox>
-            <ChartTitle variant="h6" component="h2">
-              Incident Distribution
-            </ChartTitle>
-            <ChartSubtitle variant="body2">
-              {dateRange}
-            </ChartSubtitle>
+            <ChartTitle>Incident Distribution</ChartTitle>
+            <ChartSubtitle>{dateRange}</ChartSubtitle>
           </TitleBox>
 
           <FiltersStack>
-            <FilterControl size="small">
-              <InputLabel id="incident-filter-label">Incident</InputLabel>
-              <Select
-                labelId="incident-filter-label"
-                label="Incident"
-                value={incidentScope}
-                onChange={handleIncidentChange}
-              >
-                <MenuItem value="all">All Incident</MenuItem>
-                <MenuItem value="open">Open only</MenuItem>
-                <MenuItem value="resolved">Resolved</MenuItem>
-              </Select>
-            </FilterControl>
-            <PeriodControl size="small">
-              <InputLabel id="period-label">Period</InputLabel>
-              <Select
-                labelId="period-label"
-                label="Period"
-                value={period}
-                onChange={handlePeriodChange}
-              >
-                <MenuItem value="7d">7 days</MenuItem>
-                <MenuItem value="30d">30 days</MenuItem>
-                <MenuItem value="90d">90 days</MenuItem>
-              </Select>
-            </PeriodControl>
+            {renderIncidentFilter()}
+
+            {renderPeriodFilter()}
           </FiltersStack>
         </HeaderStack>
 
-        <ChartWrapper>
-          <ReactApexChart
-            key={`${chartHeight}-${period}`}
-            type="bar"
-            height={chartHeight}
-            series={series}
-            options={chartOptions}
-          />
-        </ChartWrapper>
+        <ChartWrapper>{renderChartContent()}</ChartWrapper>
 
-        {series.length > 0 && (
-          <LegendGrid>
-            {topLegendItems.length > 0 && renderLegendRow(topLegendItems)}
-            {bottomLegendItems.length > 0 && renderLegendRow(bottomLegendItems)}
-          </LegendGrid>
-        )}
+        {renderLegendSection()}
       </StyledCardContent>
     </CardContainer>
   );

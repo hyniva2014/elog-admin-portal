@@ -11,8 +11,11 @@ import { useServices } from "../../../services/services";
 import { defaultPageSize, STATUS_OPTIONS } from "./Constants";
 import { AccountManagementColumnsData } from "./CommonRowColumnUtils";
 import { useAccountManagement } from "./useAccountManagement";
+import { useLocation } from "react-router-dom";
 
 const AccountManagement = () => {
+  const location = useLocation();
+  const statusId = location.state?.statusId;
   const { fetchApi, createApi } = useServices();
   const { setLoading, LoadingContainer } = CommonLoading();
   const [searchKey, setSearchKey] = useState(0);
@@ -45,7 +48,8 @@ const AccountManagement = () => {
       toDate: null,
       primaryContactName: "",
       secondaryContactName: "",
-      status: "",
+      // status: "",
+      status: statusId || "",
       companyId: "",
     };
   };

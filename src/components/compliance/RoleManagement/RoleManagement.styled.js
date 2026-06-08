@@ -135,3 +135,31 @@ export const ViewButton = styled(IconButton)(() => ({
 export const EditButton = styled(IconButton)(() => ({
   borderRadius: 8,
 }));
+
+export const FormEditButton = styled(Button)(({ theme }) => ({
+  backgroundColor: theme.palette.brand.main,
+  color: theme.palette.common.white,
+  borderColor: theme.palette.brand.main,
+  textTransform: "none",
+  fontWeight: 500,
+
+  "&:hover": {
+    backgroundColor: theme.palette.common.white,
+    color: theme.palette.brand.main,
+    borderColor: theme.palette.brand.main,
+  },
+}));
+
+export const CancelEditButton = styled(Button)(({ theme }) => ({
+  backgroundColor: theme.palette.common.white,
+  color: theme.palette.brand.main,
+  borderColor: theme.palette.brand.main,
+  textTransform: "none",
+  fontWeight: 500,
+
+  "&:hover": {
+    backgroundColor: theme.palette.brand.main,
+    color: theme.palette.common.white,
+    borderColor: theme.palette.brand.main,
+  },
+}));
