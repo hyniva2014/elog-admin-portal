@@ -26,3 +26,17 @@ export const AvailableCountText = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary,
   marginTop: theme.spacing(1),
 }));
+
+export const PopupMessageContainer = styled(Typography)({
+  fontSize: "14px",
+  lineHeight: 1.6,
+});
+
+export const RequestedCountText = styled("span")({
+  fontWeight: 700,
+});
+
+export const CarrierNameText = styled("span")(({ theme }) => ({
+  fontWeight: 700,
+  color: theme.palette.success.main,
+}));
