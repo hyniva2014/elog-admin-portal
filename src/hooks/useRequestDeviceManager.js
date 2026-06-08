@@ -214,7 +214,8 @@ export const useRequestDeviceManager = (
 
         const response = await createApi(
           payload,
-          REQUEST_DEVICE_ENDPOINTS.ASSIGN_DEVICES,
+          // REQUEST_DEVICE_ENDPOINTS.ASSIGN_DEVICES,
+          REQUEST_DEVICE_ENDPOINTS.BULK_ASSIGN_DEVICES,
         );
 
         if (response?.statusCode !== 200) {

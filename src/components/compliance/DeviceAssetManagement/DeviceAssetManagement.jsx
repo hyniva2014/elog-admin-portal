@@ -203,7 +203,10 @@ const DeviceAssetManagement = () => {
       const payload = {
         device_serial_number: formValues.serialNumber,
         device_model_id: Number(formValues.modelName),
-        status: formValues.status !== undefined && formValues.status !== "" ? String(formValues.status) : "1",
+        status:
+          formValues.status !== undefined && formValues.status !== ""
+            ? String(formValues.status)
+            : "1",
       };
       if (formValues.imei_number?.trim()) {
         payload.imei_number = formValues.imei_number.trim();
@@ -353,7 +356,15 @@ const DeviceAssetManagement = () => {
       setLoading(false);
       handleCloseDeleteConfirm();
     }
-  }, [deviceToDelete, fetchApi, createApi, fetchDeviceAssets, handleSnackbar, setLoading, handleCloseDeleteConfirm]);
+  }, [
+    deviceToDelete,
+    fetchApi,
+    createApi,
+    fetchDeviceAssets,
+    handleSnackbar,
+    setLoading,
+    handleCloseDeleteConfirm,
+  ]);
 
   const handleBulkSubmit = async (formValues) => {
     try {
@@ -370,8 +381,18 @@ const DeviceAssetManagement = () => {
       );
 
       if (response?.statusCode === 200) {
-        handleSnackbar("Bulk asset uploaded successfully", "success");
+        const {
+          total = 0,
+          success_count = 0,
+          failure_count = 0,
+        } = response?.body?.data || {};
 
+        const message = `Bulk ELD device onboarding completed.
+                            Out of ${total} devices, 
+                            ${success_count} were successfully onboarded 
+                            and ${failure_count} failed.`;
+
+        handleSnackbar(message, "success");
         setIsBulkModalOpen(false);
 
         // refresh grid
@@ -411,14 +432,14 @@ const DeviceAssetManagement = () => {
     setIsEditing(false);
   }, []);
 
-  const handleSetMode = useCallback(() => { }, []);
+  const handleSetMode = useCallback(() => {}, []);
   const handleRowSelectionChange = (newSelection) => {
     setSelectedRows(newSelection);
   };
 
   const columns = useMemo(
     () => getColumns(handleViewClick, handleDeleteClick),
-    [handleViewClick, handleDeleteClick]
+    [handleViewClick, handleDeleteClick],
   );
 
   const gridData = {

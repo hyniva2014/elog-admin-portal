@@ -149,7 +149,8 @@ const RequestDevice = () => {
     const payload = {
       company_id: selectedRequestData.company_id || companyId,
       request_id: selectedRequestData.id,
-      requested_devices_count: selectedRequestData.requestedDevices,
+      // requested_devices_count: selectedRequestData.requestedDevices,
+      device_count: selectedRequestData.requestedDevices,
       device_ids: stockInfo.device_id || [],
     };
 
