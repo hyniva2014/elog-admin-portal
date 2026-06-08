@@ -1,4 +1,5 @@
 import { Box, Typography } from "@mui/material";
+
 import {
   TooltipContainer,
   TooltipTitle,
@@ -10,11 +11,31 @@ import {
   TooltipFooterValue,
 } from "./IncidentDistribution.styles";
 
+const TooltipItemRow = ({ item }) => {
+  return (
+    <TooltipRow>
+      <TooltipDot dotcolor={item.color} />
+
+      <TooltipLabel>
+        {item.name}: <strong>{item.value}</strong>
+      </TooltipLabel>
+    </TooltipRow>
+  );
+};
+
+const TooltipRows = ({ chartPayload }) => {
+  return chartPayload.map((item, index) => (
+    <TooltipItemRow key={`${item.name}-${index}`} item={item} />
+  ));
+};
+
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
 
   const chartPayload = [...payload]
-    .filter((item) => item.value > 0)
+
+    .filter(({value},item) => value > 0)
+
     .sort((a, b) => b.value - a.value);
 
   const total = payload?.[0]?.payload?.total ?? 0;
@@ -23,15 +44,7 @@ const CustomTooltip = ({ active, payload, label }) => {
     <TooltipContainer>
       <TooltipTitle>{label}</TooltipTitle>
 
-      {chartPayload.map((item, index) => (
-        <TooltipRow key={index}>
-          <TooltipDot dotcolor={item.color} />
-
-          <TooltipLabel>
-            {item.name}: <strong>{item.value}</strong>
-          </TooltipLabel>
-        </TooltipRow>
-      ))}
+      <TooltipRows chartPayload={chartPayload} />
 
       <TooltipFooter>
         <TooltipFooterLabel>Total</TooltipFooterLabel>

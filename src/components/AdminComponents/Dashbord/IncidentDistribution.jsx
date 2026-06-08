@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+
 import {
   InputLabel,
   MenuItem,
@@ -6,6 +7,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+
 import {
   ResponsiveContainer,
   BarChart,
@@ -33,20 +35,21 @@ import {
   LegendDot,
   LegendLabel,
   NoDataBox,
+  getIncidentColors,
 } from "./IncidentDistribution.styles";
 
 import useIncidentDistribution from "../../../hooks/useIncidentDistribution";
+
 import CustomTooltip from "./IncidentDistributionTooltip";
+
 import {
   getChartConfig,
-  getBarRadius,
   incidentOptions,
   periodOptions,
   splitLegendItems,
   transformChartData,
   getBarConfigs,
 } from "./IncidentDistribution.utils";
-
 
 const ChartLegendItem = ({ seriesItem }) => (
   <LegendItem>
@@ -55,17 +58,37 @@ const ChartLegendItem = ({ seriesItem }) => (
   </LegendItem>
 );
 
+
+const ChartBars = ({ barConfigs }) => {
+  return barConfigs.map((config) => <Bar key={config.key} {...config} />);
+};
+
+const LegendItems = ({ items }) => {
+  return items.map((item) => (
+    <ChartLegendItem key={item.name} seriesItem={item} />
+  ));
+};
+
 const IncidentDistribution = () => {
   const theme = useTheme();
+  const incidentColors = useMemo(() => getIncidentColors(theme), [theme]);
+
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [incidentScope, setIncidentScope] = useState("all");
+
   const [period, setPeriod] = useState("7d");
 
   const { incidentDistribution, loading } = useIncidentDistribution(
     period,
+
     incidentScope,
   );
+  const seriesWithColors =
+    incidentDistribution?.series?.map((item) => ({
+      ...item,
+      color: incidentColors[item.name] || theme.palette.grey[500],
+    })) || [];
 
   const handleIncidentChange = (e) => {
     setIncidentScope(e.target.value);
@@ -80,61 +103,60 @@ const IncidentDistribution = () => {
   const dateRange =
     incidentDistribution?.dateRange?.replaceAll(",", "") || "No data available";
 
-  // Transform chart data
+
   const chartData = useMemo(
     () => transformChartData(incidentDistribution, categories),
+
     [incidentDistribution, categories],
   );
 
-  // Get chart configuration
   const chartConfig = getChartConfig(isMobile);
+
   const hasData = chartData.length > 0;
+
   const isLoading = loading;
+
   const isEmpty = !hasData && !isLoading;
 
-  // Split legend items
-  const { topLegendItems, bottomLegendItems } = splitLegendItems(
-    incidentDistribution?.series,
-  );
 
-  // Get bar configurations
-  const barConfigs = getBarConfigs(
-    incidentDistribution?.series,
-    chartConfig.barMaxSize,
-  );
+  const { topLegendItems, bottomLegendItems } =
+    splitLegendItems(seriesWithColors);
 
-  // Helper to render legend items
-  const renderLegendItems = (legendItems) => {
-    return legendItems.map((item) => (
-      <ChartLegendItem key={item.name} seriesItem={item} />
-    ));
-  };
 
-  // Render legend section
+  const barConfigs = getBarConfigs(seriesWithColors, chartConfig.barMaxSize);
+
+
   const renderLegendSection = () => {
     if (!hasData || isLoading || !incidentDistribution?.series?.length) {
       return null;
     }
 
     const hasTopLegend = topLegendItems.length > 0;
+
     const hasBottomLegend = bottomLegendItems.length > 0;
 
     return (
       <LegendGrid>
         {hasTopLegend && (
-          <LegendRow>{renderLegendItems(topLegendItems)}</LegendRow>
+          <LegendRow>
+            <LegendItems items={topLegendItems} />
+          </LegendRow>
         )}
+
         {hasBottomLegend && (
-          <LegendRow>{renderLegendItems(bottomLegendItems)}</LegendRow>
+          <LegendRow>
+            <LegendItems items={bottomLegendItems} />
+          </LegendRow>
         )}
       </LegendGrid>
     );
   };
 
-  // Filter renderers
+
   const renderIncidentFilter = () => (
     <FilterControl size="small" fullWidth={isMobile}>
       <InputLabel id="incident-filter-label">Incident</InputLabel>
+
       <Select
         labelId="incident-filter-label"
         label="Incident"
@@ -142,11 +164,9 @@ const IncidentDistribution = () => {
         onChange={handleIncidentChange}
         disabled={isLoading}
       >
-        {incidentOptions.map(({ value, label }) => (
-          <MenuItem key={value} value={value}>
-            {label}
-          </MenuItem>
-        ))}
+        <MenuItem value="all">All Incident</MenuItem>
+        <MenuItem value="open">Open Only</MenuItem>
+        <MenuItem value="resolved">Resolved</MenuItem>
       </Select>
     </FilterControl>
   );
@@ -154,6 +174,7 @@ const IncidentDistribution = () => {
   const renderPeriodFilter = () => (
     <PeriodControl size="small" fullWidth={isMobile}>
       <InputLabel id="period-label">Period</InputLabel>
+
       <Select
         labelId="period-label"
         label="Period"
@@ -161,16 +182,14 @@ const IncidentDistribution = () => {
         onChange={handlePeriodChange}
         disabled={isLoading}
       >
-        {periodOptions.map(({ value, label }) => (
-          <MenuItem key={value} value={value}>
-            {label}
-          </MenuItem>
-        ))}
+        <MenuItem value="7d">7 Days</MenuItem>
+        <MenuItem value="30d">30 Days</MenuItem>
+        <MenuItem value="90d">90 Days</MenuItem>
       </Select>
     </PeriodControl>
   );
 
-  // Chart content renderer
+
   const renderChartContent = () => {
     if (isLoading) {
       return <NoDataBox>Loading incident data...</NoDataBox>;
@@ -185,43 +204,52 @@ const IncidentDistribution = () => {
         <ResponsiveContainer width="100%" height={chartConfig.chartHeight}>
           <BarChart data={chartData} margin={chartConfig.chartMargins}>
             <CartesianGrid
-              stroke="#E5E7EB"
+              stroke={theme.palette.divider}
               strokeDasharray="4 4"
               vertical={false}
             />
+
             <XAxis
               dataKey="name"
               tick={{
-                fill: "#64748B",
+                fill: theme.palette.text.secondary,
+
                 fontSize: chartConfig.xAxisFontSize,
               }}
             />
+
             <YAxis
               tick={{
-                fill: "#64748B",
+                fill: theme.palette.text.secondary,
+
                 fontSize: chartConfig.yAxisFontSize,
               }}
               axisLine={{
-                stroke: "#CBD5E1",
+                stroke: theme.palette.divider,
               }}
               label={{
                 value: "Incident Distribution",
+
                 angle: -90,
+
                 position: "insideLeft",
+
                 style: {
-                  fill: "#64748B",
+                  fill: theme.palette.text.secondary,
+
                   fontSize: chartConfig.labelFontSize,
+
                   textAnchor: "middle",
                 },
               }}
             />
+
             <Tooltip
               content={<CustomTooltip />}
               cursor={chartConfig.tooltipCursor}
             />
-            {barConfigs.map((config) => (
-              <Bar key={config.key} {...config} />
-            ))}
+
+            <ChartBars barConfigs={barConfigs} />
           </BarChart>
         </ResponsiveContainer>
       );
@@ -238,8 +266,10 @@ const IncidentDistribution = () => {
             <ChartTitle>Incident Distribution</ChartTitle>
             <ChartSubtitle>{dateRange}</ChartSubtitle>
           </TitleBox>
+
           <FiltersStack>
             {renderIncidentFilter()}
+
             {renderPeriodFilter()}
           </FiltersStack>
         </HeaderStack>
