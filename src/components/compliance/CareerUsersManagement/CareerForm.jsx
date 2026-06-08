@@ -222,8 +222,8 @@ const CareerForm = () => {
   const canUpdate = true;
   const breadcrumbs = [
     { label: "Compliance", path: "/compliance" },
-    { label: "Platform Users", path: "/career-users" },
-    { label: userId ? "Career User View" : "Add Career User" },
+    { label: "Platform Users", path: "/carrier-users" },
+    { label: userId ? "Carrier User View" : "Add Carrier User" },
   ];
 
   const lastActiveStepRef = useRef(-1);
@@ -419,7 +419,7 @@ const CareerForm = () => {
       const response = await saveCareerUser(payload);
 
       if (response?.statusCode === 200) {
-        navigate("/career-users", {
+        navigate("/carrier-users", {
           state: {
             snackbar: {
               message: `User ${isEditMode ? "updated" : "created"} successfully`,

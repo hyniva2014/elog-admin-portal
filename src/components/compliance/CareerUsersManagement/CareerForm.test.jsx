@@ -31,8 +31,9 @@ jest.mock("../../../common/CommonLoading", () => () => ({
   LoadingContainer: () => <div data-testid="loading-container" />,
 }));
 
-jest.mock("../../../common/CommonSnackbar", () => (props) =>
-  props.open ? <div>{props.message}</div> : null,
+jest.mock(
+  "../../../common/CommonSnackbar",
+  () => (props) => (props.open ? <div>{props.message}</div> : null),
 );
 
 jest.mock("../../../common/CommonBreadcrumb", () => () => (
@@ -72,21 +73,15 @@ const createStore = () =>
     },
   });
 
-const renderComponent = (route = "/career-users/add") => {
+const renderComponent = (route = "/carrier-users/add") => {
   const store = createStore();
 
   return render(
     <Provider store={store}>
       <MemoryRouter initialEntries={[route]}>
         <Routes>
-          <Route
-            path="/career-users/add"
-            element={<CareerForm />}
-          />
-          <Route
-            path="/career-users/edit/:userId"
-            element={<CareerForm />}
-          />
+          <Route path="/carrier-users/add" element={<CareerForm />} />
+          <Route path="/carrier-users/edit/:userId" element={<CareerForm />} />
         </Routes>
       </MemoryRouter>
     </Provider>,
@@ -101,29 +96,21 @@ describe("CareerForm", () => {
   test("renders add mode correctly", () => {
     renderComponent();
 
-    expect(
-      screen.getByTestId("user-add-header"),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("user-add-header")).toBeInTheDocument();
 
-    expect(
-      screen.getByTestId("career-user-form"),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("career-user-form")).toBeInTheDocument();
   });
 
   test("renders loading container", () => {
     renderComponent();
 
-    expect(
-      screen.getByTestId("loading-container"),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("loading-container")).toBeInTheDocument();
   });
 
   test("renders form component", () => {
     renderComponent();
 
-    expect(
-      screen.getAllByTestId("career-user-form").length,
-    ).toBeGreaterThan(0);
+    expect(screen.getAllByTestId("career-user-form").length).toBeGreaterThan(0);
   });
 
   test("fetches user data in edit mode", async () => {
@@ -140,7 +127,7 @@ describe("CareerForm", () => {
       },
     });
 
-    renderComponent("/career-users/edit/525");
+    renderComponent("/carrier-users/edit/525");
 
     await waitFor(() => {
       expect(mockFetchApi).toHaveBeenCalled();
@@ -160,12 +147,10 @@ describe("CareerForm", () => {
       },
     });
 
-    renderComponent("/career-users/edit/525");
+    renderComponent("/carrier-users/edit/525");
 
     await waitFor(() => {
-      expect(
-        screen.getByTestId("user-top-header"),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId("user-top-header")).toBeInTheDocument();
     });
   });
 
@@ -180,13 +165,11 @@ describe("CareerForm", () => {
       },
     });
 
-    renderComponent("/career-users/edit/525");
+    renderComponent("/carrier-users/edit/525");
 
     await waitFor(() => {
       expect(mockFetchApi).toHaveBeenCalledWith(
-        expect.stringContaining(
-          "/masteradmin/superuser/get-superusers",
-        ),
+        expect.stringContaining("/masteradmin/superuser/get-superusers"),
       );
     });
   });
@@ -198,7 +181,7 @@ describe("CareerForm", () => {
       },
     });
 
-    renderComponent("/career-users/edit/525");
+    renderComponent("/carrier-users/edit/525");
 
     await waitFor(() => {
       expect(mockFetchApi).toHaveBeenCalled();
@@ -206,11 +189,9 @@ describe("CareerForm", () => {
   });
 
   test("handles fetch api error", async () => {
-    mockFetchApi.mockRejectedValue(
-      new Error("API Error"),
-    );
+    mockFetchApi.mockRejectedValue(new Error("API Error"));
 
-    renderComponent("/career-users/edit/525");
+    renderComponent("/carrier-users/edit/525");
 
     await waitFor(() => {
       expect(mockFetchApi).toHaveBeenCalled();
@@ -228,13 +209,12 @@ describe("CareerForm", () => {
       },
     });
 
-    renderComponent("/career-users/edit/525");
+    renderComponent("/carrier-users/edit/525");
 
     await waitFor(() => {
-      expect(
-        screen.getAllByTestId("career-user-form")
-          .length,
-      ).toBeGreaterThan(0);
+      expect(screen.getAllByTestId("career-user-form").length).toBeGreaterThan(
+        0,
+      );
     });
   });
 
@@ -249,28 +229,18 @@ describe("CareerForm", () => {
       },
     });
 
-    renderComponent("/career-users/edit/525");
+    renderComponent("/carrier-users/edit/525");
 
     await waitFor(() => {
-      expect(
-        screen.getByText("1. Basic Info"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("1. Basic Info")).toBeInTheDocument();
 
-      expect(
-        screen.getByText("2. Contact Info"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("2. Contact Info")).toBeInTheDocument();
 
-      expect(
-        screen.getByText("3. Employment"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("3. Employment")).toBeInTheDocument();
 
-      expect(
-        screen.getByText("4. Prior History"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("4. Prior History")).toBeInTheDocument();
 
-      expect(
-        screen.getByText("5. Documents"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("5. Documents")).toBeInTheDocument();
     });
   });
 });
