@@ -11,6 +11,8 @@ export const USER_PROFILE_OPTIONS = [
   { label: "Master Admin", value: "43" },
 ];
 
+export const CARRIER_ADMIN_ROLE_ID = "53";
+
 export const TotalUsersIcon = (
   <CardIcon src={totalUsersIcon} alt="totalUsersIcon" />
 );

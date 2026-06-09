@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Grid } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -9,6 +9,7 @@ import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdo
 import { FormContainer } from "./UserManagementForm.styled";
 import { EditHeaderButton } from "./UserManagementForm.styled";
 import { useServices } from "../../../services/services";
+import { CARRIER_ADMIN_ROLE_ID } from "./Constants";
 
 const STATUS_OPTIONS = [
   { label: "Active", value: "1" },
@@ -33,11 +34,9 @@ const editSchema = yup.object().shape({
   email: yup.string().email("Enter valid email").required("Email is required"),
 });
 
-const CARRIER_ADMIN_ROLE_ID = "53";
-
 const EMPTY_DEFAULTS = {
   company_id: "",
-  role_id: CARRIER_ADMIN_ROLE_ID,
+  role_id: "",
   status_id: "1",
   firstName: "",
   lastName: "",
@@ -51,8 +50,6 @@ const rowToFormValues = (row) => ({
   firstName: row?.firstName || "",
   lastName: row?.lastName || "",
   email: row?.primaryContactEmail || row?.email || "",
-  // password: "",
-  // confirmPassword: "",
 });
 
 const UserManagementForm = ({
@@ -66,6 +63,7 @@ const UserManagementForm = ({
 }) => {
   const { fetchApi } = useServices();
   const [roleOptions, setRoleOptions] = useState([]);
+  const initializedRef = useRef(false);
 
   const isViewMode = mode === "view";
 
@@ -96,59 +94,75 @@ const UserManagementForm = ({
           value: String(r.role_id),
         }));
         setRoleOptions(options);
-        const currentRoleId = watch("role_id");
-        if (!currentRoleId) {
-          setValue("role_id", CARRIER_ADMIN_ROLE_ID, { shouldValidate: true });
-        }
+        return response.body.roles;
       }
+      return [];
     } catch (err) {
       console.error("Failed to fetch roles", err);
       setRoleOptions([]);
+      return [];
     }
-  }, [fetchApi, setValue, watch]);
+  }, [fetchApi]);
 
   useEffect(() => {
-    fetchRoles();
-  }, []);
-
-  // Populate / clear form whenever the dialog opens
-  useEffect(() => {
-    if (!open) return;
-    if (isViewMode && initialData) {
-      reset(rowToFormValues(initialData));
-    } else {
-      reset(EMPTY_DEFAULTS);
+    if (!open) {
+      initializedRef.current = false;
+      return;
     }
-    // Always start in read mode when the dialog opens
-    setIsEditing(false);
-  }, [open, isViewMode, initialData, reset]);
+    if (initializedRef.current) return;
+
+    const initForm = async () => {
+      const roles = await fetchRoles();
+      const carrierAdmin = roles?.find(
+        (r) => r.role_name.trim() === "Carrier Admin"
+      );
+      const carrierAdminId = carrierAdmin ? String(carrierAdmin.role_id) : CARRIER_ADMIN_ROLE_ID;
+
+      if (isViewMode && initialData) {
+        reset(rowToFormValues(initialData));
+      } else {
+        reset({
+          ...EMPTY_DEFAULTS,
+          role_id: carrierAdminId,
+        });
+      }
+      setIsEditing(false);
+      initializedRef.current = true;
+    };
+
+    initForm();
+  }, [open]);
 
   const handleFormSubmit = (data) => {
     const submitMode = isViewMode && isEditing ? "edit" : mode;
     if (onSubmitForm) onSubmitForm(data, submitMode);
   };
 
-  /** Close the dialog entirely */
   const handleClose = () => {
     reset(EMPTY_DEFAULTS);
     setIsEditing(false);
     onClose();
   };
 
-  /** Cancel edit — restore original values, go back to read mode */
   const handleCancelEdit = () => {
     if (initialData) reset(rowToFormValues(initialData));
     setIsEditing(false);
   };
 
-  const handleAccountChange = (value) =>
-    setValue("company_id", value, { shouldValidate: true });
+  const handleAccountChange = useCallback(
+    (value) => setValue("company_id", value, { shouldValidate: true }),
+    [setValue]
+  );
 
-  const handleUserProfileChange = (value) =>
-    setValue("role_id", value, { shouldValidate: true });
+  const handleUserProfileChange = useCallback(
+    (value) => setValue("role_id", value, { shouldValidate: true }),
+    [setValue]
+  );
 
-  const handleStatusChange = (value) =>
-    setValue("status_id", value, { shouldValidate: true });
+  const handleStatusChange = useCallback(
+    (value) => setValue("status_id", value, { shouldValidate: true }),
+    [setValue]
+  );
 
   const handleEditClick = useCallback(() => setIsEditing(true), []);
 
