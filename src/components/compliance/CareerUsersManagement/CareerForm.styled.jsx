@@ -8,8 +8,8 @@ export const CareerFormContainer = styled(Box)(({ theme }) => ({
   overflow: "hidden",
   display: "flex",
   flexDirection: "column",
-  height: "100%",
-  maxHeight: "100%",
+  height: "calc(100vh - 64px)",
+  maxHeight: "calc(100vh - 64px)",
   minHeight: 0,
   boxSizing: "border-box",
 }));
@@ -19,8 +19,9 @@ export const CareerFormHeader = styled(Box)(({ theme }) => ({
   paddingBlock: 16,
   flexShrink: 0,
   backgroundColor: theme.palette.background.paper,
-  position: "relative",
-  zIndex: 2,
+  position: "sticky",
+  top: 14,
+  zIndex: 10,
 }));
 
 export const CareerFormStepper = styled(Box)(({ theme }) => ({
@@ -28,8 +29,9 @@ export const CareerFormStepper = styled(Box)(({ theme }) => ({
   borderBottom: `2px solid ${theme.palette.divider}`,
   backgroundColor: theme.palette.background.paper,
   flexShrink: 0,
-  position: "relative",
-  zIndex: 2,
+  position: "sticky",
+  top: 104,
+  zIndex: 9,
 }));
 
 export const StepRow = styled(Box)(({ theme }) => ({
