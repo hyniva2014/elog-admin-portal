@@ -13,17 +13,11 @@ export const MessageTypographySx = {
 };
 
 export const DialogPaperSx = (theme) => ({
-  background: "rgba(255, 255, 255, 0.78)",
-  backdropFilter: "blur(4px)",
+  background: theme.palette.background.paper,
   border: `1.5px solid ${theme.palette.primary.main}`,
   borderRadius: "14px",
-  boxShadow: theme.shadows[1],
+  boxShadow: theme.shadows[5],
 });
-
-export const DialogBackdropSx = {
-  background: "transparent",
-  // backdropFilter: "blur(1px)",
-};
 
 export const ReasonTextFieldSx = {
   "& .MuiOutlinedInput-root": {

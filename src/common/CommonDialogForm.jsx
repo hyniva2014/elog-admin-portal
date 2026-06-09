@@ -17,7 +17,6 @@ import {
   DIALOG_MODES,
   BUTTON_LABELS,
   DialogPaperSx,
-  DialogBackdropSx,
 } from "./CommonDialogForm.styled";
 
 const CommonDialogForm = ({
@@ -114,9 +113,6 @@ const CommonDialogForm = ({
       fullWidth
       PaperProps={{
         sx: DialogPaperSx(theme),
-      }}
-      BackdropProps={{
-        sx: DialogBackdropSx,
       }}
     >
       <DialogTitle sx={styles.title}>

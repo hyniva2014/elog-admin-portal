@@ -13,7 +13,6 @@ import {
   ActionButtonSx,
   MessageTypographySx,
   DialogPaperSx,
-  DialogBackdropSx,
   ReasonTextFieldSx,
 } from "./CommonConfirmDialog.styled";
 import { useEffect, useState } from "react";
@@ -58,9 +57,7 @@ const CommonConfirmDialog = ({
       PaperProps={{
         sx: DialogPaperSx(theme),
       }}
-      BackdropProps={{
-        sx: DialogBackdropSx,
-      }}
+      hideBackdrop={false}
     >
       <DialogTitle fontSize={16}>
         <strong>{title}</strong>

@@ -9,7 +9,6 @@ import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdo
 import { FormContainer } from "./UserManagementForm.styled";
 import { EditHeaderButton } from "./UserManagementForm.styled";
 import { useServices } from "../../../services/services";
-import { USER_PROFILE_OPTIONS } from "./Constants";
 
 const STATUS_OPTIONS = [
   { label: "Active", value: "1" },
@@ -23,14 +22,6 @@ const addSchema = yup.object().shape({
   firstName: yup.string().required("First Name is required"),
   lastName: yup.string().required("Last Name is required"),
   email: yup.string().email("Enter valid email").required("Email is required"),
-  password: yup
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .required("Password is required"),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password")], "Passwords must match")
-    .required("Confirm Password is required"),
 });
 
 const editSchema = yup.object().shape({
@@ -40,19 +31,17 @@ const editSchema = yup.object().shape({
   firstName: yup.string().required("First Name is required"),
   lastName: yup.string().required("Last Name is required"),
   email: yup.string().email("Enter valid email").required("Email is required"),
-  password: yup.string().optional(),
-  confirmPassword: yup.string().optional(),
 });
+
+const CARRIER_ADMIN_ROLE_ID = "53";
 
 const EMPTY_DEFAULTS = {
   company_id: "",
-  role_id: "",
+  role_id: CARRIER_ADMIN_ROLE_ID,
   status_id: "1",
   firstName: "",
   lastName: "",
   email: "",
-  password: "",
-  confirmPassword: "",
 };
 
 const rowToFormValues = (row) => ({
@@ -62,8 +51,8 @@ const rowToFormValues = (row) => ({
   firstName: row?.firstName || "",
   lastName: row?.lastName || "",
   email: row?.primaryContactEmail || row?.email || "",
-  password: "",
-  confirmPassword: "",
+  // password: "",
+  // confirmPassword: "",
 });
 
 const UserManagementForm = ({
@@ -97,6 +86,30 @@ const UserManagementForm = ({
     resolver: yupResolver(isViewMode ? editSchema : addSchema),
     defaultValues: EMPTY_DEFAULTS,
   });
+
+  const fetchRoles = useCallback(async () => {
+    try {
+      const response = await fetchApi("/masteradmin/roles/get-all-superusers-roles");
+      if (response?.body?.roles) {
+        const options = response.body.roles.map((r) => ({
+          label: r.role_name,
+          value: String(r.role_id),
+        }));
+        setRoleOptions(options);
+        const currentRoleId = watch("role_id");
+        if (!currentRoleId) {
+          setValue("role_id", CARRIER_ADMIN_ROLE_ID, { shouldValidate: true });
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch roles", err);
+      setRoleOptions([]);
+    }
+  }, [fetchApi, setValue, watch]);
+
+  useEffect(() => {
+    fetchRoles();
+  }, []);
 
   // Populate / clear form whenever the dialog opens
   useEffect(() => {
@@ -222,13 +235,12 @@ const UserManagementForm = ({
             name="role_id"
             label="User Profile"
             value={watch("role_id")}
-            // options={roleOptions}
-            options={USER_PROFILE_OPTIONS}
+            options={roleOptions}
             onChange={handleUserProfileChange}
             error={!!errors.role_id}
             helperText={errors.role_id?.message}
-            required={!isReadOnly}
-            disabled={isReadOnly}
+            required={true}
+            disabled={true}
           />
         </Grid>
 
@@ -285,39 +297,7 @@ const UserManagementForm = ({
             />
           </Grid>
         )}
-        {/* Password fields — only shown when adding a new user */}
-        {!isViewMode && (
-          <>
-            <Grid item xs={12}>
-              <CommonTextField
-                name="password"
-                label="Enter Password"
-                type="password"
-                fullWidth
-                autoComplete="new-password"
-                register={register}
-                error={!!errors.password}
-                helperText={errors.password?.message}
-                required
-                shrinkLabel={!!watch("password")}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <CommonTextField
-                name="confirmPassword"
-                label="Confirm Password"
-                type="password"
-                autoComplete="new-password"
-                register={register}
-                error={!!errors.confirmPassword}
-                helperText={errors.confirmPassword?.message}
-                required
-                shrinkLabel={!!watch("confirmPassword")}
-              />
-            </Grid>
-          </>
-        )}
+      
       </Grid>
     </FormContainer>
   );
