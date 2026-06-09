@@ -56,7 +56,7 @@ const AlertCardItem = ({ item }) => (
             {item.location2}
           </AlertDetailItem>
           <AlertDetailItem>
-            <AlertIcon src={IdIcon} alt="ID" style={{ width: 18, height: 18 }} />
+            <AlertIcon src={IdIcon} alt="ID" />
             -
           </AlertDetailItem>
         </AlertDetailRow>

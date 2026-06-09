@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Typography, List, ListItemButton, ListItemText, Radio, Autocomplete, TextField } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import axios from "axios";
 import CommonDialogForm from "../../../../common/CommonDialogForm";
 import TelegramIcon from "@mui/icons-material/Telegram";
@@ -181,6 +182,44 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
     if (e.key === "Enter") handleSend();
   };
 
+  const handleCloseChat = () => {
+    setPanelState(PANEL_STATE.DETAILS);
+  };
+
+  const handleChatInputChange = (e) => {
+    setChatInput(e.target.value);
+  };
+
+  const handleOperatorSelect = (operatorId) => {
+    setSelectedOperator(operatorId);
+  };
+
+  const renderMessage = ({ sender, message: msg, time, isCurrentUser }, index) => {
+    const MessageContainer = isCurrentUser 
+      ? styled("div")(() => ({ display: "flex", flexDirection: "column", alignItems: "flex-end" }))
+      : styled("div")(() => ({ display: "flex", flexDirection: "column", alignItems: "flex-start" }));
+    
+    const Timestamp = isCurrentUser 
+      ? styled(ChatTimestamp)(() => ({ textAlign: "right" }))
+      : ChatTimestamp;
+
+    return (
+      <MessageContainer key={index}>
+        {isCurrentUser ? (
+          <>
+            <CurrentUserBubble>{msg}</CurrentUserBubble>
+            <Timestamp>{time}</Timestamp>
+          </>
+        ) : (
+          <>
+            <OtherUserBubble>{msg}</OtherUserBubble>
+            <Timestamp>{time}</Timestamp>
+          </>
+        )}
+      </MessageContainer>
+    );
+  };
+
   const handleAssignOperator = async () => {
     if (!selectedOperator || !selectedAlert) return;
     
@@ -212,35 +251,18 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
         <ChatContainer>
           <ChatHeader>
             Live Chat — {company || "Operator"}
-            <span
-              style={{ cursor: "pointer", fontWeight: 400, fontSize: 20, lineHeight: 1 }}
-              onClick={() => setPanelState(PANEL_STATE.DETAILS)}
-            >
-              ×
-            </span>
+            <ChatCloseButton onClick={handleCloseChat}>×</ChatCloseButton>
           </ChatHeader>
 
           <ChatMessages>
-            {messages.map(({ sender, message: msg, time, isCurrentUser }, index) =>
-              isCurrentUser ? (
-                <div key={index} style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-                  <CurrentUserBubble>{msg}</CurrentUserBubble>
-                  <ChatTimestamp style={{ textAlign: "right" }}>{time}</ChatTimestamp>
-                </div>
-              ) : (
-                <div key={index} style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-                  <OtherUserBubble>{msg}</OtherUserBubble>
-                  <ChatTimestamp>{time}</ChatTimestamp>
-                </div>
-              )
-            )}
+            {messages.map(renderMessage)}
           </ChatMessages>
 
           <ChatInputRow>
             <ChatInput
               placeholder="Type a message..."
               value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
+              onChange={handleChatInputChange}
               onKeyDown={handleKeyDown}
             />
             <ChatSendButton onClick={handleSend}>
@@ -314,7 +336,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
               {OPERATORS.map((op) => (
                 <ListItemButton
                   key={op.id}
-                  onClick={() => setSelectedOperator(op.id)}
+                  onClick={() => handleOperatorSelect(op.id)}
                   selected={selectedOperator === op.id}
                   sx={{ borderRadius: 2, mb: 0.5 }}
                 >
