@@ -4,20 +4,31 @@ import { styled, alpha } from "@mui/material/styles";
 // Main Container
 export const AlertsContainer = styled(Box)(() => ({
   display: "flex",
-  height: "100%",
-  // alignSelf: "stretch",
+  flexDirection: "column",
+  width: "100%",
+  "& > .MuiGrid-container": {
+    flex: 1,
+    minHeight: 0,
+  },
 }));
 
-export const AlertCardContainer = styled(Paper)(({ theme, detailsPanel }) => ({
-  paddingLeft: detailsPanel ? theme.spacing(2) : 0,
-  paddingTop: 0,
-  paddingRight: detailsPanel ? theme.spacing(2) : 0,
+export const AlertCardContainer = styled(Paper, {
+  shouldForwardProp: (prop) => prop !== "detailsPanel" && prop !== "chatPanel",
+})(({ theme, detailsPanel, chatPanel }) => ({
+  paddingLeft: chatPanel ? 0 : detailsPanel ? theme.spacing(2) : 0,
+  paddingTop: chatPanel ? 0 : detailsPanel ? theme.spacing(2) : 0,
+  paddingRight: chatPanel ? 0 : detailsPanel ? theme.spacing(2) : 0,
+  paddingBottom: chatPanel ? 0 : detailsPanel ? theme.spacing(2) : 0,
   border: `1px solid ${theme.palette.grey[200]}`,
   borderRadius: "0px",
-  minHeight: "675px",
-  height: "100%",
+  height: detailsPanel ? "100%" : "auto",
+  flex: detailsPanel || chatPanel ? 1 : undefined,
   boxShadow: "none",
   alignSelf: "stretch",
+  display: detailsPanel || chatPanel ? "flex" : undefined,
+  flexDirection: detailsPanel || chatPanel ? "column" : undefined,
+  gap: detailsPanel && !chatPanel ? 16 : undefined,
+  overflow: chatPanel ? "hidden" : undefined,
 }));
 
 // Left Sidebar - Alert List
@@ -43,15 +54,24 @@ export const AlertList = styled(Box)(({ theme }) => ({
 }));
 
 // Alert Card in List
-export const AlertCard = styled(Box)(({ theme }) => ({
+export const AlertCard = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "active",
+})(({ theme, active }) => ({
   display: "flex",
   alignItems: "stretch",
-  background: theme.palette.grey[50],
-  borderRadius: "2px",
+  background: active ? "#f5f7ff" : theme.palette.common.white,
+  borderRadius: "4px",
   overflow: "hidden",
   minHeight: 90,
   border: `1px solid ${theme.palette.grey[200]}`,
   position: "relative",
+  cursor: "pointer",
+  "&:hover": {
+    backgroundColor: active ? "#f5f7ff" : theme.palette.common.white,
+  },
+  "&:active": {
+    backgroundColor: active ? "#f5f7ff" : theme.palette.common.white,
+  },
 }));
 
 // Alert Content in List
@@ -98,12 +118,57 @@ export const DetailSection = styled(Paper)(({ theme }) => ({
   },
 }));
 
+export const AlertIdBadge = styled(Box)(({ theme }) => ({
+  padding: "3px 10px",
+  borderRadius: 4,
+  border: `1px solid ${theme.palette.grey[300]}`,
+  fontSize: 12,
+  fontWeight: 600,
+  color: theme.palette.text.secondary,
+  backgroundColor: theme.palette.common.white,
+  whiteSpace: "nowrap",
+}));
+
+export const AlertAdminRole = styled(Typography)(({ theme }) => ({
+  fontSize: 13,
+  fontWeight: 500,
+  color: theme.palette.text.secondary,
+}));
+
+export const BreadcrumbRow = styled(Box)(() => ({
+  display: "flex",
+  alignItems: "center",
+  gap: 6,
+  flexWrap: "wrap",
+}));
+
+export const BreadcrumbItem = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== "isActive",
+})(({ theme, isActive }) => ({
+  fontSize: 13,
+  fontWeight: isActive ? 600 : 400,
+  color: isActive ? theme.palette.primary.main : theme.palette.text.secondary,
+  cursor: "default",
+}));
+
+export const BreadcrumbSeparator = styled(Typography)(({ theme }) => ({
+  fontSize: 13,
+  color: theme.palette.text.disabled,
+}));
+
+export const AlertDescription = styled(Typography)(({ theme }) => ({
+  fontSize: 14,
+  color: theme.palette.text.secondary,
+  lineHeight: 1.6,
+}));
+
 // Header Section with Title and Badge
 export const DetailHeader = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
-  paddingBottom: 16,
+  padding: "10px 16px",
+  backgroundColor: alpha(theme.palette.primary.main, 0.03),
   borderBottom: `1px solid ${theme.palette.divider}`,
 }));
 
@@ -115,13 +180,15 @@ export const DetailTitleWrapper = styled(Box)(() => ({
 
 export const DetailTitle = styled(Typography)(({ theme }) => ({
   margin: 0,
-  fontSize: 18,
+  fontSize: 14,
   fontWeight: 700,
   color: theme.palette.text.primary,
   lineHeight: 1.2,
 }));
 
-export const DetailSubTitle = styled(Typography)(({ theme, severity }) => ({
+export const DetailSubTitle = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== "severity",
+})(({ theme, severity }) => ({
   fontSize: 13,
   fontWeight: 400,
   color:
@@ -176,9 +243,9 @@ export const TriggerSection = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   gap: 16,
-  backgroundColor: alpha(theme.palette.warning.main, 0.09),
+  backgroundColor: "#fffef5",
   padding: 16,
-  border: `1px solid ${theme.palette.warning.lighter}`,
+  border: `1px solid #fef08a`,
   borderRadius: 6,
 }));
 
@@ -195,23 +262,19 @@ export const SectionTitle = styled(Typography)(({ theme }) => ({
 
 export const TriggerSectionTitle = styled(Typography)(({ theme }) => ({
   margin: 0,
-  fontSize: 14,
-  fontWeight: 600,
-  textTransform: "uppercase",
-  color: theme.palette.text.secondary,
-  letterSpacing: 0.5,
+  fontSize: 16,
+  fontWeight: 700,
+  textTransform: "none",
+  color: theme.palette.text.primary,
+  letterSpacing: 0,
   marginLeft: 0,
-  marginTop: 8,
+  marginTop: 0,
 }));
 
 export const InfoGrid = styled(Box)(({ theme }) => ({
   display: "grid",
-
-  gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-
+  gridTemplateColumns: "repeat(3, 1fr)",
   gap: 16,
-
-  backgroundColor: theme.palette.grey[100],
 
   [theme.breakpoints.down("md")]: {
     gridTemplateColumns: "repeat(2, 1fr)",
@@ -231,8 +294,8 @@ export const TriggerInfoGrid = styled(Box)(() => ({
 export const InfoCard = styled(Paper)(() => ({
   display: "flex",
   flexDirection: "column",
-  gap: 6,
-  padding: 12,
+  gap: 4,
+  padding: 0,
   background: "none",
   boxShadow: "none",
 }));
@@ -249,10 +312,10 @@ export const TriggerInfoCard = styled(Paper)(() => ({
 
 export const InfoLabel = styled(Typography)(({ theme }) => ({
   fontSize: 12,
-  fontWeight: 500,
+  fontWeight: 400,
   color: theme.palette.text.secondary,
-  textTransform: "uppercase",
-  letterSpacing: 0.3,
+  textTransform: "none",
+  letterSpacing: 0,
 }));
 
 export const InfoValue = styled(Typography)(({ theme }) => ({
@@ -261,24 +324,16 @@ export const InfoValue = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.primary,
 }));
 
-export const StatusBadge = styled(Box)(({ theme }) => ({
+export const StatusBadge = styled(Box)(() => ({
   display: "inline-flex",
   alignItems: "center",
-  gap: 6,
-  padding: "4px 8px",
-  borderRadius: 10,
-  fontSize: 12,
-  fontWeight: 500,
-  backgroundColor: theme.palette.success.lighter,
-  color: theme.palette.success.dark,
+  padding: "6px 18px",
+  borderRadius: 50,
+  fontSize: 14,
+  fontWeight: 700,
+  backgroundColor: "#dcfce7",
+  color: "#15803d",
   width: "fit-content",
-  "&::before": {
-    content: '""',
-    width: 6,
-    height: 6,
-    background: theme.palette.success.dark,
-    borderRadius: "50%",
-  },
 }));
 
 // Alert Card Title in List
@@ -334,23 +389,38 @@ export const ActionSection = styled(Box)(({ theme }) => ({
   borderTop: `1px solid ${theme.palette.divider}`,
 }));
 
-export const ActionButton = styled(Button)(({ theme }) => ({
+export const ActionButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== "isResolve" && prop !== "isOpenChat" && prop !== "isAssignOperator",
+})(({ theme, isResolve, isOpenChat, isAssignOperator }) => ({
   width: "100%",
   padding: "10px 16px",
-  borderRadius: 6,
+  borderRadius: 10,
   fontSize: 14,
   fontWeight: 600,
   textTransform: "none",
-  backgroundColor: "transparent",
-  color: theme.palette.text.primary,
-  border: `1px solid ${theme.palette.grey[300]}`,
+  backgroundColor: isResolve
+    ? theme.palette.success.main
+    : "transparent",
+  color: isResolve
+    ? theme.palette.common.white
+    : isOpenChat || isAssignOperator
+    ? "#1e3a8a"
+    : theme.palette.text.secondary,
+  border: isResolve
+    ? "none"
+    : isOpenChat || isAssignOperator
+    ? `1px solid #93c5fd`
+    : `1px solid ${theme.palette.grey[200]}`,
   boxShadow: "none",
 
-  "&:hover": {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
-    borderColor: theme.palette.primary.main,
-  },
+  "&:hover": isResolve
+    ? { backgroundColor: theme.palette.success.dark }
+    : isOpenChat || isAssignOperator
+    ? { backgroundColor: "transparent" }
+    : { backgroundColor: theme.palette.grey[100] },
+  "&:active": isOpenChat || isAssignOperator ? { backgroundColor: "transparent" } : {},
+  "&:focus": isOpenChat || isAssignOperator ? { backgroundColor: "transparent" } : {},
+  "&.MuiButton-root": isOpenChat || isAssignOperator ? { backgroundColor: "transparent", "& *": { backgroundColor: "transparent !important" } } : {},
 }));
 
 export const LocationItem = styled(Box)(({ theme }) => ({
@@ -405,13 +475,15 @@ export const AlertOpen = styled(Typography, {
   },
 }));
 
-export const ELDTag = styled(Box)(({ theme }) => ({
-  padding: "4px 10px",
-  borderRadius: 6,
-  background: theme.palette.cyan?.[50],
-  color: theme.palette.primary.main,
+export const ELDTag = styled(Box)(() => ({
+  padding: "3px 10px",
+  borderRadius: 8,
+  background: "#dbeafe",
+  color: "#1e3a8a",
   fontSize: 12,
+  fontWeight: 600,
   width: "fit-content",
+  border: "1px solid #93c5fd",
 }));
 
 export const LocationRow = styled(Box)(() => ({
@@ -538,4 +610,96 @@ export const MessageText = styled(Typography)(({ theme }) => ({
   fontWeight: 400,
   color: theme.palette.text.primary,
   lineHeight: 1.4,
+}));
+
+export const ChatContainer = styled(Box)(() => ({
+  display: "flex",
+  flexDirection: "column",
+  flex: 1,
+  minHeight: 0,
+}));
+
+export const ChatHeader = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: "12px 16px",
+  borderBottom: `1px solid ${theme.palette.grey[200]}`,
+  fontWeight: 600,
+  fontSize: 16,
+  color: theme.palette.text.primary,
+}));
+
+export const ChatMessages = styled(Box)(({ theme }) => ({
+  flex: 1,
+  overflowY: "auto",
+  padding: theme.spacing(2),
+  display: "flex",
+  flexDirection: "column",
+  gap: theme.spacing(2),
+  "&::-webkit-scrollbar": { width: 4 },
+  "&::-webkit-scrollbar-thumb": {
+    background: theme.palette.grey[300],
+    borderRadius: 4,
+  },
+}));
+
+export const CurrentUserBubble = styled(Box)(({ theme }) => ({
+  maxWidth: "65%",
+  padding: "12px 16px",
+  borderRadius: "16px 16px 4px 16px",
+  backgroundColor: "#1e3a8a",
+  color: theme.palette.common.white,
+  fontSize: 14,
+  lineHeight: 1.5,
+  alignSelf: "flex-end",
+}));
+
+export const OtherUserBubble = styled(Box)(({ theme }) => ({
+  maxWidth: "65%",
+  padding: "12px 16px",
+  borderRadius: "16px 16px 16px 4px",
+  backgroundColor: theme.palette.grey[100],
+  color: theme.palette.text.primary,
+  fontSize: 14,
+  lineHeight: 1.5,
+  alignSelf: "flex-start",
+}));
+
+export const ChatTimestamp = styled(Typography)(({ theme }) => ({
+  fontSize: 11,
+  color: theme.palette.text.disabled,
+  marginTop: 4,
+}));
+
+export const ChatInputRow = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  padding: "12px 16px",
+  borderTop: `1px solid ${theme.palette.grey[200]}`,
+}));
+
+export const ChatInput = styled("input")(({ theme }) => ({
+  flex: 1,
+  border: `1px solid ${theme.palette.grey[300]}`,
+  borderRadius: 8,
+  padding: "10px 14px",
+  fontSize: 14,
+  outline: "none",
+  color: theme.palette.text.primary,
+  "&::placeholder": { color: theme.palette.text.disabled },
+}));
+
+export const ChatSendButton = styled(Box)(() => ({
+  width: 40,
+  height: 40,
+  borderRadius: 12,
+  backgroundColor: "#1e3a8a",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  cursor: "pointer",
+  flexShrink: 0,
+  "&:hover": { backgroundColor: "#1e3a8a" },
 }));

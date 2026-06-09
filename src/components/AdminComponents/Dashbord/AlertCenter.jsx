@@ -19,6 +19,7 @@ import CarrierIcon from "../../../assets/images/active/Icon-1.png";
 import LocationIcon from "../../../assets/images/active/Icon-3.png";
 import DeviceIcon from "../../../assets/images/active/Icon-4.png";
 import TruckIcon from "../../../assets/images/active/Truck.png";
+import IdIcon from "../../../assets/images/active/Icon-2.png";
 import { useNavigate } from "react-router-dom";
 
 
@@ -53,6 +54,10 @@ const AlertCardItem = ({ item }) => (
           <AlertDetailItem>
             <AlertIcon src={LocationIcon} alt="Location" />
             {item.location2}
+          </AlertDetailItem>
+          <AlertDetailItem>
+            <AlertIcon src={IdIcon} alt="ID" style={{ width: 18, height: 18 }} />
+            -
           </AlertDetailItem>
         </AlertDetailRow>
 

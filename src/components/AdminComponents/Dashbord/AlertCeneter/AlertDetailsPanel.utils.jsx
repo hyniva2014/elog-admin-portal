@@ -64,21 +64,15 @@ export const getTriggerInfo = () => [
 // Sample conversation data if not provided
 export const defaultConversations = [
   {
-    sender: "TP",
-    message: "Hello Emily Wilson!",
-    time: "10:25",
-    isCurrentUser: true,
-  },
-  {
-    sender: "EW",
-    message: "Hello",
-    time: "10:26",
+    sender: "J",
+    message: "We need to update the ELD config for TRK-512. Driver swap happening tomorrow.",
+    time: "08:26 AM",
     isCurrentUser: false,
   },
   {
-    sender: "TP",
-    message: "Your 14-Hour Limit Approaching",
-    time: "10:27",
+    sender: "P",
+    message: "Received. Can you confirm the new driver ID?",
+    time: "08:28 AM",
     isCurrentUser: true,
   },
 ];

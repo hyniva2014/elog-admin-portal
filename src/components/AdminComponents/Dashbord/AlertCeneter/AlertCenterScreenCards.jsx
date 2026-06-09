@@ -10,8 +10,8 @@ const AlertCenterScreenCards = ({ alerts = [] }) => {
 
   return (
     <AlertsContainer>
-      <Grid container>
-        <Grid item xs={12} md={6}>
+      <Grid container alignItems="stretch" sx={{ width: "100%" }}>
+        <Grid item xs={12} md={4.5} sx={{ display: "flex", flexDirection: "column" }}>
           <AlertListPanel
             alerts={alerts}
             selectedAlert={selectedAlert}
@@ -19,7 +19,7 @@ const AlertCenterScreenCards = ({ alerts = [] }) => {
           />
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={7.5} sx={{ display: "flex", flexDirection: "column" }}>
           <AlertDetailsPanel selectedAlert={selectedAlert} />
         </Grid>
       </Grid>

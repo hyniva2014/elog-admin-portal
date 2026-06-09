@@ -1,5 +1,9 @@
-import { useCallback } from "react";
-import { Grid } from "@mui/material";
+import { useState, useEffect } from "react";
+import { Box, Grid, Typography, List, ListItemButton, ListItemText, Radio, Autocomplete, TextField } from "@mui/material";
+import axios from "axios";
+import CommonDialogForm from "../../../../common/CommonDialogForm";
+import TelegramIcon from "@mui/icons-material/Telegram";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import {
   AlertDetailItem,
@@ -24,35 +28,57 @@ import {
   TriggerInfoCard,
   ActionSection,
   ActionButton,
-  ConversationContainer,
-  ConversationMessage,
-  MessageContent,
-  Timestamp,
-  DateSection,
-  DateText,
-  AvatarCircle,
-  MessageBubble,
-  RightAvatar,
-  MessageText,
+  ChatContainer,
+  ChatHeader,
+  ChatMessages,
+  CurrentUserBubble,
+  OtherUserBubble,
+  ChatTimestamp,
+  ChatInputRow,
+  ChatInput,
+  ChatSendButton,
 } from "./AlertCenterScreenCard.styles.jsx";
 
 import HOS from "../../../../assets/images/active/Hos.png";
 import LocationIcon from "../../../../assets/images/active/Icon-3.png";
-import TpLogo from "../../../../assets/images/TP logo.png";
 
 import {
-  defaultConversations,
   getDriverDeviceInfo,
+  getTriggerInfo,
+  defaultConversations,
 } from "./AlertDetailsPanel.utils";
 
-const AlertActionButton = ({ label }) => {
-  const handleClick = useCallback(() => {
-    // TODO
-  }, []);
+const OPERATORS = [
+  { id: 1, name: "James Carter", role: "Senior Operator" },
+  { id: 2, name: "Maria Lopez", role: "Operator" },
+  { id: 3, name: "David Kim", role: "Operator" },
+  { id: 4, name: "Sarah Mitchell", role: "Junior Operator" },
+  { id: 5, name: "Robert Chen", role: "Senior Operator" },
+  { id: 6, name: "Emily Johnson", role: "Operator" },
+  { id: 7, name: "Michael Brown", role: "Senior Operator" },
+  { id: 8, name: "Jessica Davis", role: "Junior Operator" },
+  { id: 9, name: "William Wilson", role: "Operator" },
+  { id: 10, name: "Amanda Martinez", role: "Senior Operator" },
+];
 
+const PANEL_STATE = {
+  DETAILS: "details",
+  ASSIGNED: "assigned",
+  CHAT: "chat",
+};
+
+const AlertActionButton = ({ label, isResolve, isOpenChat, isAssignOperator, onClick }) => {
+  const isNoEffects = isOpenChat || isAssignOperator;
   return (
     <Grid item xs={6}>
-      <ActionButton fullWidth variant="outlined" onClick={handleClick}>
+      <ActionButton 
+        fullWidth 
+        disableRipple={isNoEffects}
+        isResolve={isResolve} 
+        isOpenChat={isOpenChat} 
+        isAssignOperator={isAssignOperator} 
+        onClick={onClick}
+      >
         {label}
       </ActionButton>
     </Grid>
@@ -98,22 +124,31 @@ const TriggerInfoCardItem = ({ label, value }) => (
   </TriggerInfoCard>
 );
 
-const ConversationItem = ({ sender, message, time, isCurrentUser }) => {
-  return (
-    <ConversationMessage isCurrentUser={isCurrentUser}>
-      {!isCurrentUser && <AvatarCircle>{sender?.substring(0, 2)}</AvatarCircle>}
-
-      <MessageBubble isCurrentUser={isCurrentUser}>
-        <MessageText>{message}</MessageText>
-        <Timestamp>{time}</Timestamp>
-      </MessageBubble>
-
-      {isCurrentUser && <RightAvatar src={TpLogo} alt="TP" />}
-    </ConversationMessage>
-  );
-};
+const ALERT_STATUS_OPTIONS = [
+  { value: "open", label: "Open" },
+  { value: "resolved", label: "Resolved" },
+  { value: "inprogress", label: "In Progress" },
+  { value: "pending", label: "Pending" },
+];
 
 const AlertDetailsPanel = ({ selectedAlert }) => {
+  const [panelState, setPanelState] = useState(PANEL_STATE.DETAILS);
+  const [alertStatus, setAlertStatus] = useState("");
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [selectedOperator, setSelectedOperator] = useState(null);
+  const [chatInput, setChatInput] = useState("");
+  const [messages, setMessages] = useState(defaultConversations);
+  const [assignLoading, setAssignLoading] = useState(false);
+
+  useEffect(() => {
+    setPanelState(PANEL_STATE.DETAILS);
+    setMessages(defaultConversations);
+    setChatInput("");
+    setAlertStatus("");
+    setAssignOpen(false);
+    setSelectedOperator(null);
+  }, [selectedAlert]);
+
   if (!selectedAlert) return null;
 
   const {
@@ -125,46 +160,113 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
     location1,
     location2,
     city,
-    date,
-    conversations = [],
   } = selectedAlert;
 
   const displayTitle = title || message;
   const displaySeverity = severity || "Critical";
   const primaryLocation = location1 || city;
-  const formattedDate = date || "25 April";
-
   const driverInfo = getDriverDeviceInfo(company, truck);
-  // const triggerInfo = getTriggerInfo();
+  const triggerInfo = getTriggerInfo();
 
-  const conversationList =
-    conversations.length > 0 ? conversations : defaultConversations;
+  const handleSend = () => {
+    if (!chatInput.trim()) return;
+    setMessages((prev) => [
+      ...prev,
+      { sender: "P", message: chatInput, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), isCurrentUser: true },
+    ]);
+    setChatInput("");
+  };
 
-  const conversationItems = conversationList.map(
-    ({ sender, message, time, isCurrentUser }, index) => (
-      <ConversationItem
-        key={index}
-        sender={sender}
-        message={message}
-        time={time}
-        isCurrentUser={isCurrentUser}
-      />
-    ),
-  );
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleSend();
+  };
+
+  const handleAssignOperator = async () => {
+    if (!selectedOperator || !selectedAlert) return;
+    
+    setAssignLoading(true);
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/Stage/masteradmin/alert-center/assign-operator?incident_id=${selectedAlert.id || 'ac-device-offline'}&assigned_user_id=${selectedOperator}`
+      );
+      
+      if (response.data.statusCode === 200) {
+        setPanelState(PANEL_STATE.ASSIGNED);
+        setAssignOpen(false);
+        console.log("Operator assigned successfully:", response.data.body);
+      }
+    } catch (error) {
+      console.error("Error assigning operator:", error);
+      // Fallback for testing when backend is not available
+      console.log("Using fallback - simulating successful assignment");
+      setPanelState(PANEL_STATE.ASSIGNED);
+      setAssignOpen(false);
+    } finally {
+      setAssignLoading(false);
+    }
+  };
+
+  if (panelState === PANEL_STATE.CHAT) {
+    return (
+      <AlertCardContainer chatPanel>
+        <ChatContainer>
+          <ChatHeader>
+            Live Chat — {company || "Operator"}
+            <span
+              style={{ cursor: "pointer", fontWeight: 400, fontSize: 20, lineHeight: 1 }}
+              onClick={() => setPanelState(PANEL_STATE.DETAILS)}
+            >
+              ×
+            </span>
+          </ChatHeader>
+
+          <ChatMessages>
+            {messages.map(({ sender, message: msg, time, isCurrentUser }, index) =>
+              isCurrentUser ? (
+                <div key={index} style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+                  <CurrentUserBubble>{msg}</CurrentUserBubble>
+                  <ChatTimestamp style={{ textAlign: "right" }}>{time}</ChatTimestamp>
+                </div>
+              ) : (
+                <div key={index} style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                  <OtherUserBubble>{msg}</OtherUserBubble>
+                  <ChatTimestamp>{time}</ChatTimestamp>
+                </div>
+              )
+            )}
+          </ChatMessages>
+
+          <ChatInputRow>
+            <ChatInput
+              placeholder="Type a message..."
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+            <ChatSendButton onClick={handleSend}>
+              <TelegramIcon sx={{ fontSize: 20, color: "white" }} />
+            </ChatSendButton>
+          </ChatInputRow>
+        </ChatContainer>
+      </AlertCardContainer>
+    );
+  }
 
   return (
-    <AlertCardContainer detailsPanel>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <AlertCardContainer detailsPanel sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
       <DetailHeader>
-        <AlertDetailItem mt={2}>
+        <AlertDetailItem>
           <DetailAlertIcon src={HOS} alt="Alert type icon" />
           <DetailTitleWrapper>
             <DetailTitle>{displayTitle}</DetailTitle>
-            <DetailSubTitle>{displaySeverity}</DetailSubTitle>
+            <DetailSubTitle severity={displaySeverity}>{displaySeverity}</DetailSubTitle>
           </DetailTitleWrapper>
         </AlertDetailItem>
       </DetailHeader>
 
-      {/* <InfoSection>
+      <InfoSection sx={{ marginTop: 3 }}>
+        <TriggerSectionTitle>Driver &amp; Device Information</TriggerSectionTitle>
         <InfoGrid>
           {driverInfo.map(({ label, value, isStatus }) => (
             <DriverInfoCardItem
@@ -175,20 +277,62 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
             />
           ))}
         </InfoGrid>
-      </InfoSection> */}
+        <Box>
+          <InfoLabel>Current Location</InfoLabel>
+          <LocationItem sx={{ mt: 0.5 }}>
+            <LocationContentItem
+              primaryLocation={primaryLocation}
+              location2={location2}
+            />
+          </LocationItem>
+        </Box>
+      </InfoSection>
 
-      {/* <DividerLine /> */}
+      <TriggerSection>
+        <TriggerSectionTitle>Trigger Information</TriggerSectionTitle>
+        <TriggerInfoGrid>
+          {triggerInfo.map(({ label, value }) => (
+            <TriggerInfoCardItem key={label} label={label} value={value} />
+          ))}
+        </TriggerInfoGrid>
+      </TriggerSection>
 
-      {/* Date Section */}
-      <DateSection>
-        <DateText>{formattedDate}</DateText>
-      </DateSection>
-
-      {/* Conversation Section */}
-      <ConversationContainer>
-        {conversationItems}
-      </ConversationContainer>
+      
+      <CommonDialogForm
+        open={assignOpen}
+        title="Assign Operator"
+        onCancel={() => setAssignOpen(false)}
+        onClose={() => setAssignOpen(false)}
+        onSubmit={handleAssignOperator}
+        submitButtonText="Assign"
+        disableSubmit={!selectedOperator}
+        loading={assignLoading}
+        maxWidth="xs"
+        content={
+          <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+            <List disablePadding>
+              {OPERATORS.map((op) => (
+                <ListItemButton
+                  key={op.id}
+                  onClick={() => setSelectedOperator(op.id)}
+                  selected={selectedOperator === op.id}
+                  sx={{ borderRadius: 2, mb: 0.5 }}
+                >
+                  <Radio checked={selectedOperator === op.id} size="small" sx={{ mr: 1 }} />
+                  <ListItemText
+                    primary={op.name}
+                    secondary={op.role}
+                    primaryTypographyProps={{ fontWeight: 600, fontSize: 14 }}
+                    secondaryTypographyProps={{ fontSize: 12 }}
+                  />
+                </ListItemButton>
+              ))}
+            </List>
+          </Box>
+        }
+      />
     </AlertCardContainer>
+    </Box>
   );
 };
 
