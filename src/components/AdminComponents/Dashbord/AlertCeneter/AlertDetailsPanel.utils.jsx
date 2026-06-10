@@ -1,17 +1,3 @@
-import React from "react";
-
-import {
-  InfoCard,
-  InfoLabel,
-  InfoValue,
-  StatusBadge,
-  AlertIcon,
-  CoordinateBadge,
-  TriggerInfoCard,
-} from "./AlertCenterScreenCard.styles.jsx";
-
-import LocationIcon from "../../../../assets/images/active/Icon-3.png";
-
 export const ACTION_BUTTONS = [
   "Acknowledge",
   "Assign Operator",
@@ -64,21 +50,25 @@ export const getTriggerInfo = () => [
 // Sample conversation data if not provided
 export const defaultConversations = [
   {
-    sender: "TP",
-    message: "Hello Emily Wilson!",
-    time: "10:25",
-    isCurrentUser: true,
-  },
-  {
-    sender: "EW",
-    message: "Hello",
-    time: "10:26",
+    sender: "J",
+    message: "We need to update the ELD config for TRK-512. Driver swap happening tomorrow.",
+    time: "08:26 AM",
     isCurrentUser: false,
   },
   {
-    sender: "TP",
-    message: "Your 14-Hour Limit Approaching",
-    time: "10:27",
+    sender: "P",
+    message: "Received. Can you confirm the new driver ID?",
+    time: "08:28 AM",
     isCurrentUser: true,
   },
 ];
+
+/**
+ * Calculate a numeric alert ID from the item's string id
+ * @param {string} itemId - The alert item id
+ * @returns {number} - Calculated alert ID (1000-9999)
+ */
+export const calculateAlertId = (itemId) => {
+  if (!itemId) return 1001;
+  return String(itemId).split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0) % 9000 + 1000;
+};

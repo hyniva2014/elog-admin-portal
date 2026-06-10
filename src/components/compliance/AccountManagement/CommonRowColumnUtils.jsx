@@ -1,13 +1,16 @@
-import { Box, IconButton, Tooltip, Typography } from "@mui/material";
+import { Box, IconButton, Tooltip, Typography, useTheme } from "@mui/material";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import dayjs from "dayjs";
-import { defaultColumnProps, getStickyColumnProps } from "./Constants";
+import { defaultColumnProps, getStickyColumnProps, getStatusNameFromId } from "./Constants";
 import { getFormattedDateTime } from "../../../common/CommonUtils";
+import { handleOpenStatusChange } from "./utils";
 import {
   StatusText,
   AddressCellText,
   actionIconSx,
+  TriSwitchTrack,
+  TriSwitchThumb,
+  TriSwitchZone,
 } from "./AccountManagement.styled";
 
 const formatDate = (value) => {
@@ -25,32 +28,38 @@ const renderStatusCell = (params) => (
   <StatusText accountStatus={params.value}>{params.value}</StatusText>
 );
 
-const renderActionCell = (onViewAccount, onDeleteAccount) => (params) => {
-  const isViewDisabled = params.row.status === "Inactive";
-  const isDeleteDisabled = params.row.status === "Inactive";
+const renderDateTimeCell = (dateField, timeField) => (params) => {
+  const theme = useTheme();
+  return (
+    <Box>
+      <Typography fontSize={14} fontWeight={400}>
+        {params.row[dateField]}
+      </Typography>
+      <Typography fontSize={14} fontWeight={400} color={theme.palette.grey[500]}>
+        {params.row[timeField]}
+      </Typography>
+    </Box>
+  );
+};
+
+const renderActionCell = (onViewAccount, onToggleClick) => (params) => {
+  const { row } = params;
+  const currentStatus = row.status || "Active";
+
+  const handleViewClick = () => onViewAccount(row);
+  const handleStatusClick = () => handleOpenStatusChange(row, currentStatus, onToggleClick);
 
   return (
-    <Box display="flex" gap={1}>
+    <Box display="flex" gap={1} alignItems="center">
       <Tooltip title="View">
-        <IconButton size="small" onClick={() => onViewAccount(params.row)}>
+        <IconButton size="small" onClick={handleViewClick}>
           <VisibilityOutlinedIcon sx={actionIconSx} />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Delete">
-        <span>
-          <IconButton
-            size="small"
-            onClick={() => onDeleteAccount(params.row)}
-            disabled={isDeleteDisabled}
-          >
-            <DeleteOutlineIcon
-              sx={{
-                ...actionIconSx,
-                color: isDeleteDisabled ? "text.disabled" : "#D32F2F",
-              }}
-            />
-          </IconButton>
-        </span>
+      <Tooltip title={`${currentStatus} — click to change status`}>
+        <TriSwitchTrack status={currentStatus} onClick={handleStatusClick}>
+          <TriSwitchThumb status={currentStatus} />
+        </TriSwitchTrack>
       </Tooltip>
     </Box>
   );
@@ -58,7 +67,7 @@ const renderActionCell = (onViewAccount, onDeleteAccount) => (params) => {
 
 export const AccountManagementColumnsData = (
   onViewAccount,
-  onDeleteAccount,
+  onToggleClick,
 ) => [
   {
     field: "carrierId",
@@ -145,31 +154,13 @@ export const AccountManagementColumnsData = (
     field: "createdOn",
     headerName: "Created On",
     ...defaultColumnProps,
-    renderCell: (params) => (
-      <Box>
-        <Typography fontSize={14} fontWeight={400}>
-          {params.row.createdDate}
-        </Typography>
-        <Typography fontSize={14} fontWeight={400} color="#6E7079">
-          {params.row.createdTime}
-        </Typography>
-      </Box>
-    ),
+    renderCell: renderDateTimeCell("createdDate", "createdTime"),
   },
   {
     field: "lastSync",
     headerName: "Updated on",
     ...defaultColumnProps,
-    renderCell: (params) => (
-      <Box>
-        <Typography fontSize={14} fontWeight={400}>
-          {params.row.updatedDate}
-        </Typography>
-        <Typography fontSize={14} fontWeight={400} color="#6E7079">
-          {params.row.updatedTime}
-        </Typography>
-      </Box>
-    ),
+    renderCell: renderDateTimeCell("updatedDate", "updatedTime"),
   },
   {
     field: "status",
@@ -182,7 +173,7 @@ export const AccountManagementColumnsData = (
     headerName: "Action",
     ...defaultColumnProps,
     sortable: false,
-    renderCell: renderActionCell(onViewAccount, onDeleteAccount),
+    renderCell: renderActionCell(onViewAccount, onToggleClick),
   },
 ];
 
@@ -207,6 +198,7 @@ export const AccountManagementRowData = (response = []) => {
       createdAt,
       updatedAt,
       statusName,
+      status_id,
       address = {},
       contact = {},
       secondaryContact = {},
@@ -249,7 +241,8 @@ export const AccountManagementRowData = (response = []) => {
       createdTime: createdInfo.time,
       updatedDate: updatedInfo.date,
       updatedTime: updatedInfo.time,
-      status: statusName || "-",
+      status: getStatusNameFromId(status_id, statusName),
+      statusId: status_id || "1",
     };
   });
 };

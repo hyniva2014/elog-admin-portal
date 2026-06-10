@@ -1,9 +1,11 @@
-import { useCallback } from "react";
-import { Grid } from "@mui/material";
+import { useState, useEffect, useCallback } from "react";
+import { Box, Grid, List } from "@mui/material";
+import { useServices } from "../../../../services/services";
+import CommonDialogForm from "../../../../common/CommonDialogForm";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import {
   AlertDetailItem,
-  AlertIcon,
   DetailAlertIcon,
   AlertCardContainer,
   DetailHeader,
@@ -14,106 +16,90 @@ import {
   TriggerSectionTitle,
   InfoGrid,
   TriggerInfoGrid,
-  InfoCard,
   InfoLabel,
-  InfoValue,
-  StatusBadge,
   LocationItem,
-  CoordinateBadge,
   TriggerSection,
-  TriggerInfoCard,
   ActionSection,
   ActionButton,
-  ConversationContainer,
-  ConversationMessage,
-  MessageContent,
-  Timestamp,
-  DateSection,
-  DateText,
-  AvatarCircle,
-  MessageBubble,
-  RightAvatar,
-  MessageText,
+  ChatContainer,
+  ChatHeader,
+  ChatMessages,
+  CurrentUserBubble,
+  OtherUserBubble,
+  ChatInputRow,
+  ChatInput,
+  ChatSendButton,
+  MessageContainer,
+  CurrentChatTimestamp,
+  ChatCloseButton,
+  DetailsPanelWrapper,
+  InfoSectionSpaced,
+  ScrollableListBox,
+  LocationItemSpaced,
+  TelegramIconStyled,
 } from "./AlertCenterScreenCard.styles.jsx";
 
 import HOS from "../../../../assets/images/active/Hos.png";
-import LocationIcon from "../../../../assets/images/active/Icon-3.png";
-import TpLogo from "../../../../assets/images/TP logo.png";
 
 import {
-  defaultConversations,
   getDriverDeviceInfo,
+  getTriggerInfo,
+  defaultConversations,
 } from "./AlertDetailsPanel.utils";
 
-const AlertActionButton = ({ label }) => {
-  const handleClick = useCallback(() => {
-    // TODO
-  }, []);
+import ChatMessageItem from "./ChatMessageItem.jsx";
+import AlertActionButton from "./AlertActionButton.jsx";
+import DriverInfoCardItem from "./DriverInfoCardItem.jsx";
+import LocationContentItem from "./LocationContentItem.jsx";
+import TriggerInfoCardItem from "./TriggerInfoCardItem.jsx";
+import OperatorItem from "./OperatorItem.jsx";
+import AssignOperatorContent from "./AssignOperatorContent.jsx";
 
-  return (
-    <Grid item xs={6}>
-      <ActionButton fullWidth variant="outlined" onClick={handleClick}>
-        {label}
-      </ActionButton>
-    </Grid>
-  );
+const OPERATORS = [
+  { id: 1, name: "James Carter", role: "Senior Operator" },
+  { id: 2, name: "Maria Lopez", role: "Operator" },
+  { id: 3, name: "David Kim", role: "Operator" },
+  { id: 4, name: "Sarah Mitchell", role: "Junior Operator" },
+  { id: 5, name: "Robert Chen", role: "Senior Operator" },
+  { id: 6, name: "Emily Johnson", role: "Operator" },
+  { id: 7, name: "Michael Brown", role: "Senior Operator" },
+  { id: 8, name: "Jessica Davis", role: "Junior Operator" },
+  { id: 9, name: "William Wilson", role: "Operator" },
+  { id: 10, name: "Amanda Martinez", role: "Senior Operator" },
+];
+
+const PANEL_STATE = {
+  DETAILS: "details",
+  ASSIGNED: "assigned",
+  CHAT: "chat",
 };
 
-const DriverInfoCardItem = ({ label, value, isStatus }) => {
-  const content = isStatus ? (
-    <StatusBadge>{value}</StatusBadge>
-  ) : (
-    <InfoValue>{value}</InfoValue>
-  );
-
-  return (
-    <InfoCard>
-      <InfoLabel>{label}</InfoLabel>
-      {content}
-    </InfoCard>
-  );
-};
-
-const LocationContentItem = ({ primaryLocation, location2 }) => {
-  const secondaryLocation = location2 ? (
-    <>
-      <AlertIcon src={LocationIcon} alt="Location" />
-      <CoordinateBadge>{location2}</CoordinateBadge>
-    </>
-  ) : null;
-
-  return (
-    <>
-      <AlertIcon src={LocationIcon} alt="Location" />
-      <CoordinateBadge>{primaryLocation}</CoordinateBadge>
-      {secondaryLocation}
-    </>
-  );
-};
-
-const TriggerInfoCardItem = ({ label, value }) => (
-  <TriggerInfoCard>
-    <InfoLabel>{label}</InfoLabel>
-    <InfoValue>{value}</InfoValue>
-  </TriggerInfoCard>
-);
-
-const ConversationItem = ({ sender, message, time, isCurrentUser }) => {
-  return (
-    <ConversationMessage isCurrentUser={isCurrentUser}>
-      {!isCurrentUser && <AvatarCircle>{sender?.substring(0, 2)}</AvatarCircle>}
-
-      <MessageBubble isCurrentUser={isCurrentUser}>
-        <MessageText>{message}</MessageText>
-        <Timestamp>{time}</Timestamp>
-      </MessageBubble>
-
-      {isCurrentUser && <RightAvatar src={TpLogo} alt="TP" />}
-    </ConversationMessage>
-  );
-};
+const ALERT_STATUS_OPTIONS = [
+  { value: "open", label: "Open" },
+  { value: "resolved", label: "Resolved" },
+  { value: "inprogress", label: "In Progress" },
+  { value: "pending", label: "Pending" },
+];
 
 const AlertDetailsPanel = ({ selectedAlert }) => {
+  const { updateApi } = useServices();
+  const [panelState, setPanelState] = useState(PANEL_STATE.DETAILS);
+  const [alertStatus, setAlertStatus] = useState("");
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [selectedOperator, setSelectedOperator] = useState(null);
+  const [chatInput, setChatInput] = useState("");
+  const [messages, setMessages] = useState(defaultConversations);
+  const [assignLoading, setAssignLoading] = useState(false);
+
+  useEffect(() => {
+    setPanelState(PANEL_STATE.DETAILS);
+    setMessages(defaultConversations);
+    setChatInput("");
+    setAlertStatus("");
+    setAssignOpen(false);
+    setSelectedOperator(null);
+  }, [selectedAlert]);
+
   if (!selectedAlert) return null;
 
   const {
@@ -125,70 +111,169 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
     location1,
     location2,
     city,
-    date,
-    conversations = [],
   } = selectedAlert;
 
   const displayTitle = title || message;
   const displaySeverity = severity || "Critical";
   const primaryLocation = location1 || city;
-  const formattedDate = date || "25 April";
-
   const driverInfo = getDriverDeviceInfo(company, truck);
-  // const triggerInfo = getTriggerInfo();
+  const triggerInfo = getTriggerInfo();
 
-  const conversationList =
-    conversations.length > 0 ? conversations : defaultConversations;
+  const handleSend = () => {
+    if (!chatInput.trim()) return;
+    setMessages((prev) => [
+      ...prev,
+      { sender: "P", message: chatInput, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), isCurrentUser: true },
+    ]);
+    setChatInput("");
+  };
 
-  const conversationItems = conversationList.map(
-    ({ sender, message, time, isCurrentUser }, index) => (
-      <ConversationItem
-        key={index}
-        sender={sender}
-        message={message}
-        time={time}
-        isCurrentUser={isCurrentUser}
-      />
-    ),
-  );
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleSend();
+  };
+
+  const handleCloseChat = () => {
+    setPanelState(PANEL_STATE.DETAILS);
+  };
+
+  const handleChatInputChange = (e) => {
+    setChatInput(e.target.value);
+  };
+
+  const handleOperatorSelect = useCallback((operatorId) => {
+    setSelectedOperator(operatorId);
+  }, []);
+
+  const handleCloseAssign = useCallback(() => {
+    setAssignOpen(false);
+  }, []);
+
+  const renderChatMessage = useCallback((msgItem, index) => (
+    <ChatMessageItem key={index} messageItem={msgItem} />
+  ), []);
+
+  const renderOperator = useCallback(({ id, name, role }) => (
+    <OperatorItem
+      key={id}
+      op={{ id, name, role }}
+      selectedOperator={selectedOperator}
+      onSelect={handleOperatorSelect}
+    />
+  ), [selectedOperator, handleOperatorSelect]);
+
+  const renderDriverInfo = useCallback(({ label, value, isStatus }) => (
+    <DriverInfoCardItem
+      key={label}
+      label={label}
+      value={value}
+      isStatus={isStatus}
+    />
+  ), []);
+
+  const renderTriggerInfo = useCallback(({ label, value }) => (
+    <TriggerInfoCardItem key={label} label={label} value={value} />
+  ), []);
+
+  const handleAssignOperator = async () => {
+    if (!selectedOperator || !selectedAlert) return;
+
+    setAssignLoading(true);
+    const incidentId = selectedAlert.id || "ac-device-offline";
+    const endUrl = `/Stage/masteradmin/alert-center/assign-operator?incident_id=${incidentId}&assigned_user_id=${selectedOperator}`;
+    const response = await updateApi(null, endUrl);
+    setAssignLoading(false);
+
+    if (response?.statusCode === 200) {
+      setPanelState(PANEL_STATE.ASSIGNED);
+      setAssignOpen(false);
+    }
+  };
+
+  if (panelState === PANEL_STATE.CHAT) {
+    return (
+      <AlertCardContainer chatPanel>
+        <ChatContainer>
+          <ChatHeader>
+            Live Chat — {company || "Operator"}
+            <ChatCloseButton onClick={handleCloseChat}>×</ChatCloseButton>
+          </ChatHeader>
+
+          <ChatMessages>
+            {messages.map(renderChatMessage)}
+          </ChatMessages>
+
+          <ChatInputRow>
+            <ChatInput
+              placeholder="Type a message..."
+              value={chatInput}
+              onChange={handleChatInputChange}
+              onKeyDown={handleKeyDown}
+            />
+            <ChatSendButton onClick={handleSend}>
+              <TelegramIconStyled />
+            </ChatSendButton>
+          </ChatInputRow>
+        </ChatContainer>
+      </AlertCardContainer>
+    );
+  }
 
   return (
-    <AlertCardContainer detailsPanel>
+    <DetailsPanelWrapper>
+      <AlertCardContainer detailsPanel>
       <DetailHeader>
-        <AlertDetailItem mt={2}>
+        <AlertDetailItem>
           <DetailAlertIcon src={HOS} alt="Alert type icon" />
           <DetailTitleWrapper>
             <DetailTitle>{displayTitle}</DetailTitle>
-            <DetailSubTitle>{displaySeverity}</DetailSubTitle>
+            <DetailSubTitle severity={displaySeverity}>{displaySeverity}</DetailSubTitle>
           </DetailTitleWrapper>
         </AlertDetailItem>
       </DetailHeader>
 
-      {/* <InfoSection>
+      <InfoSectionSpaced>
+        <TriggerSectionTitle>Driver &amp; Device Information</TriggerSectionTitle>
         <InfoGrid>
-          {driverInfo.map(({ label, value, isStatus }) => (
-            <DriverInfoCardItem
-              key={label}
-              label={label}
-              value={value}
-              isStatus={isStatus}
-            />
-          ))}
+          {driverInfo.map(renderDriverInfo)}
         </InfoGrid>
-      </InfoSection> */}
+        <Box>
+          <InfoLabel>Current Location</InfoLabel>
+          <LocationItemSpaced>
+            <LocationContentItem
+              primaryLocation={primaryLocation}
+              location2={location2}
+            />
+          </LocationItemSpaced>
+        </Box>
+      </InfoSectionSpaced>
 
-      {/* <DividerLine /> */}
+      <TriggerSection>
+        <TriggerSectionTitle>Trigger Information</TriggerSectionTitle>
+        <TriggerInfoGrid>
+          {triggerInfo.map(renderTriggerInfo)}
+        </TriggerInfoGrid>
+      </TriggerSection>
 
-      {/* Date Section */}
-      <DateSection>
-        <DateText>{formattedDate}</DateText>
-      </DateSection>
-
-      {/* Conversation Section */}
-      <ConversationContainer>
-        {conversationItems}
-      </ConversationContainer>
+      
+      <CommonDialogForm
+        open={assignOpen}
+        title="Assign Operator"
+        onCancel={handleCloseAssign}
+        onClose={handleCloseAssign}
+        onSubmit={handleAssignOperator}
+        submitButtonText="Assign"
+        disableSubmit={!selectedOperator}
+        loading={assignLoading}
+        maxWidth="xs"
+        content={
+          <AssignOperatorContent
+            operators={OPERATORS}
+            renderOperator={renderOperator}
+          />
+        }
+      />
     </AlertCardContainer>
+    </DetailsPanelWrapper>
   );
 };
 

@@ -265,6 +265,49 @@ export const useAccountManagement = (
     },
     [setLoading, createApi, fetchData, handleSnackbar],
   );
+
+  const handleToggleStatus = useCallback(
+    async ({ row, newStatus, newStatusId, reason }) => {
+      setLoading(true);
+
+      try {
+        const payload = {
+          company_id: row.id,
+          company_status: newStatusId,
+          reason,
+        };
+
+        const response = await createApi(
+          payload,
+          "/masteradmin/delete-company",
+        );
+
+        if (response?.statusCode === 200 || response?.statusCode === 201) {
+          handleSnackbar(
+            response?.body?.message || `Account ${newStatus.toLowerCase()} successfully.`,
+            "success",
+          );
+
+          fetchData();
+        } else {
+          handleSnackbar(
+            response?.body?.message || "Failed to update account status.",
+            "error",
+          );
+        }
+      } catch (err) {
+        console.error("Error updating account status:", err);
+        handleSnackbar(
+          "Failed to update account status. Please try again.",
+          "error",
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [setLoading, createApi, fetchData, handleSnackbar],
+  );
+
   const fetchCompaniesDropdown = useCallback(async () => {
     try {
       const response = await fetchApi("/masteradmin/dropdown/companies");
@@ -333,7 +376,7 @@ export const useAccountManagement = (
     fetchData,
     handleCreateAccount,
     handleViewAccount,
-    handleDeleteAccount,
+    handleToggleStatus,
     fetchContactsDropdown,
     fetchCompaniesDropdown,
     fetchCarrierOptions,

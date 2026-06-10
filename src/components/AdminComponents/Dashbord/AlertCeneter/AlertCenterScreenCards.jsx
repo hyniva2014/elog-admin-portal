@@ -1,30 +1,34 @@
 import { useState } from "react";
-import { Grid } from "@mui/material";
 
 import AlertListPanel from "./AlertListPanel";
 import AlertDetailsPanel from "./AlertDetailsPanel";
-import { AlertsContainer } from "./AlertCenterScreenCard.styles.jsx";
+import {
+  AlertsContainer,
+  AlertGridContainer,
+  AlertGridColumn,
+} from "./AlertCenterScreenCard.styles.jsx";
 
 const AlertCenterScreenCards = ({ alerts = [] }) => {
   const [selectedAlert, setSelectedAlert] = useState(alerts[0]);
 
   return (
     <AlertsContainer>
-      <Grid container>
-        <Grid item xs={12} md={6}>
+      <AlertGridContainer container alignItems="stretch">
+        <AlertGridColumn item xs={12} md={4.5}>
           <AlertListPanel
             alerts={alerts}
             selectedAlert={selectedAlert}
             handleAlertSelect={setSelectedAlert}
           />
-        </Grid>
+        </AlertGridColumn>
 
-        <Grid item xs={12} md={6}>
+        <AlertGridColumn item xs={12} md={7.5}>
           <AlertDetailsPanel selectedAlert={selectedAlert} />
-        </Grid>
-      </Grid>
+        </AlertGridColumn>
+      </AlertGridContainer>
     </AlertsContainer>
   );
 };
 
 export default AlertCenterScreenCards;
+
