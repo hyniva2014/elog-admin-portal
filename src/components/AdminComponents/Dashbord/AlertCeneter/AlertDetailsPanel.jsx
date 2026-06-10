@@ -53,6 +53,7 @@ import DriverInfoCardItem from "./DriverInfoCardItem.jsx";
 import LocationContentItem from "./LocationContentItem.jsx";
 import TriggerInfoCardItem from "./TriggerInfoCardItem.jsx";
 import OperatorItem from "./OperatorItem.jsx";
+import AssignOperatorContent from "./AssignOperatorContent.jsx";
 
 const OPERATORS = [
   { id: 1, name: "James Carter", role: "Senior Operator" },
@@ -160,6 +161,19 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
     />
   ), [selectedOperator, handleOperatorSelect]);
 
+  const renderDriverInfo = useCallback(({ label, value, isStatus }) => (
+    <DriverInfoCardItem
+      key={label}
+      label={label}
+      value={value}
+      isStatus={isStatus}
+    />
+  ), []);
+
+  const renderTriggerInfo = useCallback(({ label, value }) => (
+    <TriggerInfoCardItem key={label} label={label} value={value} />
+  ), []);
+
   const handleAssignOperator = async () => {
     if (!selectedOperator || !selectedAlert) return;
 
@@ -220,14 +234,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
       <InfoSectionSpaced>
         <TriggerSectionTitle>Driver &amp; Device Information</TriggerSectionTitle>
         <InfoGrid>
-          {driverInfo.map(({ label, value, isStatus }) => (
-            <DriverInfoCardItem
-              key={label}
-              label={label}
-              value={value}
-              isStatus={isStatus}
-            />
-          ))}
+          {driverInfo.map(renderDriverInfo)}
         </InfoGrid>
         <Box>
           <InfoLabel>Current Location</InfoLabel>
@@ -243,9 +250,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
       <TriggerSection>
         <TriggerSectionTitle>Trigger Information</TriggerSectionTitle>
         <TriggerInfoGrid>
-          {triggerInfo.map(({ label, value }) => (
-            <TriggerInfoCardItem key={label} label={label} value={value} />
-          ))}
+          {triggerInfo.map(renderTriggerInfo)}
         </TriggerInfoGrid>
       </TriggerSection>
 
@@ -261,11 +266,10 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
         loading={assignLoading}
         maxWidth="xs"
         content={
-          <ScrollableListBox>
-            <List disablePadding>
-              {OPERATORS.map(renderOperator)}
-            </List>
-          </ScrollableListBox>
+          <AssignOperatorContent
+            operators={OPERATORS}
+            renderOperator={renderOperator}
+          />
         }
       />
     </AlertCardContainer>

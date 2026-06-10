@@ -16,47 +16,61 @@ import DeviceIcon from "../../../../assets/images/active/Icon-4.png";
 import TruckIcon from "../../../../assets/images/active/Truck.png";
 import IdIcon from "../../../../assets/images/active/Icon-2.png";
 
-const SimpleAlertCardItem = ({ item }) => (
-  <AlertCard>
-    <AlertAccentBar />
-    <AlertContent>
-      <AlertDetails>
-        <AlertCardTitle>{item.title || item.message}</AlertCardTitle>
+const SimpleAlertCardItem = ({ item }) => {
+  const {
+    title,
+    message,
+    company,
+    truck,
+    serial,
+    location1,
+    location2,
+    date,
+    time,
+  } = item;
 
-        <AlertDetailRow>
-          <AlertDetailItem>
-            <AlertIcon src={CarrierIcon} alt="Carrier" />
-            {item.company}
-          </AlertDetailItem>
-          <AlertDetailItem>
-            <AlertIcon src={TruckIcon} alt="Truck" />
-            {item.truck}
-          </AlertDetailItem>
-          <AlertDetailItem>
-            <AlertIcon src={DeviceIcon} alt="Device" />
-            {item.serial}
-          </AlertDetailItem>
-        </AlertDetailRow>
+  return (
+    <AlertCard>
+      <AlertAccentBar />
+      <AlertContent>
+        <AlertDetails>
+          <AlertCardTitle>{title || message}</AlertCardTitle>
 
-        <AlertDetailRow>
-          <AlertDetailItem>
-            <AlertIcon src={LocationIcon} alt="Location" />
-            {item.location1}
-          </AlertDetailItem>
-          <AlertDetailItem>
-            <AlertIcon src={LocationIcon} alt="Location" />
-            {item.location2}
-          </AlertDetailItem>
-          <AlertDetailItem>
-            <AlertIcon src={IdIcon} alt="ID" />
-            -
-          </AlertDetailItem>
-        </AlertDetailRow>
+          <AlertDetailRow>
+            <AlertDetailItem>
+              <AlertIcon src={CarrierIcon} alt="Carrier" />
+              {company}
+            </AlertDetailItem>
+            <AlertDetailItem>
+              <AlertIcon src={TruckIcon} alt="Truck" />
+              {truck}
+            </AlertDetailItem>
+            <AlertDetailItem>
+              <AlertIcon src={DeviceIcon} alt="Device" />
+              {serial}
+            </AlertDetailItem>
+          </AlertDetailRow>
 
-        <AlertTime>{item.date || item.time}</AlertTime>
-      </AlertDetails>
-    </AlertContent>
-  </AlertCard>
-);
+          <AlertDetailRow>
+            <AlertDetailItem>
+              <AlertIcon src={LocationIcon} alt="Location" />
+              {location1}
+            </AlertDetailItem>
+            <AlertDetailItem>
+              <AlertIcon src={LocationIcon} alt="Location" />
+              {location2}
+            </AlertDetailItem>
+            <AlertDetailItem>
+              <AlertIcon src={IdIcon} alt="ID" />
+              -
+            </AlertDetailItem>
+          </AlertDetailRow>
+
+          <AlertTime>{date || time}</AlertTime>
+        </AlertDetails>
+      </AlertContent>
+    </AlertCard>
+  );
+};
 
 export default SimpleAlertCardItem;
