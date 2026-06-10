@@ -5,7 +5,6 @@ import { styled } from "@mui/material/styles";
 
 export const AlertContainer = styled(Paper)(({ theme }) => ({
   padding: "16px",
-  paddingTop: 0,
   border: `1px solid ${theme.palette.grey[200]}`,
   borderRadius: "16px",
   height: 376,
@@ -35,13 +34,18 @@ export const AlertContainer = styled(Paper)(({ theme }) => ({
   scrollbarColor: `${theme.palette.grey[400]} transparent`,
 }));
 
-export const ChartHeader = styled(Box)(() => ({
+export const ChartHeader = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "space-between",
-  alignItems: "flex-start",
+  alignItems: "center",
   gap: "16px",
   marginBottom: "16px",
-  marginTop: "16px",
+  position: "sticky",
+  top: -16,
+  backgroundColor: theme.palette.common.white,
+  zIndex: 1,
+  paddingTop: "16px",
+  paddingBottom: "8px",
 }));
 
 export const AlertTitle = styled(Typography)(({ theme }) => ({
@@ -67,17 +71,17 @@ export const AlertList = styled(Box)(() => ({
 export const AlertCard = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "stretch",
-  background: theme.palette.grey[50],
-  borderRadius: "2px",
+  background: theme.palette.common.white,
+  borderRadius: "8px",
   overflow: "hidden",
   minHeight: 90,
   border: `1px solid ${theme.palette.grey[200]}`,
   position: "relative",
 }));
 
-export const AlertAccentBar = styled(Box)(({ accentcolor }) => ({
+export const AlertAccentBar = styled(Box)(({ theme }) => ({
   width: "4px",
-  backgroundColor: accentcolor,
+  backgroundColor: theme.palette.custom.navyBlue,
 }));
 
 export const AlertContent = styled(Box)(() => ({
