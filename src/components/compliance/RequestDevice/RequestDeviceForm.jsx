@@ -4,8 +4,14 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import CommonTextField from "../../../common/CommonTextField";
 import { FormContainer } from "./RequestDeviceForm.styled";
+import { getCompaniesDropdown } from "../UserManagement/userManagementService";
+import { useState } from "react";
+import { REQUEST_DEVICE_ENDPOINTS } from "./ApiEndpoints";
+import { useServices } from "../../../services/services";
+import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdown";
 
 const requestDeviceSchema = yup.object().shape({
+  companyId: yup.string().required("Carrier Name is required"),
   numberOfDevices: yup
     .number()
     .typeError("Number of devices must be a number")
@@ -14,14 +20,36 @@ const requestDeviceSchema = yup.object().shape({
   description: yup.string().required("Description is required"),
 });
 
-const RequestDeviceForm = ({ formData, onSubmit, setSubmitRef }) => {
+const RequestDeviceForm = ({
+  formData,
+  onSubmit,
+  setSubmitRef,
+  companyOptions,
+}) => {
   const { control, handleSubmit, reset } = useForm({
     resolver: yupResolver(requestDeviceSchema),
     defaultValues: {
+      companyId: "",
       numberOfDevices: "",
       description: "",
     },
   });
+
+  const renderCompanyField = useCallback(
+    ({ field, fieldState: { error } }) => (
+      <CommonAutocompleteDropdown
+        select
+        value={field.value}
+        onChange={field.onChange}
+        label="Carrier Name"
+        options={companyOptions}
+        error={!!error}
+        helperText={error?.message}
+        required
+      />
+    ),
+    [companyOptions],
+  );
 
   const renderNumberOfDevicesField = useCallback(
     ({ field, fieldState: { error } }) => (
@@ -35,7 +63,7 @@ const RequestDeviceForm = ({ formData, onSubmit, setSubmitRef }) => {
         required
       />
     ),
-    []
+    [],
   );
 
   const renderDescriptionField = useCallback(
@@ -51,14 +79,14 @@ const RequestDeviceForm = ({ formData, onSubmit, setSubmitRef }) => {
         required
       />
     ),
-    []
+    [],
   );
 
   const handleFormSubmit = useCallback(
     (data) => {
       onSubmit(data);
     },
-    [onSubmit]
+    [onSubmit],
   );
 
   useEffect(() => {
@@ -66,6 +94,7 @@ const RequestDeviceForm = ({ formData, onSubmit, setSubmitRef }) => {
       reset(formData);
     } else {
       reset({
+        companyId: "",
         numberOfDevices: "",
         description: "",
       });
@@ -84,6 +113,11 @@ const RequestDeviceForm = ({ formData, onSubmit, setSubmitRef }) => {
       id="request-device-form"
       onSubmit={handleSubmit(handleFormSubmit)}
     >
+      <Controller
+        name="companyId"
+        control={control}
+        render={renderCompanyField}
+      />
       <Controller
         name="numberOfDevices"
         control={control}

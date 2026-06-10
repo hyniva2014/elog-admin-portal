@@ -82,3 +82,9 @@ export const BUTTON_LABELS = {
   SAVING: "Saving...",
   CANCEL: "Cancel",
 };
+
+export const DialogPaperSx = (theme) => ({
+  background: theme.palette.background.paper,
+  borderRadius: "14px",
+  boxShadow: theme.shadows[5],
+});

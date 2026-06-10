@@ -845,7 +845,7 @@ const adminRoutes = [
     ),
   },
   {
-    path: "/career-users",
+    path: "/carrier-users",
     element: (
       <LoadComponent
         component={lazy(
@@ -892,13 +892,12 @@ const adminRoutes = [
     path: "/open-incidents",
     element: (
       <LoadComponent
-      component={lazy(
-        () =>
-          import("../components/AdminComponents/Dashbord/OpenIncident"),
-      )}
+        component={lazy(
+          () => import("../components/AdminComponents/Dashbord/OpenIncident"),
+        )}
       />
     ),
-  },    
+  },
   {
     path: "/alert-center",
     element: (

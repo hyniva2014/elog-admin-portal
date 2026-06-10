@@ -8,7 +8,7 @@ import CommonLoading from "../common/CommonLoading";
  */
 const INCIDENT_TYPE_MAPPING = {
   HOS: "HOS",
-  LOGS: "Mobile - Driver Log",
+  LOGS: "LOGS",
   DVIR: "DVIR",
   DOT: "DOT",
   ACCIDENT: "ACCIDENT",
@@ -25,41 +25,6 @@ const INCIDENT_TYPE_MAPPING = {
   REPORTS: "REPORTS",
 };
 
-/**
- * Color mapping for each incident type
- */
-const INCIDENT_COLORS = {
-  HOS: "#FE5429",
-  LOGS: "#E20021",
-  DVIR: "#30C151",
-  DOT: "#FF9800",
-  ACCIDENT: "#9C27B0",
-  TEAM_DRIVER: "#00BCD4",
-  PROFILE: "#6C757D",
-  COMPLIANCE_DASHBOARD: "#2563EB",
-  VIOLATIONS: "#F44336",
-  DOCUMENT_CENTER: "#17A2B8",
-  OPERATION_CENTER: "#28A745",
-  HOS_SETTINGS: "#FD7E14",
-  ROLES: "#6F42C1",
-  USERS: "#20C997",
-  REPORT_INCIDENT: "#DC3545",
-  REPORTS: "#007BFF",
-};
-
-// Reverse mapping for display name lookup
-const INCIDENT_COLORS_BY_DISPLAY_NAME = Object.keys(INCIDENT_TYPE_MAPPING).reduce((acc, key) => {
-  acc[INCIDENT_TYPE_MAPPING[key]] = INCIDENT_COLORS[key];
-  return acc;
-}, {});
-
-/**
- * Get color for an incident type, accepts either key or display name
- */
-const getIncidentColor = (value) => {
-  // Try as key first, then as display name
-  return INCIDENT_COLORS[value] || INCIDENT_COLORS_BY_DISPLAY_NAME[value] || "#757575";
-};
 
 /**
  * Transform API data for 7-day period
@@ -78,21 +43,16 @@ const transform7DayData = (apiData) => {
     return { categories: [], series: [], dateRange: null };
   }
 
-  // Check if data is in date range format (e.g., "2026-05-01 - 2026-05-07")
   const isRangeFormat = keys[0].includes(" - ");
 
   if (isRangeFormat) {
-    // If API returns ranges even for 7 days, use the 30-day transformation
     return transform30DayData(apiData);
   }
 
-  // Original logic for individual dates
   const dates = keys;
 
-  // Generate categories (display labels) - Format: "Mar 28"
   const categories = dates.map((date) => dayjs(date).format("MMM D"));
 
-  // Calculate date range for subtitle
   const startDate = dayjs(dates[0]).format("MMM D, YYYY");
   const endDate = dayjs(dates[dates.length - 1]).format("MMM D, YYYY");
   const dateRange = `${startDate} – ${endDate}`;
@@ -115,20 +75,16 @@ const transform7DayData = (apiData) => {
     })
     .map((type) => {
       const displayName = INCIDENT_TYPE_MAPPING[type] || type;
-      return {
-        name: displayName,
-        data: dates.map((date) => distribution[date][type] || 0),
-        color: getIncidentColor(displayName),
-      };
+     return {
+  name: displayName,
+  data: dates.map((date) => distribution[date][type] || 0),
+};
     });
 
   return { categories, series, dateRange };
 };
 
-/**
- * Transform API data for 30-day period
- * API returns data with date ranges as keys (e.g., "2026-05-01 - 2026-05-07")
- */
+
 const transform30DayData = (apiData) => {
   if (!apiData) {
     return { categories: [], series: [], dateRange: null };
@@ -179,10 +135,9 @@ const transform30DayData = (apiData) => {
     .map((type) => {
       const displayName = INCIDENT_TYPE_MAPPING[type] || type;
       return {
-        name: displayName,
-        data: dateRanges.map((range) => distribution[range][type] || 0),
-        color: getIncidentColor(displayName),
-      };
+  name: displayName,
+  data: dateRanges.map((range) => distribution[range][type] || 0),
+};
     });
 
   return { categories, series, dateRange };

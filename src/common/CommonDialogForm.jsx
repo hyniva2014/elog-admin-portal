@@ -16,6 +16,7 @@ import {
   dialogStyles,
   DIALOG_MODES,
   BUTTON_LABELS,
+  DialogPaperSx,
 } from "./CommonDialogForm.styled";
 
 const CommonDialogForm = ({
@@ -111,7 +112,7 @@ const CommonDialogForm = ({
       maxWidth={maxWidth}
       fullWidth
       PaperProps={{
-        sx: styles.paper,
+        sx: DialogPaperSx(theme),
       }}
     >
       <DialogTitle sx={styles.title}>

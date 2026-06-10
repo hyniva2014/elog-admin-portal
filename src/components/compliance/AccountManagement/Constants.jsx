@@ -106,3 +106,13 @@ export const SECONDARY_CONTACT_FIELDS = [
     label: "Secondary Contact Email",
   },
 ];
+
+export const DEACTIVATION_FIELDS = [
+  {
+    name: "reasonForDeactivation",
+    label: "Reason for Deactivation",
+    multiline: true,
+    rows: 4,
+    xs: 12,
+  },
+];

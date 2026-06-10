@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Grid } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -9,7 +9,7 @@ import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdo
 import { FormContainer } from "./UserManagementForm.styled";
 import { EditHeaderButton } from "./UserManagementForm.styled";
 import { useServices } from "../../../services/services";
-import { USER_PROFILE_OPTIONS } from "./Constants";
+import { CARRIER_ADMIN_ROLE_ID } from "./Constants";
 
 const STATUS_OPTIONS = [
   { label: "Active", value: "1" },
@@ -23,14 +23,6 @@ const addSchema = yup.object().shape({
   firstName: yup.string().required("First Name is required"),
   lastName: yup.string().required("Last Name is required"),
   email: yup.string().email("Enter valid email").required("Email is required"),
-  password: yup
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .required("Password is required"),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password")], "Passwords must match")
-    .required("Confirm Password is required"),
 });
 
 const editSchema = yup.object().shape({
@@ -40,8 +32,6 @@ const editSchema = yup.object().shape({
   firstName: yup.string().required("First Name is required"),
   lastName: yup.string().required("Last Name is required"),
   email: yup.string().email("Enter valid email").required("Email is required"),
-  password: yup.string().optional(),
-  confirmPassword: yup.string().optional(),
 });
 
 const EMPTY_DEFAULTS = {
@@ -51,8 +41,6 @@ const EMPTY_DEFAULTS = {
   firstName: "",
   lastName: "",
   email: "",
-  password: "",
-  confirmPassword: "",
 };
 
 const rowToFormValues = (row) => ({
@@ -62,8 +50,6 @@ const rowToFormValues = (row) => ({
   firstName: row?.firstName || "",
   lastName: row?.lastName || "",
   email: row?.primaryContactEmail || row?.email || "",
-  password: "",
-  confirmPassword: "",
 });
 
 const UserManagementForm = ({
@@ -77,6 +63,7 @@ const UserManagementForm = ({
 }) => {
   const { fetchApi } = useServices();
   const [roleOptions, setRoleOptions] = useState([]);
+  const initializedRef = useRef(false);
 
   const isViewMode = mode === "view";
 
@@ -98,44 +85,84 @@ const UserManagementForm = ({
     defaultValues: EMPTY_DEFAULTS,
   });
 
-  // Populate / clear form whenever the dialog opens
-  useEffect(() => {
-    if (!open) return;
-    if (isViewMode && initialData) {
-      reset(rowToFormValues(initialData));
-    } else {
-      reset(EMPTY_DEFAULTS);
+  const fetchRoles = useCallback(async () => {
+    try {
+      const response = await fetchApi("/masteradmin/roles/get-all-superusers-roles");
+      if (response?.body?.roles) {
+        const options = response.body.roles.map((r) => ({
+          label: r.role_name,
+          value: String(r.role_id),
+        }));
+        setRoleOptions(options);
+        return response.body.roles;
+      }
+      return [];
+    } catch (err) {
+      console.error("Failed to fetch roles", err);
+      setRoleOptions([]);
+      return [];
     }
-    // Always start in read mode when the dialog opens
-    setIsEditing(false);
-  }, [open, isViewMode, initialData, reset]);
+  }, [fetchApi]);
+
+  useEffect(() => {
+    if (!open) {
+      initializedRef.current = false;
+      return;
+    }
+    if (initializedRef.current) return;
+
+    const initForm = async () => {
+      const roles = await fetchRoles();
+      const carrierAdmin = roles?.find(
+        (r) => r.role_name.trim() === "Carrier Admin"
+      );
+      const carrierAdminId = carrierAdmin ? String(carrierAdmin.role_id) : CARRIER_ADMIN_ROLE_ID;
+
+      if (isViewMode && initialData) {
+        reset(rowToFormValues(initialData));
+      } else {
+        reset({
+          ...EMPTY_DEFAULTS,
+          role_id: carrierAdminId,
+        });
+      }
+      setIsEditing(false);
+      initializedRef.current = true;
+    };
+
+    initForm();
+  }, [open]);
 
   const handleFormSubmit = (data) => {
     const submitMode = isViewMode && isEditing ? "edit" : mode;
     if (onSubmitForm) onSubmitForm(data, submitMode);
   };
 
-  /** Close the dialog entirely */
   const handleClose = () => {
     reset(EMPTY_DEFAULTS);
     setIsEditing(false);
     onClose();
   };
 
-  /** Cancel edit — restore original values, go back to read mode */
   const handleCancelEdit = () => {
     if (initialData) reset(rowToFormValues(initialData));
     setIsEditing(false);
   };
 
-  const handleAccountChange = (value) =>
-    setValue("company_id", value, { shouldValidate: true });
+  const handleAccountChange = useCallback(
+    (value) => setValue("company_id", value, { shouldValidate: true }),
+    [setValue]
+  );
 
-  const handleUserProfileChange = (value) =>
-    setValue("role_id", value, { shouldValidate: true });
+  const handleUserProfileChange = useCallback(
+    (value) => setValue("role_id", value, { shouldValidate: true }),
+    [setValue]
+  );
 
-  const handleStatusChange = (value) =>
-    setValue("status_id", value, { shouldValidate: true });
+  const handleStatusChange = useCallback(
+    (value) => setValue("status_id", value, { shouldValidate: true }),
+    [setValue]
+  );
 
   const handleEditClick = useCallback(() => setIsEditing(true), []);
 
@@ -222,13 +249,12 @@ const UserManagementForm = ({
             name="role_id"
             label="User Profile"
             value={watch("role_id")}
-            // options={roleOptions}
-            options={USER_PROFILE_OPTIONS}
+            options={roleOptions}
             onChange={handleUserProfileChange}
             error={!!errors.role_id}
             helperText={errors.role_id?.message}
-            required={!isReadOnly}
-            disabled={isReadOnly}
+            required={true}
+            disabled={true}
           />
         </Grid>
 
@@ -285,39 +311,7 @@ const UserManagementForm = ({
             />
           </Grid>
         )}
-        {/* Password fields — only shown when adding a new user */}
-        {!isViewMode && (
-          <>
-            <Grid item xs={12}>
-              <CommonTextField
-                name="password"
-                label="Enter Password"
-                type="password"
-                fullWidth
-                autoComplete="new-password"
-                register={register}
-                error={!!errors.password}
-                helperText={errors.password?.message}
-                required
-                shrinkLabel={!!watch("password")}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <CommonTextField
-                name="confirmPassword"
-                label="Confirm Password"
-                type="password"
-                autoComplete="new-password"
-                register={register}
-                error={!!errors.confirmPassword}
-                helperText={errors.confirmPassword?.message}
-                required
-                shrinkLabel={!!watch("confirmPassword")}
-              />
-            </Grid>
-          </>
-        )}
+      
       </Grid>
     </FormContainer>
   );
