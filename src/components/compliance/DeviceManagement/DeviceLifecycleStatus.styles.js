@@ -1,5 +1,5 @@
 import { styled } from "@mui/material/styles";
-import { Box, Card, CardContent, Typography, Stack } from "@mui/material";
+import { Box, Card, CardContent, Typography, Stack, Grid } from "@mui/material";
 
 export const CardContainer = styled(Card)(({ theme }) => ({
   borderRadius: 10,
@@ -40,7 +40,7 @@ export const CardTitle = styled(Typography)(({ theme }) => ({
   },
   [theme.breakpoints.up("md")]: {
     fontSize: "1.25rem",
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(7),
   },
 }));
 
@@ -153,4 +153,94 @@ export const StatCardCount = styled(Typography, {
   fontWeight: 700,
   lineHeight: 1.2,
   fontSize: fontsize,
+}));
+
+export const SegmentWrapper = styled(Grid)(({ theme }) => ({
+  width: "100%",
+}));
+
+export const SegmentRow = styled(Grid)(({ theme }) => ({
+  [theme.breakpoints.down("sm")]: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+  },
+
+  [theme.breakpoints.up("sm")]: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+}));
+
+export const SegmentLabelWrapper = styled(Grid)(({ theme }) => ({
+  width: "100%",
+
+  [theme.breakpoints.up("sm")]: {
+    width: "160px",
+  },
+}));
+
+export const SegmentLabelContent = styled(Box)({
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+  minWidth: "max-content",
+  whiteSpace: "nowrap",
+});
+
+export const SegmentDot = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "dotcolor",
+})(({ dotcolor }) => ({
+  width: "12px",
+  height: "12px",
+  minWidth: "12px",
+  minHeight: "12px",
+  borderRadius: "50%",
+  background: dotcolor,
+  flexShrink: 0,
+}));
+
+export const SegmentLabel = styled(Typography)(({ theme }) => ({
+  fontSize: "17px",
+  fontWeight: 500,
+  color: theme.palette.text.primary,
+}));
+
+export const ProgressBarWrapper = styled(Box)({
+  width: "100%",
+  height: "64px",
+  background: theme.palette.grey[100],
+  borderRadius: "14px",
+  position: "relative",
+  overflow: "hidden",
+});
+
+export const ProgressBarFill = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "barwidth" && prop !== "barcolor",
+})(({ barwidth, barcolor }) => ({
+  width: barwidth,
+  height: "100%",
+  background: barcolor,
+  borderRadius: "14px",
+  display: "flex",
+  alignItems: "center",
+  paddingLeft: "22px",
+  transition: "width 0.3s ease",
+  overflow: "hidden",
+  whiteSpace: "nowrap",
+}));
+
+export const ProgressCount = styled(Typography)(({ theme }) => ({
+  color: theme.palette.common.black,
+  fontSize: "15px",
+  fontWeight: 700,
+}));
+
+export const ProgressPercentage = styled(Typography)(({ theme }) => ({
+  position: "absolute",
+  right: "20px",
+  top: "50%",
+  transform: "translateY(-50%)",
+  fontSize: "15px",
+  fontWeight: 700,
+  color: theme.palette.text.primary,
 }));

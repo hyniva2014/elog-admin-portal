@@ -89,6 +89,12 @@ const paletteTheme = (themeMode) => {
       successGreen: "#22C55E",
 
       dangerRed: "#DC2626",
+
+      activeGreen: "#10B981",
+
+      inStockBlue: "#2563EB",
+
+      retiredGrey: "#CAD5E2",
     },
 
     background: {
