@@ -1,6 +1,6 @@
-import { Box, Button, Paper, Typography } from "@mui/material";
+import { Box, Button, Paper, Typography, ListItemButton, Radio } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
-import { ALERT_CENTER_COLORS } from "./AlertCenter.constants";
+import TelegramIcon from "@mui/icons-material/Telegram";
 
 // Main Container
 export const AlertsContainer = styled(Box)(() => ({
@@ -60,7 +60,7 @@ export const AlertCard = styled(Box, {
 })(({ theme, active }) => ({
   display: "flex",
   alignItems: "stretch",
-  background: active ? ALERT_CENTER_COLORS.activeBackground : theme.palette.common.white,
+  background: active ? theme.palette.custom.alertActiveBackground : theme.palette.common.white,
   borderRadius: "4px",
   overflow: "hidden",
   minHeight: 90,
@@ -68,10 +68,10 @@ export const AlertCard = styled(Box, {
   position: "relative",
   cursor: "pointer",
   "&:hover": {
-    backgroundColor: active ? ALERT_CENTER_COLORS.activeBackground : theme.palette.common.white,
+    backgroundColor: active ? theme.palette.custom.alertActiveBackground : theme.palette.common.white,
   },
   "&:active": {
-    backgroundColor: active ? ALERT_CENTER_COLORS.activeBackground : theme.palette.common.white,
+    backgroundColor: active ? theme.palette.custom.alertActiveBackground : theme.palette.common.white,
   },
 }));
 
@@ -244,9 +244,9 @@ export const TriggerSection = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   gap: 16,
-  backgroundColor: ALERT_CENTER_COLORS.triggerBackground,
+  backgroundColor: theme.palette.custom.triggerBackground,
   padding: 16,
-  border: `1px solid ${ALERT_CENTER_COLORS.triggerBorder}`,
+  border: `1px solid ${theme.palette.custom.triggerBorder}`,
   borderRadius: 6,
 }));
 
@@ -332,8 +332,8 @@ export const StatusBadge = styled(Box)(({ theme }) => ({
   borderRadius: 50,
   fontSize: 14,
   fontWeight: 700,
-  backgroundColor: ALERT_CENTER_COLORS.statusBadgeBackground,
-  color: ALERT_CENTER_COLORS.statusBadgeText,
+  backgroundColor: theme.palette.custom.statusBadgeBackground,
+  color: theme.palette.custom.statusBadgeText,
   width: "fit-content",
 }));
 
@@ -411,12 +411,12 @@ export const ActionButton = styled(Button, {
   color: isResolve
     ? theme.palette.common.white
     : isOpenChat || isAssignOperator
-    ? ALERT_CENTER_COLORS.navyBlue
+    ? theme.palette.custom.navyBlue
     : theme.palette.text.secondary,
   border: isResolve
     ? "none"
     : isOpenChat || isAssignOperator
-    ? `1px solid ${ALERT_CENTER_COLORS.navyBlueBorder}`
+    ? `1px solid ${theme.palette.custom.navyBlueBorder}`
     : `1px solid ${theme.palette.grey[200]}`,
   boxShadow: "none",
 
@@ -485,12 +485,12 @@ export const AlertOpen = styled(Typography, {
 export const ELDTag = styled(Box)(({ theme }) => ({
   padding: "3px 10px",
   borderRadius: 8,
-  background: ALERT_CENTER_COLORS.blueBadgeBackground,
-  color: ALERT_CENTER_COLORS.navyBlue,
+  background: theme.palette.custom.blueBadgeBackground,
+  color: theme.palette.custom.navyBlue,
   fontSize: 12,
   fontWeight: 600,
   width: "fit-content",
-  border: `1px solid ${ALERT_CENTER_COLORS.navyBlueBorder}`,
+  border: `1px solid ${theme.palette.custom.navyBlueBorder}`,
 }));
 
 export const LocationRow = styled(Box)(() => ({
@@ -655,7 +655,7 @@ export const CurrentUserBubble = styled(Box)(({ theme }) => ({
   maxWidth: "65%",
   padding: "12px 16px",
   borderRadius: "16px 16px 4px 16px",
-  backgroundColor: ALERT_CENTER_COLORS.navyBlue,
+  backgroundColor: theme.palette.custom.navyBlue,
   color: theme.palette.common.white,
   fontSize: 14,
   lineHeight: 1.5,
@@ -702,13 +702,13 @@ export const ChatSendButton = styled(Box)(({ theme }) => ({
   width: 40,
   height: 40,
   borderRadius: 12,
-  backgroundColor: ALERT_CENTER_COLORS.navyBlue,
+  backgroundColor: theme.palette.custom.navyBlue,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   cursor: "pointer",
   flexShrink: 0,
-  "&:hover": { backgroundColor: ALERT_CENTER_COLORS.navyBlue },
+  "&:hover": { backgroundColor: theme.palette.custom.navyBlue },
 }));
 
 export const MessageContainer = styled("div", {
@@ -723,4 +723,52 @@ export const CurrentChatTimestamp = styled(ChatTimestamp, {
   shouldForwardProp: (prop) => prop !== "$isCurrentUser",
 })(({ $isCurrentUser }) => ({
   textAlign: $isCurrentUser ? "right" : "left",
+}));
+
+export const ChatCloseButton = styled("button")(({ theme }) => ({
+  background: "none",
+  border: "none",
+  fontSize: 20,
+  cursor: "pointer",
+  color: theme.palette.text.secondary,
+  padding: "0 4px",
+  lineHeight: 1,
+  "&:hover": {
+    color: theme.palette.text.primary,
+  },
+}));
+
+// Styled components to replace sx prop usages
+export const DetailsPanelWrapper = styled(Box)(() => ({
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
+}));
+
+export const InfoSectionSpaced = styled(InfoSection)(() => ({
+  marginTop: 24,
+}));
+
+export const ScrollableListBox = styled(Box)(() => ({
+  maxHeight: 300,
+  overflow: "auto",
+}));
+
+export const LocationItemSpaced = styled(LocationItem)(() => ({
+  marginTop: 4,
+}));
+
+// MUI Component Wrappers to replace sx props
+export const OperatorListItemButton = styled(ListItemButton)(() => ({
+  borderRadius: 8,
+  marginBottom: 4,
+}));
+
+export const OperatorRadio = styled(Radio)(() => ({
+  marginRight: 8,
+}));
+
+export const TelegramIconStyled = styled(TelegramIcon)(() => ({
+  fontSize: 20,
+  color: "white",
 }));

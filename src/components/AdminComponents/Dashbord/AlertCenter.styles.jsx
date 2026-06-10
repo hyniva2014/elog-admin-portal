@@ -1,6 +1,5 @@
 import { Box, ButtonGroup, Button, Paper, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { ALERT_CENTER_COLORS } from "./AlertCeneter/AlertCenter.constants";
 
 // ─── Alert Center ────────────────────────────────────────────────────────────
 
@@ -80,9 +79,9 @@ export const AlertCard = styled(Box)(({ theme }) => ({
   position: "relative",
 }));
 
-export const AlertAccentBar = styled(Box)(() => ({
+export const AlertAccentBar = styled(Box)(({ theme }) => ({
   width: "4px",
-  backgroundColor: ALERT_CENTER_COLORS.accentBar,
+  backgroundColor: theme.palette.custom.accentBar,
 }));
 
 export const AlertContent = styled(Box)(() => ({

@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Typography, List, ListItemButton, ListItemText, Radio, Autocomplete, TextField } from "@mui/material";
+import { Box, Grid, Typography, List, ListItemText, Autocomplete, TextField } from "@mui/material";
 import { useServices } from "../../../../services/services";
 import CommonDialogForm from "../../../../common/CommonDialogForm";
-import TelegramIcon from "@mui/icons-material/Telegram";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import {
@@ -38,6 +37,14 @@ import {
   ChatSendButton,
   MessageContainer,
   CurrentChatTimestamp,
+  ChatCloseButton,
+  DetailsPanelWrapper,
+  InfoSectionSpaced,
+  ScrollableListBox,
+  LocationItemSpaced,
+  OperatorListItemButton,
+  OperatorRadio,
+  TelegramIconStyled,
 } from "./AlertCenterScreenCard.styles.jsx";
 
 import HOS from "../../../../assets/images/active/Hos.png";
@@ -135,20 +142,19 @@ const ALERT_STATUS_OPTIONS = [
 const OperatorItem = ({ op, selectedOperator, onSelect }) => {
   const handleClick = () => onSelect(op.id);
   return (
-    <ListItemButton
+    <OperatorListItemButton
       key={op.id}
       onClick={handleClick}
       selected={selectedOperator === op.id}
-      sx={{ borderRadius: 2, mb: 0.5 }}
     >
-      <Radio checked={selectedOperator === op.id} size="small" sx={{ mr: 1 }} />
+      <OperatorRadio checked={selectedOperator === op.id} size="small" />
       <ListItemText
         primary={op.name}
         secondary={op.role}
         primaryTypographyProps={{ fontWeight: 600, fontSize: 14 }}
         secondaryTypographyProps={{ fontSize: 12 }}
       />
-    </ListItemButton>
+    </OperatorListItemButton>
   );
 };
 
@@ -267,7 +273,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
               onKeyDown={handleKeyDown}
             />
             <ChatSendButton onClick={handleSend}>
-              <TelegramIcon sx={{ fontSize: 20, color: "white" }} />
+              <TelegramIconStyled />
             </ChatSendButton>
           </ChatInputRow>
         </ChatContainer>
@@ -276,8 +282,8 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
   }
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <AlertCardContainer detailsPanel sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+    <DetailsPanelWrapper>
+      <AlertCardContainer detailsPanel>
       <DetailHeader>
         <AlertDetailItem>
           <DetailAlertIcon src={HOS} alt="Alert type icon" />
@@ -288,7 +294,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
         </AlertDetailItem>
       </DetailHeader>
 
-      <InfoSection sx={{ marginTop: 3 }}>
+      <InfoSectionSpaced>
         <TriggerSectionTitle>Driver &amp; Device Information</TriggerSectionTitle>
         <InfoGrid>
           {driverInfo.map(({ label, value, isStatus }) => (
@@ -302,14 +308,14 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
         </InfoGrid>
         <Box>
           <InfoLabel>Current Location</InfoLabel>
-          <LocationItem sx={{ mt: 0.5 }}>
+          <LocationItemSpaced>
             <LocationContentItem
               primaryLocation={primaryLocation}
               location2={location2}
             />
-          </LocationItem>
+          </LocationItemSpaced>
         </Box>
-      </InfoSection>
+      </InfoSectionSpaced>
 
       <TriggerSection>
         <TriggerSectionTitle>Trigger Information</TriggerSectionTitle>
@@ -332,7 +338,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
         loading={assignLoading}
         maxWidth="xs"
         content={
-          <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+          <ScrollableListBox>
             <List disablePadding>
               {OPERATORS.map((op) => (
                 <OperatorItem
@@ -343,11 +349,11 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
                 />
               ))}
             </List>
-          </Box>
+          </ScrollableListBox>
         }
       />
     </AlertCardContainer>
-    </Box>
+    </DetailsPanelWrapper>
   );
 };
 
