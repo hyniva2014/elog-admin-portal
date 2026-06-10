@@ -88,3 +88,7 @@ export const DialogPaperSx = (theme) => ({
   borderRadius: "14px",
   boxShadow: theme.shadows[5],
 });
+
+export const DialogBackdropSx = (theme) => ({
+  backgroundColor: theme.palette.action.backdrop || "rgba(0, 0, 0, 0.7)",
+});

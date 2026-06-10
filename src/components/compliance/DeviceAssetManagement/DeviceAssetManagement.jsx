@@ -19,6 +19,7 @@ import {
 } from "./DeviceAssetManagementTable.utils";
 import BulkUploadForm from "./BulkUploadForm";
 import AssignDevicesToCarriers from "../DeviceManagement/AssignDevicesToCarriers";
+import { useSelector } from "react-redux";
 
 const isDeviceAssetSelectable = (params) => {
   return params.row.status?.toLowerCase() === "in stock";
@@ -71,6 +72,10 @@ const DeviceAssetManagement = () => {
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [deviceToDelete, setDeviceToDelete] = useState(null);
+
+  const user_name = useSelector(
+      (state) => state.loginSlice.loginDetails?.body?.data?.userdetails?.user_name,
+    );
 
   const handleBulkClick = useCallback(() => {
     setIsBulkModalOpen(true);
@@ -373,6 +378,7 @@ const DeviceAssetManagement = () => {
       const formData = new FormData();
 
       // files comes from BulkUploadForm
+      formData.append("loggedInUserEmail", user_name);
       formData.append("file", formValues.files);
 
       const response = await createApi(
