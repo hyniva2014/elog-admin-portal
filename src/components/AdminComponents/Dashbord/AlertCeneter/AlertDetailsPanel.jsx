@@ -47,6 +47,7 @@ import {
   defaultConversations,
 } from "./AlertDetailsPanel.utils";
 
+import ChatMessageItem from "./ChatMessageItem.jsx";
 import AlertActionButton from "./AlertActionButton.jsx";
 import DriverInfoCardItem from "./DriverInfoCardItem.jsx";
 import LocationContentItem from "./LocationContentItem.jsx";
@@ -138,25 +139,26 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
     setChatInput(e.target.value);
   };
 
-  const handleOperatorSelect = (operatorId) => {
+  const handleOperatorSelect = useCallback((operatorId) => {
     setSelectedOperator(operatorId);
-  };
+  }, []);
 
-  const renderMessage = ({ sender, message: msg, time, isCurrentUser }, index) => (
-    <MessageContainer key={index} $isCurrentUser={isCurrentUser}>
-      {isCurrentUser ? (
-        <>
-          <CurrentUserBubble>{msg}</CurrentUserBubble>
-          <CurrentChatTimestamp $isCurrentUser>{time}</CurrentChatTimestamp>
-        </>
-      ) : (
-        <>
-          <OtherUserBubble>{msg}</OtherUserBubble>
-          <CurrentChatTimestamp>{time}</CurrentChatTimestamp>
-        </>
-      )}
-    </MessageContainer>
-  );
+  const handleCloseAssign = useCallback(() => {
+    setAssignOpen(false);
+  }, []);
+
+  const renderChatMessage = useCallback((msgItem, index) => (
+    <ChatMessageItem key={index} messageItem={msgItem} />
+  ), []);
+
+  const renderOperator = useCallback(({ id, name, role }) => (
+    <OperatorItem
+      key={id}
+      op={{ id, name, role }}
+      selectedOperator={selectedOperator}
+      onSelect={handleOperatorSelect}
+    />
+  ), [selectedOperator, handleOperatorSelect]);
 
   const handleAssignOperator = async () => {
     if (!selectedOperator || !selectedAlert) return;
@@ -183,7 +185,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
           </ChatHeader>
 
           <ChatMessages>
-            {messages.map(renderMessage)}
+            {messages.map(renderChatMessage)}
           </ChatMessages>
 
           <ChatInputRow>
@@ -251,8 +253,8 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
       <CommonDialogForm
         open={assignOpen}
         title="Assign Operator"
-        onCancel={() => setAssignOpen(false)}
-        onClose={() => setAssignOpen(false)}
+        onCancel={handleCloseAssign}
+        onClose={handleCloseAssign}
         onSubmit={handleAssignOperator}
         submitButtonText="Assign"
         disableSubmit={!selectedOperator}
@@ -261,14 +263,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
         content={
           <ScrollableListBox>
             <List disablePadding>
-              {OPERATORS.map((op) => (
-                <OperatorItem
-                  key={op.id}
-                  op={op}
-                  selectedOperator={selectedOperator}
-                  onSelect={handleOperatorSelect}
-                />
-              ))}
+              {OPERATORS.map(renderOperator)}
             </List>
           </ScrollableListBox>
         }

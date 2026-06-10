@@ -13,6 +13,15 @@ export const AlertsContainer = styled(Box)(() => ({
   },
 }));
 
+export const AlertGridContainer = styled(Grid)(() => ({
+  width: "100%",
+}));
+
+export const AlertGridColumn = styled(Grid)(() => ({
+  display: "flex",
+  flexDirection: "column",
+}));
+
 export const AlertCardContainer = styled(Paper, {
   shouldForwardProp: (prop) => prop !== "detailsPanel" && prop !== "chatPanel",
 })(({ theme, detailsPanel, chatPanel }) => ({
@@ -771,4 +780,13 @@ export const OperatorRadio = styled(Radio)(() => ({
 export const TelegramIconStyled = styled(TelegramIcon)(() => ({
   fontSize: 20,
   color: "white",
+}));
+
+export const OperatorPrimaryText = styled(Typography)(() => ({
+  fontWeight: 600,
+  fontSize: 14,
+}));
+
+export const OperatorSecondaryText = styled(Typography)(() => ({
+  fontSize: 12,
 }));
