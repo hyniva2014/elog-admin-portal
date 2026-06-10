@@ -20,8 +20,6 @@ export const CareerFormHeader = styled(Box)(({ theme }) => ({
   flexShrink: 0,
   backgroundColor: theme.palette.background.paper,
   position: "sticky",
-  top: 14,
-  zIndex: 10,
 }));
 
 export const CareerFormStepper = styled(Box)(({ theme }) => ({
@@ -29,9 +27,6 @@ export const CareerFormStepper = styled(Box)(({ theme }) => ({
   borderBottom: `2px solid ${theme.palette.divider}`,
   backgroundColor: theme.palette.background.paper,
   flexShrink: 0,
-  position: "sticky",
-  top: 104,
-  zIndex: 9,
 }));
 
 export const StepRow = styled(Box)(({ theme }) => ({
