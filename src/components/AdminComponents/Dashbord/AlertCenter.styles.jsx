@@ -81,7 +81,7 @@ export const AlertCard = styled(Box)(({ theme }) => ({
 
 export const AlertAccentBar = styled(Box)(({ theme }) => ({
   width: "4px",
-  backgroundColor: theme.palette.custom.accentBar,
+  backgroundColor: theme.palette.custom.navyBlue,
 }));
 
 export const AlertContent = styled(Box)(() => ({
