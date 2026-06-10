@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Typography, List, ListItemText, Autocomplete, TextField } from "@mui/material";
+import { Box, Grid, List } from "@mui/material";
 import { useServices } from "../../../../services/services";
 import CommonDialogForm from "../../../../common/CommonDialogForm";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import {
   AlertDetailItem,
-  AlertIcon,
   DetailAlertIcon,
   AlertCardContainer,
   DetailHeader,
@@ -17,14 +16,9 @@ import {
   TriggerSectionTitle,
   InfoGrid,
   TriggerInfoGrid,
-  InfoCard,
   InfoLabel,
-  InfoValue,
-  StatusBadge,
   LocationItem,
-  CoordinateBadge,
   TriggerSection,
-  TriggerInfoCard,
   ActionSection,
   ActionButton,
   ChatContainer,
@@ -42,19 +36,22 @@ import {
   InfoSectionSpaced,
   ScrollableListBox,
   LocationItemSpaced,
-  OperatorListItemButton,
-  OperatorRadio,
   TelegramIconStyled,
 } from "./AlertCenterScreenCard.styles.jsx";
 
 import HOS from "../../../../assets/images/active/Hos.png";
-import LocationIcon from "../../../../assets/images/active/Icon-3.png";
 
 import {
   getDriverDeviceInfo,
   getTriggerInfo,
   defaultConversations,
 } from "./AlertDetailsPanel.utils";
+
+import AlertActionButton from "./AlertActionButton.jsx";
+import DriverInfoCardItem from "./DriverInfoCardItem.jsx";
+import LocationContentItem from "./LocationContentItem.jsx";
+import TriggerInfoCardItem from "./TriggerInfoCardItem.jsx";
+import OperatorItem from "./OperatorItem.jsx";
 
 const OPERATORS = [
   { id: 1, name: "James Carter", role: "Senior Operator" },
@@ -75,88 +72,12 @@ const PANEL_STATE = {
   CHAT: "chat",
 };
 
-const AlertActionButton = ({ label, isResolve, isOpenChat, isAssignOperator, onClick }) => {
-  const isNoEffects = isOpenChat || isAssignOperator;
-  return (
-    <Grid item xs={6}>
-      <ActionButton 
-        fullWidth 
-        disableRipple={isNoEffects}
-        isResolve={isResolve} 
-        isOpenChat={isOpenChat} 
-        isAssignOperator={isAssignOperator} 
-        onClick={onClick}
-      >
-        {label}
-      </ActionButton>
-    </Grid>
-  );
-};
-
-const DriverInfoCardItem = ({ label, value, isStatus }) => {
-  const content = isStatus ? (
-    <StatusBadge>{value}</StatusBadge>
-  ) : (
-    <InfoValue>{value}</InfoValue>
-  );
-
-  return (
-    <InfoCard>
-      <InfoLabel>{label}</InfoLabel>
-      {content}
-    </InfoCard>
-  );
-};
-
-const LocationContentItem = ({ primaryLocation, location2 }) => {
-  const secondaryLocation = location2 ? (
-    <>
-      <AlertIcon src={LocationIcon} alt="Location" />
-      <CoordinateBadge>{location2}</CoordinateBadge>
-    </>
-  ) : null;
-
-  return (
-    <>
-      <AlertIcon src={LocationIcon} alt="Location" />
-      <CoordinateBadge>{primaryLocation}</CoordinateBadge>
-      {secondaryLocation}
-    </>
-  );
-};
-
-const TriggerInfoCardItem = ({ label, value }) => (
-  <TriggerInfoCard>
-    <InfoLabel>{label}</InfoLabel>
-    <InfoValue>{value}</InfoValue>
-  </TriggerInfoCard>
-);
-
 const ALERT_STATUS_OPTIONS = [
   { value: "open", label: "Open" },
   { value: "resolved", label: "Resolved" },
   { value: "inprogress", label: "In Progress" },
   { value: "pending", label: "Pending" },
 ];
-
-const OperatorItem = ({ op, selectedOperator, onSelect }) => {
-  const handleClick = () => onSelect(op.id);
-  return (
-    <OperatorListItemButton
-      key={op.id}
-      onClick={handleClick}
-      selected={selectedOperator === op.id}
-    >
-      <OperatorRadio checked={selectedOperator === op.id} size="small" />
-      <ListItemText
-        primary={op.name}
-        secondary={op.role}
-        primaryTypographyProps={{ fontWeight: 600, fontSize: 14 }}
-        secondaryTypographyProps={{ fontSize: 12 }}
-      />
-    </OperatorListItemButton>
-  );
-};
 
 const AlertDetailsPanel = ({ selectedAlert }) => {
   const { updateApi } = useServices();

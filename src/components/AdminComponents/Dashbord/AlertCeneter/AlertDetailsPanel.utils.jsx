@@ -1,17 +1,3 @@
-import React from "react";
-
-import {
-  InfoCard,
-  InfoLabel,
-  InfoValue,
-  StatusBadge,
-  AlertIcon,
-  CoordinateBadge,
-  TriggerInfoCard,
-} from "./AlertCenterScreenCard.styles.jsx";
-
-import LocationIcon from "../../../../assets/images/active/Icon-3.png";
-
 export const ACTION_BUTTONS = [
   "Acknowledge",
   "Assign Operator",
@@ -76,3 +62,13 @@ export const defaultConversations = [
     isCurrentUser: true,
   },
 ];
+
+/**
+ * Calculate a numeric alert ID from the item's string id
+ * @param {string} itemId - The alert item id
+ * @returns {number} - Calculated alert ID (1000-9999)
+ */
+export const calculateAlertId = (itemId) => {
+  if (!itemId) return 1001;
+  return String(itemId).split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0) % 9000 + 1000;
+};

@@ -21,6 +21,7 @@ import DeviceIcon from "../../../../assets/images/active/Icon-4.png";
 import TruckIcon from "../../../../assets/images/active/Truck.png";
 import TimeIcon from "../../../../assets/images/active/ti.png";
 import IdIcon from "../../../../assets/images/active/Icon-2.png";
+import { calculateAlertId } from "./AlertDetailsPanel.utils";
 
 
 
@@ -44,9 +45,7 @@ const AlertCardItem = ({ item, isSelected, onSelect }) => {
     onSelect(item);
   }, [item, onSelect]);
 
-  const alertIdNumber = item.id
-    ? String(item.id).split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0) % 9000 + 1000
-    : 1001;
+  const alertIdNumber = calculateAlertId(item.id);
 
   const isSystem = role === "System";
   const showStatusLabel = role !== "Admin";
