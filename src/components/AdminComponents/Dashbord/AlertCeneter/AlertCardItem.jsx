@@ -12,6 +12,7 @@ import {
   AlertRight,
   AlertStatus,
   AlertOpen,
+  AlertIdIcon,
 } from "./AlertCenterScreenCard.styles.jsx";
 
 import CarrierIcon from "../../../../assets/images/active/Icon-1.png";
@@ -99,7 +100,7 @@ const AlertCardItem = ({ item, isSelected, onSelect }) => {
           </AlertDetailItem>
 
           <AlertDetailItem>
-            <AlertIcon src={IdIcon} alt="ID" style={{ width: 22, height: 22 }} />
+            <AlertIdIcon src={IdIcon} alt="ID" />
             {alertIdNumber}
           </AlertDetailItem>
         </LocationRow>

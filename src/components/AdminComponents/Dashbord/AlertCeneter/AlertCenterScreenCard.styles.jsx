@@ -1,5 +1,6 @@
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
+import { ALERT_CENTER_COLORS } from "./AlertCenter.constants";
 
 // Main Container
 export const AlertsContainer = styled(Box)(() => ({
@@ -59,7 +60,7 @@ export const AlertCard = styled(Box, {
 })(({ theme, active }) => ({
   display: "flex",
   alignItems: "stretch",
-  background: active ? "#f5f7ff" : theme.palette.common.white,
+  background: active ? ALERT_CENTER_COLORS.activeBackground : theme.palette.common.white,
   borderRadius: "4px",
   overflow: "hidden",
   minHeight: 90,
@@ -67,10 +68,10 @@ export const AlertCard = styled(Box, {
   position: "relative",
   cursor: "pointer",
   "&:hover": {
-    backgroundColor: active ? "#f5f7ff" : theme.palette.common.white,
+    backgroundColor: active ? ALERT_CENTER_COLORS.activeBackground : theme.palette.common.white,
   },
   "&:active": {
-    backgroundColor: active ? "#f5f7ff" : theme.palette.common.white,
+    backgroundColor: active ? ALERT_CENTER_COLORS.activeBackground : theme.palette.common.white,
   },
 }));
 
@@ -243,9 +244,9 @@ export const TriggerSection = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   gap: 16,
-  backgroundColor: "#fffef5",
+  backgroundColor: ALERT_CENTER_COLORS.triggerBackground,
   padding: 16,
-  border: `1px solid #fef08a`,
+  border: `1px solid ${ALERT_CENTER_COLORS.triggerBorder}`,
   borderRadius: 6,
 }));
 
@@ -324,15 +325,15 @@ export const InfoValue = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.primary,
 }));
 
-export const StatusBadge = styled(Box)(() => ({
+export const StatusBadge = styled(Box)(({ theme }) => ({
   display: "inline-flex",
   alignItems: "center",
   padding: "6px 18px",
   borderRadius: 50,
   fontSize: 14,
   fontWeight: 700,
-  backgroundColor: "#dcfce7",
-  color: "#15803d",
+  backgroundColor: ALERT_CENTER_COLORS.statusBadgeBackground,
+  color: ALERT_CENTER_COLORS.statusBadgeText,
   width: "fit-content",
 }));
 
@@ -374,6 +375,12 @@ export const DetailAlertIcon = styled("img")({
   objectFit: "contain",
 });
 
+export const AlertIdIcon = styled("img")({
+  width: 22,
+  height: 22,
+  objectFit: "contain",
+});
+
 // Alert Time
 export const AlertTime = styled(Typography)(({ theme }) => ({
   margin: 0,
@@ -404,12 +411,12 @@ export const ActionButton = styled(Button, {
   color: isResolve
     ? theme.palette.common.white
     : isOpenChat || isAssignOperator
-    ? "#1e3a8a"
+    ? ALERT_CENTER_COLORS.navyBlue
     : theme.palette.text.secondary,
   border: isResolve
     ? "none"
     : isOpenChat || isAssignOperator
-    ? `1px solid #93c5fd`
+    ? `1px solid ${ALERT_CENTER_COLORS.navyBlueBorder}`
     : `1px solid ${theme.palette.grey[200]}`,
   boxShadow: "none",
 
@@ -475,15 +482,15 @@ export const AlertOpen = styled(Typography, {
   },
 }));
 
-export const ELDTag = styled(Box)(() => ({
+export const ELDTag = styled(Box)(({ theme }) => ({
   padding: "3px 10px",
   borderRadius: 8,
-  background: "#dbeafe",
-  color: "#1e3a8a",
+  background: ALERT_CENTER_COLORS.blueBadgeBackground,
+  color: ALERT_CENTER_COLORS.navyBlue,
   fontSize: 12,
   fontWeight: 600,
   width: "fit-content",
-  border: "1px solid #93c5fd",
+  border: `1px solid ${ALERT_CENTER_COLORS.navyBlueBorder}`,
 }));
 
 export const LocationRow = styled(Box)(() => ({
@@ -648,7 +655,7 @@ export const CurrentUserBubble = styled(Box)(({ theme }) => ({
   maxWidth: "65%",
   padding: "12px 16px",
   borderRadius: "16px 16px 4px 16px",
-  backgroundColor: "#1e3a8a",
+  backgroundColor: ALERT_CENTER_COLORS.navyBlue,
   color: theme.palette.common.white,
   fontSize: 14,
   lineHeight: 1.5,
@@ -691,15 +698,29 @@ export const ChatInput = styled("input")(({ theme }) => ({
   "&::placeholder": { color: theme.palette.text.disabled },
 }));
 
-export const ChatSendButton = styled(Box)(() => ({
+export const ChatSendButton = styled(Box)(({ theme }) => ({
   width: 40,
   height: 40,
   borderRadius: 12,
-  backgroundColor: "#1e3a8a",
+  backgroundColor: ALERT_CENTER_COLORS.navyBlue,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   cursor: "pointer",
   flexShrink: 0,
-  "&:hover": { backgroundColor: "#1e3a8a" },
+  "&:hover": { backgroundColor: ALERT_CENTER_COLORS.navyBlue },
+}));
+
+export const MessageContainer = styled("div", {
+  shouldForwardProp: (prop) => prop !== "$isCurrentUser",
+})(({ $isCurrentUser }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: $isCurrentUser ? "flex-end" : "flex-start",
+}));
+
+export const CurrentChatTimestamp = styled(ChatTimestamp, {
+  shouldForwardProp: (prop) => prop !== "$isCurrentUser",
+})(({ $isCurrentUser }) => ({
+  textAlign: $isCurrentUser ? "right" : "left",
 }));

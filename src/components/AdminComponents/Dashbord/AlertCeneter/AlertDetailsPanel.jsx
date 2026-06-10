@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Typography, List, ListItemButton, ListItemText, Radio, Autocomplete, TextField } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import axios from "axios";
+import { useServices } from "../../../../services/services";
 import CommonDialogForm from "../../../../common/CommonDialogForm";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -34,10 +33,11 @@ import {
   ChatMessages,
   CurrentUserBubble,
   OtherUserBubble,
-  ChatTimestamp,
   ChatInputRow,
   ChatInput,
   ChatSendButton,
+  MessageContainer,
+  CurrentChatTimestamp,
 } from "./AlertCenterScreenCard.styles.jsx";
 
 import HOS from "../../../../assets/images/active/Hos.png";
@@ -132,7 +132,28 @@ const ALERT_STATUS_OPTIONS = [
   { value: "pending", label: "Pending" },
 ];
 
+const OperatorItem = ({ op, selectedOperator, onSelect }) => {
+  const handleClick = () => onSelect(op.id);
+  return (
+    <ListItemButton
+      key={op.id}
+      onClick={handleClick}
+      selected={selectedOperator === op.id}
+      sx={{ borderRadius: 2, mb: 0.5 }}
+    >
+      <Radio checked={selectedOperator === op.id} size="small" sx={{ mr: 1 }} />
+      <ListItemText
+        primary={op.name}
+        secondary={op.role}
+        primaryTypographyProps={{ fontWeight: 600, fontSize: 14 }}
+        secondaryTypographyProps={{ fontSize: 12 }}
+      />
+    </ListItemButton>
+  );
+};
+
 const AlertDetailsPanel = ({ selectedAlert }) => {
+  const { updateApi } = useServices();
   const [panelState, setPanelState] = useState(PANEL_STATE.DETAILS);
   const [alertStatus, setAlertStatus] = useState("");
   const [assignOpen, setAssignOpen] = useState(false);
@@ -194,54 +215,34 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
     setSelectedOperator(operatorId);
   };
 
-  const renderMessage = ({ sender, message: msg, time, isCurrentUser }, index) => {
-    const MessageContainer = isCurrentUser 
-      ? styled("div")(() => ({ display: "flex", flexDirection: "column", alignItems: "flex-end" }))
-      : styled("div")(() => ({ display: "flex", flexDirection: "column", alignItems: "flex-start" }));
-    
-    const Timestamp = isCurrentUser 
-      ? styled(ChatTimestamp)(() => ({ textAlign: "right" }))
-      : ChatTimestamp;
-
-    return (
-      <MessageContainer key={index}>
-        {isCurrentUser ? (
-          <>
-            <CurrentUserBubble>{msg}</CurrentUserBubble>
-            <Timestamp>{time}</Timestamp>
-          </>
-        ) : (
-          <>
-            <OtherUserBubble>{msg}</OtherUserBubble>
-            <Timestamp>{time}</Timestamp>
-          </>
-        )}
-      </MessageContainer>
-    );
-  };
+  const renderMessage = ({ sender, message: msg, time, isCurrentUser }, index) => (
+    <MessageContainer key={index} $isCurrentUser={isCurrentUser}>
+      {isCurrentUser ? (
+        <>
+          <CurrentUserBubble>{msg}</CurrentUserBubble>
+          <CurrentChatTimestamp $isCurrentUser>{time}</CurrentChatTimestamp>
+        </>
+      ) : (
+        <>
+          <OtherUserBubble>{msg}</OtherUserBubble>
+          <CurrentChatTimestamp>{time}</CurrentChatTimestamp>
+        </>
+      )}
+    </MessageContainer>
+  );
 
   const handleAssignOperator = async () => {
     if (!selectedOperator || !selectedAlert) return;
-    
+
     setAssignLoading(true);
-    try {
-      const response = await axios.put(
-        `http://localhost:3000/Stage/masteradmin/alert-center/assign-operator?incident_id=${selectedAlert.id || 'ac-device-offline'}&assigned_user_id=${selectedOperator}`
-      );
-      
-      if (response.data.statusCode === 200) {
-        setPanelState(PANEL_STATE.ASSIGNED);
-        setAssignOpen(false);
-        console.log("Operator assigned successfully:", response.data.body);
-      }
-    } catch (error) {
-      console.error("Error assigning operator:", error);
-      // Fallback for testing when backend is not available
-      console.log("Using fallback - simulating successful assignment");
+    const incidentId = selectedAlert.id || "ac-device-offline";
+    const endUrl = `/Stage/masteradmin/alert-center/assign-operator?incident_id=${incidentId}&assigned_user_id=${selectedOperator}`;
+    const response = await updateApi(null, endUrl);
+    setAssignLoading(false);
+
+    if (response?.statusCode === 200) {
       setPanelState(PANEL_STATE.ASSIGNED);
       setAssignOpen(false);
-    } finally {
-      setAssignLoading(false);
     }
   };
 
@@ -334,20 +335,12 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
           <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
             <List disablePadding>
               {OPERATORS.map((op) => (
-                <ListItemButton
+                <OperatorItem
                   key={op.id}
-                  onClick={() => handleOperatorSelect(op.id)}
-                  selected={selectedOperator === op.id}
-                  sx={{ borderRadius: 2, mb: 0.5 }}
-                >
-                  <Radio checked={selectedOperator === op.id} size="small" sx={{ mr: 1 }} />
-                  <ListItemText
-                    primary={op.name}
-                    secondary={op.role}
-                    primaryTypographyProps={{ fontWeight: 600, fontSize: 14 }}
-                    secondaryTypographyProps={{ fontSize: 12 }}
-                  />
-                </ListItemButton>
+                  op={op}
+                  selectedOperator={selectedOperator}
+                  onSelect={handleOperatorSelect}
+                />
               ))}
             </List>
           </Box>
