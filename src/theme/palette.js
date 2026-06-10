@@ -90,6 +90,11 @@ const paletteTheme = (themeMode) => {
 
       dangerRed: "#DC2626",
 
+      activeGreen: "#10B981",
+
+      inStockBlue: "#2563EB",
+
+      retiredGrey: "#CAD5E2",
       // Alert Center Colors
       alertActiveBackground: "#f5f7ff",
       navyBlue: "#1e3a8a",
