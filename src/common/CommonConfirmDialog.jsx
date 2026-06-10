@@ -26,6 +26,8 @@ const CommonConfirmDialog = ({
   onConfirm,
   onCancel,
   showReasonField = false,
+  reasonLabel = "Reason for Deactivation",
+  customContent = null,
 }) => {
   const [reason, setReason] = useState("");
   const theme = useTheme();
@@ -40,6 +42,11 @@ const CommonConfirmDialog = ({
     onConfirm(reason);
     setReason("");
   };
+
+  const handleReasonChange = (event) => {
+    setReason(event.target.value);
+  };
+
   const handleDialogClose = (event, reason) => {
     if (reason === "backdropClick") {
       return; // Prevent closing on outside click
@@ -68,15 +75,17 @@ const CommonConfirmDialog = ({
           <strong>{message}</strong>
         </Typography>
 
+        {customContent}
+
         {showReasonField && (
           <TextField
             fullWidth
             multiline
             minRows={3}
             margin="normal"
-            label="Reason for Deactivation"
+            label={reasonLabel}
             value={reason}
-            onChange={(e) => setReason(e.target.value)}
+            onChange={handleReasonChange}
             sx={ReasonTextFieldSx}
           />
         )}
