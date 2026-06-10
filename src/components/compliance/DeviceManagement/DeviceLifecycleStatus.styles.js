@@ -205,14 +205,14 @@ export const SegmentLabel = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.primary,
 }));
 
-export const ProgressBarWrapper = styled(Box)({
+export const ProgressBarWrapper = styled(Box)(({ theme }) => ({
   width: "100%",
   height: "64px",
   background: theme.palette.grey[100],
   borderRadius: "14px",
   position: "relative",
   overflow: "hidden",
-});
+}));
 
 export const ProgressBarFill = styled(Box, {
   shouldForwardProp: (prop) => prop !== "barwidth" && prop !== "barcolor",
