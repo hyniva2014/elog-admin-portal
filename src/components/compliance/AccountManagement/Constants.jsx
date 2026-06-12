@@ -1,7 +1,50 @@
 export const STATUS_OPTIONS = [
   { label: "Active", value: "1" },
   { label: "Inactive", value: "2" },
+  { label: "Suspended", value: "3" },
 ];
+
+export const ACCOUNT_STATUS_OPTIONS = [
+  { label: "Active", value: "Active" },
+  { label: "Inactive", value: "Inactive" },
+  { label: "Suspended", value: "Suspended" },
+];
+
+export const STATUS_ID_MAP = {
+  "1": "Active",
+  "2": "Inactive",
+  "3": "Suspended",
+};
+
+export const STATUS_TRANSITION_OPTIONS = {
+  Active: [
+    { label: "Inactive", value: "Inactive", statusId: "2" },
+    { label: "Suspended", value: "Suspended", statusId: "3" },
+  ],
+  Inactive: [
+    { label: "Active", value: "Active", statusId: "1" },
+    { label: "Suspended", value: "Suspended", statusId: "3" },
+  ],
+  Suspended: [
+    { label: "Active", value: "Active", statusId: "1" },
+    { label: "Inactive", value: "Inactive", statusId: "2" },
+  ],
+};
+
+export const getDefaultTargetStatus = (currentStatus) => {
+  if (currentStatus === "Active") return "Inactive";
+  return "Active";
+};
+
+export const getStatusNameFromId = (statusId, statusName) => {
+  const mappedStatus = STATUS_ID_MAP[String(statusId)];
+
+  if (statusName && statusName !== "-" && mappedStatus?.toLowerCase() === statusName.toLowerCase()) {
+    return mappedStatus;
+  }
+
+  return mappedStatus || statusName || "-";
+};
 
 export const MIN_SEARCH_LENGTH = 3;
 export const DEBOUNCE_DELAY_MS = 300;

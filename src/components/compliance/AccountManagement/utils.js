@@ -35,3 +35,15 @@ export const formatPhoneNumber = (value, previousValue) => {
   if (cleaned.length <= 6) return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3)}`;
   return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
 };
+
+export const getStatusChangeMessage = (row) => {
+  const carrierId = row?.carrierId ?? row?.id;
+  return `Are you sure you want to change account status for Carrier ID ${carrierId}?`;
+};
+
+export const handleOpenStatusChange = (row, currentStatus, onToggleClick) => {
+  onToggleClick({
+    row,
+    currentStatus,
+  });
+};

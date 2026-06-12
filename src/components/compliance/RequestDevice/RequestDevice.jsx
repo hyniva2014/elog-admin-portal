@@ -8,15 +8,25 @@ import CommonDialogForm from "../../../common/CommonDialogForm";
 import RequestDeviceHeader from "./RequestDeviceHeader";
 import RequestDeviceForm from "./RequestDeviceForm";
 import AssignAssetForm from "./AssignAssetForm";
-import { columns, statusOptions, DIALOG_CONFIG } from "./Constants";
+import {
+  columns,
+  statusOptions,
+  DIALOG_CONFIG,
+  CONFIRMATION_DIALOG_TITLE,
+} from "./Constants";
 import { useRequestDevices } from "../../../hooks/useRequestDevices";
 import { useRequestDeviceManager } from "../../../hooks/useRequestDeviceManager";
+import { getColumnsWithAssign } from "./requestDevice.utils";
+import RequestDevicePopupMessage from "./RequestDevicePopupMessage";
 
 const RequestDevice = () => {
   const { setLoading, LoadingContainer } = CommonLoading();
   const { allRows, total, isLoading, fetchRequestedDevices } =
     useRequestDevices();
-
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [selectedRequestData, setSelectedRequestData] = useState(null);
+  const [stockInfo, setStockInfo] = useState(null);
+  const [companyOptions, setCompanyOptions] = useState([]);
   const [data, setData] = useState({
     total: 0,
     page: 1,
@@ -30,7 +40,10 @@ const RequestDevice = () => {
   const userDetails = useSelector(
     (state) => state.loginSlice.loginDetails?.body?.data?.userdetails,
   );
-
+  const companyId = useSelector(
+    (state) =>
+      state.loginSlice.loginDetails?.body?.data?.userdetails?.company_id,
+  );
   const {
     isRequestDialogOpen,
     isAssignDialogOpen,
@@ -49,6 +62,9 @@ const RequestDevice = () => {
     handleAssignDialogSubmit,
     snackbar,
     handleSnackbarClose,
+    checkDeviceStock,
+    approveDeviceAllocation,
+    getCompanyOptions,
   } = useRequestDeviceManager(userDetails, setLoading, fetchRequestedDevices);
 
   useEffect(() => {
@@ -73,6 +89,15 @@ const RequestDevice = () => {
     data.search,
   ]);
 
+  const loadCompanies = useCallback(async () => {
+    const options = await getCompanyOptions();
+    setCompanyOptions(options);
+  }, [getCompanyOptions]);
+
+  useEffect(() => {
+    loadCompanies();
+  }, []);
+
   const handleDataChange = useCallback((updateOrFn) => {
     if (typeof updateOrFn === "function") {
       setData(updateOrFn);
@@ -91,13 +116,67 @@ const RequestDevice = () => {
 
   const getRowHeight = useCallback(() => "auto", []);
 
-  const columnsWithAssign = columns.map((col) =>
-    col.field === "action"
-      ? {
-          ...col,
-          onView: handleOpenAssignDialog,
-        }
-      : col,
+  const handleCloseConfirmDialog = useCallback(() => {
+    setConfirmDialogOpen(false);
+  }, []);
+
+  const handleAttachmentClick = useCallback(
+    async (row) => {
+      setSelectedRequestData(row);
+
+      const count = row.requestedDevices;
+
+      const response = await checkDeviceStock(count);
+
+      if (!response?.body) {
+        return;
+      }
+
+      setStockInfo(response.body);
+      setConfirmDialogOpen(true);
+    },
+    [checkDeviceStock],
+  );
+
+  const isApproveDisabled = useMemo(() => {
+    const available = stockInfo?.available_count || 0;
+    const requested = selectedRequestData?.requestedDevices || 0;
+
+    return available < requested;
+  }, [stockInfo, selectedRequestData]);
+
+  const handleApproveAllocation = useCallback(async () => {
+    const payload = {
+      company_id: selectedRequestData.company_id || companyId,
+      requestedDeviceId: selectedRequestData.id,
+      // requested_devices_count: selectedRequestData.requestedDevices,
+      device_count: selectedRequestData.requestedDevices,
+      // device_ids: stockInfo.device_id || [],
+    };
+
+    const response = await approveDeviceAllocation(payload);
+
+    if (response?.statusCode === 200) {
+      setConfirmDialogOpen(false);
+
+      fetchRequestedDevices({
+        page: data.page,
+        pageSize: data.pageSize,
+      });
+    }
+  }, [
+    selectedRequestData,
+    stockInfo,
+    companyId,
+    approveDeviceAllocation,
+    fetchRequestedDevices,
+    data.page,
+    data.pageSize,
+  ]);
+
+  const columnsWithAssign = useMemo(
+    () => getColumnsWithAssign(columns, handleAttachmentClick),
+    [handleAttachmentClick],
   );
 
   const gridData = {
@@ -152,26 +231,25 @@ const RequestDevice = () => {
         content={
           <RequestDeviceForm
             formData={{}}
+            companyOptions={companyOptions}
             onSubmit={submitRequestDevice}
             setSubmitRef={submitRef}
           />
         }
       />
       <CommonDialogForm
-        open={isAssignDialogOpen}
-        title={DIALOG_CONFIG.ASSIGN_ASSET.TITLE}
-        submitButtonText={DIALOG_CONFIG.ASSIGN_ASSET.SUBMIT_TEXT}
-        onSubmit={handleAssignDialogSubmit}
-        disableSubmit={!isStockAvailable}
-        onCancel={handleCloseAssignDialog}
-        onClose={handleCloseAssignDialog}
-        formId={DIALOG_CONFIG.ASSIGN_ASSET.FORM_ID}
+        open={confirmDialogOpen}
+        title={CONFIRMATION_DIALOG_TITLE}
+        submitButtonText="Approve"
+        disableSubmit={isApproveDisabled}
+        onSubmit={handleApproveAllocation}
+        onCancel={handleCloseConfirmDialog}
+        onClose={handleCloseConfirmDialog}
         content={
-          <AssignAssetForm
-            formData={assignFormData}
-            onSubmit={submitAssignAsset}
-            setSubmitRef={assignSubmitRef}
-            onStockStatusChange={setIsStockAvailable}
+          <RequestDevicePopupMessage
+            available={stockInfo?.available_count ?? 0}
+            requested={selectedRequestData?.requestedDevices ?? 0}
+            carrierName={selectedRequestData?.carrierName ?? ""}
           />
         }
       />

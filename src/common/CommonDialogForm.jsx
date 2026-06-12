@@ -115,8 +115,10 @@ const CommonDialogForm = ({
       PaperProps={{
         sx: DialogPaperSx(theme),
       }}
-      BackdropProps={{
-        sx: DialogBackdropSx,
+      slotProps={{
+        backdrop: {
+          sx: DialogBackdropSx(theme),
+        },
       }}
     >
       <DialogTitle sx={styles.title}>

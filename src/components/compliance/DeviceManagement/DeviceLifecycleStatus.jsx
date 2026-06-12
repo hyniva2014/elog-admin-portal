@@ -8,15 +8,19 @@ import {
   CardContainer,
   StyledCardContent,
   CardTitle,
-  ContentStack,
-  ChartBox,
-  ChartCenterLabel,
-  ChartCenterSubText,
-  ChartCenterTotal,
-  StatCardsWrapper,
   StatCardBox,
   StatCardLabel,
   StatCardCount,
+  SegmentWrapper,
+  SegmentRow,
+  SegmentLabelWrapper,
+  SegmentLabelContent,
+  SegmentDot,
+  SegmentLabel,
+  ProgressBarWrapper,
+  ProgressBarFill,
+  ProgressCount,
+  ProgressPercentage,
 } from "./DeviceLifecycleStatus.styles";
 
 import {
@@ -153,58 +157,85 @@ const DeviceLifecycleStatus = ({
     [displayedSegments, colors],
   );
 
+  const getBarColor = (key) => {
+    switch (key) {
+      case "active":
+        return theme.palette.custom.activeGreen;
+
+      case "inStock":
+        return theme.palette.custom.inStockBlue;
+
+      case "retired":
+      default:
+        return theme.palette.custom.retiredGrey;
+    }
+  };
+
+  const getBarWidth = (segmentCount, percentage) => {
+    if (segmentCount <= 0) return "0%";
+
+    return percentage >= 95 ? "94%" : `${percentage}%`;
+  };
+
+  const getProgressBarColor = (segmentCount, key) => {
+    return segmentCount > 0 ? getBarColor(key) : "transparent";
+  };
+
+  const getFormattedCount = (count) => {
+    return count.toLocaleString();
+  };
+
+  const getFormattedPercentage = (percentage) => {
+    return `${String(percentage).padStart(2, "0")}%`;
+  };
+
+  const renderDeviceStatus = () =>
+    displayedSegments.map((segment) => {
+      const percentage =
+        total > 0 ? Math.round((segment.count / total) * 100) : 0;
+
+      return (
+        <SegmentWrapper item xs={12} key={segment.key}>
+          <SegmentRow container alignItems="center" spacing={2} wrap="nowrap">
+            <SegmentLabelWrapper item>
+              <SegmentLabelContent>
+                <SegmentDot dotcolor={getBarColor(segment.key)} />
+
+                <SegmentLabel variant="inherit">{segment.label}</SegmentLabel>
+              </SegmentLabelContent>
+            </SegmentLabelWrapper>
+
+            <Grid item xs>
+              <ProgressBarWrapper>
+                <ProgressBarFill
+                  barwidth={getBarWidth(segment.count, percentage)}
+                  barcolor={getProgressBarColor(segment.count, segment.key)}
+                >
+                  <ProgressCount variant="inherit">
+                    {getFormattedCount(segment.count)}
+                  </ProgressCount>
+                </ProgressBarFill>
+
+                <ProgressPercentage variant="inherit">
+                  {getFormattedPercentage(percentage)}
+                </ProgressPercentage>
+              </ProgressBarWrapper>
+            </Grid>
+          </SegmentRow>
+        </SegmentWrapper>
+      );
+    });
+
   return (
     <CardContainer variant="outlined" ref={containerRef}>
       <StyledCardContent>
-        <CardTitle variant="h6" component="h2">
-          Device Lifecycle Status
+        <CardTitle variant="inherit" component="h2">
+          Device Status
         </CardTitle>
 
-        <ContentStack
-          direction={isNarrow ? "column" : "row"}
-          spacing={2}
-          alignItems="center"
-        >
-          <ChartBox chartsize={chartPx}>
-            <ReactApexChart
-              key={chartPx}
-              type="donut"
-              height={chartPx}
-              width={chartPx}
-              series={series}
-              options={chartOptions}
-            />
-
-            <ChartCenterLabel>
-              <ChartCenterSubText fontsize={centerSubSize}>
-                Total
-              </ChartCenterSubText>
-
-              <ChartCenterTotal fontsize={totalFontSize}>
-                {total}
-              </ChartCenterTotal>
-            </ChartCenterLabel>
-          </ChartBox>
-
-          <StatCardsWrapper>
-            <Grid
-              container
-              columnSpacing={isNarrow ? 1.5 : 2}
-              rowSpacing={isNarrow ? 2.5 : 4.5}
-            >
-              {displayedSegments.map((s) => (
-                <StatCardItem
-                  key={s.key}
-                  segment={s}
-                  cardPx={cardPx}
-                  cardPy={cardPy}
-                  labelSize={labelSize}
-                  numberSize={numberSize}
-                />
-              ))}
-            </Grid>
-          </StatCardsWrapper>
-        </ContentStack>
+        <Grid container spacing={4}>
+          {renderDeviceStatus()}
+        </Grid>
       </StyledCardContent>
     </CardContainer>
   );

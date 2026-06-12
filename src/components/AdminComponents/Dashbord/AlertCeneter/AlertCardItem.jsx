@@ -12,6 +12,7 @@ import {
   AlertRight,
   AlertStatus,
   AlertOpen,
+  AlertIdIcon,
 } from "./AlertCenterScreenCard.styles.jsx";
 
 import CarrierIcon from "../../../../assets/images/active/Icon-1.png";
@@ -19,7 +20,8 @@ import LocationIcon from "../../../../assets/images/active/Icon-3.png";
 import DeviceIcon from "../../../../assets/images/active/Icon-4.png";
 import TruckIcon from "../../../../assets/images/active/Truck.png";
 import TimeIcon from "../../../../assets/images/active/ti.png";
-import { AlertAccentBar } from "../AlertCenter.styles";
+import IdIcon from "../../../../assets/images/active/Icon-2.png";
+import { calculateAlertId } from "./AlertDetailsPanel.utils";
 
 
 
@@ -38,11 +40,12 @@ const AlertCardItem = ({ item, isSelected, onSelect }) => {
     time,
   } = item;
   
-  const accentBar = isSelected && <AlertAccentBar accentcolor={color} />;
   
   const handleClick = useCallback(() => {
     onSelect(item);
   }, [item, onSelect]);
+
+  const alertIdNumber = calculateAlertId(item.id);
 
   const isSystem = role === "System";
   const showStatusLabel = role !== "Admin";
@@ -52,8 +55,6 @@ const AlertCardItem = ({ item, isSelected, onSelect }) => {
 
   return (
     <AlertCard accentcolor={color} active={isSelected} onClick={handleClick}>
-      {accentBar}
-
       <AlertContent>
         <AlertTopRow>
           <AlertCardTitle>{title}</AlertCardTitle>
@@ -95,6 +96,11 @@ const AlertCardItem = ({ item, isSelected, onSelect }) => {
           <AlertDetailItem>
             <AlertIcon src={secondaryIcon} alt="Time or Location" />
             {location2 || time}
+          </AlertDetailItem>
+
+          <AlertDetailItem>
+            <AlertIdIcon src={IdIcon} alt="ID" />
+            {alertIdNumber}
           </AlertDetailItem>
         </LocationRow>
       </AlertContent>

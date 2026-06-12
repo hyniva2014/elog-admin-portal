@@ -10,7 +10,6 @@ import {
   DialogFormContainer,
   PrimarySectionHeader,
   SecondarySectionHeader,
-  EditButton,
   CancelEditButton,
 } from "./AccountManagement.styled";
 
@@ -178,7 +177,6 @@ const AddAccountDialog = ({
   loading = false,
   mode = "add",
   initialData = null,
-  onEditClick,
   onCancelEdit,
   fetchCarrierOptions,
 }) => {
@@ -208,7 +206,7 @@ const AddAccountDialog = ({
 
   const selectedStatus = watch("status");
 
-  const shouldShowStatusField = mode !== "add";
+  const shouldShowStatusField = isEditMode;
   const dialogTitle = DIALOG_TITLES[mode] ?? DIALOG_TITLES.add;
 
   const handleCarrierSelect = useCallback(
@@ -241,17 +239,6 @@ const AddAccountDialog = ({
   );
 
   const headerActions = useMemo(() => {
-    if (isViewMode && onEditClick) {
-      return (
-        <EditButton
-          variant="contained"
-          onClick={onEditClick}
-          disabled={loading}
-        >
-          Edit
-        </EditButton>
-      );
-    }
     if (isEditMode && onCancelEdit) {
       return (
         <CancelEditButton
@@ -264,7 +251,7 @@ const AddAccountDialog = ({
       );
     }
     return null;
-  }, [isViewMode, isEditMode, onEditClick, onCancelEdit, loading]);
+  }, [isEditMode, onCancelEdit, loading]);
 
   const formContent = (
     <form id={ADD_ACCOUNT_FORM_ID} onSubmit={handleSubmit(submitHandler)}>

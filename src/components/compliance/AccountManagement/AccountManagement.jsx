@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState, useEffect } from "react";
+import { Box } from "@mui/material";
 import CommonDataGrid from "@src/common/CommonDataGrid";
 import { PageContainer } from "../../../common/PageContainer";
 import AccountManagementHeader from "./AccountMangementHeader";
@@ -7,8 +8,10 @@ import CommonLoading from "../../../common/CommonLoading";
 import CommonConfirmDialog from "../../../common/CommonConfirmDialog";
 import { GridContainer } from "./AccountManagement.styled";
 import AddAccountDialog from "./AddAccountDialog";
+import StatusSelectDropdown from "./StatusSelectDropdown";
+import { getStatusChangeMessage } from "./utils";
 import { useServices } from "../../../services/services";
-import { defaultPageSize, STATUS_OPTIONS } from "./Constants";
+import { defaultPageSize, STATUS_OPTIONS, STATUS_TRANSITION_OPTIONS, getDefaultTargetStatus } from "./Constants";
 import { AccountManagementColumnsData } from "./CommonRowColumnUtils";
 import { useAccountManagement } from "./useAccountManagement";
 import { useLocation } from "react-router-dom";
@@ -32,8 +35,9 @@ const AccountManagement = () => {
     secondaryContactOptions: [],
   });
   const [carrierOptions, setCarrierOptions] = useState([]);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const [companyToDelete, setCompanyToDelete] = useState(null);
+  const [isStatusChangeOpen, setIsStatusChangeOpen] = useState(false);
+  const [statusChangeData, setStatusChangeData] = useState(null);
+  const [selectedTargetStatus, setSelectedTargetStatus] = useState("");
 
   const getDefaultFilters = () => {
     return {
@@ -96,22 +100,26 @@ const AccountManagement = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   }, []);
 
-  const handleEditClick = useCallback(() => {
-    setDialogMode("edit");
-  }, []);
-
   const handleCancelEdit = useCallback(() => {
     setDialogMode("view");
   }, []);
 
-  const handleOpenDeleteConfirm = useCallback((company) => {
-    setCompanyToDelete(company);
-    setIsDeleteConfirmOpen(true);
+  const handleOpenStatusChange = useCallback((data) => {
+    const defaultTarget =
+      data.targetStatus || getDefaultTargetStatus(data.currentStatus);
+    setStatusChangeData(data);
+    setSelectedTargetStatus(defaultTarget);
+    setIsStatusChangeOpen(true);
   }, []);
 
-  const handleCloseDeleteConfirm = useCallback(() => {
-    setIsDeleteConfirmOpen(false);
-    setCompanyToDelete(null);
+  const handleCloseStatusChange = useCallback(() => {
+    setIsStatusChangeOpen(false);
+    setStatusChangeData(null);
+    setSelectedTargetStatus("");
+  }, []);
+
+  const handleTargetStatusChange = useCallback((event) => {
+    setSelectedTargetStatus(event.target.value);
   }, []);
 
   const {
@@ -119,7 +127,7 @@ const AccountManagement = () => {
     fetchData,
     handleCreateAccount,
     handleViewAccount,
-    handleDeleteAccount,
+    handleToggleStatus,
     fetchContactsDropdown,
     fetchCompaniesDropdown,
     fetchCarrierOptions,
@@ -144,22 +152,33 @@ const AccountManagement = () => {
     createApi,
   );
 
-  const handleConfirmDelete = useCallback(
-    async (reason) => {
-      if (!reason?.trim()) {
-        handleSnackbar("Deactivation reason is required.", "error");
+  const handleConfirmStatusChange = useCallback(
+    async (dialogReason) => {
+      if (!statusChangeData || !selectedTargetStatus) return;
+
+      const statusOptions = STATUS_TRANSITION_OPTIONS[statusChangeData.currentStatus] || STATUS_TRANSITION_OPTIONS.Active;
+      const selectedOption = statusOptions.find(opt => opt.value === selectedTargetStatus);
+      if (!selectedOption) return;
+
+      if (!dialogReason?.trim()) {
+        handleSnackbar("Reason for status change is required.", "error");
         return;
       }
 
-      if (companyToDelete) {
-        await handleDeleteAccount(companyToDelete, reason.trim());
-        handleCloseDeleteConfirm();
-      }
+      await handleToggleStatus({
+        row: statusChangeData.row,
+        newStatus: selectedOption.value,
+        newStatusId: selectedOption.statusId,
+        reason: dialogReason.trim(),
+      });
+
+      handleCloseStatusChange();
     },
     [
-      companyToDelete,
-      handleDeleteAccount,
-      handleCloseDeleteConfirm,
+      statusChangeData,
+      selectedTargetStatus,
+      handleToggleStatus,
+      handleCloseStatusChange,
       handleSnackbar,
     ],
   );
@@ -218,8 +237,8 @@ const AccountManagement = () => {
 
   const columns = useMemo(
     () =>
-      AccountManagementColumnsData(handleViewAccount, handleOpenDeleteConfirm),
-    [handleViewAccount, handleOpenDeleteConfirm],
+      AccountManagementColumnsData(handleViewAccount, handleOpenStatusChange),
+    [handleViewAccount, handleOpenStatusChange],
   );
 
   const initialFormData = selectedCompany
@@ -301,20 +320,29 @@ const AccountManagement = () => {
         loading={false}
         mode={dialogMode}
         initialData={initialFormData}
-        onEditClick={handleEditClick}
         onCancelEdit={handleCancelEdit}
         fetchCarrierOptions={fetchCarrierOptions}
       />
 
       <CommonConfirmDialog
-        open={isDeleteConfirmOpen}
-        title="Deactivate Account"
-        message={`Are you sure you want to deactivate ${companyToDelete?.carrierName || ""}?`}
-        confirmText="Deactivate"
+        open={isStatusChangeOpen}
+        title="Account Status"
+        message={statusChangeData ? getStatusChangeMessage(statusChangeData.row) : ""}
+        confirmText="Update Status"
         cancelText="Cancel"
         showReasonField={true}
-        onConfirm={handleConfirmDelete}
-        onCancel={handleCloseDeleteConfirm}
+        reasonLabel="Reason for Status Change"
+        onConfirm={handleConfirmStatusChange}
+        onCancel={handleCloseStatusChange}
+        customContent={
+          statusChangeData && (
+            <StatusSelectDropdown
+              currentStatus={statusChangeData.currentStatus}
+              value={selectedTargetStatus}
+              onChange={handleTargetStatusChange}
+            />
+          )
+        }
       />
     </PageContainer>
   );
