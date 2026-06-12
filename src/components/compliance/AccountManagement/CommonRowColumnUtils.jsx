@@ -71,6 +71,11 @@ export const AccountManagementColumnsData = (
     ...getStickyColumnProps("sticky-col-left-2"),
   },
   {
+    field: "companyCode",
+    headerName: "Company Code",
+    ...defaultColumnProps,
+  },
+  {
     field: "taxId",
     headerName: "Tax ID(EIN)",
     ...defaultColumnProps,
@@ -198,6 +203,7 @@ export const AccountManagementRowData = (response = []) => {
       company_id,
       companyName,
       ein,
+      company_code,
       dotNumber,
       mcNumber,
       website,
@@ -250,6 +256,7 @@ export const AccountManagementRowData = (response = []) => {
       updatedDate: updatedInfo.date,
       updatedTime: updatedInfo.time,
       status: statusName || "-",
+      companyCode: company_code || "-",
     };
   });
 };
