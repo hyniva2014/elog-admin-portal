@@ -1,13 +1,4 @@
-/**
- * Centralized Permission Utilities for RBAC System
- * This file contains all permission checking logic and helper functions
- */
 
-/**
- * Format permissions from API response to a more usable structure
- * @param {Object|Array} permissions - Raw permissions from login API (object with module keys) or role API (flat array)
- * @returns {Object} Formatted permissions object
- */
 export const formatPermissions = (permissions = {}) => {
   if (!permissions || typeof permissions !== 'object') {
     return {};
@@ -15,12 +6,10 @@ export const formatPermissions = (permissions = {}) => {
 
   const formatted = {};
 
-  // Handle flat array structure from role API
   if (Array.isArray(permissions)) {
     permissions.forEach((perm) => {
       if (perm && perm.module) {
         const moduleKey = perm.module;
-        // Use code field for action key (e.g., "ACCOUNT_CREATE") instead of description (e.g., "Create account")
         const actionKey = perm.code || perm.description;
         const isGranted = perm.granted === 1 || perm.is_enabled === 1;
         
@@ -34,14 +23,11 @@ export const formatPermissions = (permissions = {}) => {
       }
     });
   } else {
-    // Handle object structure from login API
     Object.entries(permissions).forEach(([moduleKey, modulePermissions]) => {
       if (Array.isArray(modulePermissions)) {
-        // Convert array of permission objects to a lookup object
         formatted[moduleKey] = {};
         modulePermissions.forEach((perm) => {
           if (perm) {
-            // Handle both login API structure (description, granted) and role API structure (code, is_enabled)
             const actionKey = perm.description || perm.code;
             const isGranted = perm.granted === 1 || perm.is_enabled === 1;
             if (actionKey) {
@@ -58,13 +44,6 @@ export const formatPermissions = (permissions = {}) => {
   return formatted;
 };
 
-/**
- * Check if a user has a specific permission
- * @param {Object} permissions - Formatted permissions object
- * @param {String} moduleKey - Module name (e.g., "Account Management")
- * @param {String} actionKey - Action/permission name (e.g., "ACCOUNT_CREATE")
- * @returns {Boolean} - True if permission is granted
- */
 export const hasPermission = (
   permissions = {},
   moduleKey = "",
@@ -92,12 +71,6 @@ export const hasPermission = (
   return modulePermissions === actionKey;
 };
 
-/**
- * Check if user has ANY permission in a module
- * @param {Object} permissions - Formatted permissions object
- * @param {String} moduleKey - Module name
- * @returns {Boolean} - True if user has at least one permission in the module
- */
 export const hasAnyPermissionInModule = (permissions = {}, moduleKey = "") => {
   if (!permissions || !moduleKey) return false;
 
@@ -116,12 +89,6 @@ export const hasAnyPermissionInModule = (permissions = {}, moduleKey = "") => {
   return false;
 };
 
-/**
- * Check if user has ALL specified permissions
- * @param {Object} permissions - Formatted permissions object
- * @param {Array} permissionChecks - Array of {moduleKey, actionKey} objects
- * @returns {Boolean} - True if user has all specified permissions
- */
 export const hasAllPermissions = (permissions = {}, permissionChecks = []) => {
   if (!permissionChecks || permissionChecks.length === 0) return true;
   
@@ -130,12 +97,6 @@ export const hasAllPermissions = (permissions = {}, permissionChecks = []) => {
   );
 };
 
-/**
- * Check if user has ANY of the specified permissions
- * @param {Object} permissions - Formatted permissions object
- * @param {Array} permissionChecks - Array of {moduleKey, actionKey} objects
- * @returns {Boolean} - True if user has at least one of the specified permissions
- */
 export const hasAnyPermission = (permissions = {}, permissionChecks = []) => {
   if (!permissionChecks || permissionChecks.length === 0) return true;
   
@@ -144,12 +105,6 @@ export const hasAnyPermission = (permissions = {}, permissionChecks = []) => {
   );
 };
 
-/**
- * Get all granted permissions for a module
- * @param {Object} permissions - Formatted permissions object
- * @param {String} moduleKey - Module name
- * @returns {Array} - Array of granted permission names
- */
 export const getModulePermissions = (permissions = {}, moduleKey = "") => {
   if (!permissions || !moduleKey) return [];
 
@@ -170,24 +125,18 @@ export const getModulePermissions = (permissions = {}, moduleKey = "") => {
   return [];
 };
 
-/**
- * Permission mapping for menu items and routes
- * Maps menu keys to their required module and action permissions
- */
+
 export const PERMISSION_MAPPING = {
-  // Dashboard
   dashboard: {
     module: "Dashboard",
     action: "DASHBOARD_METRICS",
   },
   
-  // Account Management
   "account-management": {
     module: "Account Management",
     action: "ACCOUNT_VIEW",
   },
   
-  // Device Management
   "device-management": {
     module: "Device Management",
     action: "DEVICE_VIEW_ALL",
@@ -209,7 +158,6 @@ export const PERMISSION_MAPPING = {
     action: "REQUESTED_DEVICES_VIEW",
   },
   
-  // User Management
   "platform-users-management": {
     module: "Platform Users",
     action: "PLATFORM_USER_VIEW",
@@ -227,7 +175,6 @@ export const PERMISSION_MAPPING = {
     action: "ROLE_OVERVIEW_VIEW",
   },
   
-  // Additional routes
   "open-incidents": {
     module: "Dashboard",
     action: "DASHBOARD_METRICS",
@@ -238,38 +185,24 @@ export const PERMISSION_MAPPING = {
   },
 };
 
-/**
- * Check if a menu item should be visible based on permissions
- * @param {String} menuKey - Menu item key from menu-items.js
- * @param {Object} permissions - Formatted permissions object
- * @returns {Boolean} - True if menu item should be visible
- */
 export const shouldShowMenuItem = (menuKey = "", permissions = {}) => {
   if (!menuKey || !permissions) return false;
 
   const mapping = PERMISSION_MAPPING[menuKey];
-  if (!mapping) return true; // Show if no mapping defined (default to visible)
+  if (!mapping) return true; 
 
   return hasPermission(permissions, mapping.module, mapping.action);
 };
 
-/**
- * Check if a route should be accessible based on permissions
- * @param {String} path - Route path
- * @param {Object} permissions - Formatted permissions object
- * @returns {Boolean} - True if route should be accessible
- */
 export const shouldAllowRoute = (path = "", permissions = {}) => {
   if (!path || !permissions) return false;
 
-  // Find matching menu key for the path
   const menuKey = Object.keys(PERMISSION_MAPPING).find(key => {
     const mapping = PERMISSION_MAPPING[key];
-    // This is a simplified check - you may need to adjust based on your route structure
     return path.includes(key) || path.includes(mapping.module.toLowerCase().replace(/\s+/g, '-'));
   });
 
-  if (!menuKey) return true; // Allow if no mapping defined
+  if (!menuKey) return true;
 
   return shouldShowMenuItem(menuKey, permissions);
 };
