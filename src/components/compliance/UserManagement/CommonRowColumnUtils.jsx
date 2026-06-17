@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import eyeIcon from "../../../assets/images/svg/eyeicon.png";
 import { Box, IconButton, Typography } from "@mui/material";
-import { StatusText } from "./CommonRowColumnUtils.styled";
+import { StatusText, ViewIconButtonSx } from "./CommonRowColumnUtils.styled";
 import { USER_STATUS, USER_STATUS_COL_CONFIG } from "./Constants";
 import dayjs from "dayjs";
 import { getFormattedDateTime } from "../../../common/CommonUtils";
@@ -14,19 +14,27 @@ const StatusCell = (params) => {
   return <StatusText statuscolor={color}>{params.value || "-"}</StatusText>;
 };
 
-const ActionCell = (params) => {
+const ActionCell = (canView) => (params) => {
   const handleClick = useCallback(() => {
-    params.colDef.onView?.(params.row);
-  }, [params]);
+    if (canView) {
+      params.colDef.onView?.(params.row);
+    }
+  }, [params, canView]);
 
   return (
-    <IconButton size="small" color="primary" onClick={handleClick}>
+    <IconButton 
+      size="small" 
+      color="primary" 
+      onClick={handleClick}
+      disabled={!canView}
+      sx={ViewIconButtonSx(canView)}
+    >
       <img src={eyeIcon} alt="view" width={16} height={16} />
     </IconButton>
   );
 };
 
-export const UserManagementColumnData = [
+export const UserManagementColumnData = (canView = true) => [
   {
     field: "carrierId",
     headerName: "Carrier ID",
@@ -118,7 +126,7 @@ export const UserManagementColumnData = [
     headerName: "Action",
     flex: 1,
     sortable: false,
-    renderCell: ActionCell,
+    renderCell: ActionCell(canView),
   },
 ];
 

@@ -3,15 +3,19 @@ import { IconButton, Tooltip } from "@mui/material";
 import { StyledActionIcon } from "./DeviceModelManagement.styled";
 
 const DeviceModelManagementActionButton = React.memo(
-  ({ row, onView }) => {
+  ({ row, onView, canView = true }) => {
     const handleClick = useCallback(() => {
-      onView(row);
-    }, [onView, row]);
+      if (canView) {
+        onView(row);
+      }
+    }, [onView, row, canView]);
+
+    const viewTitle = canView ? "View" : "No permission to view";
 
     return (
-      <Tooltip title="View">
-        <IconButton size="small" onClick={handleClick}>
-          <StyledActionIcon />
+      <Tooltip title={viewTitle}>
+        <IconButton size="small" onClick={handleClick} disabled={!canView}>
+          <StyledActionIcon canView={canView} />
         </IconButton>
       </Tooltip>
     );

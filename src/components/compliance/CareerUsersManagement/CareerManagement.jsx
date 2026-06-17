@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-// import { hasPermission } from "./Constants";
+import { useDispatch, useSelector } from "react-redux";
 import { UserManagementTableData } from "./CommonRowColumnUtils";
 import CommonLoading from "../../../common/CommonLoading";
 import { PageContainer } from "../../../common/PageContainer";
@@ -10,17 +10,28 @@ import CareerManagementHeader from "./CareerManagementHeader";
 import CommonSnackbar from "../../../common/CommonSnackbar";
 import CommonConfirmDialog from "../../../common/CommonConfirmDialog";
 import { useCareerUsers } from "../../../hooks";
+import { usePermissionRefresh } from "../../../hooks/usePermissionRefresh";
 import dayjs from "dayjs";
 import { useSearchParams, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import CommonNoAccess from "../../../common/CommonNoAccess";
+import AccessControl from "../../../common/AccessControl";
+import usePermissions from "../../../hooks/usePermissions";
+import { useServices } from "../../../services/services";
 
 const CareerManagement = () => {
   const { setLoading, LoadingContainer } = CommonLoading();
   const { getCareerUsers } = useCareerUsers();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const location = useLocation();
+  const {fetchApi } = useServices();
+  const { refreshPermissions } = usePermissionRefresh();
+  const { checkPermission } = usePermissions();
+  const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
+  const companyId = useSelector(
+    (state) =>
+      state.loginSlice.loginDetails?.body?.data?.userdetails?.company_id,
+  );
   const [searchKey, setSearchKey] = useState(0);
   const [searchParams] = useSearchParams();
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -32,48 +43,15 @@ const CareerManagement = () => {
     severity: "success",
   });
 
-  const companyId = useSelector(
-    (state) =>
-      state.loginSlice.loginDetails?.body?.data?.userdetails?.company_id,
-  );
+  const canCreate = checkPermission("Platform Users", "PLATFORM_USER_CREATE");
+  const canView = checkPermission("Platform Users", "PLATFORM_USER_VIEW");
+  const canViewAll = checkPermission("Platform Users", "PLATFORM_USER_VIEW_ALL");
+  const canUpdate = checkPermission("Platform Users", "PLATFORM_USER_UPDATE");
+  const canDelete = checkPermission("Platform Users", "PLATFORM_USER_DELETE");
 
-  const roleId = useSelector(
-    (state) => state.loginSlice.loginDetails?.body?.data?.userdetails?.role_id,
-  );
-
-  const userId = useSelector(
-    (state) => state.loginSlice.loginDetails?.body?.data?.userdetails?.user_id,
-  );
-
-  //   const permissions = useSelector((state) => state.rolePermissions.permissions);
-  // const permissions = useSelector(
-  //   (state) => state.rolePermissions?.permissions || {},
-  // );
-
-  //   const canCreate = hasPermission(
-  //     permissions,
-  //     "CAREER_USER_MANAGEMENT",
-  //     "USER_CREATE",
-  //   );
-
-  // const canView = hasPermission(permissions, "CAREER_USER_MANAGEMENT", "USER_VIEW");
-
-  //   const canUpdate = hasPermission(
-  //     permissions,
-  //     "CAREER_USER_MANAGEMENT",
-  //     "USER_UPDATE",
-  //   );
-
-  //   const canDelete = hasPermission(
-  //     permissions,
-  //     "CAREER_USER_MANAGEMENT",
-  //     "USER_DELETE",
-  //   );
-
-  const canCreate = true;
-  const canView = true;
-  const canUpdate = true;
-  const canDelete = true;
+  useEffect(() => {
+    refreshPermissions(fetchApi);
+  }, [refreshPermissions, fetchApi]);
 
   const queryFromDate = searchParams.get("fromDate");
   const queryToDate = searchParams.get("endDate");
@@ -255,17 +233,15 @@ const CareerManagement = () => {
   return (
     <>
       <LoadingContainer />
-      <PageContainer>
-        {!canView ? (
-          <CommonNoAccess />
-        ) : (
-          <>
+      <AccessControl hasAccess={canViewAll}>
+        <PageContainer>
             <CareerManagementHeader
               data={data}
               setData={setData}
               searchKey={searchKey}
               summaryCards={summaryCards}
               addData={canCreate ? handleClick : undefined}
+              canCreate={canCreate}
             />
 
             <CommonDataGrid
@@ -278,8 +254,6 @@ const CareerManagement = () => {
               paginationMode="server"
               showMuiLoading={false}
             />
-          </>
-        )}
 
         <CommonConfirmDialog
           open={confirmOpen}
@@ -298,6 +272,7 @@ const CareerManagement = () => {
           onClose={handleSnackbarClose}
         />
       </PageContainer>
+    </AccessControl>
     </>
   );
 };

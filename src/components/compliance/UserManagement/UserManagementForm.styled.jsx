@@ -18,4 +18,13 @@ export const EditHeaderButton = styled(Button)(({ theme }) => ({
   "&:hover": {
     backgroundColor: theme.palette.primary.dark,
   },
+
+  "&.Mui-disabled": {
+    backgroundColor: theme.palette.grey[400],
+    color: theme.palette.common.white,
+  },
+
+  "&.Mui-disabled:hover": {
+    backgroundColor: theme.palette.grey[400],
+  },
 }));

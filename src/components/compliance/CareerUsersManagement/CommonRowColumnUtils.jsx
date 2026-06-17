@@ -35,24 +35,35 @@ const ActionsCell = ({
   handleOpenEdit,
   handleDeleteClick,
   canDelete,
+  canView,
   eyeIcon,
   trashIcon,
 }) => {
   const handleViewClick = useCallback(() => {
+    if (!canView) return;
     handleOpenEdit(row);
-  }, [handleOpenEdit, row]);
+  }, [handleOpenEdit, row, canView]);
 
   const handleDeleteAction = useCallback(() => {
     if (!canDelete) return;
     handleDeleteClick?.(row);
   }, [canDelete, handleDeleteClick, row]);
 
+  const viewTitle = canView ? "View" : "No permission";
+
   return (
     <Box width="100%" display="flex" justifyContent="center" gap={1}>
-      <Tooltip title="View" placement="right">
-        <IconButton size="small" onClick={handleViewClick}>
+      <Tooltip title={viewTitle} placement="right">
+        <span>
+          <IconButton
+            size="small"
+            disabled={!canView}
+            onClick={handleViewClick}
+            sx={getActionButtonSx(canView)}
+          >
           <img src={eyeIcon} alt="view" width={16} height={16} />
         </IconButton>
+      </span>
       </Tooltip>
 
       <Tooltip title={canDelete ? "Delete" : "No permission"} placement="right">
@@ -80,7 +91,8 @@ export const UserManagementTableData = (
 ) => {
   const pencilIcon = isDarkMode ? pencilDark : pencilLight;
   const trashIcon = isDarkMode ? trashDark : trashLight;
-  const { canDelete } = permissions || {};
+
+  const { canDelete, canView } = permissions || {};
 
   const UserManagementColumnData = [
     {
@@ -205,6 +217,7 @@ export const UserManagementTableData = (
           handleOpenEdit={handleOpenEdit}
           handleDeleteClick={handleDeleteClick}
           canDelete={canDelete}
+          canView={canView}
           eyeIcon={eyeIcon}
           trashIcon={trashIcon}
         />

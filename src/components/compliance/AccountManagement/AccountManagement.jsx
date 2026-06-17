@@ -1,11 +1,13 @@
 import { useCallback, useMemo, useState, useEffect } from "react";
 import { Box } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
 import CommonDataGrid from "@src/common/CommonDataGrid";
 import { PageContainer } from "../../../common/PageContainer";
 import AccountManagementHeader from "./AccountMangementHeader";
 import CommonSnackbar from "../../../common/CommonSnackbar";
 import CommonLoading from "../../../common/CommonLoading";
 import CommonConfirmDialog from "../../../common/CommonConfirmDialog";
+import AccessControl from "../../../common/AccessControl";
 import { GridContainer } from "./AccountManagement.styled";
 import AddAccountDialog from "./AddAccountDialog";
 import StatusSelectDropdown from "./StatusSelectDropdown";
@@ -15,12 +17,29 @@ import { defaultPageSize, STATUS_OPTIONS, STATUS_TRANSITION_OPTIONS, getDefaultT
 import { AccountManagementColumnsData } from "./CommonRowColumnUtils";
 import { useAccountManagement } from "./useAccountManagement";
 import { useLocation } from "react-router-dom";
+import { usePermissions } from "../../../hooks/usePermissions";
+import { usePermissionRefresh } from "../../../hooks/usePermissionRefresh";
 
 const AccountManagement = () => {
   const location = useLocation();
   const statusId = location.state?.statusId;
   const { fetchApi, createApi } = useServices();
   const { setLoading, LoadingContainer } = CommonLoading();
+  const { checkPermission, permissions } = usePermissions();
+  const dispatch = useDispatch();
+  const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
+  
+  const canCreate = useMemo(() => checkPermission("Account Management", "ACCOUNT_CREATE"), [permissions]);
+  const canUpdate = useMemo(() => checkPermission("Account Management", "ACCOUNT_UPDATE"), [permissions]);
+  const canDelete = useMemo(() => checkPermission("Account Management", "ACCOUNT_DELETE"), [permissions]);
+  const canView = useMemo(() => checkPermission("Account Management", "ACCOUNT_VIEW"), [permissions]);
+  const canViewAll = useMemo(() => checkPermission("Account Management", "ACCOUNT_VIEW_ALL"), [permissions]);
+
+  const { refreshPermissions } = usePermissionRefresh();
+  useEffect(() => {
+    refreshPermissions(fetchApi);
+  }, [refreshPermissions, fetchApi]);
+  
   const [searchKey, setSearchKey] = useState(0);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -237,8 +256,8 @@ const AccountManagement = () => {
 
   const columns = useMemo(
     () =>
-      AccountManagementColumnsData(handleViewAccount, handleOpenStatusChange),
-    [handleViewAccount, handleOpenStatusChange],
+      AccountManagementColumnsData(handleViewAccount, handleOpenStatusChange, canUpdate, canView),
+    [handleViewAccount, handleOpenStatusChange, canUpdate, canView],
   );
 
   const initialFormData = selectedCompany
@@ -284,11 +303,14 @@ const AccountManagement = () => {
   return (
     <PageContainer>
       <LoadingContainer />
+      <AccessControl hasAccess={canViewAll}>
+        <>
       <AccountManagementHeader
         data={gridData}
         setData={setData}
         searchKey={searchKey}
         handleClick={handleAddAccount}
+        canCreate={canCreate}
         primaryContactOptions={contactOptions.primaryContactOptions}
         secondaryContactOptions={contactOptions.secondaryContactOptions}
         carrierOptions={carrierOptions}
@@ -305,6 +327,8 @@ const AccountManagement = () => {
           getRowHeight={() => "auto"}
         />
       </GridContainer>
+        </>
+      </AccessControl>
 
       <CommonSnackbar
         open={snackbar.open}

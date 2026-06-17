@@ -15,6 +15,7 @@ import { useCareerUsers } from "../../../hooks";
 import { useSelector } from "react-redux";
 import CommonLoading from "../../../common/CommonLoading";
 import { buildCareerUserPayload } from "./careerUserUtils";
+import { hasPermission } from "../../../utils/permissionUtils";
 
 const CareerFormStepItem = ({ step, active, index, onClick }) => (
   <StepItem
@@ -212,14 +213,23 @@ const CareerForm = () => {
       state.loginSlice.loginDetails?.body?.data?.userdetails?.user_id || "",
   );
 
-  //   const permissions = useSelector((state) => state.rolePermissions.permissions);
+  const loginPermissions = useSelector(
+    (state) => state.loginSlice.permissions || {},
+  );
 
-  //   const canUpdate = hasPermission(
-  //     permissions,
-  //     "CAREER_USER_MANAGEMENT",
-  //     "USER_UPDATE",
-  //   );
-  const canUpdate = true;
+  const rolePermissions = useSelector(
+    (state) => state.rolePermissions?.permissions || {},
+  );
+
+  const permissions = Object.keys(rolePermissions).length > 0
+    ? rolePermissions
+    : loginPermissions;
+
+  const canUpdate = hasPermission(
+    permissions,
+    "Carrier Users",
+    "CARRIER_USER_UPDATE",
+  );
   const breadcrumbs = [
     { label: "Compliance", path: "/compliance" },
     { label: "Platform Users", path: "/carrier-users" },

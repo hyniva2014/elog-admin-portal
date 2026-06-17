@@ -7,18 +7,24 @@ const AccountManagementHeader = ({
   setData,
   searchKey,
   handleClick,
+  canCreate = false,
   primaryContactOptions = [],
   secondaryContactOptions = [],
   carrierOptions,
   statusOptions,
 }) => {
+  const isButtonDisabled = !canCreate || !handleClick;
   return (
     <HeaderContainer>
       <CommonPageHeader
         title="Account Management"
         subtitle="Manage carrier accounts and subscriptions"
         rightContent={
-          <AddAccountButton variant="contained" onClick={handleClick}>
+          <AddAccountButton 
+            variant="contained" 
+            onClick={handleClick}
+            disabled={isButtonDisabled}
+          >
             Add Account
           </AddAccountButton>
         }

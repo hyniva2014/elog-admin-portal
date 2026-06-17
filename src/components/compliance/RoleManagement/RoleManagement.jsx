@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Box, Button } from "@mui/material";
 import { useServices } from "../../../services/services";
 import RoleCard from "./RoleCard";
@@ -6,8 +7,10 @@ import RoleManagementForm from "./RoleManagementForm";
 import { useTheme } from "@mui/material/styles";
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonLoading from "../../../common/CommonLoading";
+import AccessControl from "../../../common/AccessControl";
 import CommonSnackbar from "../../../common/CommonSnackbar";
-
+import { usePermissions } from "@src/hooks/usePermissions";
+import { usePermissionRefresh } from "@src/hooks/usePermissionRefresh";
 import {
   fetchRolesApi,
   fetchRoleByIdApi,
@@ -29,6 +32,19 @@ const RoleManagement = () => {
   const { fetchApi, createApi } = useServices();
   const theme = useTheme();
   const { setLoading, LoadingContainer } = CommonLoading();
+  const { checkPermission } = usePermissions();
+  const { refreshPermissions } = usePermissionRefresh();
+  const dispatch = useDispatch();
+  const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
+  const canView = checkPermission("Roles Overview", "ROLE_OVERVIEW_VIEW");
+  const canViewAll = checkPermission("Roles Overview", "ROLE_OVERVIEW_VIEW_ALL");
+  const canCreate = checkPermission("Roles Overview", "ROLE_OVERVIEW_CREATE");
+  const canUpdate = checkPermission("Roles Overview", "ROLE_OVERVIEW_UPDATE");
+  const canDelete = checkPermission("Roles Overview", "ROLE_OVERVIEW_DELETE");
+
+  useEffect(() => {
+    refreshPermissions(fetchApi);
+  }, [refreshPermissions, fetchApi]);
   const [roles, setRoles] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [defaultValues, setDefaultValues] = useState({
@@ -212,7 +228,7 @@ const RoleManagement = () => {
       color: theme.palette.brand.main,
     };
 
-    return <RoleCard key={role.id} role={roleData} onEdit={handleRoleEdit} />;
+    return <RoleCard key={role.id} role={roleData} onEdit={handleRoleEdit} canView={canView} canUpdate={canUpdate} />;
   });
 
   const pageTitle = isEditMode ? "Edit Role" : "Add Role";
@@ -240,6 +256,7 @@ const RoleManagement = () => {
   return (
     <>
       <LoadingContainer />
+    <AccessControl hasAccess={canViewAll}>
       <PageContainer>
         <Header>
           <Box>
@@ -248,7 +265,11 @@ const RoleManagement = () => {
             <Subtitle>Quick view of all roles and their access levels</Subtitle>
           </Box>
 
-          <AddButton variant="contained" onClick={handleAddRole}>
+          <AddButton 
+            variant="contained" 
+            onClick={handleAddRole}
+            disabled={!canCreate}
+          >
             Add Role
           </AddButton>
         </Header>
@@ -283,6 +304,7 @@ const RoleManagement = () => {
           onClose={handleSnackbarClose}
         />
       </PageContainer>
+    </AccessControl>
     </>
   );
 };
