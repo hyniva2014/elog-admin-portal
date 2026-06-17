@@ -19,6 +19,8 @@ const DeviceAssetManagementActionButton = React.memo(
       }
     }, [onDelete, row, canDelete]);
 
+    const isOutOfService = row.status === "Out of Service";
+
     const iconStyle = canView ? actionIconSx : { color: "action.disabled" };
 
     const tooltipTitle = isOutOfService
@@ -28,8 +30,6 @@ const DeviceAssetManagementActionButton = React.memo(
         : "No permission to delete";
 
     const isDeleteDisabled = isOutOfService || !canDelete;
-
-    const isOutOfService = row.status === "Out of Service";
 
     return (
       <div style={{ display: "flex", gap: "8px" }}>
