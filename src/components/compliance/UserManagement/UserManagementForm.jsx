@@ -3,6 +3,7 @@ import { Grid } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useSelector } from "react-redux";
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonTextField from "../../../common/CommonTextField";
 import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdown";
@@ -10,6 +11,7 @@ import { FormContainer } from "./UserManagementForm.styled";
 import { EditHeaderButton } from "./UserManagementForm.styled";
 import { useServices } from "../../../services/services";
 import { CARRIER_ADMIN_ROLE_ID } from "./Constants";
+import { hasPermission } from "../../../utils/permissionUtils";
 
 const STATUS_OPTIONS = [
   { label: "Active", value: "1" },
@@ -69,6 +71,23 @@ const UserManagementForm = ({
 
   // Internal editing state — only relevant when mode === "view"
   const [isEditing, setIsEditing] = useState(false);
+  const loginPermissions = useSelector(
+    (state) => state.loginSlice.permissions || {},
+  );
+
+  const rolePermissions = useSelector(
+    (state) => state.rolePermissions?.permissions || {},
+  );
+
+  const permissions = Object.keys(rolePermissions).length > 0
+    ? rolePermissions
+    : loginPermissions;
+
+  const canUpdate = hasPermission(
+    permissions,
+    "Carrier Users",
+    "CARRIER_USER_UPDATE",
+  );
 
   // The effective read-only state
   const isReadOnly = isViewMode && !isEditing;
@@ -218,6 +237,7 @@ const UserManagementForm = ({
       size="small"
       variant="contained"
       onClick={handleEditClick}
+      disabled={!canUpdate}
     >
       Edit
     </EditHeaderButton>

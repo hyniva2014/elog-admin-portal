@@ -1,16 +1,27 @@
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useState, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import CommonDataGrid from "@src/common/CommonDataGrid";
 import { PageContainer } from "@src/common/PageContainer";
 import CommonLoading from "@src/common/CommonLoading";
+import AccessControl from "@src/common/AccessControl";
 import CommonDialogForm from "@src/common/CommonDialogForm";
 import CommonSnackbar from "@src/common/CommonSnackbar";
 import DeviceModelManagementHeader from "./DeviceModelManagementHeader";
 import DeviceModelManagementForm from "./DeviceModelManagementForm";
 import { GridContainer } from "./DeviceModelManagement.styled";
-import { HeaderEditButton, HeaderCancelEditButton } from "./DeviceModelManagementButtons";
-import { DEVICE_MODEL_STATUS_FILTER_OPTIONS, ASSET_TYPE_FILTER_OPTIONS } from "./Constants";
+import {
+  HeaderEditButton,
+  HeaderCancelEditButton,
+} from "./DeviceModelManagementButtons";
+import {
+  DEVICE_MODEL_STATUS_FILTER_OPTIONS,
+  ASSET_TYPE_FILTER_OPTIONS,
+} from "./Constants";
 import { getColumns, getRowHeight } from "./DeviceModelManagementTable.utils";
 import useDeviceModelManagement from "@src/hooks/useDeviceModelManagement";
+import { usePermissions } from "@src/hooks/usePermissions";
+import { useServices } from "@src/services/services";
+import { usePermissionRefresh } from "@src/hooks/usePermissionRefresh";
 
 const getDialogTitle = (isEditMode, isEditing) => {
   if (!isEditMode) return "Add Device Model";
@@ -26,14 +37,52 @@ const getFormKey = (deviceModelId) => {
   return deviceModelId || "new";
 };
 
-const getHeaderActionsElement = (isEditMode, isEditing, handleEditClick, handleCancelEdit) => {
+const getHeaderActionsElement = (
+  isEditMode,
+  isEditing,
+  handleEditClick,
+  handleCancelEdit,
+  canUpdate,
+) => {
   if (!isEditMode) return null;
-  if (!isEditing) return <HeaderEditButton onClick={handleEditClick} />;
+  if (!isEditing)
+ return <HeaderEditButton onClick={handleEditClick} disabled={!canUpdate} />;
   return <HeaderCancelEditButton onClick={handleCancelEdit} />;
 };
 
 const DeviceModelManagement = () => {
   const { setLoading, LoadingContainer } = CommonLoading();
+  const { checkPermission, permissions } = usePermissions();
+  const dispatch = useDispatch();
+  const loginDetails = useSelector(
+    (state) => state.loginSlice.loginDetails || {},
+  );
+  const { fetchApi } = useServices();
+
+  const canCreate = checkPermission(
+    "Device Model Management",
+    "DEVICE_MODEL_CREATE",
+  );
+
+  const canUpdate = checkPermission(
+    "Device Model Management",
+    "DEVICE_MODEL_UPDATE",
+  );
+
+  const canView = checkPermission(
+    "Device Model Management",
+    "DEVICE_MODEL_VIEW",
+  );
+
+  const canViewAll = checkPermission(
+    "Device Model Management",
+    "DEVICE_MODEL_VIEW_ALL",
+  );
+
+  const { refreshPermissions } = usePermissionRefresh();
+  useEffect(() => {
+    refreshPermissions(fetchApi);
+  }, [refreshPermissions, fetchApi]);
 
   const {
     allRows,
@@ -47,19 +96,44 @@ const DeviceModelManagement = () => {
     isEditMode,
     isEditing,
     handleSnackbarClose,
-    handleClick,
-    handleViewClick,
-    handleEditClick,
+    handleClick: hookHandleClick,
+    handleViewClick: hookHandleViewClick,
+    handleEditClick: hookHandleEditClick,
     handleCancelEdit,
-    handleAddSubmit,
+    handleAddSubmit: hookHandleAddSubmit,
     handleAddCancel,
   } = useDeviceModelManagement();
+
+  const handleClick = useCallback(() => {
+    hookHandleClick();
+  }, [hookHandleClick]);
+
+  const handleViewClick = useCallback(
+    (row) => {
+      hookHandleViewClick(row);
+    },
+    [hookHandleViewClick],
+  );
+
+  const handleEditClick = useCallback(() => {
+    hookHandleEditClick();
+  }, [hookHandleEditClick]);
+
+  const handleAddSubmit = useCallback(
+    async (formValues) => {
+      await hookHandleAddSubmit(formValues);
+    },
+    [hookHandleAddSubmit],
+  );
 
   useEffect(() => {
     setLoading(isLoading);
   }, [isLoading]);
 
-  const columns = useMemo(() => getColumns(handleViewClick), [handleViewClick]);
+  const columns = useMemo(
+    () => getColumns(handleViewClick, canView),
+    [handleViewClick, canView],
+  );
 
   const gridData = {
     ...data,
@@ -68,7 +142,13 @@ const DeviceModelManagement = () => {
     total: data.total,
   };
 
-  const headerActionsElement = getHeaderActionsElement(isEditMode, isEditing, handleEditClick, handleCancelEdit);
+  const headerActionsElement = getHeaderActionsElement(
+    isEditMode,
+    isEditing,
+    handleEditClick,
+    handleCancelEdit,
+    canUpdate,
+  );
 
   const dialogMode = isEditMode ? "edit" : "add";
   const dialogTitle = getDialogTitle(isEditMode, isEditing);
@@ -78,6 +158,7 @@ const DeviceModelManagement = () => {
   return (
     <>
       <LoadingContainer />
+    <AccessControl hasAccess={canViewAll}>
       <PageContainer>
         <DeviceModelManagementHeader
           data={gridData}
@@ -88,6 +169,7 @@ const DeviceModelManagement = () => {
           modelOptions={modelOptions}
           statusOptions={DEVICE_MODEL_STATUS_FILTER_OPTIONS}
           assetTypeOptions={ASSET_TYPE_FILTER_OPTIONS}
+          canCreate={canCreate}
         />
         <GridContainer>
           <CommonDataGrid
@@ -99,6 +181,7 @@ const DeviceModelManagement = () => {
           />
         </GridContainer>
       </PageContainer>
+    </AccessControl>
 
       <CommonSnackbar
         open={snackbar.open}

@@ -18,7 +18,7 @@ import {
   EditButton,
 } from "./RoleCard.styles";
 
-const RoleCard = ({ role, onEdit }) => {
+const RoleCard = ({ role, onEdit, canView, canUpdate }) => {
   const navigate = useNavigate();
 
   const handleUsersClick = () => {
@@ -65,8 +65,8 @@ const RoleCard = ({ role, onEdit }) => {
       </UsersColumn>
       <StatusColumn>{statusComponent}</StatusColumn>
       <ActionsWrapper>
-        <ViewButton onClick={handleViewClick}>{viewIcon}</ViewButton>
-        <EditButton onClick={handleEditClick}>{editIcon}</EditButton>
+        <ViewButton onClick={handleViewClick} disabled={!canView}>{viewIcon}</ViewButton>
+        <EditButton onClick={handleEditClick} disabled={!canUpdate}>{editIcon}</EditButton>
       </ActionsWrapper>
     </RoleRow>
   );

@@ -50,31 +50,70 @@ const renderDateTimeCell = (dateField, timeField) => (params) => {
   );
 };
 
-const renderActionCell = (onViewAccount, onToggleClick) => (params) => {
+const renderActionCell = (onViewAccount, onToggleClick, canUpdate, canView) => (params) => {
   const { row } = params;
   const currentStatus = row.status || "Active";
+  const theme = useTheme();
 
-  const handleViewClick = () => onViewAccount(row);
-  const handleStatusClick = () =>
-    handleOpenStatusChange(row, currentStatus, onToggleClick);
+  const handleViewClick = () => {
+    if (canView) {
+      onViewAccount(row);
+    }
+  };
+
+  const handleStatusClick = () => {
+    if (canUpdate) {
+      handleOpenStatusChange(row, currentStatus, onToggleClick);
+    }
+  };
+
+  const tooltipTitle = canUpdate
+  ? `${currentStatus} — click to change status`
+  : `${currentStatus} — Permission denied`;
 
   return (
     <Box display="flex" gap={1} alignItems="center">
-      <Tooltip title="View">
-        <IconButton size="small" onClick={handleViewClick}>
+      <Tooltip title={canView ? "View" : "View - Permission denied"}>
+        <IconButton 
+          size="small" 
+          onClick={handleViewClick}
+          disabled={!canView}
+          sx={{
+            ...actionIconSx,
+            color: !canView ? theme.palette.error.main : "inherit",
+            opacity: !canView ? 0.5 : 1,
+          }}
+        >
           <VisibilityOutlinedIcon sx={actionIconSx} />
         </IconButton>
       </Tooltip>
-      <Tooltip title={`${currentStatus} — click to change status`}>
-        <TriSwitchTrack status={currentStatus} onClick={handleStatusClick}>
-          <TriSwitchThumb status={currentStatus} />
+      <Tooltip title={tooltipTitle}>
+        <TriSwitchTrack 
+          status={currentStatus} 
+          onClick={handleStatusClick}
+          disabled={!canUpdate}
+          sx={{
+            opacity: !canUpdate ? 0.5 : 1,
+          }}
+        >
+          <TriSwitchThumb 
+            status={currentStatus}
+            sx={{
+              color: !canUpdate ? theme.palette.error.main : "inherit",
+            }}
+          />
         </TriSwitchTrack>
       </Tooltip>
     </Box>
   );
 };
 
-export const AccountManagementColumnsData = (onViewAccount, onToggleClick) => [
+export const AccountManagementColumnsData = (
+  onViewAccount,
+  onToggleClick,
+  canUpdate = true,
+  canView = true,
+) => [
   {
     field: "carrierId",
     headerName: "Carrier ID",
@@ -174,7 +213,7 @@ export const AccountManagementColumnsData = (onViewAccount, onToggleClick) => [
     headerName: "Action",
     ...defaultColumnProps,
     sortable: false,
-    renderCell: renderActionCell(onViewAccount, onToggleClick),
+    renderCell: renderActionCell(onViewAccount, onToggleClick, canUpdate, canView),
   },
 ];
 

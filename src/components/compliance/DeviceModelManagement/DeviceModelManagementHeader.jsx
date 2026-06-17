@@ -14,6 +14,7 @@ const DeviceModelManagementHeader = (props) => {
     modelOptions = [],
     statusOptions = [],
     assetTypeOptions = [],
+    canCreate = false,
   } = props;
 
   const filters = [
@@ -22,6 +23,8 @@ const DeviceModelManagementHeader = (props) => {
     { label: "All Status", dataKey: "status", options: statusOptions },
   ];
 
+  const isCreateDisabled = !canCreate || !handleClick;
+
   return (
     <HeaderContainer>
       <CommonPageHeader
@@ -29,7 +32,12 @@ const DeviceModelManagementHeader = (props) => {
         subtitle="Manage device models and specifications"
         handleClick={handleClick}
         addButton={true}
-        rightContent={<HeaderAddButton onClick={handleClick} />}
+        rightContent={
+          <HeaderAddButton 
+            onClick={handleClick} 
+            disabled={isCreateDisabled}
+          />
+        }
       />
       <SummaryCardBox>
         <CommonSummaryCardGroup cards={summaryCards} />

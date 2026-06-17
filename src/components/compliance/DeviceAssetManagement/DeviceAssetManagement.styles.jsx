@@ -72,3 +72,10 @@ export const actionIconSx = {
   fontSize: 20,
   color: COLORS.grey,
 };
+
+export const DeleteIconSx = (isOutOfService, canDelete) => (theme) => ({
+  color:
+    isOutOfService || !canDelete
+      ? theme.palette.action.disabled
+      : theme.palette.error.main,
+});

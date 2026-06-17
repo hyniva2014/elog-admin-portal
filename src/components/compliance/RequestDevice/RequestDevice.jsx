@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import CommonDataGrid from "../../../common/CommonDataGrid";
 import CommonSnackbar from "../../../common/CommonSnackbar";
 import { PageContainer } from "../../../common/PageContainer";
 import CommonLoading from "../../../common/CommonLoading";
+import AccessControl from "../../../common/AccessControl";
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import RequestDeviceHeader from "./RequestDeviceHeader";
 import RequestDeviceForm from "./RequestDeviceForm";
 import AssignAssetForm from "./AssignAssetForm";
+import { usePermissionRefresh } from "@src/hooks/usePermissionRefresh";
 import {
   columns,
   statusOptions,
@@ -16,11 +18,26 @@ import {
 } from "./Constants";
 import { useRequestDevices } from "../../../hooks/useRequestDevices";
 import { useRequestDeviceManager } from "../../../hooks/useRequestDeviceManager";
+import { useServices } from "../../../services/services";
 import { getColumnsWithAssign } from "./requestDevice.utils";
 import RequestDevicePopupMessage from "./RequestDevicePopupMessage";
+import usePermissions from "../../../hooks/usePermissions";
 
 const RequestDevice = () => {
   const { setLoading, LoadingContainer } = CommonLoading();
+  const { refreshPermissions } = usePermissionRefresh();
+  const { checkPermission } = usePermissions();
+  const { fetchApi } = useServices();
+  const dispatch = useDispatch();
+  const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
+
+  const canView = checkPermission("Requested Devices", "REQUESTED_DEVICES_VIEW");
+  const canViewAll = checkPermission("Requested Devices", "REQUESTED_DEVICES_VIEW_ALL");
+  const create = checkPermission("Requested Devices", "CREATE_REQUESTED_DEVICES");
+
+  useEffect(() => {
+    refreshPermissions(fetchApi);
+  }, [refreshPermissions, fetchApi]);
   const { allRows, total, isLoading, fetchRequestedDevices } =
     useRequestDevices();
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
@@ -175,8 +192,8 @@ const RequestDevice = () => {
   ]);
 
   const columnsWithAssign = useMemo(
-    () => getColumnsWithAssign(columns, handleAttachmentClick),
-    [handleAttachmentClick],
+    () => getColumnsWithAssign(columns, handleAttachmentClick, canView),
+    [handleAttachmentClick, canView],
   );
 
   const gridData = {
@@ -202,6 +219,7 @@ const RequestDevice = () => {
   return (
     <>
       <LoadingContainer />
+    <AccessControl hasAccess={canViewAll}>
       <PageContainer>
         <RequestDeviceHeader
           data={gridData}
@@ -209,6 +227,7 @@ const RequestDevice = () => {
           searchKey={data.search}
           statusOptions={statusOptions}
           handleRequestDeviceClick={handleOpenRequestDialog}
+          canCreate={create}
         />
         <CommonDataGrid
           columnsData={columnsWithAssign}
@@ -219,6 +238,7 @@ const RequestDevice = () => {
           getRowHeight={getRowHeight}
         />
       </PageContainer>
+      </AccessControl>
 
       <CommonDialogForm
         open={isRequestDialogOpen}

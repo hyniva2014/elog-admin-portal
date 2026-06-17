@@ -1,14 +1,17 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import CommonDataGrid from "@src/common/CommonDataGrid";
 import UserManagementHeader from "./UserManagementHeader";
 import { PageContainer } from "../../../common/PageContainer";
 import CommonLoading from "../../../common/CommonLoading";
+import AccessControl from "../../../common/AccessControl";
 import { UserManagementColumnData, mapUserToRow } from "./CommonRowColumnUtils";
 import UserManagementForm from "./UserManagementForm";
 import { USER_SUMMARY_CARDS } from "./Constants";
 import { buildSummaryCards } from "../../../common/CommonUtils";
 import { useServices } from "../../../services/services";
 import CommonSnackbar from "../../../common/CommonSnackbar";
+import { usePermissionRefresh } from "../../../hooks/usePermissionRefresh";
 import dayjs from "dayjs";
 import {
   getUsers,
@@ -16,12 +19,28 @@ import {
   onboardUser,
   getCompaniesDropdown,
 } from "./userManagementService";
+import usePermissions from "../../../hooks/usePermissions";
 
 /** Format ISO date string to DD-MM-YYYY */
 const formatDate = (iso) => (iso ? dayjs(iso).format("DD-MM-YYYY") : "-");
 
 const UserManagement = () => {
   const { setLoading, LoadingContainer } = CommonLoading();
+  const {  refreshPermissions } = usePermissionRefresh();
+  const { checkPermission } = usePermissions();
+  const dispatch = useDispatch();
+  const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
+  const { fetchApi, createApi } = useServices();
+
+  const canCreate = checkPermission("Carrier Users", "CARRIER_USER_CREATE");
+  const canUpdate = checkPermission("Carrier Users", "CARRIER_USER_UPDATE");
+  const canDelete = checkPermission("Carrier Users", "CARRIER_USER_DELETE");
+  const canView = checkPermission("Carrier Users", "CARRIER_USER_VIEW");
+  const canViewAll = checkPermission("Carrier Users", "CARRIER_USER_VIEW_ALL");
+
+  useEffect(() => {
+    refreshPermissions(fetchApi);
+  }, [refreshPermissions, fetchApi]);
 
   const [data, setData] = useState({
     rows: [],
@@ -59,7 +78,6 @@ const UserManagement = () => {
     severity: "success",
   });
   const [companyOptions, setCompanyOptions] = useState([]);
-  const { fetchApi, createApi } = useServices();
 
   const handleSnackbarClose = useCallback(() => {
     setSnackbar((prev) => ({ ...prev, open: false }));
@@ -118,11 +136,12 @@ const UserManagement = () => {
       }));
 
       setSummaryCards(buildSummaryCards(response?.body, USER_SUMMARY_CARDS));
-    } catch {
+    } catch (error) {
+      console.error("Failed to fetch users error:", error);
       setData((prev) => ({ ...prev, isLoading: false }));
       setSnackbar({
         open: true,
-        message: "Failed to fetch users.",
+        message: error?.message || "Failed to fetch users.",
         severity: "error",
       });
     }
@@ -181,10 +200,10 @@ const UserManagement = () => {
 
   const columnsWithActions = useMemo(
     () =>
-      UserManagementColumnData.map((col) =>
+      UserManagementColumnData(canView).map((col) =>
         col.field === "action" ? { ...col, onView: handleViewRow } : col,
       ),
-    [handleViewRow],
+    [handleViewRow, canView],
   );
 
   const handleAddClick = () => {
@@ -301,6 +320,7 @@ const UserManagement = () => {
   return (
     <>
       <LoadingContainer />
+    <AccessControl hasAccess={canViewAll}>
       <PageContainer>
         <UserManagementHeader
           data={data}
@@ -310,6 +330,7 @@ const UserManagement = () => {
           setMode={setMode}
           handleClick={handleAddClick}
           companyOptions={companyOptions}
+          canCreate={canCreate}
         />
         <CommonDataGrid
           columnsData={columnsWithActions}
@@ -323,6 +344,7 @@ const UserManagement = () => {
           useAutoHeight={true}
         />
       </PageContainer>
+    </AccessControl>
 
       <UserManagementForm
         open={openForm}

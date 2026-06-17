@@ -8,6 +8,7 @@ import {
   StatusDotSx,
   HeaderButtonsSx,
   PageHeaderTitleSx,
+  EditButtonStyle,
 } from "./UserPageHeader.styled";
 
 const StatusChip = ({ statusLabel, isActive }) => {
@@ -22,7 +23,12 @@ const StatusChip = ({ statusLabel, isActive }) => {
 };
 
 const EditActionButton = ({ canUpdate, handleStartEdit }) => (
-  <Button variant="contained" disabled={!canUpdate} onClick={handleStartEdit}>
+  <Button
+    variant="contained"
+    disabled={!canUpdate}
+    onClick={handleStartEdit}
+    sx={EditButtonStyle(canUpdate)}
+  >
     Edit
   </Button>
 );
