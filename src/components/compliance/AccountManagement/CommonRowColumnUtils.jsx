@@ -1,7 +1,18 @@
-import { Box, IconButton, Tooltip, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  styled,
+  Tooltip,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import dayjs from "dayjs";
-import { defaultColumnProps, getStickyColumnProps, getStatusNameFromId } from "./Constants";
+import {
+  defaultColumnProps,
+  getStickyColumnProps,
+  getStatusNameFromId,
+} from "./Constants";
 import { getFormattedDateTime } from "../../../common/CommonUtils";
 import { handleOpenStatusChange } from "./utils";
 import {
@@ -12,6 +23,7 @@ import {
   TriSwitchThumb,
   TriSwitchZone,
 } from "./AccountManagement.styled";
+import { Datefieldstext, Timefieldstext } from "./CommomRowColumnUtils.styled";
 
 const formatDate = (value) => {
   if (!value || value === "-") return "-";
@@ -32,12 +44,8 @@ const renderDateTimeCell = (dateField, timeField) => (params) => {
   const theme = useTheme();
   return (
     <Box>
-      <Typography fontSize={14} fontWeight={400}>
-        {params.row[dateField]}
-      </Typography>
-      <Typography fontSize={14} fontWeight={400} color={theme.palette.grey[500]}>
-        {params.row[timeField]}
-      </Typography>
+      <Datefieldstext theme={theme}>{params.row[dateField]}</Datefieldstext>
+      <Timefieldstext theme={theme}>{params.row[timeField]}</Timefieldstext>
     </Box>
   );
 };
@@ -117,6 +125,11 @@ export const AccountManagementColumnsData = (
     ...getStickyColumnProps("sticky-col-left-2"),
   },
   {
+    field: "companyCode",
+    headerName: "Company Code",
+    ...defaultColumnProps,
+  },
+  {
     field: "taxId",
     headerName: "Tax ID(EIN)",
     ...defaultColumnProps,
@@ -167,21 +180,11 @@ export const AccountManagementColumnsData = (
     headerName: "Secondary Contact Email",
     ...defaultColumnProps,
   },
-  // {
-  //   field: "website",
-  //   headerName: "Website",
-  //    ...defaultColumnProps,
-  // },
   {
     field: "tollFree",
     headerName: "Toll Free",
     ...defaultColumnProps,
   },
-  // {
-  //   field: "fax",
-  //   headerName: "Fax",
-  //   ...defaultColumnProps,
-  // },
   {
     field: "maxDevices",
     headerName: "Max Devices",
@@ -226,6 +229,7 @@ export const AccountManagementRowData = (response = []) => {
       company_id,
       companyName,
       ein,
+      company_code,
       dotNumber,
       mcNumber,
       website,
@@ -280,6 +284,7 @@ export const AccountManagementRowData = (response = []) => {
       updatedTime: updatedInfo.time,
       status: getStatusNameFromId(status_id, statusName),
       statusId: status_id || "1",
+      companyCode: company_code || "-",
     };
   });
 };
