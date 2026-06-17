@@ -227,8 +227,8 @@ const CareerForm = () => {
 
   const canUpdate = hasPermission(
     permissions,
-    "Carrier Users",
-    "CARRIER_USER_UPDATE",
+    "Platform Users",
+    "PLATFORM_USER_UPDATE",
   );
   const breadcrumbs = [
     { label: "Compliance", path: "/compliance" },
