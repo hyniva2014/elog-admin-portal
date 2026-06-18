@@ -4,28 +4,14 @@ frontend:
   phases:
     preBuild:
       commands:
-        - echo "Using Node 20"
         - nvm install 20
         - nvm use 20
-        - npm install
+        - npm install --script-shell=/bin/bash
 
     build:
       commands:
-        - echo "Current branch: $AWS_BRANCH"
-        - ls -la
-
-        - |
-          if [ "$AWS_BRANCH" = "preprod" ] && [ -f ".env.preprod" ]; then
-            echo "Using PREPROD environment"
-            cp .env.preprod .env.production
-          elif [ "$AWS_BRANCH" = "main" ] && [ -f ".env.production" ]; then
-            echo "Using PROD environment"
-            cp .env.production .env.production
-          else
-            echo "Using DEFAULT environment"
-          fi
-
-        - npm run build
+        - npm run build --script-shell=/bin/bash
+        - npm run build:preprod
 
   artifacts:
     baseDirectory: dist
@@ -35,3 +21,4 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
+``
