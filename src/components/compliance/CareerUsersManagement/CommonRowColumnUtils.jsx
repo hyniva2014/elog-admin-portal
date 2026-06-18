@@ -1,10 +1,10 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import eyeIcon from "../../../assets/images/svg/eye.svg";
-import pencilLight from "../../../assets/images/svg/pencil.png";
-import pencilDark from "../../../assets/images/svg/pencildark.png";
+import GroupIcon from "../../../assets/images/svg/Group.png";
 import trashLight from "../../../assets/images/svg/trash.png";
 import trashDark from "../../../assets/images/svg/trashdark.png";
 import { Box, IconButton, Tooltip, Typography } from "@mui/material";
+import PlatformUserAuditDialog from "./PlatformUserAuditDialog";
 import dayjs from "dayjs";
 import { USER_STATUS, USER_STATUS_COL_CONFIG } from "./Constants";
 import { getFormattedDateTime } from "../../../common/CommonUtils";
@@ -39,6 +39,8 @@ const ActionsCell = ({
   eyeIcon,
   trashIcon,
 }) => {
+  const [groupDialogOpen, setGroupDialogOpen] = useState(false);
+
   const handleViewClick = useCallback(() => {
     if (!canView) return;
     handleOpenEdit(row);
@@ -52,33 +54,44 @@ const ActionsCell = ({
   const viewTitle = canView ? "View" : "No permission";
 
   return (
-    <Box width="100%" display="flex" justifyContent="center" gap={1}>
-      <Tooltip title={viewTitle} placement="right">
-        <span>
-          <IconButton
-            size="small"
-            disabled={!canView}
-            onClick={handleViewClick}
-            sx={getActionButtonSx(canView)}
-          >
-          <img src={eyeIcon} alt="view" width={16} height={16} />
-        </IconButton>
-      </span>
-      </Tooltip>
-
-      <Tooltip title={canDelete ? "Delete" : "No permission"} placement="right">
-        <span>
-          <IconButton
-            size="small"
-            disabled={!canDelete}
-            onClick={handleDeleteAction}
-            sx={getActionButtonSx(canDelete)}
-          >
-            <img src={trashIcon} alt="delete" width={16} height={16} />
+    <>
+      <Box width="100%" display="flex" justifyContent="center" gap={1}>
+        <Tooltip title="Group" placement="right">
+          <IconButton size="small" onClick={() => setGroupDialogOpen(true)}>
+            <img src={GroupIcon} alt="group" width={16} height={16} />
           </IconButton>
-        </span>
-      </Tooltip>
-    </Box>
+        </Tooltip>
+        <Tooltip title={viewTitle} placement="right">
+          <span>
+            <IconButton
+              size="small"
+              disabled={!canView}
+              onClick={handleViewClick}
+              sx={getActionButtonSx(canView)}
+            >
+              <img src={eyeIcon} alt="view" width={16} height={16} />
+            </IconButton>
+          </span>
+        </Tooltip>
+        <Tooltip title={canDelete ? "Delete" : "No permission"} placement="right">
+          <span>
+            <IconButton
+              size="small"
+              disabled={!canDelete}
+              onClick={handleDeleteAction}
+              sx={getActionButtonSx(canDelete)}
+            >
+              <img src={trashIcon} alt="delete" width={16} height={16} />
+            </IconButton>
+          </span>
+        </Tooltip>
+      </Box>
+
+      <PlatformUserAuditDialog
+        open={groupDialogOpen}
+        onClose={() => setGroupDialogOpen(false)}
+      />
+    </>
   );
 };
 
@@ -89,7 +102,6 @@ export const UserManagementTableData = (
   isDarkMode,
   permissions = {},
 ) => {
-  const pencilIcon = isDarkMode ? pencilDark : pencilLight;
   const trashIcon = isDarkMode ? trashDark : trashLight;
 
   const { canDelete, canView } = permissions || {};
