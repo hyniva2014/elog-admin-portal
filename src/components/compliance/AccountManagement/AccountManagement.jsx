@@ -11,6 +11,7 @@ import AccessControl from "../../../common/AccessControl";
 import { GridContainer } from "./AccountManagement.styled";
 import AddAccountDialog from "./AddAccountDialog";
 import StatusSelectDropdown from "./StatusSelectDropdown";
+import AuditLogModal from "./AuditLogModal";
 import { getStatusChangeMessage } from "./utils";
 import { useServices } from "../../../services/services";
 import { defaultPageSize, STATUS_OPTIONS, STATUS_TRANSITION_OPTIONS, getDefaultTargetStatus } from "./Constants";
@@ -57,6 +58,8 @@ const AccountManagement = () => {
   const [isStatusChangeOpen, setIsStatusChangeOpen] = useState(false);
   const [statusChangeData, setStatusChangeData] = useState(null);
   const [selectedTargetStatus, setSelectedTargetStatus] = useState("");
+  const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
+  const [auditLogData, setAuditLogData] = useState([]);
 
   const getDefaultFilters = () => {
     return {
@@ -141,6 +144,11 @@ const AccountManagement = () => {
     setSelectedTargetStatus(event.target.value);
   }, []);
 
+  const handleCloseAuditLog = useCallback(() => {
+    setIsAuditLogOpen(false);
+    setAuditLogData([]);
+  }, []);
+
   const {
     buildFetchUrl,
     fetchData,
@@ -150,6 +158,7 @@ const AccountManagement = () => {
     fetchContactsDropdown,
     fetchCompaniesDropdown,
     fetchCarrierOptions,
+    fetchAuditLog,
   } = useAccountManagement(
     companyId,
     primaryContactName,
@@ -169,6 +178,23 @@ const AccountManagement = () => {
     setSelectedCompany,
     fetchApi,
     createApi,
+  );
+
+  const handleOpenAuditLog = useCallback(
+    async (row) => {
+      setLoading(true);
+      try {
+        const auditData = await fetchAuditLog(row.id);
+        setAuditLogData(auditData);
+        setIsAuditLogOpen(true);
+      } catch (err) {
+        console.error("Error opening audit log:", err);
+        setAuditLogData([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchAuditLog, setLoading],
   );
 
   const handleConfirmStatusChange = useCallback(
@@ -256,8 +282,8 @@ const AccountManagement = () => {
 
   const columns = useMemo(
     () =>
-      AccountManagementColumnsData(handleViewAccount, handleOpenStatusChange, canUpdate, canView),
-    [handleViewAccount, handleOpenStatusChange, canUpdate, canView],
+      AccountManagementColumnsData(handleViewAccount, handleOpenStatusChange, handleOpenAuditLog, canUpdate, canView),
+    [handleViewAccount, handleOpenStatusChange, handleOpenAuditLog, canUpdate, canView],
   );
 
   const initialFormData = selectedCompany
@@ -367,6 +393,12 @@ const AccountManagement = () => {
             />
           )
         }
+      />
+
+      <AuditLogModal
+        open={isAuditLogOpen}
+        onClose={handleCloseAuditLog}
+        auditData={auditLogData}
       />
     </PageContainer>
   );
