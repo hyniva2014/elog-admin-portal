@@ -17,6 +17,7 @@ import {
   UserNameTypographySx,
   RoleCellSx,
   EmailTypographySx,
+  actionContainerSx,
 } from "./CommonRowColumnUtils.styled";
 
 const CreatedAtCell = ({ row }) => (
@@ -55,7 +56,7 @@ const ActionsCell = ({
 
   return (
     <>
-      <Box width="100%" display="flex" justifyContent="center" gap={1}>
+      <Box sx={actionContainerSx}>
         <Tooltip title="Group" placement="right">
           <IconButton size="small" onClick={() => setGroupDialogOpen(true)}>
             <img src={GroupIcon} alt="group" width={16} height={16} />

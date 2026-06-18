@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 
-// ─── DataGrid column definitions ─────────────────────────────────────────────
+
 export const getAuditColumns = (theme) => [
   {
     field: "createdBy",
@@ -54,13 +54,13 @@ export const getAuditColumns = (theme) => [
   },
 ];
 
-// ─── Table container ─────────────────────────────────────────────────────────
+
 export const tableContainerSx = {
   width: "100%",
   mt: 1,
 };
 
-// ─── Back button wrapper ──────────────────────────────────────────────────────
+
 export const backButtonWrapperSx = {
   pt: 2,
   mt: 1,
@@ -68,7 +68,7 @@ export const backButtonWrapperSx = {
   justifyContent: "center",
 };
 
-// ─── Back button ─────────────────────────────────────────────────────────────
+
 export const backButtonSx = {
   minWidth: 200,
   backgroundColor: "#1a3a6b",

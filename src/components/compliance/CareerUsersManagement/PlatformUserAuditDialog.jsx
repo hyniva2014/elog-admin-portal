@@ -9,7 +9,7 @@ import {
   backButtonSx,
 } from "./PlatformUserAuditDialog.styled";
 
-// ─── Static data ─────────────────────────────────────────────────────────────
+
 const STATIC_GROUP_DATA = [
   { id: 1, createdBy: "John Miller", createdDate: "Dec 11, 2025", createdTime: "06:15 AM", notes: "Note Content Here" },
   { id: 2, createdBy: "John Miller", createdDate: "Dec 12, 2025", createdTime: "06:15 AM", notes: "Note Content Here" },
@@ -18,7 +18,7 @@ const STATIC_GROUP_DATA = [
   { id: 5, createdBy: "John Miller", createdDate: "Dec 15, 2025", createdTime: "06:15 AM", notes: "Note Content Here" },
 ];
 
-// ─── Dialog content ───────────────────────────────────────────────────────────
+
 const GroupDialogContent = ({ onClose }) => {
   const theme = useTheme();
   const columns = getAuditColumns(theme);
@@ -46,7 +46,6 @@ const GroupDialogContent = ({ onClose }) => {
   );
 };
 
-// ─── Main dialog ──────────────────────────────────────────────────────────────
 const PlatformUserAuditDialog = ({ open, onClose }) => {
   return (
     <CommonDialogForm
