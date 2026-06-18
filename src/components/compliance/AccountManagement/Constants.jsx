@@ -159,3 +159,7 @@ export const DEACTIVATION_FIELDS = [
     xs: 12,
   },
 ];
+
+export const AUDIT_LOG_TITLE = "Audit History";
+export const ACCOUNT_HISTORY_TITLE = "Account Audit History";
+export const BACK_BUTTON_TEXT = "Back";

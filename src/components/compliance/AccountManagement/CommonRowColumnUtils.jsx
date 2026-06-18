@@ -7,11 +7,14 @@ import {
   useTheme,
 } from "@mui/material";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import groupIcon from "../../../assets/images/svg/Group.png";
 import dayjs from "dayjs";
+
 import {
   defaultColumnProps,
   getStickyColumnProps,
   getStatusNameFromId,
+  AUDIT_LOG_TITLE,
 } from "./Constants";
 import { getFormattedDateTime } from "../../../common/CommonUtils";
 import { handleOpenStatusChange } from "./utils";
@@ -23,7 +26,7 @@ import {
   TriSwitchThumb,
   TriSwitchZone,
 } from "./AccountManagement.styled";
-import { Datefieldstext, Timefieldstext } from "./CommomRowColumnUtils.styled";
+import { ActionIcon, Datefieldstext, Timefieldstext } from "./CommomRowColumnUtils.styled";
 
 const formatDate = (value) => {
   if (!value || value === "-") return "-";
@@ -50,7 +53,7 @@ const renderDateTimeCell = (dateField, timeField) => (params) => {
   );
 };
 
-const renderActionCell = (onViewAccount, onToggleClick, canUpdate, canView) => (params) => {
+const renderActionCell = (onViewAccount, onToggleClick, onOpenAuditLog, canUpdate, canView) => (params) => {
   const { row } = params;
   const currentStatus = row.status || "Active";
   const theme = useTheme();
@@ -65,6 +68,10 @@ const renderActionCell = (onViewAccount, onToggleClick, canUpdate, canView) => (
     if (canUpdate) {
       handleOpenStatusChange(row, currentStatus, onToggleClick);
     }
+  };
+
+  const handleAuditLogClick = () => {
+    onOpenAuditLog(row);
   };
 
   const tooltipTitle = canUpdate
@@ -85,6 +92,19 @@ const renderActionCell = (onViewAccount, onToggleClick, canUpdate, canView) => (
           }}
         >
           <VisibilityOutlinedIcon sx={actionIconSx} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title={AUDIT_LOG_TITLE}>
+        <IconButton 
+          size="small" 
+          onClick={handleAuditLogClick}
+          sx={actionIconSx}
+        >
+          <ActionIcon
+            component="img"
+            src={groupIcon}
+            alt="Audit Log"
+          />
         </IconButton>
       </Tooltip>
       <Tooltip title={tooltipTitle}>
@@ -111,6 +131,7 @@ const renderActionCell = (onViewAccount, onToggleClick, canUpdate, canView) => (
 export const AccountManagementColumnsData = (
   onViewAccount,
   onToggleClick,
+  onOpenAuditLog,
   canUpdate = true,
   canView = true,
 ) => [
@@ -213,7 +234,7 @@ export const AccountManagementColumnsData = (
     headerName: "Action",
     ...defaultColumnProps,
     sortable: false,
-    renderCell: renderActionCell(onViewAccount, onToggleClick, canUpdate, canView),
+    renderCell: renderActionCell(onViewAccount, onToggleClick, onOpenAuditLog, canUpdate, canView),
   },
 ];
 
