@@ -109,10 +109,10 @@ export const HistoryBackButton = styled(Button)(({ theme }) => ({
   color: theme.palette.common.white,
   fontSize: 14,
   fontWeight: 500,
-  borderRadius: "4px",
+  borderRadius: "8px",
   padding: "10px 40px",
   textTransform: "none",
-  minWidth: "120px",
+  minWidth: "250px",
   boxShadow: "none",
   "&:hover": {
     backgroundColor: theme.palette.brand.dark,
