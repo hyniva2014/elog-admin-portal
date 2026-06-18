@@ -1,27 +1,15 @@
-import React from "react";
-import {
-  Box,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import CommonDialogForm from "../../../common/CommonDialogForm";
+import CommonDataGrid from "../../../common/CommonDataGrid";
 import {
-  getHeaderCellSx,
-  getBodyCellSx,
-  dateTextSx,
-  getTimeTextSx,
+  getAuditColumns,
   tableContainerSx,
   backButtonWrapperSx,
   backButtonSx,
 } from "./PlatformUserAuditDialog.styled";
 
+// ─── Static data ─────────────────────────────────────────────────────────────
 const STATIC_GROUP_DATA = [
   { id: 1, createdBy: "John Miller", createdDate: "Dec 11, 2025", createdTime: "06:15 AM", notes: "Note Content Here" },
   { id: 2, createdBy: "John Miller", createdDate: "Dec 12, 2025", createdTime: "06:15 AM", notes: "Note Content Here" },
@@ -30,44 +18,24 @@ const STATIC_GROUP_DATA = [
   { id: 5, createdBy: "John Miller", createdDate: "Dec 15, 2025", createdTime: "06:15 AM", notes: "Note Content Here" },
 ];
 
-
-const HeaderCell = ({ children, theme }) => (
-  <TableCell sx={getHeaderCellSx(theme)}>{children}</TableCell>
-);
-
-const BodyCell = ({ children, theme }) => (
-  <TableCell sx={getBodyCellSx(theme)}>{children}</TableCell>
-);
-
-
+// ─── Dialog content ───────────────────────────────────────────────────────────
 const GroupDialogContent = ({ onClose }) => {
   const theme = useTheme();
+  const columns = getAuditColumns(theme);
 
   return (
-    <Box>
-      <TableContainer sx={tableContainerSx}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <HeaderCell theme={theme}>Created By</HeaderCell>
-              <HeaderCell theme={theme}>Created On</HeaderCell>
-              <HeaderCell theme={theme}>Notes</HeaderCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {STATIC_GROUP_DATA.map((row) => (
-              <TableRow key={row.id} hover>
-                <BodyCell theme={theme}>{row.createdBy}</BodyCell>
-                <BodyCell theme={theme}>
-                  <Typography sx={dateTextSx}>{row.createdDate}</Typography>
-                  <Typography sx={getTimeTextSx(theme)}>{row.createdTime}</Typography>
-                </BodyCell>
-                <BodyCell theme={theme}>{row.notes}</BodyCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+    <Box sx={tableContainerSx}>
+      <CommonDataGrid
+        columnsData={columns}
+        rowData={STATIC_GROUP_DATA}
+        hideFooter
+        useAutoHeight
+        showMuiLoading={false}
+        showColumnSeparator={false}
+        disableStickyColumns
+        getRowHeight={() => "auto"}
+        data={{}}
+      />
 
       <Box sx={backButtonWrapperSx}>
         <Button variant="contained" onClick={onClose} sx={backButtonSx}>
@@ -78,7 +46,7 @@ const GroupDialogContent = ({ onClose }) => {
   );
 };
 
-
+// ─── Main dialog ──────────────────────────────────────────────────────────────
 const PlatformUserAuditDialog = ({ open, onClose }) => {
   return (
     <CommonDialogForm

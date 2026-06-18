@@ -49,6 +49,8 @@ const CommonDataGrid = ({
   showMuiLoading = true,
   useAutoHeight = false,
   isRowSelectable = null,
+  showColumnSeparator = true,
+  disableStickyColumns = false,
 }) => {
   const pagePaginationModel = {
     page: (data.page || 1) - 1,
@@ -191,7 +193,7 @@ const CommonDataGrid = ({
     );
   };
 
-  const updatedColumns = applyEqualWidth(columnsData);
+  const updatedColumns = disableStickyColumns ? columnsData : applyEqualWidth(columnsData);
 
   const enhancedColumns = updatedColumns.map((col) => {
     const isSortable = col.sortable !== false;
@@ -230,6 +232,7 @@ const CommonDataGrid = ({
         paginationMode="server"
         disableColumnMenu
         disableColumnSorting
+        disableColumnResize={showColumnSeparator}
         pageSizeOptions={[10]}
         disableVirtualization
         disableRowSelectionOnClick
@@ -255,6 +258,18 @@ const CommonDataGrid = ({
         }}
         sx={(theme) => ({
           ...gridSx(theme),
+          ...(!showColumnSeparator && {
+            "& .MuiDataGrid-columnSeparator": {
+              display: "none !important",
+              visibility: "hidden !important",
+            },
+            "& .MuiDataGrid-columnSeparator--resizable": {
+              display: "none !important",
+            },
+            "& .MuiDataGrid-iconSeparator": {
+              display: "none !important",
+            },
+          }),
         })}
       />
     </Box>
