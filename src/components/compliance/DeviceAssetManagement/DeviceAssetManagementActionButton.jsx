@@ -4,7 +4,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import GroupIcon from "../../../assets/images/svg/Group.png";
 
-import { actionIconSx, DeleteIconSx } from "./DeviceAssetManagement.styles";
+import { actionIconSx, DeleteIconSx, HistoryIcon } from "./DeviceAssetManagement.styles";
 
 const DeviceAssetManagementActionButton = React.memo(
   ({ row, onView, onDelete, onHistory, canView = true, canDelete = true }) => {
@@ -49,7 +49,7 @@ const DeviceAssetManagementActionButton = React.memo(
         </Tooltip>
         <Tooltip title="Audit History">
           <IconButton size="small" onClick={handleHistoryClick}>
-            <img src={GroupIcon} alt="Device History" style={{ width: 20, height: 20 }} />
+            <HistoryIcon src={GroupIcon} alt="Device History" />
           </IconButton>
         </Tooltip>
         <Tooltip title={tooltipTitle}>

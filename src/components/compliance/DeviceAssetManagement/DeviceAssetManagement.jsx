@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import dayjs from "dayjs";
-import { Box, Button, Typography } from "@mui/material";
+import useDeviceHistory from "./useDeviceHistory";
+import DeviceAssetHistoryModalContent from "./DeviceAssetHistoryModalContent";
 import CommonDataGrid from "@src/common/CommonDataGrid";
 import { PageContainer } from "../../../common/PageContainer";
 import CommonLoading from "../../../common/CommonLoading";
@@ -91,8 +92,8 @@ const DeviceAssetManagement = () => {
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [deviceToDelete, setDeviceToDelete] = useState(null);
-  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-  const [deviceHistoryData, setDeviceHistoryData] = useState([]);
+  const { historyData, isHistoryModalOpen, fetchHistory, closeHistoryModal } =
+    useDeviceHistory(fetchApi, setLoading);
 
   const user_name = useSelector(
       (state) => state.loginSlice.loginDetails?.body?.data?.userdetails?.user_name,
@@ -331,38 +332,6 @@ const DeviceAssetManagement = () => {
     setIsDeleteConfirmOpen(true);
   }, [canDelete, handleSnackbar]);
 
-  const handleHistoryClick = useCallback(async (row) => {
-    try {
-      setLoading(true);
-      // TODO: Update with actual API endpoint when provided by backend
-      const response = await fetchApi(`/masteradmin/get-device-history?device_id=${row.id}`);
-
-      let apiData = response?.body?.data || response?.data || response?.body || [];
-      if (!Array.isArray(apiData)) apiData = [];
-
-      const transformedData = apiData.map((item) => ({
-        created_by: item.created_by || item.user_name || "-",
-        created_date: item.created_date || "-",
-        created_time: item.created_time || "",
-        notes: item.notes || "-",
-      }));
-
-      setDeviceHistoryData(transformedData);
-      setIsHistoryModalOpen(true);
-      setLoading(false);
-    } catch (error) {
-      console.error("Fetch Device History Error:", error);
-      setLoading(false);
-      setDeviceHistoryData([]);
-      setIsHistoryModalOpen(true);
-    }
-  }, [fetchApi, setLoading]);
-
-  const handleCloseHistoryModal = useCallback(() => {
-    setIsHistoryModalOpen(false);
-    setDeviceHistoryData([]);
-  }, []);
-
   const handleCloseDeleteConfirm = useCallback(() => {
     setIsDeleteConfirmOpen(false);
     setDeviceToDelete(null);
@@ -506,9 +475,19 @@ const DeviceAssetManagement = () => {
     setSelectedRows(newSelection);
   };
 
+  const columnHandlers = useMemo(
+    () => ({ onView: handleViewClick, onDelete: handleDeleteClick, onHistory: fetchHistory }),
+    [handleViewClick, handleDeleteClick, fetchHistory],
+  );
+
+  const columnPermissions = useMemo(
+    () => ({ canView, canDelete }),
+    [canView, canDelete],
+  );
+
   const columns = useMemo(
-    () => getColumns(handleViewClick, handleDeleteClick, handleHistoryClick, canView, canDelete),
-    [handleViewClick, handleDeleteClick, handleHistoryClick, canView, canDelete],
+    () => getColumns(columnHandlers, columnPermissions),
+    [columnHandlers, columnPermissions],
   );
 
   const gridData = {
@@ -696,97 +675,18 @@ const DeviceAssetManagement = () => {
 
       <CommonDialogForm
         open={isHistoryModalOpen}
-        onCancel={handleCloseHistoryModal}
-        onClose={handleCloseHistoryModal}
+        onCancel={closeHistoryModal}
+        onClose={closeHistoryModal}
         mode="view"
         title="Device Asset Management"
         formId="deviceHistoryForm"
         loading={false}
         maxWidth="sm"
         content={
-          <Box sx={{ padding: "16px" }}>
-            <Box>
-              {/* Header Row */}
-              <Box
-                sx={{
-                  display: "flex",
-                  backgroundColor: "#F5F5F5",
-                  padding: "12px 16px",
-                  borderTop: "1px solid #E5E7EB",
-                  borderBottom: "1px solid #E5E7EB",
-                }}
-              >
-                <Typography sx={{ flex: 1, fontWeight: 500, fontSize: 14, color: "#374151" }}>
-                  Created By
-                </Typography>
-                <Typography sx={{ flex: 1, fontWeight: 500, fontSize: 14, color: "#374151" }}>
-                  Created On
-                </Typography>
-                <Typography sx={{ flex: 1, fontWeight: 500, fontSize: 14, color: "#374151" }}>
-                  Notes
-                </Typography>
-              </Box>
-              {/* Data Rows */}
-              {deviceHistoryData.length > 0 ? (
-                deviceHistoryData.map((history, index) => (
-                  <Box
-                    key={index}
-                    sx={{
-                      display: "flex",
-                      padding: "12px 16px",
-                      borderBottom: "1px solid #E5E7EB",
-                      backgroundColor: "#FFFFFF",
-                      alignItems: "flex-start",
-                    }}
-                  >
-                    <Typography sx={{ flex: 1, fontSize: 14, color: "#111827" }}>
-                      {history.created_by || "-"}
-                    </Typography>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography sx={{ fontSize: 14, color: "#111827" }}>
-                        {history.created_date || "-"}
-                      </Typography>
-                      <Typography sx={{ fontSize: 12, color: "#6B7280" }}>
-                        {history.created_time || ""}
-                      </Typography>
-                    </Box>
-                    <Typography sx={{ flex: 1, fontSize: 14, color: "#111827" }}>
-                      {history.notes || "-"}
-                    </Typography>
-                  </Box>
-                ))
-              ) : (
-                <Box sx={{ padding: "32px", textAlign: "center" }}>
-                  <Typography sx={{ fontSize: 14, color: "#6B7280" }}>
-                    No Rows
-                  </Typography>
-                </Box>
-              )}
-            </Box>
-            <Box sx={{ display: "flex", justifyContent: "center", marginTop: 3 }}>
-              <Button
-                variant="contained"
-                onClick={handleCloseHistoryModal}
-                sx={{
-                  backgroundColor: "#284495",
-                  color: "#FFFFFF",
-                  fontSize: 14,
-                  fontWeight: 500,
-                  borderRadius: "4px",
-                  padding: "10px 40px",
-                  textTransform: "none",
-                  minWidth: "120px",
-                  boxShadow: "none",
-                  "&:hover": {
-                    backgroundColor: "#1e3570",
-                    boxShadow: "none",
-                  },
-                }}
-              >
-                Back
-              </Button>
-            </Box>
-          </Box>
+          <DeviceAssetHistoryModalContent
+            historyData={historyData}
+            onClose={closeHistoryModal}
+          />
         }
       />
     </>

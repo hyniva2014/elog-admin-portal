@@ -3,6 +3,7 @@ import { Box, Button, Typography } from "@mui/material";
 
 export const COLORS = {
   primary: "#284495",
+  primaryDark: "#1e3570",
   white: "#FFFFFF",
   lightBlue: "#F3F8FF",
   success: "#2e7d32",
@@ -11,6 +12,9 @@ export const COLORS = {
   warning: "#ed6c02",
   orange: "#FFA726",
   textPrimary: "#111827",
+  textSecondary: "#374151",
+  borderLight: "#E5E7EB",
+  bgLight: "#F5F5F5",
 };
 
 export const HeaderContainer = styled(Box)(({ theme }) => ({
@@ -78,4 +82,43 @@ export const DeleteIconSx = (isOutOfService, canDelete) => (theme) => ({
     isOutOfService || !canDelete
       ? theme.palette.action.disabled
       : theme.palette.error.main,
+});
+
+export const HistoryIcon = styled("img")({
+  width: 20,
+  height: 20,
+});
+
+export const HistoryContentWrapper = styled(Box)({
+  marginTop: 12,
+  marginLeft: -12,
+  marginRight: -12,
+});
+
+export const HistoryTimeText = styled(Typography)({
+  fontSize: 12,
+  color: COLORS.grey,
+});
+
+export const HistoryBackButtonWrapper = styled(Box)({
+  display: "flex",
+  justifyContent: "center",
+  marginTop: 24,
+  paddingBottom: 8,
+});
+
+export const HistoryBackButton = styled(Button)({
+  backgroundColor: COLORS.primary,
+  color: COLORS.white,
+  fontSize: 14,
+  fontWeight: 500,
+  borderRadius: "4px",
+  padding: "10px 40px",
+  textTransform: "none",
+  minWidth: "120px",
+  boxShadow: "none",
+  "&:hover": {
+    backgroundColor: COLORS.primaryDark,
+    boxShadow: "none",
+  },
 });
