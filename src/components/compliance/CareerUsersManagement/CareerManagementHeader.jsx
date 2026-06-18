@@ -12,7 +12,7 @@ import {
 } from "./CareerManagementHeader.styled";
 
 const CareerManagementHeader = (props) => {
-  const { data = [], setData, searchKey = {}, summaryCards, addData } = props;
+  const { data = [], setData, searchKey = {}, summaryCards, addData, canCreate = true } = props;
   const { getDriverOptions } = useCareerUsers();
   const [driverOptions, setDriverOptions] = useState([]);
 
@@ -27,8 +27,6 @@ const CareerManagementHeader = (props) => {
     }
   }, [companyId]);
 
-  const canCreate = true;
-
   const handleAddCareerUser = (event) => {
     if (!canCreate) {
       event.preventDefault();
@@ -36,7 +34,9 @@ const CareerManagementHeader = (props) => {
       return;
     }
 
-    addData();
+    if (addData && typeof addData === 'function') {
+      addData();
+    }
   };
 
   const statusOptions = [

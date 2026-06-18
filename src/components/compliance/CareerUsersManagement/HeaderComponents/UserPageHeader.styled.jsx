@@ -57,3 +57,14 @@ export const PageHeaderTitleSx = {
   fontWeight: 700,
   fontSize: 17,
 };
+
+export const EditButtonStyle = (canUpdate) => (theme) => ({
+  ...(canUpdate
+    ? {}
+    : {
+        backgroundColor: theme.palette.grey[400],
+        "&:hover": {
+          backgroundColor: theme.palette.grey[400],
+        },
+      }),
+});

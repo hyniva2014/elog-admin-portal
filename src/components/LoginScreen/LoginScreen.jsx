@@ -16,7 +16,7 @@ import { useDispatch } from "react-redux";
 import CommonSnackbar from "@src/common/CommonSnackbar";
 import { useAuthContext } from "@src/states";
 import TruckLogo from "@src/assets/images/TruckLogo.png";
-import { useServices } from "@src/services/services";
+import { useServices, fetchTokenApi } from "@src/services/services";
 import { setLoginDetails, setLoginPermissions } from "./Loginstore/Login.slice";
 import {
   FieldContainer,
@@ -35,6 +35,9 @@ import {
   SignInButton,
 } from "./LoginScreenstyled";
 import CommonLoading from "../../common/CommonLoading";
+import { formatPermissions } from "../../utils/permissionUtils";
+import { setRolePermissions, clearRolePermissions } from "../compliance/RoleManagement/RolePermissionsSlice";
+import { fetchRoleDetailsApi } from "../compliance/RoleManagement/RolesManagementUtils";
 
 const loginSchema = yup.object().shape({
   username: yup
@@ -135,13 +138,16 @@ const LoginScreen = () => {
         const expiryTime = Date.now() + 30 * 60 * 1000;
         const token = response?.body?.data?.token;
         const permissions = response?.body?.data?.permissions || {};
+        const userdetails = response?.body?.data?.userdetails || {};
 
         if (token) {
           localStorage.setItem("token", token);
         }
 
-        localStorage.setItem("permissions", JSON.stringify(permissions));
-        dispatch(setLoginPermissions(permissions));
+        const formattedPermissions = formatPermissions(permissions);
+        localStorage.setItem("permissions", JSON.stringify(formattedPermissions));
+        dispatch(setLoginPermissions(formattedPermissions));
+        dispatch(clearRolePermissions());
         dispatch(
           setLoginDetails({
             ...response,
@@ -152,8 +158,8 @@ const LoginScreen = () => {
         if (token) {
           saveSession({
             token,
-            permissions,
-            userdetails: response?.body?.data?.userdetails,
+            permissions: formattedPermissions,
+            userdetails,
           });
         }
         navigate(location.state?.from?.pathname || "/dashboard");

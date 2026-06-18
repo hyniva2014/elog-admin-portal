@@ -14,19 +14,22 @@ export const isRequestApproved = (status) => status === "Approved";
 const ActionCell = (params) => {
   const { row, colDef } = params;
   const isApproved = isRequestApproved(row.status);
+  const canView = colDef.canView ?? true;
 
   const handleClick = useCallback(() => {
-    if (!isApproved) {
+    if (!isApproved && canView) {
       colDef.onView?.(row);
     }
-  }, [row, colDef, isApproved]);
+  }, [row, colDef, isApproved, canView]);
+
+  const isViewDisabled = isApproved || !canView;
 
   return (
     <IconButton
       size="small"
       color="primary"
       onClick={handleClick}
-      disabled={isApproved}
+      disabled={isViewDisabled}
     >
       <AssignmentIcon fontSize="small" />
     </IconButton>

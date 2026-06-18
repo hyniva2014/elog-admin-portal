@@ -1,11 +1,14 @@
 import React, { useCallback, useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import dayjs from "dayjs";
 import CommonDataGrid from "@src/common/CommonDataGrid";
 import { PageContainer } from "../../../common/PageContainer";
 import CommonLoading from "../../../common/CommonLoading";
+import AccessControl from "../../../common/AccessControl";
 import DeviceManagementHeader from "./DeviceManagementHeader";
 import { useServices } from "../../../services/services";
 import CommonSnackbar from "../../../common/CommonSnackbar";
+import { usePermissionRefresh } from "@src/hooks/usePermissionRefresh";
 import {
   columns,
   transformDeviceData,
@@ -17,6 +20,7 @@ import {
 } from "../../../common/CommonUtils";
 import AssignDevicesToCarriers from "./AssignDevicesToCarriers";
 import { useLocation } from "react-router-dom";
+import usePermissions from "../../../hooks/usePermissions";
 
 const isDeviceSelectable = (params) => {
   return params.row.status?.toLowerCase() === "unassigned";
@@ -27,6 +31,16 @@ const DeviceManagement = () => {
   const defaultStatus = location.state?.status;
   const { fetchApi, createApi } = useServices();
   const { setLoading, LoadingContainer } = CommonLoading();
+  const { refreshPermissions } = usePermissionRefresh();
+  const { checkPermission } = usePermissions();
+  const dispatch = useDispatch();
+  const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
+
+  const canViewAll = checkPermission("Device Management", "DEVICE_VIEW_ALL");
+
+  useEffect(() => {
+    refreshPermissions(fetchApi);
+  }, [refreshPermissions, fetchApi]);
 
   const [allRows, setAllRows] = useState([]);
   const [dynamicSummaryCards, setDynamicSummaryCards] = useState([]);
@@ -136,6 +150,7 @@ const DeviceManagement = () => {
   return (
     <>
       <LoadingContainer />
+    <AccessControl hasAccess={canViewAll}>
       <PageContainer>
         <DeviceManagementHeader
           data={data}
@@ -157,6 +172,7 @@ const DeviceManagement = () => {
           getRowHeight={() => "auto"}
         />
       </PageContainer>
+    </AccessControl>
       <CommonSnackbar
         open={snackbar.open}
         message={snackbar.message}

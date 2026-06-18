@@ -8,3 +8,7 @@ export const StatusText = styled("span")(({ theme, statuscolor }) => {
     fontWeight: 400,
   };
 });
+
+export const ViewIconButtonSx = (canView) => ({
+  opacity: canView ? 1 : 0.5,
+});

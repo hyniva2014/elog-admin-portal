@@ -1,6 +1,7 @@
 import CommonPageHeader from "../../../common/CommonPageHeader";
 import CommonFilters from "../../../common/CommonFilters";
 import { HeaderContainer } from "./RequestDevice.styled";
+import { Button } from "@mui/material";
 
 const RequestDeviceHeader = ({
   data,
@@ -8,6 +9,7 @@ const RequestDeviceHeader = ({
   searchKey,
   statusOptions,
   handleRequestDeviceClick,
+  canCreate,
 }) => {
   const requestDeviceFilters = (statusOptions) => [
     {
@@ -17,14 +19,22 @@ const RequestDeviceHeader = ({
     },
   ];
 
+  const isCreateDisabled = !canCreate || !handleRequestDeviceClick;
+
   return (
     <HeaderContainer>
       <CommonPageHeader
         title="Requested Devices"
-        addButton={true}
-        addButtonText="Request Device"
-        handleClick={handleRequestDeviceClick}
         showExport={false}
+        rightContent={
+          <Button
+            variant="contained"
+            onClick={handleRequestDeviceClick}
+            disabled={isCreateDisabled}
+          >
+            Request Device
+          </Button>
+        }
       />
       <CommonFilters
         data={data}

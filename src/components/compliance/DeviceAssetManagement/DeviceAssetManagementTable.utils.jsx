@@ -15,13 +15,19 @@ const StatusCell = (params) => (
   </StatusTypography>
 );
 
-const ActionCell = (onView, onDelete) => {
+const ActionCell = (onView, onDelete, canView, canDelete) => {
   return (params) => (
-    <DeviceAssetManagementActionButton row={params.row} onView={onView} onDelete={onDelete} />
+    <DeviceAssetManagementActionButton
+      row={params.row}
+      onView={onView}
+      onDelete={onDelete}
+      canView={canView}
+      canDelete={canDelete}
+    />
   );
 };
 
-export const getColumns = (onView, onDelete) => [
+export const getColumns = (onView, onDelete, canView = true, canDelete = true) => [
   {
     field: "serialNumber",
     headerName: "Serial Number",
@@ -134,7 +140,7 @@ export const getColumns = (onView, onDelete) => [
     headerAlign: "center",
     sortable: false,
     headerTooltip: true,
-    renderCell: ActionCell(onView, onDelete),
+    renderCell: ActionCell(onView, onDelete, canView, canDelete),
   },
 ];
 

@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-
+import { useDispatch, useSelector } from "react-redux";
 import CommonSummaryCardGroup from "../../../common/CommonSummaryCardGroup";
 import { PageContainer } from "../component.styled";
 import CarrierGrowthTrend from "./CarrierGrowthTrend";
 import CommonAlertCenter from "./AlertCenter";
 import IncidentDistribution from "./IncidentDistribution";
 import DeviceLifecycleStatus from "../../compliance/DeviceManagement/DeviceLifecycleStatus";
+import AccessControl from "../../../common/AccessControl";
 import {
   StretchGridContainer,
   ChartGrid,
@@ -28,6 +29,8 @@ import CommonLoading from "../../../common/CommonLoading";
 import { useNavigate } from "react-router-dom";
 import { useServices } from "../../../services/services";
 import { useAlertCenter } from "./useAlertCenter";
+import { usePermissions } from "../../../hooks/usePermissions";
+import { usePermissionRefresh } from "../../../hooks/usePermissionRefresh";
 
 const getTodayRange = () => {
   const today = new Date();
@@ -48,8 +51,19 @@ const getTodayRange = () => {
 };
 
 const AdminDashboard = () => {
-  const [selectedRange, setSelectedRange] = useState(getTodayRange());
   const { setLoading, LoadingContainer } = CommonLoading();
+  const { checkPermission, permissions } = usePermissions();
+  const dispatch = useDispatch();
+  const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
+  const { fetchApi } = useServices();
+  const canViewMetrics = checkPermission("Dashboard", "DASHBOARD_METRICS");
+  const canViewAll = canViewMetrics; 
+  const { refreshPermissions } = usePermissionRefresh();
+  useEffect(() => {
+    refreshPermissions(fetchApi);
+  }, [refreshPermissions, fetchApi]);
+
+  const [selectedRange, setSelectedRange] = useState(getTodayRange());
 
   const { dashboardMetrics } = useDashboardMetrics(selectedRange, setLoading);
 
@@ -57,8 +71,6 @@ const AdminDashboard = () => {
     alerts: [],
     isLoading: false,
   });
-
-  const { fetchApi } = useServices();
 
   const { fetchData: fetchAlerts } = useAlertCenter(setAlertData, fetchApi);
 
@@ -145,8 +157,10 @@ const AdminDashboard = () => {
       ? selectedRange.date
       : `${selectedRange.startDate} - ${selectedRange.endDate}`;
   return (
-    <PageContainer>
+    <>
       <LoadingContainer />
+      <AccessControl hasAccess={canViewAll}>
+        <PageContainer>
       {/* Header */}
       <HeaderContainer>
         <HeaderLeft>
@@ -188,6 +202,8 @@ const AdminDashboard = () => {
         </DeviceGrid>
       </StretchGridContainer>
     </PageContainer>
+      </AccessControl>
+    </>
   );
 };
 

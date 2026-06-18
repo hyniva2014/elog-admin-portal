@@ -3,37 +3,55 @@ import { IconButton, Tooltip } from "@mui/material";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
-import { actionIconSx } from "./DeviceAssetManagement.styles";
+import { actionIconSx, DeleteIconSx } from "./DeviceAssetManagement.styles";
 
 const DeviceAssetManagementActionButton = React.memo(
-  ({ row, onView, onDelete }) => {
+  ({ row, onView, onDelete, canView = true, canDelete = true }) => {
     const handleViewClick = useCallback(() => {
-      onView(row);
-    }, [onView, row]);
+      if (canView) {
+        onView(row);
+      }
+    }, [onView, row, canView]);
 
     const handleDeleteClick = useCallback(() => {
-      onDelete(row);
-    }, [onDelete, row]);
+      if (canDelete) {
+        onDelete(row);
+      }
+    }, [onDelete, row, canDelete]);
 
     const isOutOfService = row.status === "Out of Service";
 
+    const iconStyle = canView ? actionIconSx : { color: "action.disabled" };
+
+    const tooltipTitle = isOutOfService
+      ? "Out of Service"
+      : canDelete
+        ? "Delete"
+        : "No permission to delete";
+
+    const isDeleteDisabled = isOutOfService || !canDelete;
+
     return (
       <div style={{ display: "flex", gap: "8px" }}>
-        <Tooltip title="View">
-          <IconButton size="small" onClick={handleViewClick}>
-            <VisibilityOutlinedIcon sx={actionIconSx} />
+        <Tooltip title={canView ? "View" : "No permission to view"}>
+          <IconButton
+            size="small"
+            onClick={handleViewClick}
+            disabled={!canView}
+          >
+            <VisibilityOutlinedIcon sx={iconStyle} />
           </IconButton>
         </Tooltip>
-        <Tooltip title={isOutOfService ? "Out of Service" : "Delete"}>
+        <Tooltip
+          title={tooltipTitle}
+        >
           <span>
             <IconButton
               size="small"
               onClick={handleDeleteClick}
-              disabled={isOutOfService}
+              disabled={isDeleteDisabled}
             >
-              <DeleteOutlineIcon
-                sx={isOutOfService ? { color: "action.disabled" } : { color: "#E02020" }}
-              />
+              <DeleteOutlineIcon sx={DeleteIconSx(isOutOfService, canDelete)} />
             </IconButton>
           </span>
         </Tooltip>

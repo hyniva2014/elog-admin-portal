@@ -1,8 +1,8 @@
 import React from "react";
 import { EditButton, CancelEditButton, AddButton } from "./DeviceModelManagement.styled";
 
-export const HeaderEditButton = ({ onClick }) => (
-  <EditButton variant="contained" onClick={onClick}>
+export const HeaderEditButton = ({ onClick, disabled }) => (
+  <EditButton variant="contained" onClick={onClick} disabled={disabled}>
     Edit
   </EditButton>
 );
@@ -13,8 +13,8 @@ export const HeaderCancelEditButton = ({ onClick }) => (
   </CancelEditButton>
 );
 
-export const HeaderAddButton = ({ onClick }) => (
-  <AddButton variant="contained" onClick={onClick}>
+export const HeaderAddButton = ({ onClick, disabled }) => (
+  <AddButton variant="contained" onClick={onClick} disabled={disabled}>
     Add Asset
   </AddButton>
 );

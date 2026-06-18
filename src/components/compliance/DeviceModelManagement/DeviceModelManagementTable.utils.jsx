@@ -34,17 +34,17 @@ const StatusCell = (params) => (
 );
 const ELogsCell = (params) => <ELogsCellComponent value={params.value} />;
 
-const ActionCell = ({ row, onView }) => (
-  <DeviceModelManagementActionButton row={row} onView={onView} />
+const ActionCell = ({ row, onView, canView }) => (
+  <DeviceModelManagementActionButton row={row} onView={onView} canView={canView} />
 );
 
-const createActionCellRenderer = (onView) => (params) => (
-  <ActionCell row={params.row} onView={onView} />
+const createActionCellRenderer = (onView, canView) => (params) => (
+  <ActionCell row={params.row} onView={onView} canView={canView} />
 );
 
 const renderDateCell = (params) => formatDate(params.value);
 
-export const getColumns = (onView) => [
+export const getColumns = (onView, canView = true) => [
   {
     field: "model",
     headerName: "Model",
@@ -146,6 +146,6 @@ export const getColumns = (onView) => [
     minWidth: 100,
     sortable: false,
     headerTooltip: true,
-    renderCell: createActionCellRenderer(onView),
+    renderCell: createActionCellRenderer(onView, canView),
   },
 ];

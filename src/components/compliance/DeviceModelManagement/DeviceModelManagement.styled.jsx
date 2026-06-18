@@ -12,6 +12,10 @@ export const AddButton = styled(Button)(({ theme }) => ({
   fontSize: theme.typography.pxToRem(14),
   fontWeight: 400,
   borderRadius: theme.shape.borderRadius * 2,
+  '&.Mui-disabled': {
+    backgroundColor: theme.palette.grey[300],
+    color: theme.palette.grey[500],
+  },
 }));
 
 export const SummaryCardBox = styled(Box)(({ theme }) => ({
@@ -34,6 +38,11 @@ export const EditButton = styled(Button)(({ theme }) => ({
   backgroundColor: theme.palette.sidebar.main,
   border: `1px solid ${theme.palette.sidebar.main}`,
   borderRadius: theme.shape.borderRadius * 2,
+  '&.Mui-disabled': {
+    backgroundColor: theme.palette.grey[300],
+    color: theme.palette.grey[500],
+    border: `1px solid ${theme.palette.grey[300]}`,
+  },
 }));
 
 export const CancelEditButton = styled(Button)(({ theme }) => ({
@@ -53,7 +62,11 @@ export const ELogsTypography = styled(Typography)(({ value, theme }) => ({
   color: value === "Yes" ? theme.palette.success.main : theme.palette.grey[600],
 }));
 
-export const StyledActionIcon = styled(VisibilityOutlinedIcon)(({ theme }) => ({
-  fontSize: 20,
-  color: theme.palette.text.secondary,
-}));
+export const StyledActionIcon = styled(VisibilityOutlinedIcon)(
+  ({ theme, canView }) => ({
+    fontSize: 20,
+    color: canView
+      ? theme.palette.text.secondary
+      : theme.palette.action.disabled,
+  })
+);

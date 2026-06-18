@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Grid } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { useServices } from "../../../services/services";
 import CommonLoading from "../../../common/CommonLoading";
 import CommonTextField from "../../../common/CommonTextField";
 import CommonSnackbar from "../../../common/CommonSnackbar";
 import PermissionCardItem from "./PermissionCardItem";
+import { usePermissionRefresh } from "../../../hooks/usePermissionRefresh";
 
 import {
   fetchRoleDetailsApi,
@@ -33,6 +35,9 @@ const RolePermissions = () => {
   const { fetchApi, createApi } = useServices();
 
   const { setLoading, LoadingContainer } = CommonLoading();
+  const dispatch = useDispatch();
+  const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
+  const { refreshPermissions } = usePermissionRefresh();
 
   const [roleData, setRoleData] = useState(null);
 
@@ -175,6 +180,7 @@ const RolePermissions = () => {
       const response = await syncRolePermissionsApi(createApi, payload);
 
       if (response?.statusCode === 200) {
+        await refreshPermissions(fetchApi);
         handleSnackbar(
           response?.body?.message || "Role permissions updated successfully",
           "success",
