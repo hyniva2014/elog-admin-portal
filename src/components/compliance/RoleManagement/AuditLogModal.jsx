@@ -1,8 +1,10 @@
 import React, { useMemo } from "react";
 import CommonDataGrid from "../../../common/CommonDataGrid";
 import CommonDialogForm from "../../../common/CommonDialogForm";
-import { BackButton, BackButtonContainer } from "./CommomRowColumnUtils.styled";
-import { ACCOUNT_HISTORY_TITLE, BACK_BUTTON_TEXT } from "./Constants";
+import { BackButton, BackButtonContainer } from "./RoleManagement.styled";
+
+const ROLE_AUDIT_HISTORY_TITLE = "Role Audit History";
+const BACK_BUTTON_TEXT = "Back";
 
 const AuditLogModal = ({ open, onClose, auditData = [] }) => {
   const columns = useMemo(
@@ -79,7 +81,7 @@ const AuditLogModal = ({ open, onClose, auditData = [] }) => {
   return (
     <CommonDialogForm
       open={open}
-      title={ACCOUNT_HISTORY_TITLE}
+      title={ROLE_AUDIT_HISTORY_TITLE}
       content={content}
       onClose={onClose}
       mode="view"
