@@ -3,7 +3,6 @@ import { Box, Button, Typography } from "@mui/material";
 
 export const COLORS = {
   primary: "#284495",
-  primaryDark: "#1e3570",
   white: "#FFFFFF",
   lightBlue: "#F3F8FF",
   success: "#2e7d32",
@@ -13,8 +12,6 @@ export const COLORS = {
   orange: "#FFA726",
   textPrimary: "#111827",
   textSecondary: "#374151",
-  borderLight: "#E5E7EB",
-  bgLight: "#F5F5F5",
 };
 
 export const HeaderContainer = styled(Box)(({ theme }) => ({
@@ -95,10 +92,10 @@ export const HistoryContentWrapper = styled(Box)({
   marginRight: -12,
 });
 
-export const HistoryTimeText = styled(Typography)({
+export const HistoryTimeText = styled(Typography)(({ theme }) => ({
   fontSize: 12,
-  color: COLORS.grey,
-});
+  color: theme.palette.text.secondary,
+}));
 
 export const HistoryBackButtonWrapper = styled(Box)({
   display: "flex",
@@ -107,9 +104,9 @@ export const HistoryBackButtonWrapper = styled(Box)({
   paddingBottom: 8,
 });
 
-export const HistoryBackButton = styled(Button)({
-  backgroundColor: COLORS.primary,
-  color: COLORS.white,
+export const HistoryBackButton = styled(Button)(({ theme }) => ({
+  backgroundColor: theme.palette.brand.main,
+  color: theme.palette.common.white,
   fontSize: 14,
   fontWeight: 500,
   borderRadius: "4px",
@@ -118,7 +115,7 @@ export const HistoryBackButton = styled(Button)({
   minWidth: "120px",
   boxShadow: "none",
   "&:hover": {
-    backgroundColor: COLORS.primaryDark,
+    backgroundColor: theme.palette.brand.dark,
     boxShadow: "none",
   },
-});
+}));

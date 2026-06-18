@@ -15,6 +15,8 @@ const CreatedOnCell = (params) => (
   </Box>
 );
 
+const getHistoryRowHeight = () => "auto";
+
 const HISTORY_COLUMNS = [
   {
     field: "created_by",
@@ -46,7 +48,7 @@ const DeviceAssetHistoryModalContent = ({ historyData, onClose }) => (
       hideFooter
       useAutoHeight
       showMuiLoading={false}
-      getRowHeight={() => "auto"}
+      getRowHeight={getHistoryRowHeight}
     />
     <HistoryBackButtonWrapper>
       <HistoryBackButton variant="contained" onClick={onClose}>
