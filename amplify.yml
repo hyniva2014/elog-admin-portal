@@ -12,9 +12,8 @@ frontend:
     build:
       commands:
         - echo "Current branch: $AWS_BRANCH"
-        - ls -la   # ✅ shows files to debug
+        - ls -la
 
-        # ✅ Safe env handling
         - |
           if [ "$AWS_BRANCH" = "preprod" ] && [ -f ".env.preprod" ]; then
             echo "Using PREPROD environment"
