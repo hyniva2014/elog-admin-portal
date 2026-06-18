@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useCallback, useMemo } from "react";
 import { deleteCookie } from "cookies-next";
 import { ELOG_API_GATEWAY_URL } from "./serviceUtils";
 import { store } from "../store/reduxSlice";
@@ -50,7 +51,7 @@ export const useServices = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userDetails = useSelector((state) => state.loginSlice);
-  const token = userDetails?.loginDetails?.body?.data?.token;
+  const token = useMemo(() => userDetails?.loginDetails?.body?.data?.token, [userDetails?.loginDetails?.body?.data?.token]);
 
   const getAuthHeaders = () => {
     if (!token) return {};
@@ -59,7 +60,7 @@ export const useServices = () => {
     };
   };
 
-  const fetchApi = async (endUrl) => {
+  const fetchApi = useCallback(async (endUrl) => {
     try {
       const response = await axios.get(`${ELOG_API_GATEWAY_URL}${endUrl}`, {
         headers: {
@@ -79,9 +80,9 @@ export const useServices = () => {
       }
       return error?.response?.data;
     }
-  };
+  }, [token, dispatch, navigate]);
 
-  const createApi = async (payload, endUrl) => {
+  const createApi = useCallback(async (payload, endUrl) => {
     try {
       const isPublicEndpoint =
         endUrl.includes("/masteradmin/login") ||
@@ -110,9 +111,9 @@ export const useServices = () => {
       }
       return error?.response?.data;
     }
-  };
+  }, [token, dispatch, navigate]);
 
-  const updateApi = async (payload, endUrl) => {
+  const updateApi = useCallback(async (payload, endUrl) => {
     try {
       const response = await axios.put(
         `${ELOG_API_GATEWAY_URL}${endUrl}`,
@@ -135,9 +136,9 @@ export const useServices = () => {
       }
       return error?.response?.data;
     }
-  };
+  }, [token, dispatch, navigate]);
 
-  const deleteApi = async (payload, endUrl) => {
+  const deleteApi = useCallback(async (payload, endUrl) => {
     try {
       const response = await axios.delete(`${ELOG_API_GATEWAY_URL}${endUrl}`, {
         payload,
@@ -157,7 +158,7 @@ export const useServices = () => {
       }
       return error?.response?.data;
     }
-  };
+  }, [token, dispatch, navigate]);
 
   return {
     fetchApi,
