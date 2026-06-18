@@ -1,6 +1,8 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import dayjs from "dayjs";
+import useDeviceHistory from "./useDeviceHistory";
+import DeviceAssetHistoryModalContent from "./DeviceAssetHistoryModalContent";
 import CommonDataGrid from "@src/common/CommonDataGrid";
 import { PageContainer } from "../../../common/PageContainer";
 import CommonLoading from "../../../common/CommonLoading";
@@ -90,6 +92,8 @@ const DeviceAssetManagement = () => {
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [deviceToDelete, setDeviceToDelete] = useState(null);
+  const { historyData, isHistoryModalOpen, fetchHistory, closeHistoryModal } =
+    useDeviceHistory(fetchApi, setLoading);
 
   const user_name = useSelector(
       (state) => state.loginSlice.loginDetails?.body?.data?.userdetails?.user_name,
@@ -471,9 +475,19 @@ const DeviceAssetManagement = () => {
     setSelectedRows(newSelection);
   };
 
+  const columnHandlers = useMemo(
+    () => ({ onView: handleViewClick, onDelete: handleDeleteClick, onHistory: fetchHistory }),
+    [handleViewClick, handleDeleteClick, fetchHistory],
+  );
+
+  const columnPermissions = useMemo(
+    () => ({ canView, canDelete }),
+    [canView, canDelete],
+  );
+
   const columns = useMemo(
-    () => getColumns(handleViewClick, handleDeleteClick, canView, canDelete),
-    [handleViewClick, handleDeleteClick, canView, canDelete],
+    () => getColumns(columnHandlers, columnPermissions),
+    [columnHandlers, columnPermissions],
   );
 
   const gridData = {
@@ -657,6 +671,23 @@ const DeviceAssetManagement = () => {
         cancelText="Cancel"
         onConfirm={handleConfirmDelete}
         onCancel={handleCloseDeleteConfirm}
+      />
+
+      <CommonDialogForm
+        open={isHistoryModalOpen}
+        onCancel={closeHistoryModal}
+        onClose={closeHistoryModal}
+        mode="view"
+        title="Device Asset Management"
+        formId="deviceHistoryForm"
+        loading={false}
+        maxWidth="sm"
+        content={
+          <DeviceAssetHistoryModalContent
+            historyData={historyData}
+            onClose={closeHistoryModal}
+          />
+        }
       />
     </>
   );
