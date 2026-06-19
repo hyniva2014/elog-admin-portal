@@ -1,17 +1,14 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import PlatformUserAuditDialog from "./PlatformUserAuditDialog";
 
-jest.mock("../CareerUsersManagement/Constants", () => [
-  {
-    id: 1,
-    createdBy: "John Miller",
-    createdDate: "Dec 11, 2025",
-    createdTime: "06:15 AM",
-    notes: "Account Created",
-  },
-]);
+const mockFetchApi = jest.fn();
+
+jest.mock("../../../services/services", () => ({
+  useServices: () => ({
+    fetchApi: mockFetchApi,
+  }),
+}));
 
 jest.mock("../../../common/CommonDialogForm", () => ({
   __esModule: true,
@@ -35,58 +32,129 @@ jest.mock("../../../common/CommonDataGrid", () => ({
   ),
 }));
 
+const mockAuditResponse = {
+  statusCode: 200,
+  body: {
+    audit_logs: [
+      {
+        id: 12,
+        role_id: 49,
+        description: "Description changed from Audit Test to Test Audit",
+        created_by: "Emil watson",
+        created_at: "2026-06-18T05:50:46-05:00",
+      },
+      {
+        id: 11,
+        role_id: 49,
+        description: "Permission Create carrier user disabled",
+        created_by: "Emil watson",
+        created_at: "2026-06-18T05:49:47-05:00",
+      },
+    ],
+    pagination: {
+      total_records: 2,
+      total_pages: 1,
+      current_page: 1,
+      limit: 10,
+    },
+  },
+};
+
 describe("PlatformUserAuditDialog", () => {
   const mockOnClose = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockFetchApi.mockResolvedValue(mockAuditResponse);
   });
 
   it("renders dialog title when open is true", () => {
     render(
-      <PlatformUserAuditDialog open={true} onClose={mockOnClose} />
+      <PlatformUserAuditDialog open={true} onClose={mockOnClose} userId={42} />,
     );
 
     expect(
-      screen.getByText("Platform User Audit History")
+      screen.getByText("Platform User Audit History"),
     ).toBeInTheDocument();
   });
 
   it("renders CommonDataGrid", () => {
     render(
-      <PlatformUserAuditDialog open={true} onClose={mockOnClose} />
+      <PlatformUserAuditDialog open={true} onClose={mockOnClose} userId={42} />,
     );
 
-    expect(
-      screen.getByTestId("common-data-grid")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
   });
 
-  it("renders audit data in grid", () => {
+  it("fetches and displays audit log data", async () => {
     render(
-      <PlatformUserAuditDialog open={true} onClose={mockOnClose} />
+      <PlatformUserAuditDialog open={true} onClose={mockOnClose} userId={42} />,
     );
 
-    expect(screen.getByText("Account Created")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText("Description changed from Audit Test to Test Audit"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Permission Create carrier user disabled"),
+      ).toBeInTheDocument();
+    });
   });
 
-  it("calls onClose when Back button is clicked", () => {
+  it("calls fetchApi with correct endpoint", async () => {
     render(
-      <PlatformUserAuditDialog open={true} onClose={mockOnClose} />
+      <PlatformUserAuditDialog open={true} onClose={mockOnClose} userId={42} />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: /back/i }));
+    await waitFor(() => {
+      expect(mockFetchApi).toHaveBeenCalledWith(
+        "/masteradmin/platformUser/audit-logs?page=1&limit=10&platform_user_id=42",
+      );
+    });
+  });
 
-    expect(mockOnClose).toHaveBeenCalledTimes(1);
+  it("calls onClose when Back button is clicked", async () => {
+    render(
+      <PlatformUserAuditDialog open={true} onClose={mockOnClose} userId={42} />,
+    );
+
+    await waitFor(() => {
+      fireEvent.click(screen.getByRole("button", { name: /back/i }));
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
+    });
   });
 
   it("does not render dialog when open is false", () => {
     render(
-      <PlatformUserAuditDialog open={false} onClose={mockOnClose} />
+      <PlatformUserAuditDialog open={false} onClose={mockOnClose} userId={42} />,
     );
 
     expect(
-      screen.queryByText("Platform User Audit History")
+      screen.queryByText("Platform User Audit History"),
     ).not.toBeInTheDocument();
+  });
+
+  it("renders empty grid when API returns no logs", async () => {
+    mockFetchApi.mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        audit_logs: [],
+        pagination: { total_records: 0 },
+      },
+    });
+
+    render(
+      <PlatformUserAuditDialog open={true} onClose={mockOnClose} userId={99} />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("common-data-grid")).toBeInTheDocument();
+    });
+  });
+
+  it("does not fetch when userId is not provided", () => {
+    render(<PlatformUserAuditDialog open={true} onClose={mockOnClose} />);
+
+    expect(mockFetchApi).not.toHaveBeenCalled();
   });
 });

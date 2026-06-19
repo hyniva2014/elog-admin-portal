@@ -91,6 +91,7 @@ const ActionsCell = ({
       <PlatformUserAuditDialog
         open={groupDialogOpen}
         onClose={() => setGroupDialogOpen(false)}
+        userId={row.id}
       />
     </>
   );

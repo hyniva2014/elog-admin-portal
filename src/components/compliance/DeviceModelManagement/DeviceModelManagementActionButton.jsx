@@ -44,6 +44,7 @@ const DeviceModelManagementActionButton = React.memo(
         <DeviceModelAuditDialog
           open={auditDialogOpen}
           onClose={() => setAuditDialogOpen(false)}
+          deviceModelId={row.id}
         />
       </>
     );
