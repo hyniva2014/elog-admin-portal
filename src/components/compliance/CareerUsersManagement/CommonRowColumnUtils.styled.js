@@ -36,3 +36,9 @@ export const EmailTypographySx = (theme) => ({
   fontSize: 13,
   color: theme.palette.text.secondary,
 });
+export const actionContainerSx = {
+  width: "100%",
+  display: "flex",
+  justifyContent: "center",
+  gap: 1,
+};

@@ -1,38 +1,67 @@
-import React, { useCallback } from "react";
-import eyeIcon from "../../../assets/images/svg/eyeicon.png";
-import { Box, IconButton, Typography } from "@mui/material";
-import { StatusText, ViewIconButtonSx } from "./CommonRowColumnUtils.styled";
-import { USER_STATUS, USER_STATUS_COL_CONFIG } from "./Constants";
+import React, { useState, useCallback } from "react";
 import dayjs from "dayjs";
+import { Box, IconButton, Typography, Tooltip } from "@mui/material";
+
+import eyeIcon from "../../../assets/images/svg/eyeicon.png";
+import GroupIcon from "../../../assets/images/svg/Group.png";
+
+import UserManagementGroupDialog from "./UserManagementGroupDialog";
+import { StatusText } from "./CommonRowColumnUtils.styled";
+import { USER_STATUS, USER_STATUS_COL_CONFIG } from "./Constants";
 import { getFormattedDateTime } from "../../../common/CommonUtils";
+import { ActionContainer, GroupIconImage } from "./UserManagementGroupDialog.styles";
 
 const formatDate = (iso) => (iso ? dayjs(iso).format("DD-MM-YYYY") : "-");
 
 const StatusCell = (params) => {
   const color =
     USER_STATUS_COL_CONFIG[params.value]?.colorKey || "text.primary";
+
   return <StatusText statuscolor={color}>{params.value || "-"}</StatusText>;
 };
 
-const ActionCell = (canView) => (params) => {
-  const handleClick = useCallback(() => {
+const ActionCellComponent = ({ params, canView }) => {
+  const [groupDialogOpen, setGroupDialogOpen] = useState(false);
+
+  const handleViewClick = useCallback(() => {
     if (canView) {
       params.colDef.onView?.(params.row);
     }
   }, [params, canView]);
 
   return (
-    <IconButton 
-      size="small" 
-      color="primary" 
-      onClick={handleClick}
-      disabled={!canView}
-      sx={ViewIconButtonSx(canView)}
-    >
-      <img src={eyeIcon} alt="view" width={16} height={16} />
-    </IconButton>
+    <>
+      <ActionContainer>
+        <Tooltip title="Group">
+          <IconButton size="small" onClick={() => setGroupDialogOpen(true)}>
+            <GroupIconImage component="img" src={GroupIcon} alt="group" />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title={canView ? "View" : "No permission"} placement="right">
+          <span>
+            <IconButton
+              size="small"
+              disabled={!canView}
+              onClick={handleViewClick}
+            >
+              <img src={eyeIcon} alt="view" width={16} height={16} />
+            </IconButton>
+          </span>
+        </Tooltip>
+      </ActionContainer>
+
+      <UserManagementGroupDialog
+        open={groupDialogOpen}
+        onClose={() => setGroupDialogOpen(false)}
+      />
+    </>
   );
 };
+
+const ActionCell = (canView) => (params) => (
+  <ActionCellComponent params={params} canView={canView} />
+);
 
 export const UserManagementColumnData = (canView = true) => [
   {

@@ -11,6 +11,7 @@ export const COLORS = {
   warning: "#ed6c02",
   orange: "#FFA726",
   textPrimary: "#111827",
+  textSecondary: "#374151",
 };
 
 export const HeaderContainer = styled(Box)(({ theme }) => ({
@@ -79,3 +80,42 @@ export const DeleteIconSx = (isOutOfService, canDelete) => (theme) => ({
       ? theme.palette.action.disabled
       : theme.palette.error.main,
 });
+
+export const HistoryIcon = styled("img")({
+  width: 20,
+  height: 20,
+});
+
+export const HistoryContentWrapper = styled(Box)({
+  marginTop: 12,
+  marginLeft: -12,
+  marginRight: -12,
+});
+
+export const HistoryTimeText = styled(Typography)(({ theme }) => ({
+  fontSize: 12,
+  color: theme.palette.text.secondary,
+}));
+
+export const HistoryBackButtonWrapper = styled(Box)({
+  display: "flex",
+  justifyContent: "center",
+  marginTop: 24,
+  paddingBottom: 8,
+});
+
+export const HistoryBackButton = styled(Button)(({ theme }) => ({
+  backgroundColor: theme.palette.brand.main,
+  color: theme.palette.common.white,
+  fontSize: 14,
+  fontWeight: 500,
+  borderRadius: "8px",
+  padding: "10px 40px",
+  textTransform: "none",
+  minWidth: "250px",
+  boxShadow: "none",
+  "&:hover": {
+    backgroundColor: theme.palette.brand.dark,
+    boxShadow: "none",
+  },
+}));

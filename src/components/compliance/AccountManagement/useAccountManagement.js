@@ -378,6 +378,31 @@ export const useAccountManagement = (
     [fetchApi],
   );
 
+  const fetchAuditLog = useCallback(
+    async (companyId) => {
+      try {
+        const endUrl = `/masteradmin/audit-log?company_id=${companyId}`;
+        const response = await fetchApi(endUrl);
+
+        if (response?.statusCode === 200 && response?.body?.data) {
+          const responseData = response?.body?.data;
+          const records = extractRecordsFromResponse(responseData);
+          return transformAuditLogRecords(records);
+        } else {
+          return [];
+        }
+      } catch (err) {
+        console.error("Error fetching audit log:", err);
+        handleSnackbar(
+          "Failed to fetch audit log. Please try again.",
+          "error",
+        );
+        return [];
+      }
+    },
+    [fetchApi, handleSnackbar],
+  );
+
   return {
     buildFetchUrl,
     fetchData,
@@ -387,5 +412,25 @@ export const useAccountManagement = (
     fetchContactsDropdown,
     fetchCompaniesDropdown,
     fetchCarrierOptions,
+    fetchAuditLog,
   };
+};
+
+const extractRecordsFromResponse = (responseData) => {
+  if (!responseData) return [];
+
+  const data = responseData?.data;
+  if (data) {
+    return Array.isArray(data) ? data : [data];
+  }
+
+  return Array.isArray(responseData) ? responseData : [responseData];
+};
+
+const transformAuditLogRecords = (records) => {
+  return records.map((record) => ({
+    createdBy: record.created_by || record.user || "-",
+    createdOn: record.created_on || record.timestamp || "-",
+    notes: record.notes || record.details || record.action || "-",
+  }));
 };
