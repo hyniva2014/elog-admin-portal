@@ -8,7 +8,7 @@ import {
   CreatedDateText,
   CreatedTimeText,
 } from "./DeviceModelAuditDialog.styled";
-import { STATIC_GROUP_DATA } from "../DeviceModelManagement/Constants";
+import { STATIC_GROUP_DATA } from "./Constants";
 
 const getAuditColumns = () => [
   {
