@@ -240,9 +240,24 @@ export const NoDataBox = styled(Box)(({ theme }) => ({
 }));
 
 
+export const INCIDENT_FALLBACK_PALETTE = [
+  "#2563EB",
+  "#DC2626",
+  "#16A34A",
+  "#D97706",
+  "#7C3AED",
+  "#0891B2",
+  "#DB2777",
+  "#65A30D",
+  "#4F46E5",
+  "#EA580C",
+  "#0D9488",
+  "#9333EA",
+];
+
 export const getIncidentColors = (theme) => ({
   HOS: theme.palette.error.main,
-  "Mobile - Driver Log": theme.palette.error.dark,
+  LOGS: theme.palette.grey[500],
   DVIR: theme.palette.success.main,
   DOT: theme.palette.warning.main,
   ACCIDENT: theme.palette.secondary.main,
@@ -257,4 +272,5 @@ export const getIncidentColors = (theme) => ({
   USERS: theme.palette.success.light,
   "REPORT INCIDENT": theme.palette.error.main,
   REPORTS: theme.palette.primary.dark,
+  "FLEET MANAGEMENT": theme.palette.custom.teal,
 });
