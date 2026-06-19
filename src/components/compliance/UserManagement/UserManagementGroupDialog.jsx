@@ -2,8 +2,15 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonDataGrid from "../../../common/CommonDataGrid";
-import { ActionBox, BackButton, CreatedDateText, CreatedOnWrapper, CreatedTimeText, DataGridWrapper } from "./UserManagementGroupDialog.styles";
-import { STATIC_GROUP_DATA } from "../DeviceAssetManagement/Constants";
+import {
+  ActionBox,
+  BackButton,
+  CreatedDateText,
+  CreatedOnWrapper,
+  CreatedTimeText,
+  DataGridWrapper,
+} from "./UserManagementGroupDialog.styles";
+import { STATIC_GROUP_DATA } from "../DeviceModelManagement/Constants";
 
 const columns = [
   {
