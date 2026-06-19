@@ -1,75 +1,45 @@
-import { Box, Typography } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { Box, Button, Typography } from "@mui/material";
 
-export const getAuditColumns = (theme) => [
-  {
-    field: "createdBy",
-    headerName: "Created By",
-    sortable: false,
-    flex: 1,
-    minWidth: 0,
-    width: undefined,
-    maxWidth: undefined,
-  },
-  {
-    field: "createdDate",
-    headerName: "Created On",
-    sortable: false,
-    flex: 1,
-    minWidth: 0,
-    width: undefined,
-    maxWidth: undefined,
-    renderCell: ({ row }) => (
-      <Box>
-        <Typography
-          sx={{
-            fontSize: "0.875rem",
-            fontWeight: 500,
-            lineHeight: 1,
-            color: theme.palette.text.primary,
-          }}
-        >
-          {row.createdDate}
-        </Typography>
-        <Typography
-          sx={{
-            fontSize: "0.75rem",
-            color: theme.palette.text.secondary,
-            lineHeight: 1.4,
-          }}
-        >
-          {row.createdTime}
-        </Typography>
-      </Box>
-    ),
-  },
-  {
-    field: "notes",
-    headerName: "Notes",
-    sortable: false,
-    flex: 1,
-    minWidth: 0,
-    width: undefined,
-    maxWidth: undefined,
-  },
-];
-
-export const tableContainerSx = {
+export const DataGridWrapper = styled(Box)({
   width: "100%",
-  mt: 1,
-};
+  marginTop: 8,
+});
 
-export const backButtonWrapperSx = {
-  pt: 2,
-  mt: 1,
+export const ActionBox = styled(Box)(({ theme }) => ({
+  paddingTop: theme.spacing(2),
+  marginTop: theme.spacing(1),
   display: "flex",
   justifyContent: "center",
-};
+}));
 
-export const backButtonSx = {
+export const BackButton = styled(Button)(({ theme }) => ({
   minWidth: 200,
-  backgroundColor: "#1a3a6b",
-  "&:hover": { backgroundColor: "#14306a" },
+  backgroundColor: theme.palette.sidebar.main,
   textTransform: "none",
   fontWeight: 600,
-  borderRadius: 1,
-};
+  borderRadius: theme.spacing(1),
+  "&:hover": {
+    backgroundColor: theme.palette.sidebar.dark,
+  },
+}));
+
+export const CreatedOnWrapper = styled(Box)({
+  display: "flex",
+  flexDirection: "column",
+  gap: 0,
+});
+
+export const CreatedDateText = styled(Typography)({
+  fontSize: "0.875rem",
+  fontWeight: 500,
+  lineHeight: 1.2,
+});
+
+export const CreatedTimeText = styled(Typography)(({ theme }) => ({
+  fontSize: "0.75rem",
+  color: theme.palette.text.secondary,
+  lineHeight: 1.2,
+}));
+
+

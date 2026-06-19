@@ -1,91 +1,84 @@
-import { Box, Button } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonDataGrid from "../../../common/CommonDataGrid";
 import {
-  getAuditColumns,
-  tableContainerSx,
-  backButtonWrapperSx,
-  backButtonSx,
+  DataGridWrapper,
+  ActionBox,
+  BackButton,
+  CreatedOnWrapper,
+  CreatedDateText,
+  CreatedTimeText,
 } from "./DeviceModelAuditDialog.styled";
+import { STATIC_GROUP_DATA } from "../DeviceModelManagement/Constants";
 
-const STATIC_AUDIT_DATA = [
+const getAuditColumns = () => [
   {
-    id: 1,
-    createdBy: "John Miller",
-    createdDate: "Dec 11, 2025",
-    createdTime: "06:15 AM",
-    notes: "Account Created",
+    field: "createdBy",
+    headerName: "Created By",
+    sortable: false,
+    flex: 1,
+    minWidth: 0,
+    width: undefined,
+    maxWidth: undefined,
   },
   {
-    id: 2,
-    createdBy: "John Miller",
-    createdDate: "Dec 12, 2025",
-    createdTime: "06:15 AM",
-    notes: "Note Content Here",
+    field: "createdDate",
+    headerName: "Created On",
+    sortable: false,
+    flex: 1,
+    minWidth: 0,
+    width: undefined,
+    maxWidth: undefined,
+    renderCell: ({ row }) => (
+      <CreatedOnWrapper>
+        <CreatedDateText>{row.createdDate}</CreatedDateText>
+        <CreatedTimeText>{row.createdTime}</CreatedTimeText>
+      </CreatedOnWrapper>
+    ),
   },
   {
-    id: 3,
-    createdBy: "John Miller",
-    createdDate: "Dec 12, 2025",
-    createdTime: "06:15 AM",
-    notes: "carrier requested 100 devices",
-  },
-  {
-    id: 4,
-    createdBy: "John Miller",
-    createdDate: "Dec 12, 2025",
-    createdTime: "06:15 AM",
-    notes: " 100 Devices assigned ",
-  },
-  {
-    id: 5,
-    createdBy: "John Miller",
-    createdDate: "Dec 15, 2025",
-    createdTime: "06:15 AM",
-    notes: "Note Content Here",
+    field: "notes",
+    headerName: "Notes",
+    sortable: false,
+    flex: 1,
+    minWidth: 0,
+    width: undefined,
+    maxWidth: undefined,
   },
 ];
 
-const AuditDialogContent = ({ onClose }) => {
-  const theme = useTheme();
-  const columns = getAuditColumns(theme);
+const AUDIT_COLUMNS = getAuditColumns();
 
-  return (
-    <Box sx={tableContainerSx}>
-      <CommonDataGrid
-        columnsData={columns}
-        rowData={STATIC_AUDIT_DATA}
-        hideFooter
-        useAutoHeight
-        showMuiLoading={false}
-        showColumnSeparator={false}
-        disableStickyColumns
-        getRowHeight={() => "auto"}
-        data={{}}
-      />
-
-      <Box sx={backButtonWrapperSx}>
-        <Button variant="contained" onClick={onClose} sx={backButtonSx}>
-          Back
-        </Button>
-      </Box>
-    </Box>
-  );
-};
-
-const DeviceModelAuditDialog = ({ open, onClose }) => {
-  return (
-    <CommonDialogForm
-      open={open}
-      title="Device Model Audit History"
-      content={<AuditDialogContent onClose={onClose} />}
-      onCancel={onClose}
-      onClose={onClose}
-      mode="view"
-      maxWidth="md"
+const AuditDialogContent = ({ onClose }) => (
+  <DataGridWrapper>
+    <CommonDataGrid
+      columnsData={AUDIT_COLUMNS}
+      rowData={STATIC_GROUP_DATA}
+      hideFooter
+      useAutoHeight
+      showMuiLoading={false}
+      showColumnSeparator={false}
+      disableStickyColumns
+      getRowHeight={() => "auto"}
+      data={{}}
     />
-  );
-};
+    <ActionBox>
+      <BackButton variant="contained" onClick={onClose}>
+        Back
+      </BackButton>
+    </ActionBox>
+  </DataGridWrapper>
+);
+
+const DeviceModelAuditDialog = ({ open, onClose }) => (
+  <CommonDialogForm
+    open={open}
+    title="Device Model Audit History"
+    content={<AuditDialogContent onClose={onClose} />}
+    onCancel={onClose}
+    onClose={onClose}
+    mode="view"
+    maxWidth="md"
+  />
+);
 
 export default DeviceModelAuditDialog;
