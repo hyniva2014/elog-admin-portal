@@ -36,7 +36,10 @@ import {
 } from "./LoginScreenstyled";
 import CommonLoading from "../../common/CommonLoading";
 import { formatPermissions } from "../../utils/permissionUtils";
-import { setRolePermissions, clearRolePermissions } from "../compliance/RoleManagement/RolePermissionsSlice";
+import {
+  setRolePermissions,
+  clearRolePermissions,
+} from "../compliance/RoleManagement/RolePermissionsSlice";
 import { fetchRoleDetailsApi } from "../compliance/RoleManagement/RolesManagementUtils";
 
 const loginSchema = yup.object().shape({
@@ -79,7 +82,6 @@ const LoginScreen = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  // const [truckId, setTruckId] = useState("");
   const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({});
   const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -145,7 +147,10 @@ const LoginScreen = () => {
         }
 
         const formattedPermissions = formatPermissions(permissions);
-        localStorage.setItem("permissions", JSON.stringify(formattedPermissions));
+        localStorage.setItem(
+          "permissions",
+          JSON.stringify(formattedPermissions),
+        );
         dispatch(setLoginPermissions(formattedPermissions));
         dispatch(clearRolePermissions());
         dispatch(
