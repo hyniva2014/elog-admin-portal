@@ -360,3 +360,40 @@ export const EMPLOYMENT_ENTRY_FIELDS = [
   { name: "emp_history_end_date", label: "End Date", type: "date" },
   { name: "emp_history_duration", label: "Duration", disabled: true },
 ];
+export const STATIC_GROUP_DATA = [
+  {
+    id: 1,
+    createdBy: "John Miller",
+    createdDate: "Dec 11, 2025",
+    createdTime: "06:15 AM",
+    notes: "Note Content Here",
+  },
+  {
+    id: 2,
+    createdBy: "John Miller",
+    createdDate: "Dec 12, 2025",
+    createdTime: "06:15 AM",
+    notes: "Note Content Here",
+  },
+  {
+    id: 3,
+    createdBy: "John Miller",
+    createdDate: "Dec 12, 2025",
+    createdTime: "06:15 AM",
+    notes: "Note Content Here",
+  },
+  {
+    id: 4,
+    createdBy: "John Miller",
+    createdDate: "Dec 12, 2025",
+    createdTime: "06:15 AM",
+    notes: "Note Content Here",
+  },
+  {
+    id: 5,
+    createdBy: "John Miller",
+    createdDate: "Dec 15, 2025",
+    createdTime: "06:15 AM",
+    notes: "Note Content Here",
+  },
+];

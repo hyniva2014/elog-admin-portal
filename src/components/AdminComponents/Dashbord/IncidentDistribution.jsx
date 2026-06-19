@@ -36,6 +36,7 @@ import {
   LegendLabel,
   NoDataBox,
   getIncidentColors,
+  INCIDENT_FALLBACK_PALETTE,
 } from "./IncidentDistribution.styles";
 
 import useIncidentDistribution from "../../../hooks/useIncidentDistribution";
@@ -85,9 +86,11 @@ const IncidentDistribution = () => {
     incidentScope,
   );
   const seriesWithColors =
-    incidentDistribution?.series?.map((item) => ({
+    incidentDistribution?.series?.map((item, index) => ({
       ...item,
-      color: incidentColors[item.name] || theme.palette.grey[500],
+      color:
+        incidentColors[item.name] ||
+        INCIDENT_FALLBACK_PALETTE[index % INCIDENT_FALLBACK_PALETTE.length],
     })) || [];
 
   const handleIncidentChange = (e) => {
