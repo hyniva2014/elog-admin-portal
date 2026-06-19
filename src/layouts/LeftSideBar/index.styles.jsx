@@ -3,7 +3,8 @@ import SimpleBar from "simplebar-react";
 
 export const LeftSideBarWrapper = styled("div")(({ theme, settings }) => {
   const collapsed = settings?.sidenav?.isCollapsed;
-  const width = collapsed ? 80 : 240;
+  const isMobile = settings?.sidenav?.mode === "mobile";
+  const width = isMobile ? 240 : (collapsed ? 80 : 240);
   return {
     backgroundColor: theme.palette.sidebar.main,
     width,
