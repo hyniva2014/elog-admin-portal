@@ -16,6 +16,7 @@ import {
   fetchRoleByIdApi,
   saveRoleApi,
 } from "./RolePermissionsApi";
+import AuditLogModal from "./AuditLogModal";
 
 import {
   Container,
@@ -59,6 +60,8 @@ const RoleManagement = () => {
     message: "",
     severity: "success",
   });
+  const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
+  const [auditLogData, setAuditLogData] = useState([]);
 
   const handleSnackbar = useCallback((message, severity = "info") => {
     setSnackbar({
@@ -218,6 +221,54 @@ const RoleManagement = () => {
     setIsEditing(false);
   }, []);
 
+  const handleOpenAuditLog = useCallback(
+    async (role) => {
+      setLoading(true);
+
+      try {
+        const endUrl = `/masteradmin/audit-log?role_id=${role.id}`;
+        const response = await fetchApi(endUrl);
+
+        if (response?.statusCode === 200 && response?.body?.data) {
+          const responseData = response?.body?.data;
+          const records = responseData?.data
+            ? Array.isArray(responseData.data)
+              ? responseData.data
+              : [responseData.data]
+            : responseData
+              ? Array.isArray(responseData)
+                ? responseData
+                : [responseData]
+              : [];
+
+          const transformedData = records.map((record) => ({
+            createdBy: record.created_by || record.user || "-",
+            createdOn: record.created_on || record.timestamp || "-",
+            notes: record.notes || record.details || record.action || "-",
+          }));
+
+          setAuditLogData(transformedData);
+          setIsAuditLogOpen(true);
+        } else {
+          setAuditLogData([]);
+          setIsAuditLogOpen(true);
+        }
+      } catch (err) {
+        console.error("Error fetching audit log:", err);
+        setAuditLogData([]);
+        setIsAuditLogOpen(true);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchApi, setLoading],
+  );
+
+  const handleCloseAuditLog = useCallback(() => {
+    setIsAuditLogOpen(false);
+    setAuditLogData([]);
+  }, []);
+
   const roleCards = roles.map((role) => {
     const roleData = {
       id: role.id,
@@ -228,7 +279,7 @@ const RoleManagement = () => {
       color: theme.palette.brand.main,
     };
 
-    return <RoleCard key={role.id} role={roleData} onEdit={handleRoleEdit} canView={canView} canUpdate={canUpdate} />;
+    return <RoleCard key={role.id} role={roleData} onEdit={handleRoleEdit} onOpenAuditLog={handleOpenAuditLog} canView={canView} canUpdate={canUpdate} />;
   });
 
   const pageTitle = isEditMode ? "Edit Role" : "Add Role";
@@ -302,6 +353,12 @@ const RoleManagement = () => {
           message={snackbar.message}
           severity={snackbar.severity}
           onClose={handleSnackbarClose}
+        />
+
+        <AuditLogModal
+          open={isAuditLogOpen}
+          onClose={handleCloseAuditLog}
+          auditData={auditLogData}
         />
       </PageContainer>
     </AccessControl>

@@ -28,3 +28,41 @@ export const STATUS_OPTIONS = [
     label: "Inactive",
   },
 ];
+
+export const STATIC_GROUP_DATA = [
+  {
+    id: 1,
+    createdBy: "John Miller",
+    createdDate: "Dec 11, 2025",
+    createdTime: "06:15 AM",
+    notes: "Note Content Here",
+  },
+  {
+    id: 2,
+    createdBy: "John Miller",
+    createdDate: "Dec 12, 2025",
+    createdTime: "06:15 AM",
+    notes: "Note Content Here",
+  },
+  {
+    id: 3,
+    createdBy: "John Miller",
+    createdDate: "Dec 12, 2025",
+    createdTime: "06:15 AM",
+    notes: "Note Content Here",
+  },
+  {
+    id: 4,
+    createdBy: "John Miller",
+    createdDate: "Dec 12, 2025",
+    createdTime: "06:15 AM",
+    notes: "Note Content Here",
+  },
+  {
+    id: 5,
+    createdBy: "John Miller",
+    createdDate: "Dec 15, 2025",
+    createdTime: "06:15 AM",
+    notes: "Note Content Here",
+  },
+];
