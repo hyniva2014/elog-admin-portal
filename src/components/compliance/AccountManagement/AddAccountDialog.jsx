@@ -197,9 +197,7 @@ const AddAccountDialog = ({
   });
 
   useEffect(() => {
-    if (!open) {
-      reset(defaultValues);
-    } else if (initialData) {
+    if (open && initialData) {
       reset(initialData);
     }
   }, [open, reset, initialData]);
@@ -222,9 +220,8 @@ const AddAccountDialog = ({
   );
 
   const handleCancel = useCallback(() => {
-    reset(defaultValues);
     onClose();
-  }, [reset, onClose]);
+  }, [onClose]);
 
   const submitHandler = useCallback(
     (data) => {
@@ -233,9 +230,8 @@ const AddAccountDialog = ({
         maxDevices: Number(data.maxDevices),
         companyId: initialData?.companyId,
       });
-      reset(defaultValues);
     },
-    [onSubmit, initialData, reset],
+    [onSubmit, initialData],
   );
 
   const headerActions = useMemo(() => {
