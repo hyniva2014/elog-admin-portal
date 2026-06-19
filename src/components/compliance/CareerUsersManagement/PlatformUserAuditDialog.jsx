@@ -1,22 +1,54 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonDataGrid from "../../../common/CommonDataGrid";
+import { STATIC_GROUP_DATA } from "./Constants"
 import {
-  getAuditColumns,
+  auditCreatedDateSx,
+  auditCreatedTimeSx,
   tableContainerSx,
   backButtonWrapperSx,
   backButtonSx,
 } from "./PlatformUserAuditDialog.styled";
 
-
-const STATIC_GROUP_DATA = [
-  { id: 1, createdBy: "John Miller", createdDate: "Dec 11, 2025", createdTime: "06:15 AM", notes: "Note Content Here" },
-  { id: 2, createdBy: "John Miller", createdDate: "Dec 12, 2025", createdTime: "06:15 AM", notes: "Note Content Here" },
-  { id: 3, createdBy: "John Miller", createdDate: "Dec 12, 2025", createdTime: "06:15 AM", notes: "Note Content Here" },
-  { id: 4, createdBy: "John Miller", createdDate: "Dec 12, 2025", createdTime: "06:15 AM", notes: "Note Content Here" },
-  { id: 5, createdBy: "John Miller", createdDate: "Dec 15, 2025", createdTime: "06:15 AM", notes: "Note Content Here" },
+const getAuditColumns = (theme) => [
+  {
+    field: "createdBy",
+    headerName: "Created By",
+    sortable: false,
+    flex: 1,
+    minWidth: 0,
+    width: undefined,
+    maxWidth: undefined,
+  },
+  {
+    field: "createdDate",
+    headerName: "Created On",
+    sortable: false,
+    flex: 1,
+    minWidth: 0,
+    width: undefined,
+    maxWidth: undefined,
+    renderCell: ({ row }) => (
+      <Box>
+        <Typography sx={auditCreatedDateSx(theme)}>{row.createdDate}</Typography>
+        <Typography sx={auditCreatedTimeSx(theme)}>{row.createdTime}</Typography>
+      </Box>
+    ),
+  },
+  {
+    field: "notes",
+    headerName: "Notes",
+    sortable: false,
+    flex: 1,
+    minWidth: 0,
+    width: undefined,
+    maxWidth: undefined,
+  },
 ];
+
+
+
 
 
 const GroupDialogContent = ({ onClose }) => {

@@ -1,10 +1,14 @@
-import React, { useCallback } from "react";
-import { IconButton, Tooltip } from "@mui/material";
-import { StyledActionIcon } from "./DeviceModelManagement.styled";
+import React, { useCallback, useState } from "react";
+import { Box, IconButton, Tooltip } from "@mui/material";
+import { StyledActionIcon,actionContainer } from "./DeviceModelManagement.styled";
+import GroupIcon from "../../../assets/images/svg/Group.png";
+import DeviceModelAuditDialog from "./DeviceModelAuditDialog";
 
 const DeviceModelManagementActionButton = React.memo(
   ({ row, onView, canView = true }) => {
-    const handleClick = useCallback(() => {
+    const [auditDialogOpen, setAuditDialogOpen] = useState(false);
+
+    const handleViewClick = useCallback(() => {
       if (canView) {
         onView(row);
       }
@@ -13,15 +17,40 @@ const DeviceModelManagementActionButton = React.memo(
     const viewTitle = canView ? "View" : "No permission to view";
 
     return (
-      <Tooltip title={viewTitle}>
-        <IconButton size="small" onClick={handleClick} disabled={!canView}>
-          <StyledActionIcon canView={canView} />
-        </IconButton>
-      </Tooltip>
+      <>
+        <Box sx={actionContainer}>
+          <Tooltip title="Audit History" placement="top">
+            <IconButton
+              size="small"
+              onClick={() => setAuditDialogOpen(true)}
+            >
+              <img src={GroupIcon} alt="audit history" width={16} height={16} />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title={viewTitle} placement="top">
+            <span>
+              <IconButton
+                size="small"
+                onClick={handleViewClick}
+                disabled={!canView}
+              >
+                <StyledActionIcon canView={canView} />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </Box>
+
+        <DeviceModelAuditDialog
+          open={auditDialogOpen}
+          onClose={() => setAuditDialogOpen(false)}
+        />
+      </>
     );
   },
 );
 
-DeviceModelManagementActionButton.displayName = "DeviceModelManagementActionButton";
+DeviceModelManagementActionButton.displayName =
+  "DeviceModelManagementActionButton";
 
 export default DeviceModelManagementActionButton;
