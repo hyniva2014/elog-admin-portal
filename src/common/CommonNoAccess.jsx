@@ -7,8 +7,8 @@ import {
 
 const CommonNoAccess = ({ height = "80vh", message = "No Access" }) => (
   <Box sx={NoAccessWrapperSx(height)}>
-    <Typography sx={NoAccessTitleSx}>🚫 {message}</Typography>
-    <Typography sx={NoAccessSubtitleSx}>
+    <Typography variant="inherit" sx={NoAccessTitleSx}>🚫 {message}</Typography>
+    <Typography variant="inherit" sx={NoAccessSubtitleSx}>
       You don’t have permission to view this page
     </Typography>
   </Box>

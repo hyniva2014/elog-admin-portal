@@ -1,7 +1,8 @@
-import { Box, Typography } from "@mui/material";
+import { Box, IconButton, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import groupIcon from "../../../assets/images/svg/Group.png";
 import {
   RoleRow,
   LeftSection,
@@ -16,9 +17,10 @@ import {
   ActionsWrapper,
   ViewButton,
   EditButton,
+  AuditLogIcon,
 } from "./RoleCard.styles";
 
-const RoleCard = ({ role, onEdit }) => {
+const RoleCard = ({ role, onEdit, onOpenAuditLog, canView, canUpdate }) => {
   const navigate = useNavigate();
 
   const handleUsersClick = () => {
@@ -31,6 +33,10 @@ const RoleCard = ({ role, onEdit }) => {
 
   const handleEditClick = () => {
     onEdit(role);
+  };
+
+  const handleAuditLogClick = () => {
+    onOpenAuditLog(role);
   };
 
   const avatarLetter = role.title?.charAt(0);
@@ -65,8 +71,21 @@ const RoleCard = ({ role, onEdit }) => {
       </UsersColumn>
       <StatusColumn>{statusComponent}</StatusColumn>
       <ActionsWrapper>
-        <ViewButton onClick={handleViewClick}>{viewIcon}</ViewButton>
-        <EditButton onClick={handleEditClick}>{editIcon}</EditButton>
+
+        <Tooltip title={canView ? "View" : "View - Permission denied"}>
+          <ViewButton onClick={handleViewClick} disabled={!canView}>{viewIcon}</ViewButton>
+        </Tooltip>
+
+        <Tooltip title="Audit History">
+          <IconButton size="small" onClick={handleAuditLogClick}>
+            <AuditLogIcon src={groupIcon} alt="Audit Log" />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title={canUpdate ? "Edit" : "Edit - Permission denied"}>
+          <EditButton onClick={handleEditClick} disabled={!canUpdate}>{editIcon}</EditButton>
+        </Tooltip>
+
       </ActionsWrapper>
     </RoleRow>
   );

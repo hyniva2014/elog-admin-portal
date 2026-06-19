@@ -1,26 +1,46 @@
 import { useCallback, useMemo, useState, useEffect } from "react";
 import { Box } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
 import CommonDataGrid from "@src/common/CommonDataGrid";
 import { PageContainer } from "../../../common/PageContainer";
 import AccountManagementHeader from "./AccountMangementHeader";
 import CommonSnackbar from "../../../common/CommonSnackbar";
 import CommonLoading from "../../../common/CommonLoading";
 import CommonConfirmDialog from "../../../common/CommonConfirmDialog";
+import AccessControl from "../../../common/AccessControl";
 import { GridContainer } from "./AccountManagement.styled";
 import AddAccountDialog from "./AddAccountDialog";
 import StatusSelectDropdown from "./StatusSelectDropdown";
+import AuditLogModal from "./AuditLogModal";
 import { getStatusChangeMessage } from "./utils";
 import { useServices } from "../../../services/services";
 import { defaultPageSize, STATUS_OPTIONS, STATUS_TRANSITION_OPTIONS, getDefaultTargetStatus } from "./Constants";
 import { AccountManagementColumnsData } from "./CommonRowColumnUtils";
 import { useAccountManagement } from "./useAccountManagement";
 import { useLocation } from "react-router-dom";
+import { usePermissions } from "../../../hooks/usePermissions";
+import { usePermissionRefresh } from "../../../hooks/usePermissionRefresh";
 
 const AccountManagement = () => {
   const location = useLocation();
   const statusId = location.state?.statusId;
   const { fetchApi, createApi } = useServices();
   const { setLoading, LoadingContainer } = CommonLoading();
+  const { checkPermission, permissions } = usePermissions();
+  const dispatch = useDispatch();
+  const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
+  
+  const canCreate = useMemo(() => checkPermission("Account Management", "ACCOUNT_CREATE"), [permissions]);
+  const canUpdate = useMemo(() => checkPermission("Account Management", "ACCOUNT_UPDATE"), [permissions]);
+  const canDelete = useMemo(() => checkPermission("Account Management", "ACCOUNT_DELETE"), [permissions]);
+  const canView = useMemo(() => checkPermission("Account Management", "ACCOUNT_VIEW"), [permissions]);
+  const canViewAll = useMemo(() => checkPermission("Account Management", "ACCOUNT_VIEW_ALL"), [permissions]);
+
+  const { refreshPermissions } = usePermissionRefresh();
+  useEffect(() => {
+    refreshPermissions(fetchApi);
+  }, [refreshPermissions, fetchApi]);
+  
   const [searchKey, setSearchKey] = useState(0);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -38,6 +58,8 @@ const AccountManagement = () => {
   const [isStatusChangeOpen, setIsStatusChangeOpen] = useState(false);
   const [statusChangeData, setStatusChangeData] = useState(null);
   const [selectedTargetStatus, setSelectedTargetStatus] = useState("");
+  const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
+  const [auditLogData, setAuditLogData] = useState([]);
 
   const getDefaultFilters = () => {
     return {
@@ -122,6 +144,11 @@ const AccountManagement = () => {
     setSelectedTargetStatus(event.target.value);
   }, []);
 
+  const handleCloseAuditLog = useCallback(() => {
+    setIsAuditLogOpen(false);
+    setAuditLogData([]);
+  }, []);
+
   const {
     buildFetchUrl,
     fetchData,
@@ -131,6 +158,7 @@ const AccountManagement = () => {
     fetchContactsDropdown,
     fetchCompaniesDropdown,
     fetchCarrierOptions,
+    fetchAuditLog,
   } = useAccountManagement(
     companyId,
     primaryContactName,
@@ -150,6 +178,23 @@ const AccountManagement = () => {
     setSelectedCompany,
     fetchApi,
     createApi,
+  );
+
+  const handleOpenAuditLog = useCallback(
+    async (row) => {
+      setLoading(true);
+      try {
+        const auditData = await fetchAuditLog(row.id);
+        setAuditLogData(auditData);
+        setIsAuditLogOpen(true);
+      } catch (err) {
+        console.error("Error opening audit log:", err);
+        setAuditLogData([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchAuditLog, setLoading],
   );
 
   const handleConfirmStatusChange = useCallback(
@@ -237,8 +282,8 @@ const AccountManagement = () => {
 
   const columns = useMemo(
     () =>
-      AccountManagementColumnsData(handleViewAccount, handleOpenStatusChange),
-    [handleViewAccount, handleOpenStatusChange],
+      AccountManagementColumnsData(handleViewAccount, handleOpenStatusChange, handleOpenAuditLog, canUpdate, canView),
+    [handleViewAccount, handleOpenStatusChange, handleOpenAuditLog, canUpdate, canView],
   );
 
   const initialFormData = selectedCompany
@@ -284,11 +329,14 @@ const AccountManagement = () => {
   return (
     <PageContainer>
       <LoadingContainer />
+      <AccessControl hasAccess={canViewAll}>
+        <>
       <AccountManagementHeader
         data={gridData}
         setData={setData}
         searchKey={searchKey}
         handleClick={handleAddAccount}
+        canCreate={canCreate}
         primaryContactOptions={contactOptions.primaryContactOptions}
         secondaryContactOptions={contactOptions.secondaryContactOptions}
         carrierOptions={carrierOptions}
@@ -305,6 +353,8 @@ const AccountManagement = () => {
           getRowHeight={() => "auto"}
         />
       </GridContainer>
+        </>
+      </AccessControl>
 
       <CommonSnackbar
         open={snackbar.open}
@@ -343,6 +393,12 @@ const AccountManagement = () => {
             />
           )
         }
+      />
+
+      <AuditLogModal
+        open={isAuditLogOpen}
+        onClose={handleCloseAuditLog}
+        auditData={auditLogData}
       />
     </PageContainer>
   );

@@ -16,15 +16,23 @@ const UserManagementHeader = (props) => {
     summaryCards = [],
     handleClick,
     companyOptions = [],
+    canCreate = false,
   } = props;
   const filters = getUserManagementFilters(companyOptions);
+
+  const isCreateButtonDisabled = !canCreate || !handleClick;
+
   return (
     <HeaderContainer>
       <CommonPageHeader
         title="Carrier Users"
         subtitle="Manage career users, view details and activity history"
         rightContent={
-          <AddUserButton variant="contained" onClick={handleClick}>
+          <AddUserButton 
+            variant="contained" 
+            onClick={handleClick}
+            disabled={isCreateButtonDisabled}
+          >
             Add User
           </AddUserButton>
         }

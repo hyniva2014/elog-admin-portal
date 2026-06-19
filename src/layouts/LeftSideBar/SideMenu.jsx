@@ -36,6 +36,7 @@ import {
   menuListSx,
   chevronContainerSx,
 } from "./SideMenu.styles";
+import { useFilteredMenuItems } from "@src/common/menu-items-rbac";
 
 const MenuIcon = ({ icon, size }) => {
   if (!icon) return null;
@@ -277,7 +278,7 @@ const MenuItem = ({ item, theme, activeMenuItems, isCollapsed, onNavigate }) => 
   );
 };
 
-const SideMenu = ({ menuItems, isCollapsed }) => {
+const SideMenu = ({ menuItems: propMenuItems, isCollapsed }) => {
   const location = useLocation();
   const { settings, updateSidenav } = useLayoutContext();
   const [activeMenuItems, setActiveMenuItems] = useState([]);
@@ -287,7 +288,8 @@ const SideMenu = ({ menuItems, isCollapsed }) => {
     [settings.sidenav.theme],
   );
 
-  const filteredMenuItems = useMemo(() => menuItems || [], [menuItems]);
+  const filteredMenuItemsFromHook = useFilteredMenuItems();
+  const filteredMenuItems = useMemo(() => propMenuItems || filteredMenuItemsFromHook, [propMenuItems, filteredMenuItemsFromHook]);
 
   const activateMenu = useCallback(() => {
     const match = getMenuItemFromURL(filteredMenuItems, location.pathname);

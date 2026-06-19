@@ -5,6 +5,7 @@ import { LuChevronRight } from "react-icons/lu";
 import { Link, useLocation } from "react-router-dom";
 import { useLayoutContext } from "@src/states";
 import { getLeftbarTheme } from "@src/layouts/LeftSideBar/helpers";
+import { useFilteredMenuItems } from "@src/common/menu-items-rbac";
 
 const MenuIcon = ({ icon, size = 16 }) => {
   if (!icon) return null;
@@ -150,7 +151,7 @@ const MenuItem = ({
     </li>;
 };
 const AppMenu = ({
-  menuItems
+  menuItems: propMenuItems
 }) => {
   const location = useLocation();
   const {
@@ -158,6 +159,10 @@ const AppMenu = ({
   } = useLayoutContext();
   const menuRef = useRef(null);
   const [activeMenuItems, setActiveMenuItems] = useState([]);
+  
+  const filteredMenuItems = useFilteredMenuItems();
+  const menuItems = propMenuItems || filteredMenuItems;
+  
   const toggleMenu = (menuItem, show) => {
     if (show) {
       setActiveMenuItems([menuItem["key"], ...findAllParent(menuItems, menuItem)]);

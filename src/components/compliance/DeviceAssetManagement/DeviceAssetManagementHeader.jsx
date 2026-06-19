@@ -26,6 +26,9 @@ const DeviceAssetManagementHeader = (props) => {
     isAssignDeviceEnabled,
     modelOptions = [],
     statusOptions = [],
+    canCreate = false,
+    canAssignDevices = false,
+    canAddBulkAsset = false,
   } = props;
   const { fetchApi } = useServices();
   const [deviceModelOptions, setDeviceModelOptions] = useState([]);
@@ -66,6 +69,9 @@ const DeviceAssetManagementHeader = (props) => {
     { label: "All Status", dataKey: "status", options: resolvedStatusOptions },
   ];
 
+  const isAssignDeviceDisabled =
+  !isAssignDeviceEnabled || !canAssignDevices;
+
   return (
     <HeaderContainer>
       <CommonPageHeader
@@ -77,14 +83,22 @@ const DeviceAssetManagementHeader = (props) => {
             <AddButton
               variant="contained"
               onClick={handleAssignDevices}
-              disabled={!isAssignDeviceEnabled}
+              disabled={isAssignDeviceDisabled}
             >
               Assign Devices
             </AddButton>
-            <AddButton variant="contained" onClick={handleAddAsset}>
+            <AddButton 
+              variant="contained" 
+              onClick={handleAddAsset}
+              disabled={!canAddBulkAsset}
+            >
               Add Bulk Asset
             </AddButton>
-            <AddButton variant="contained" onClick={handleClick}>
+            <AddButton 
+              variant="contained" 
+              onClick={handleClick}
+              disabled={!canCreate}
+            >
               Add Asset
             </AddButton>
           </Box>

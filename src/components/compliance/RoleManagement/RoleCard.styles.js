@@ -156,3 +156,9 @@ export const EditButton = styled(IconButton)(({ theme }) => ({
     backgroundColor: theme.palette.custom.hoverBackground,
   },
 }));
+
+export const AuditLogIcon = styled("img")(({ theme }) => ({
+  width: 18,
+  height: 18,
+  color: theme.palette.text.secondary,
+}));

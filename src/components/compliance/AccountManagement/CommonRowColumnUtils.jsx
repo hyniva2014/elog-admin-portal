@@ -7,11 +7,14 @@ import {
   useTheme,
 } from "@mui/material";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import groupIcon from "../../../assets/images/svg/Group.png";
 import dayjs from "dayjs";
+
 import {
   defaultColumnProps,
   getStickyColumnProps,
   getStatusNameFromId,
+  AUDIT_LOG_TITLE,
 } from "./Constants";
 import { getFormattedDateTime } from "../../../common/CommonUtils";
 import { handleOpenStatusChange } from "./utils";
@@ -23,7 +26,7 @@ import {
   TriSwitchThumb,
   TriSwitchZone,
 } from "./AccountManagement.styled";
-import { Datefieldstext, Timefieldstext } from "./CommomRowColumnUtils.styled";
+import { ActionIcon, Datefieldstext, Timefieldstext } from "./CommomRowColumnUtils.styled";
 
 const formatDate = (value) => {
   if (!value || value === "-") return "-";
@@ -50,31 +53,88 @@ const renderDateTimeCell = (dateField, timeField) => (params) => {
   );
 };
 
-const renderActionCell = (onViewAccount, onToggleClick) => (params) => {
+const renderActionCell = (onViewAccount, onToggleClick, onOpenAuditLog, canUpdate, canView) => (params) => {
   const { row } = params;
   const currentStatus = row.status || "Active";
+  const theme = useTheme();
 
-  const handleViewClick = () => onViewAccount(row);
-  const handleStatusClick = () =>
-    handleOpenStatusChange(row, currentStatus, onToggleClick);
+  const handleViewClick = () => {
+    if (canView) {
+      onViewAccount(row);
+    }
+  };
+
+  const handleStatusClick = () => {
+    if (canUpdate) {
+      handleOpenStatusChange(row, currentStatus, onToggleClick);
+    }
+  };
+
+  const handleAuditLogClick = () => {
+    onOpenAuditLog(row);
+  };
+
+  const tooltipTitle = canUpdate
+  ? `${currentStatus} — click to change status`
+  : `${currentStatus} — Permission denied`;
 
   return (
     <Box display="flex" gap={1} alignItems="center">
-      <Tooltip title="View">
-        <IconButton size="small" onClick={handleViewClick}>
+      <Tooltip title={canView ? "View" : "View - Permission denied"}>
+        <IconButton 
+          size="small" 
+          onClick={handleViewClick}
+          disabled={!canView}
+          sx={{
+            ...actionIconSx,
+            color: !canView ? theme.palette.error.main : "inherit",
+            opacity: !canView ? 0.5 : 1,
+          }}
+        >
           <VisibilityOutlinedIcon sx={actionIconSx} />
         </IconButton>
       </Tooltip>
-      <Tooltip title={`${currentStatus} — click to change status`}>
-        <TriSwitchTrack status={currentStatus} onClick={handleStatusClick}>
-          <TriSwitchThumb status={currentStatus} />
+      <Tooltip title={AUDIT_LOG_TITLE}>
+        <IconButton 
+          size="small" 
+          onClick={handleAuditLogClick}
+          sx={actionIconSx}
+        >
+          <ActionIcon
+            component="img"
+            src={groupIcon}
+            alt="Audit Log"
+          />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title={tooltipTitle}>
+        <TriSwitchTrack 
+          status={currentStatus} 
+          onClick={handleStatusClick}
+          disabled={!canUpdate}
+          sx={{
+            opacity: !canUpdate ? 0.5 : 1,
+          }}
+        >
+          <TriSwitchThumb 
+            status={currentStatus}
+            sx={{
+              color: !canUpdate ? theme.palette.error.main : "inherit",
+            }}
+          />
         </TriSwitchTrack>
       </Tooltip>
     </Box>
   );
 };
 
-export const AccountManagementColumnsData = (onViewAccount, onToggleClick) => [
+export const AccountManagementColumnsData = (
+  onViewAccount,
+  onToggleClick,
+  onOpenAuditLog,
+  canUpdate = true,
+  canView = true,
+) => [
   {
     field: "carrierId",
     headerName: "Carrier ID",
@@ -174,7 +234,7 @@ export const AccountManagementColumnsData = (onViewAccount, onToggleClick) => [
     headerName: "Action",
     ...defaultColumnProps,
     sortable: false,
-    renderCell: renderActionCell(onViewAccount, onToggleClick),
+    renderCell: renderActionCell(onViewAccount, onToggleClick, onOpenAuditLog, canUpdate, canView),
   },
 ];
 

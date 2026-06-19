@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Box, Button } from "@mui/material";
 import { useServices } from "../../../services/services";
 import RoleCard from "./RoleCard";
@@ -6,13 +7,16 @@ import RoleManagementForm from "./RoleManagementForm";
 import { useTheme } from "@mui/material/styles";
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonLoading from "../../../common/CommonLoading";
+import AccessControl from "../../../common/AccessControl";
 import CommonSnackbar from "../../../common/CommonSnackbar";
-
+import { usePermissions } from "@src/hooks/usePermissions";
+import { usePermissionRefresh } from "@src/hooks/usePermissionRefresh";
 import {
   fetchRolesApi,
   fetchRoleByIdApi,
   saveRoleApi,
 } from "./RolePermissionsApi";
+import AuditLogModal from "./AuditLogModal";
 
 import {
   Container,
@@ -29,6 +33,19 @@ const RoleManagement = () => {
   const { fetchApi, createApi } = useServices();
   const theme = useTheme();
   const { setLoading, LoadingContainer } = CommonLoading();
+  const { checkPermission } = usePermissions();
+  const { refreshPermissions } = usePermissionRefresh();
+  const dispatch = useDispatch();
+  const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
+  const canView = checkPermission("Roles Overview", "ROLE_OVERVIEW_VIEW");
+  const canViewAll = checkPermission("Roles Overview", "ROLE_OVERVIEW_VIEW_ALL");
+  const canCreate = checkPermission("Roles Overview", "ROLE_OVERVIEW_CREATE");
+  const canUpdate = checkPermission("Roles Overview", "ROLE_OVERVIEW_UPDATE");
+  const canDelete = checkPermission("Roles Overview", "ROLE_OVERVIEW_DELETE");
+
+  useEffect(() => {
+    refreshPermissions(fetchApi);
+  }, [refreshPermissions, fetchApi]);
   const [roles, setRoles] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [defaultValues, setDefaultValues] = useState({
@@ -43,6 +60,8 @@ const RoleManagement = () => {
     message: "",
     severity: "success",
   });
+  const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
+  const [auditLogData, setAuditLogData] = useState([]);
 
   const handleSnackbar = useCallback((message, severity = "info") => {
     setSnackbar({
@@ -202,6 +221,54 @@ const RoleManagement = () => {
     setIsEditing(false);
   }, []);
 
+  const handleOpenAuditLog = useCallback(
+    async (role) => {
+      setLoading(true);
+
+      try {
+        const endUrl = `/masteradmin/audit-log?role_id=${role.id}`;
+        const response = await fetchApi(endUrl);
+
+        if (response?.statusCode === 200 && response?.body?.data) {
+          const responseData = response?.body?.data;
+          const records = responseData?.data
+            ? Array.isArray(responseData.data)
+              ? responseData.data
+              : [responseData.data]
+            : responseData
+              ? Array.isArray(responseData)
+                ? responseData
+                : [responseData]
+              : [];
+
+          const transformedData = records.map((record) => ({
+            createdBy: record.created_by || record.user || "-",
+            createdOn: record.created_on || record.timestamp || "-",
+            notes: record.notes || record.details || record.action || "-",
+          }));
+
+          setAuditLogData(transformedData);
+          setIsAuditLogOpen(true);
+        } else {
+          setAuditLogData([]);
+          setIsAuditLogOpen(true);
+        }
+      } catch (err) {
+        console.error("Error fetching audit log:", err);
+        setAuditLogData([]);
+        setIsAuditLogOpen(true);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchApi, setLoading],
+  );
+
+  const handleCloseAuditLog = useCallback(() => {
+    setIsAuditLogOpen(false);
+    setAuditLogData([]);
+  }, []);
+
   const roleCards = roles.map((role) => {
     const roleData = {
       id: role.id,
@@ -212,7 +279,7 @@ const RoleManagement = () => {
       color: theme.palette.brand.main,
     };
 
-    return <RoleCard key={role.id} role={roleData} onEdit={handleRoleEdit} />;
+    return <RoleCard key={role.id} role={roleData} onEdit={handleRoleEdit} onOpenAuditLog={handleOpenAuditLog} canView={canView} canUpdate={canUpdate} />;
   });
 
   const pageTitle = isEditMode ? "Edit Role" : "Add Role";
@@ -240,6 +307,7 @@ const RoleManagement = () => {
   return (
     <>
       <LoadingContainer />
+    <AccessControl hasAccess={canViewAll}>
       <PageContainer>
         <Header>
           <Box>
@@ -248,7 +316,11 @@ const RoleManagement = () => {
             <Subtitle>Quick view of all roles and their access levels</Subtitle>
           </Box>
 
-          <AddButton variant="contained" onClick={handleAddRole}>
+          <AddButton 
+            variant="contained" 
+            onClick={handleAddRole}
+            disabled={!canCreate}
+          >
             Add Role
           </AddButton>
         </Header>
@@ -282,7 +354,14 @@ const RoleManagement = () => {
           severity={snackbar.severity}
           onClose={handleSnackbarClose}
         />
+
+        <AuditLogModal
+          open={isAuditLogOpen}
+          onClose={handleCloseAuditLog}
+          auditData={auditLogData}
+        />
       </PageContainer>
+    </AccessControl>
     </>
   );
 };

@@ -8,7 +8,7 @@ export const fetchRoleDetailsApi = async (
       `/masteradmin/role/get-roles?is_superuser=1&role_id=${roleId}`,
     );
 
-    return response?.body?.Roles;
+    return response?.body?.Roles || response?.data?.Roles || response;
   } catch (error) {
     console.error("fetchRoleDetailsApi Error:", error);
     return null;

@@ -1,8 +1,12 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import dayjs from "dayjs";
+import useDeviceHistory from "./useDeviceHistory";
+import DeviceAssetHistoryModalContent from "./DeviceAssetHistoryModalContent";
 import CommonDataGrid from "@src/common/CommonDataGrid";
 import { PageContainer } from "../../../common/PageContainer";
 import CommonLoading from "../../../common/CommonLoading";
+import AccessControl from "../../../common/AccessControl";
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonSnackbar from "../../../common/CommonSnackbar";
 import CommonConfirmDialog from "../../../common/CommonConfirmDialog";
@@ -11,6 +15,8 @@ import DeviceAssetManagementForm from "./DeviceAssetManagementForm";
 import { EditButton, CancelEditButton } from "./DeviceAssetManagement.styles";
 import { GridContainer } from "../AccountManagement/AccountManagement.styled";
 import { useServices } from "../../../services/services";
+import { usePermissions } from "../../../hooks/usePermissions";
+import { usePermissionRefresh } from "../../../hooks/usePermissionRefresh";
 import { DEVICE_ASSET_STATUS_FILTER_OPTIONS } from "./Constants";
 import {
   getColumns,
@@ -19,7 +25,6 @@ import {
 } from "./DeviceAssetManagementTable.utils";
 import BulkUploadForm from "./BulkUploadForm";
 import AssignDevicesToCarriers from "../DeviceManagement/AssignDevicesToCarriers";
-import { useSelector } from "react-redux";
 
 const isDeviceAssetSelectable = (params) => {
   return params.row.status?.toLowerCase() === "in stock";
@@ -28,6 +33,21 @@ const isDeviceAssetSelectable = (params) => {
 const DeviceAssetManagement = () => {
   const { fetchApi, createApi } = useServices();
   const { loading, setLoading, LoadingContainer } = CommonLoading();
+  const { checkPermission, permissions } = usePermissions();
+  const dispatch = useDispatch();
+  const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
+  const canCreate = checkPermission("Device Asset Management", "DEVICE_ASSET_CREATE");
+  const canUpdate = checkPermission("Device Asset Management", "DEVICE_ASSET_UPDATE");
+  const canDelete = checkPermission("Device Asset Management", "DEVICE_ASSET_DELETE");
+  const canView = checkPermission("Device Asset Management", "DEVICE_ASSET_VIEW");
+  const canViewAll = checkPermission("Device Asset Management", "DEVICE_ASSET_VIEW_ALL");
+  const canAssignDevices = checkPermission("Device Asset Management", "DEVICE_ASSET_ASSIGN_DEVICES");
+  const canAddBulkAsset = checkPermission("Device Asset Management", "DEVICE_ASSET_ADD_BULK_ASSET");
+
+  const { refreshPermissions } = usePermissionRefresh();
+  useEffect(() => {
+    refreshPermissions(fetchApi);
+  }, [refreshPermissions, fetchApi]);
   const [allRows, setAllRows] = useState([]);
   const [deviceModelOptions, setDeviceModelOptions] = useState([]);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
@@ -72,6 +92,8 @@ const DeviceAssetManagement = () => {
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [deviceToDelete, setDeviceToDelete] = useState(null);
+  const { historyData, isHistoryModalOpen, fetchHistory, closeHistoryModal } =
+    useDeviceHistory(fetchApi, setLoading);
 
   const user_name = useSelector(
       (state) => state.loginSlice.loginDetails?.body?.data?.userdetails?.user_name,
@@ -186,12 +208,17 @@ const DeviceAssetManagement = () => {
   }, []);
 
   const handleViewClick = useCallback(async (row) => {
+    if (!canView) {
+      handleSnackbar("You don't have permission to view assets", "error");
+      return;
+    }
+
     setIsEditMode(true);
 
     setIsEditing(false);
 
     await fetchDeviceById(row.id);
-  }, []);
+  }, [canView, handleSnackbar]);
 
   const handleEditClick = useCallback(() => {
     setIsEditing(true);
@@ -296,9 +323,14 @@ const DeviceAssetManagement = () => {
   };
 
   const handleDeleteClick = useCallback((row) => {
+    if (!canDelete) {
+      handleSnackbar("You don't have permission to delete assets", "error");
+      return;
+    }
+
     setDeviceToDelete(row);
     setIsDeleteConfirmOpen(true);
-  }, []);
+  }, [canDelete, handleSnackbar]);
 
   const handleCloseDeleteConfirm = useCallback(() => {
     setIsDeleteConfirmOpen(false);
@@ -443,9 +475,19 @@ const DeviceAssetManagement = () => {
     setSelectedRows(newSelection);
   };
 
+  const columnHandlers = useMemo(
+    () => ({ onView: handleViewClick, onDelete: handleDeleteClick, onHistory: fetchHistory }),
+    [handleViewClick, handleDeleteClick, fetchHistory],
+  );
+
+  const columnPermissions = useMemo(
+    () => ({ canView, canDelete }),
+    [canView, canDelete],
+  );
+
   const columns = useMemo(
-    () => getColumns(handleViewClick, handleDeleteClick),
-    [handleViewClick, handleDeleteClick],
+    () => getColumns(columnHandlers, columnPermissions),
+    [columnHandlers, columnPermissions],
   );
 
   const gridData = {
@@ -459,7 +501,12 @@ const DeviceAssetManagement = () => {
 
   if (isEditMode && !isEditing) {
     headerActionsElement = (
-      <EditButton variant="contained" onClick={handleEditClick}>
+      <EditButton
+        variant="contained"
+        onClick={handleEditClick}
+        disabled={!canUpdate}
+        sx={!canUpdate ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+      >
         Edit
       </EditButton>
     );
@@ -531,6 +578,7 @@ const DeviceAssetManagement = () => {
   return (
     <>
       <LoadingContainer />
+    <AccessControl hasAccess={canViewAll}>
       <PageContainer>
         <DeviceAssetManagementHeader
           data={gridData}
@@ -545,6 +593,9 @@ const DeviceAssetManagement = () => {
           handleAssignDevices={handleAssignDevices}
           statusOptions={DEVICE_ASSET_STATUS_FILTER_OPTIONS}
           isAssignDeviceEnabled={selectedRows.length > 0}
+          canCreate={canCreate}
+          canAssignDevices={canAssignDevices}
+          canAddBulkAsset={canAddBulkAsset}
         />
         <GridContainer>
           <CommonDataGrid
@@ -561,6 +612,7 @@ const DeviceAssetManagement = () => {
           />
         </GridContainer>
       </PageContainer>
+    </AccessControl>
 
       <CommonSnackbar
         open={snackbar.open}
@@ -619,6 +671,23 @@ const DeviceAssetManagement = () => {
         cancelText="Cancel"
         onConfirm={handleConfirmDelete}
         onCancel={handleCloseDeleteConfirm}
+      />
+
+      <CommonDialogForm
+        open={isHistoryModalOpen}
+        onCancel={closeHistoryModal}
+        onClose={closeHistoryModal}
+        mode="view"
+        title="Device Asset Management"
+        formId="deviceHistoryForm"
+        loading={false}
+        maxWidth="sm"
+        content={
+          <DeviceAssetHistoryModalContent
+            historyData={historyData}
+            onClose={closeHistoryModal}
+          />
+        }
       />
     </>
   );

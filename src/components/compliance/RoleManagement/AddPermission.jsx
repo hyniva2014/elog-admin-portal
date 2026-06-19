@@ -1,12 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Grid, Box } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 import CommonPageHeader from "../../../common/CommonPageHeader";
 import CommonTextField from "../../../common/CommonTextField";
 import CommonLoading from "../../../common/CommonLoading";
 
 import { useServices } from "../../../services/services";
+import { usePermissionRefresh } from "../../../hooks/usePermissionRefresh";
 
 import PermissionCardItem from "./PermissionCardItem";
 
@@ -33,6 +35,9 @@ const AddPermission = () => {
   const { fetchApi, createApi } = useServices();
 
   const { setLoading, LoadingContainer } = CommonLoading();
+  const dispatch = useDispatch();
+  const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
+  const { refreshPermissions } = usePermissionRefresh();
 
   const [roleData, setRoleData] = useState(null);
 
@@ -136,7 +141,10 @@ const AddPermission = () => {
         disabled_permissions,
       };
 
-      await syncRolePermissionsApi(createApi, payload);
+      const response = await syncRolePermissionsApi(createApi, payload);
+      if (response) {
+        await refreshPermissions(fetchApi);
+      }
     } catch (error) {
       console.error("Save Permission Error:", error);
     } finally {
