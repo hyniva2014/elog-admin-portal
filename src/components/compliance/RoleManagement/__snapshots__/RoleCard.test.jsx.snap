@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`RoleCard Component matches snapshot 1`] = `
+<DocumentFragment>
+  <div>
+    <div>
+      <div>
+        A
+      </div>
+      <div>
+        <h3>
+          Admin
+        </h3>
+        <p>
+          Administrator Role
+        </p>
+      </div>
+    </div>
+    <div>
+      <button>
+        05
+      </button>
+    </div>
+    <div>
+      <span>
+        Active
+      </span>
+    </div>
+    <div>
+      <div
+        title="View"
+      >
+        <button>
+          <span>
+            ViewIcon
+          </span>
+        </button>
+      </div>
+      <div
+        title="Audit History"
+      >
+        <button>
+          <img
+            alt="Audit Log"
+            src="mock-group-icon.png"
+          />
+        </button>
+      </div>
+      <div
+        title="Edit"
+      >
+        <button>
+          <span>
+            EditIcon
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
