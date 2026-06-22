@@ -82,7 +82,7 @@ const UserPageHeader = ({
           ← Back
         </Button>
 
-        <Typography sx={PageHeaderTitleSx}>Career User Details</Typography>
+        <Typography sx={PageHeaderTitleSx}>Platform User Details</Typography>
 
         <StatusChip statusLabel={statusLabel} isActive={isActive} />
       </Box>

@@ -197,8 +197,14 @@ const CareerForm = () => {
     }
   }, [mode]);
   const companyId = useSelector(
-    (state) =>
-      state.loginSlice.loginDetails?.body?.data?.userdetails?.company_id,
+    (state) => {
+      const loginDetails = state.loginSlice.loginDetails;
+      if (!loginDetails) {
+        const storedUserDetails = JSON.parse(localStorage.getItem("userdetails") || "{}");
+        return storedUserDetails.company_id;
+      }
+      return loginDetails?.body?.data?.userdetails?.company_id;
+    },
   );
   const carrierId = useSelector(
     (state) =>
@@ -276,13 +282,8 @@ const CareerForm = () => {
         }
       }
 
-      const primaryAddress = Array.isArray(data.address)
-        ? data.address.find((addr) => String(addr.address_type) === "1") || {}
-        : {};
-
-      const secondaryAddress = Array.isArray(data.address)
-        ? data.address.find((addr) => String(addr.address_type) === "2") || {}
-        : {};
+      const primaryAddress = data.primary_address || {};
+      const secondaryAddress = data.secondary_address || {};
 
       const employeeExperience = Array.isArray(data.employee_experience)
         ? data.employee_experience
