@@ -85,7 +85,7 @@ const ActionsCell = ({
         page,
         limit: pageSize,
       });
-      const endUrl = `/masteradmin/platformUser/audit-logs?${params.toString()}`;
+      const endUrl = `/masteradmin/superuser/audit-logs?${params.toString()}`;
       const response = await fetchApi(endUrl);
       if (response?.statusCode === 200 && response?.body?.audit_logs) {
         const auditLogs = response.body.audit_logs;
