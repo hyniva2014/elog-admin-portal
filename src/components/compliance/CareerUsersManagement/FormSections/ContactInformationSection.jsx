@@ -37,6 +37,8 @@ const ContactInformationSection = ({
 }) => {
   const optionsMap = {
     RegistrationState,
+    dynamicStates,
+    secondaryDynamicStates,
   };
 
   const additionalProps = {
