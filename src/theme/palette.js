@@ -105,6 +105,7 @@ const paletteTheme = (themeMode) => {
       accentBar: "#0a1f5c",
       triggerBackground: "#fffef5",
       triggerBorder: "#fef08a",
+      teal: "#0D9488",
     },
 
     background: {

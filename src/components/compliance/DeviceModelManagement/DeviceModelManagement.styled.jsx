@@ -70,3 +70,9 @@ export const StyledActionIcon = styled(VisibilityOutlinedIcon)(
       : theme.palette.action.disabled,
   })
 );
+export const actionContainer = {
+  width: "100%",
+  display: "flex",
+  justifyContent: "center",
+  gap: 1,
+};

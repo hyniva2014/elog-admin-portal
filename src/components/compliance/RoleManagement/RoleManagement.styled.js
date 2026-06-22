@@ -163,3 +163,24 @@ export const CancelEditButton = styled(Button)(({ theme }) => ({
     borderColor: theme.palette.brand.main,
   },
 }));
+
+export const BackButtonContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  marginTop: theme.spacing(3),
+}));
+
+export const BackButton = styled(Button)(({ theme }) => ({
+  fontSize: 14,
+  fontWeight: 500,
+  color: theme.palette.common.white,
+  backgroundColor: theme.palette.brand.main,
+  width: 183,
+  "&:hover": {
+    backgroundColor: theme.palette.brand.dark,
+  },
+}));
+
+export const CreatedOnCellContainer = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(1, 0),
+}));

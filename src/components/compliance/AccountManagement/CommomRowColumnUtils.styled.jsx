@@ -12,6 +12,8 @@ export const Timefieldstext = styled(Typography)(({ theme }) => ({
 }));
 
 export const ActionIcon = styled("img")(({ theme }) => ({
+  width: 18,
+  height: 18,
   color: theme.palette.text.secondary,
 }));
 
