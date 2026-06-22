@@ -92,7 +92,7 @@ const DeviceAssetManagement = () => {
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [deviceToDelete, setDeviceToDelete] = useState(null);
-  const { historyData, isHistoryModalOpen, fetchHistory, closeHistoryModal } =
+  const { auditLogData, isHistoryModalOpen, fetchHistory, closeHistoryModal, handlePageChange } =
     useDeviceHistory(fetchApi, setLoading);
 
   const user_name = useSelector(
@@ -684,8 +684,9 @@ const DeviceAssetManagement = () => {
         maxWidth="md"
         content={
           <DeviceAssetHistoryModalContent
-           historyData={historyData}
+            auditLogData={auditLogData}
             onClose={closeHistoryModal}
+            onPageChange={handlePageChange}
           />
         }
       />
