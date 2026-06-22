@@ -95,6 +95,7 @@ const CareerUserForm = ({
   headerOnly = false,
   onFormValuesChange,
   fetchUserData,
+  roles = [],
 }) => {
   const navigate = useNavigate();
   const [existingProfileFiles, setExistingProfileFiles] = useState([]);
@@ -117,28 +118,6 @@ const CareerUserForm = ({
   const [isInitializing, setIsInitializing] = useState(false);
   const deletedIdsRef = useRef([]);
   const { fetchApi } = useServices();
-  const [roles, setRoles] = useState([]);
-
-  useEffect(() => {
-    fetchRoles();
-  }, []);
-
-  const fetchRoles = async () => {
-    try {
-      const response = await fetchApi(
-        "/masteradmin/roles/get-all-superusers-roles",
-      );
-      if (response?.body?.roles) {
-        const formattedRoles = response.body.roles.map((r) => ({
-          value: r.role_id,
-          label: r.role_name,
-        }));
-        setRoles(formattedRoles);
-      }
-    } catch (err) {
-      console.error("Failed to fetch superuser roles", err);
-    }
-  };
 
   // console.log("roles:", roles);
 
@@ -184,12 +163,12 @@ const CareerUserForm = ({
   const formValues = watch();
 
   useEffect(() => {
-    if (selectedCountry) {
+    if (!headerOnly && selectedCountry) {
       loadStatesByCountry(selectedCountry, false);
-    } else {
+    } else if (!headerOnly) {
       setDynamicStates([]);
     }
-  }, [selectedCountry]);
+  }, [selectedCountry, headerOnly]);
 
   useEffect(() => {
     if (onFormValuesChange && formValues) {
@@ -198,22 +177,22 @@ const CareerUserForm = ({
   }, [formValues, onFormValuesChange]);
 
   useEffect(() => {
-    if (secondaryCountry) {
+    if (!headerOnly && secondaryCountry) {
       loadStatesByCountry(secondaryCountry, true);
-    } else {
+    } else if (!headerOnly) {
       setSecondaryDynamicStates([]);
     }
-  }, [secondaryCountry]);
+  }, [secondaryCountry, headerOnly]);
 
   const selectedSecondaryCountry = watch("secondary_country");
 
   useEffect(() => {
-    if (selectedSecondaryCountry) {
+    if (!headerOnly && selectedSecondaryCountry) {
       loadStatesByCountry(selectedSecondaryCountry, true);
-    } else {
+    } else if (!headerOnly) {
       setSecondaryDynamicStates([]);
     }
-  }, [selectedSecondaryCountry]);
+  }, [selectedSecondaryCountry, headerOnly]);
 
   //   useEffect(() => {
   //     if (selectedSecondaryCountry) {
@@ -349,13 +328,14 @@ const CareerUserForm = ({
       secondary_zip_code: data.secondary_zip_code || "",
       secondary_country: data.secondary_country || "",
       same_as_primary:
-        data.same_as_primary ||
+        data.same_as_primary === true ||
         (data.secondary_address_line === data.address_line1 &&
           data.secondary_city === data.city &&
           data.secondary_states === data.states &&
           data.secondary_country === data.country &&
           data.secondary_zip_code === data.zip_code &&
-          data.secondary_address_line !== ""),
+          data.secondary_address_line !== "" &&
+          data.secondary_address_line !== undefined),
       employment_type: data.employment_type ?? null,
       status: data.status || "",
       username: data.username || "",
@@ -482,24 +462,28 @@ const CareerUserForm = ({
         hire_date: formData.hire_date ? dayjs(formData.hire_date) : null,
         citizenship_country: formData.country || "",
 
-        address_line1: primaryAddress.street || "",
-        city: primaryAddress.city || "",
-        states: primaryAddress.state || "",
-        zip_code: primaryAddress.zipcode || "",
-        country: primaryAddress.country || "",
+        address_line1: formData.address_line1 || primaryAddress.street || "",
+        city: formData.city || primaryAddress.city || "",
+        states: formData.states || primaryAddress.state || "",
+        zip_code: formData.zip_code || primaryAddress.zipcode || "",
+        country: formData.country || primaryAddress.country || "",
 
         phone: formData.phone || "",
         alternate_contact_number: formData.alternate_contact_number || "",
         total_years_of_experince: formData.total_years_of_experince || "",
 
-        secondary_address_line: secondaryAddress.street || "",
-        secondary_city: secondaryAddress.city || "",
-        secondary_states: secondaryAddress.state || "",
-        secondary_zip_code: secondaryAddress.zipcode || "",
-        secondary_country: secondaryAddress.country || "",
+        secondary_address_line:
+          formData.secondary_address_line || secondaryAddress.street || "",
+        secondary_city: formData.secondary_city || secondaryAddress.city || "",
+        secondary_states:
+          formData.secondary_states || secondaryAddress.state || "",
+        secondary_zip_code:
+          formData.secondary_zip_code || secondaryAddress.zipcode || "",
+        secondary_country:
+          formData.secondary_country || secondaryAddress.country || "",
 
         same_as_primary:
-          formData.same_as_primary ||
+          formData.same_as_primary === true ||
           (secondaryAddress.street === primaryAddress.street &&
             secondaryAddress.city === primaryAddress.city &&
             secondaryAddress.state === primaryAddress.state &&
@@ -950,10 +934,10 @@ const CareerUserForm = ({
         } else {
         }
       } catch (error) {
-        // Error handling without console statement
+        console.error("Error in handleAddressChange:", error);
       }
     } else {
-      // Address too short, skipping geocoding
+      console.log("Address too short, skipping geocoding");
     }
   }, 500);
 
@@ -1007,7 +991,7 @@ const CareerUserForm = ({
         setValue("secondary_country", primaryCountry);
         setValue("secondary_zip_code", watch("zip_code"));
 
-        if (primaryCountry) {
+        if (primaryCountry && !headerOnly) {
           loadStatesByCountry(primaryCountry, true);
         }
 
@@ -1037,7 +1021,7 @@ const CareerUserForm = ({
         ]);
       }
     },
-    [watch, setValue, clearErrors, loadStatesByCountry],
+    [watch, setValue, clearErrors, loadStatesByCountry, headerOnly],
   );
 
   if (headerOnly) {
