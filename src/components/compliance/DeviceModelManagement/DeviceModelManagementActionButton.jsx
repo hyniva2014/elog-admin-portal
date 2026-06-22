@@ -43,7 +43,12 @@ const DeviceModelManagementActionButton = React.memo(
       setAuditData((prev) => ({ ...prev, isLoading: true }));
       try {
         const { page, pageSize } = auditData;
-        const endUrl = `/masteradmin/device-model/audit-logs?device_model_id=${row.id}&page=${page}&limit=${pageSize}`;
+        const params = new URLSearchParams({
+          device_model_id: row.id,
+          page,
+          limit: pageSize,
+        });
+        const endUrl = `/masteradmin/device-model/audit-logs?${params.toString()}`;
         const response = await fetchApi(endUrl);
         if (response?.statusCode === 200 && response?.body?.audit_logs) {
           const auditLogs = response.body.audit_logs;

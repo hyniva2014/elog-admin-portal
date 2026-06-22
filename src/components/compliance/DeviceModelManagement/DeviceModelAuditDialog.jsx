@@ -10,6 +10,13 @@ import {
   CreatedTimeText,
 } from "./DeviceModelAuditDialog.styled";
 
+const renderCreatedOnCell = ({ row }) => (
+  <CreatedOnWrapper>
+    <CreatedDateText>{row.createdDate}</CreatedDateText>
+    <CreatedTimeText>{row.createdTime}</CreatedTimeText>
+  </CreatedOnWrapper>
+);
+
 const getAuditColumns = () => [
   {
     field: "createdBy",
@@ -24,12 +31,7 @@ const getAuditColumns = () => [
     sortable: false,
     flex: 1,
     minWidth: 150,
-    renderCell: ({ row }) => (
-      <CreatedOnWrapper>
-        <CreatedDateText>{row.createdDate}</CreatedDateText>
-        <CreatedTimeText>{row.createdTime}</CreatedTimeText>
-      </CreatedOnWrapper>
-    ),
+    renderCell: renderCreatedOnCell,
   },
   {
     field: "notes",
@@ -41,6 +43,8 @@ const getAuditColumns = () => [
 ];
 
 const AUDIT_COLUMNS = getAuditColumns();
+
+const getAutoRowHeight = () => "auto";
 
 const AuditDialogContent = ({ auditData, setAuditData, onClose }) => {
   const data = useMemo(
@@ -64,7 +68,7 @@ const AuditDialogContent = ({ auditData, setAuditData, onClose }) => {
         showMuiLoading={auditData.isLoading}
         showColumnSeparator={false}
         disableStickyColumns
-        getRowHeight={() => "auto"}
+        getRowHeight={getAutoRowHeight}
       />
       <ActionBox>
         <BackButton variant="contained" onClick={onClose}>
@@ -75,24 +79,26 @@ const AuditDialogContent = ({ auditData, setAuditData, onClose }) => {
   );
 };
 
-const DeviceModelAuditDialog = ({ open, onClose, auditData, setAuditData }) => (
-  <CommonDialogForm
-    open={open}
-    title="Device Model Audit History"
-    content={
-      open ? (
-        <AuditDialogContent
-          auditData={auditData}
-          setAuditData={setAuditData}
-          onClose={onClose}
-        />
-      ) : null
-    }
-    onCancel={onClose}
-    onClose={onClose}
-    mode="view"
-    maxWidth="md"
-  />
-);
+const DeviceModelAuditDialog = ({ open, onClose, auditData, setAuditData }) => {
+  const dialogContent = open ? (
+    <AuditDialogContent
+      auditData={auditData}
+      setAuditData={setAuditData}
+      onClose={onClose}
+    />
+  ) : null;
+
+  return (
+    <CommonDialogForm
+      open={open}
+      title="Device Model Audit History"
+      content={dialogContent}
+      onCancel={onClose}
+      onClose={onClose}
+      mode="view"
+      maxWidth="md"
+    />
+  );
+};
 
 export default DeviceModelAuditDialog;
