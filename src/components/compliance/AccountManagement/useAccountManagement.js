@@ -18,6 +18,7 @@ export const useAccountManagement = (
   setIsAddAccountOpen,
   setDialogMode,
   setSelectedCompany,
+  setIsEditing,
   fetchApi,
   createApi,
 ) => {
@@ -206,7 +207,8 @@ export const useAccountManagement = (
 
           if (company) {
             setSelectedCompany(company);
-            setDialogMode("view");
+            setDialogMode("edit");
+            setIsEditing(false);
             setIsAddAccountOpen(true);
           }
         } else {
@@ -225,7 +227,7 @@ export const useAccountManagement = (
     [
       setLoading,
       setSelectedCompany,
-      setDialogMode,
+      setIsEditing,
       setIsAddAccountOpen,
       handleSnackbar,
       fetchApi,

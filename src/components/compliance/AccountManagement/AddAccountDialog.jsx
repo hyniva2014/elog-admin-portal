@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import CarrierNameAutocomplete from "./CarrierNameAutocomplete";
 import { Divider, Grid } from "@mui/material";
 import { useForm } from "react-hook-form";
@@ -137,10 +137,10 @@ const validationSchema = yup.object({
 
   status: yup.string().oneOf(["1", "2"]),
   reasonForDeactivation: yup.string().when("status", {
-  is: "2",
-  then: (schema) =>
-    schema.required("Reason for Deactivation is required"),
-  otherwise: (schema) => schema.notRequired(),
+    is: "2",
+    then: (schema) =>
+      schema.required("Reason for Deactivation is required"),
+    otherwise: (schema) => schema.notRequired(),
   }),
 });
 
@@ -176,13 +176,19 @@ const AddAccountDialog = ({
   onSubmit,
   loading = false,
   mode = "add",
+  isEditing = false,
+  title,
+  submitButtonText,
+  headerActions,
   initialData = null,
   onCancelEdit,
   fetchCarrierOptions,
 }) => {
+  const prevModeRef = useRef(mode);
+  const prevInitialDataRef = useRef(initialData);
   const isEditMode = mode === "edit";
   const isViewMode = mode === "view";
-  const isFieldDisabled = loading || isViewMode;
+  const isFieldDisabled = loading || isViewMode || (isEditMode && !isEditing);
 
   const {
     control,
@@ -197,10 +203,22 @@ const AddAccountDialog = ({
   });
 
   useEffect(() => {
-    if (open && initialData) {
-      reset(initialData);
+    if (open) {
+      if (initialData) {
+        reset(initialData);
+      } else if (mode === "add" && prevModeRef.current !== "add") {
+        reset(defaultValues);
+      }
     }
-  }, [open, reset, initialData]);
+    prevModeRef.current = mode;
+  }, [open, mode, initialData, reset]);
+
+  useEffect(() => {
+    if (!initialData && prevInitialDataRef.current) {
+      reset(defaultValues);
+    }
+    prevInitialDataRef.current = initialData;
+  }, [initialData, reset]);
 
   const selectedStatus = watch("status");
 
@@ -220,8 +238,12 @@ const AddAccountDialog = ({
   );
 
   const handleCancel = useCallback(() => {
-    onClose();
-  }, [onClose]);
+    if (isEditMode && isEditing && onCancelEdit) {
+      onCancelEdit();
+    } else {
+      onClose();
+    }
+  }, [isEditMode, isEditing, onCancelEdit, onClose]);
 
   const submitHandler = useCallback(
     (data) => {
@@ -234,20 +256,7 @@ const AddAccountDialog = ({
     [onSubmit, initialData],
   );
 
-  const headerActions = useMemo(() => {
-    if (isEditMode && onCancelEdit) {
-      return (
-        <CancelEditButton
-          variant="outlined"
-          onClick={onCancelEdit}
-          disabled={loading}
-        >
-          Cancel Edit
-        </CancelEditButton>
-      );
-    }
-    return null;
-  }, [isEditMode, onCancelEdit, loading]);
+
 
   const formContent = (
     <form id={ADD_ACCOUNT_FORM_ID} onSubmit={handleSubmit(submitHandler)}>
@@ -332,7 +341,7 @@ const AddAccountDialog = ({
   return (
     <CommonDialogForm
       open={open}
-      title={dialogTitle}
+      title={title || dialogTitle}
       content={formContent}
       formId={ADD_ACCOUNT_FORM_ID}
       onCancel={handleCancel}
@@ -340,8 +349,9 @@ const AddAccountDialog = ({
       loading={loading}
       maxWidth="md"
       headerActions={headerActions}
-      mode={isViewMode ? "view" : isEditMode ? "edit" : "add"}
-      key={mode}
+      isEditing={isEditing}
+      submitButtonText={submitButtonText}
+      mode={mode}
     />
   );
 };
