@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonDataGrid from "../../../common/CommonDataGrid";
 import {
@@ -10,7 +10,6 @@ import {
   CreatedTimeText,
   DataGridWrapper,
 } from "./UserManagementGroupDialog.styles";
-import { STATIC_GROUP_DATA } from "../DeviceModelManagement/Constants";
 
 const columns = [
   {
@@ -39,14 +38,24 @@ const columns = [
   },
 ];
 
-const GroupDialogContent = ({ onClose }) => {
+const GroupDialogContent = ({ auditData, setAuditData, onClose }) => {
+  const data = {
+    page: auditData.page,
+    pageSize: auditData.pageSize,
+    total: auditData.total,
+    isLoading: auditData.isLoading,
+  };
+
   return (
     <DataGridWrapper>
       <CommonDataGrid
         columnsData={columns}
-        rowData={STATIC_GROUP_DATA}
-        hideFooter
+        rowData={auditData.rows}
+        data={data}
+        setData={setAuditData}
         useAutoHeight
+        showMuiLoading={auditData.isLoading}
+        paginationMode="server"
       />
       <ActionBox>
         <BackButton variant="contained" onClick={onClose}>
@@ -57,12 +66,20 @@ const GroupDialogContent = ({ onClose }) => {
   );
 };
 
-const UserManagementGroupDialog = ({ open, onClose }) => {
+const UserManagementGroupDialog = ({ open, onClose, auditData, setAuditData }) => {
+  const dialogContent = open ? (
+    <GroupDialogContent
+      auditData={auditData}
+      setAuditData={setAuditData}
+      onClose={onClose}
+    />
+  ) : null;
+
   return (
     <CommonDialogForm
       open={open}
       title="Carrier Users Audit History"
-      content={<GroupDialogContent onClose={onClose} />}
+      content={dialogContent}
       onCancel={onClose}
       onClose={onClose}
       mode="view"
