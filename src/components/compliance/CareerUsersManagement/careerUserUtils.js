@@ -132,6 +132,7 @@ export const transformApiToFormData = (apiData = {}) => {
     hire_date: apiData.hire_date ? dayjs(apiData.hire_date) : null,
     last_drug_test: apiData.last_drug_test ? dayjs(apiData.last_drug_test) : null,
     termination_date: apiData.termination_date ? dayjs(apiData.termination_date) : null,
+    profile_pic: apiData.profile_pic || "",
     profile_photo: apiData.profile_pic || "",
     citizenship: apiData.citizenship ? Number(apiData.citizenship) : 1,
     employment_type: apiData.employment_type ? Number(apiData.employment_type) : 1,
@@ -174,6 +175,7 @@ export const transformApiToFormData = (apiData = {}) => {
         ? dayjs(apiData.cdl_info.cdl_expiry_date)
         : null,
     },
+    documents: apiData.documents || [],
   };
 };
 

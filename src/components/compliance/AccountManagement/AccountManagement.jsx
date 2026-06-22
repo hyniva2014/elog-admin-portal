@@ -8,13 +8,18 @@ import CommonSnackbar from "../../../common/CommonSnackbar";
 import CommonLoading from "../../../common/CommonLoading";
 import CommonConfirmDialog from "../../../common/CommonConfirmDialog";
 import AccessControl from "../../../common/AccessControl";
-import { GridContainer } from "./AccountManagement.styled";
+import { GridContainer, EditButton, CancelEditButton } from "./AccountManagement.styled";
 import AddAccountDialog from "./AddAccountDialog";
 import StatusSelectDropdown from "./StatusSelectDropdown";
 import AuditLogModal from "./AuditLogModal";
 import { getStatusChangeMessage } from "./utils";
 import { useServices } from "../../../services/services";
-import { defaultPageSize, STATUS_OPTIONS, STATUS_TRANSITION_OPTIONS, getDefaultTargetStatus } from "./Constants";
+import {
+  defaultPageSize,
+  STATUS_OPTIONS,
+  STATUS_TRANSITION_OPTIONS,
+  getDefaultTargetStatus,
+} from "./Constants";
 import { AccountManagementColumnsData } from "./CommonRowColumnUtils";
 import { useAccountManagement } from "./useAccountManagement";
 import { useLocation } from "react-router-dom";
@@ -28,19 +33,36 @@ const AccountManagement = () => {
   const { setLoading, LoadingContainer } = CommonLoading();
   const { checkPermission, permissions } = usePermissions();
   const dispatch = useDispatch();
-  const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
-  
-  const canCreate = useMemo(() => checkPermission("Account Management", "ACCOUNT_CREATE"), [permissions]);
-  const canUpdate = useMemo(() => checkPermission("Account Management", "ACCOUNT_UPDATE"), [permissions]);
-  const canDelete = useMemo(() => checkPermission("Account Management", "ACCOUNT_DELETE"), [permissions]);
-  const canView = useMemo(() => checkPermission("Account Management", "ACCOUNT_VIEW"), [permissions]);
-  const canViewAll = useMemo(() => checkPermission("Account Management", "ACCOUNT_VIEW_ALL"), [permissions]);
+  const loginDetails = useSelector(
+    (state) => state.loginSlice.loginDetails || {},
+  );
+
+  const canCreate = useMemo(
+    () => checkPermission("Account Management", "ACCOUNT_CREATE"),
+    [permissions],
+  );
+  const canUpdate = useMemo(
+    () => checkPermission("Account Management", "ACCOUNT_UPDATE"),
+    [permissions],
+  );
+  const canDelete = useMemo(
+    () => checkPermission("Account Management", "ACCOUNT_DELETE"),
+    [permissions],
+  );
+  const canView = useMemo(
+    () => checkPermission("Account Management", "ACCOUNT_VIEW"),
+    [permissions],
+  );
+  const canViewAll = useMemo(
+    () => checkPermission("Account Management", "ACCOUNT_VIEW_ALL"),
+    [permissions],
+  );
 
   const { refreshPermissions } = usePermissionRefresh();
   useEffect(() => {
     refreshPermissions(fetchApi);
   }, [refreshPermissions, fetchApi]);
-  
+
   const [searchKey, setSearchKey] = useState(0);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -58,8 +80,24 @@ const AccountManagement = () => {
   const [isStatusChangeOpen, setIsStatusChangeOpen] = useState(false);
   const [statusChangeData, setStatusChangeData] = useState(null);
   const [selectedTargetStatus, setSelectedTargetStatus] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
   const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
-  const [auditLogData, setAuditLogData] = useState([]);
+  const [auditLogData, setAuditLogData] = useState({
+    rows: [],
+    total: 0,
+    page: 1,
+    pageSize: 20,
+    isLoading: false,
+  });
+  const [selectedCompanyId, setSelectedCompanyId] = useState(null);
+
+  const handleEditClick = useCallback(() => {
+    setIsEditing(true);
+  }, []);
+
+  const handleCancelEdit = useCallback(() => {
+    setIsEditing(false);
+  }, []);
 
   const getDefaultFilters = () => {
     return {
@@ -115,6 +153,7 @@ const AccountManagement = () => {
   const handleCloseAddAccount = useCallback(() => {
     setIsAddAccountOpen(false);
     setDialogMode("add");
+    setIsEditing(false);
     setSelectedCompany(null);
   }, []);
 
@@ -122,9 +161,8 @@ const AccountManagement = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   }, []);
 
-  const handleCancelEdit = useCallback(() => {
-    setDialogMode("view");
-  }, []);
+  // Cancel edit handler is already defined above
+
 
   const handleOpenStatusChange = useCallback((data) => {
     const defaultTarget =
@@ -146,7 +184,14 @@ const AccountManagement = () => {
 
   const handleCloseAuditLog = useCallback(() => {
     setIsAuditLogOpen(false);
-    setAuditLogData([]);
+    setAuditLogData({
+      rows: [],
+      total: 0,
+      page: 1,
+      pageSize: 20,
+      isLoading: false,
+    });
+    setSelectedCompanyId(null);
   }, []);
 
   const {
@@ -176,6 +221,7 @@ const AccountManagement = () => {
     setIsAddAccountOpen,
     setDialogMode,
     setSelectedCompany,
+    setIsEditing,
     fetchApi,
     createApi,
   );
@@ -183,26 +229,51 @@ const AccountManagement = () => {
   const handleOpenAuditLog = useCallback(
     async (row) => {
       setLoading(true);
+      setSelectedCompanyId(row.id);
       try {
-        const auditData = await fetchAuditLog(row.id);
+        const { page, pageSize } = auditLogData;
+        const auditData = await fetchAuditLog(row.id, page, pageSize);
         setAuditLogData(auditData);
         setIsAuditLogOpen(true);
       } catch (err) {
         console.error("Error opening audit log:", err);
-        setAuditLogData([]);
+        setAuditLogData({
+          rows: [],
+          total: 0,
+          page: 1,
+          pageSize: 20,
+          isLoading: false,
+        });
+        setIsAuditLogOpen(true);
       } finally {
         setLoading(false);
       }
     },
-    [fetchAuditLog, setLoading],
+    [fetchAuditLog, setLoading, auditLogData.page, auditLogData.pageSize],
   );
+
+  useEffect(() => {
+    if (isAuditLogOpen && selectedCompanyId) {
+      handleOpenAuditLog({ id: selectedCompanyId });
+    }
+  }, [
+    auditLogData.page,
+    auditLogData.pageSize,
+    isAuditLogOpen,
+    selectedCompanyId,
+    handleOpenAuditLog,
+  ]);
 
   const handleConfirmStatusChange = useCallback(
     async (dialogReason) => {
       if (!statusChangeData || !selectedTargetStatus) return;
 
-      const statusOptions = STATUS_TRANSITION_OPTIONS[statusChangeData.currentStatus] || STATUS_TRANSITION_OPTIONS.Active;
-      const selectedOption = statusOptions.find(opt => opt.value === selectedTargetStatus);
+      const statusOptions =
+        STATUS_TRANSITION_OPTIONS[statusChangeData.currentStatus] ||
+        STATUS_TRANSITION_OPTIONS.Active;
+      const selectedOption = statusOptions.find(
+        (opt) => opt.value === selectedTargetStatus,
+      );
       if (!selectedOption) return;
 
       if (!dialogReason?.trim()) {
@@ -282,8 +353,20 @@ const AccountManagement = () => {
 
   const columns = useMemo(
     () =>
-      AccountManagementColumnsData(handleViewAccount, handleOpenStatusChange, handleOpenAuditLog, canUpdate, canView),
-    [handleViewAccount, handleOpenStatusChange, handleOpenAuditLog, canUpdate, canView],
+      AccountManagementColumnsData(
+        handleViewAccount,
+        handleOpenStatusChange,
+        handleOpenAuditLog,
+        canUpdate,
+        canView,
+      ),
+    [
+      handleViewAccount,
+      handleOpenStatusChange,
+      handleOpenAuditLog,
+      canUpdate,
+      canView,
+    ],
   );
 
   const initialFormData = selectedCompany
@@ -326,33 +409,61 @@ const AccountManagement = () => {
     isLoading: false,
   };
 
+  const isEditMode = dialogMode === "edit";
+
+  let headerActionsElement = null;
+
+  if (isEditMode && !isEditing) {
+    headerActionsElement = (
+      <EditButton
+        variant="contained"
+        onClick={handleEditClick}
+        disabled={!canUpdate}
+      >
+        Edit
+      </EditButton>
+    );
+  }
+
+  const dialogTitle = isEditMode
+    ? isEditing
+      ? "Edit Account"
+      : "View Account"
+    : "Add New Account";
+
+  const submitButtonLabel = isEditMode
+    ? isEditing
+      ? "Update"
+      : "Save"
+    : "Add Account";
+
   return (
     <PageContainer>
       <LoadingContainer />
       <AccessControl hasAccess={canViewAll}>
         <>
-      <AccountManagementHeader
-        data={gridData}
-        setData={setData}
-        searchKey={searchKey}
-        handleClick={handleAddAccount}
-        canCreate={canCreate}
-        primaryContactOptions={contactOptions.primaryContactOptions}
-        secondaryContactOptions={contactOptions.secondaryContactOptions}
-        carrierOptions={carrierOptions}
-        statusOptions={STATUS_OPTIONS}
-      />
+          <AccountManagementHeader
+            data={gridData}
+            setData={setData}
+            searchKey={searchKey}
+            handleClick={handleAddAccount}
+            canCreate={canCreate}
+            primaryContactOptions={contactOptions.primaryContactOptions}
+            secondaryContactOptions={contactOptions.secondaryContactOptions}
+            carrierOptions={carrierOptions}
+            statusOptions={STATUS_OPTIONS}
+          />
 
-      <GridContainer>
-        <CommonDataGrid
-          columnsData={columns}
-          rowData={rows}
-          data={gridData}
-          setData={setData}
-          paginationMode="server"
-          getRowHeight={() => "auto"}
-        />
-      </GridContainer>
+          <GridContainer>
+            <CommonDataGrid
+              columnsData={columns}
+              rowData={rows}
+              data={gridData}
+              setData={setData}
+              paginationMode="server"
+              getRowHeight={() => "auto"}
+            />
+          </GridContainer>
         </>
       </AccessControl>
 
@@ -368,7 +479,11 @@ const AccountManagement = () => {
         onClose={handleCloseAddAccount}
         onSubmit={handleCreateAccount}
         loading={false}
-        mode={dialogMode}
+        mode={isEditMode && !isEditing ? "view" : dialogMode}
+        isEditing={isEditing}
+        title={dialogTitle}
+        submitButtonText={submitButtonLabel}
+        headerActions={headerActionsElement}
         initialData={initialFormData}
         onCancelEdit={handleCancelEdit}
         fetchCarrierOptions={fetchCarrierOptions}
@@ -377,7 +492,9 @@ const AccountManagement = () => {
       <CommonConfirmDialog
         open={isStatusChangeOpen}
         title="Account Status"
-        message={statusChangeData ? getStatusChangeMessage(statusChangeData.row) : ""}
+        message={
+          statusChangeData ? getStatusChangeMessage(statusChangeData.row) : ""
+        }
         confirmText="Update Status"
         cancelText="Cancel"
         showReasonField={true}
@@ -399,6 +516,7 @@ const AccountManagement = () => {
         open={isAuditLogOpen}
         onClose={handleCloseAuditLog}
         auditData={auditLogData}
+        setAuditData={setAuditLogData}
       />
     </PageContainer>
   );
