@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import eyeIcon from "../../../assets/images/svg/eye.svg";
 import GroupIcon from "../../../assets/images/svg/Group.png";
 import trashLight from "../../../assets/images/svg/trash.png";
@@ -8,6 +8,7 @@ import PlatformUserAuditDialog from "./PlatformUserAuditDialog";
 import dayjs from "dayjs";
 import { USER_STATUS, USER_STATUS_COL_CONFIG } from "./Constants";
 import { getFormattedDateTime } from "../../../common/CommonUtils";
+import { useServices } from "../../../services/services";
 import {
   EllipsisTextSx,
   getActionButtonSx,
@@ -31,6 +32,26 @@ const StatusCell = ({ value, row }) => (
   <Typography sx={getStatusCellSx(row.statusColor)}>{value}</Typography>
 );
 
+const INITIAL_AUDIT_DATA = {
+  rows: [],
+  total: 0,
+  page: 1,
+  pageSize: 10,
+  isLoading: false,
+};
+
+const transformAuditLogs = (logs = []) =>
+  logs.map((entry) => {
+    const { date, time } = getFormattedDateTime(entry.created_at);
+    return {
+      id: entry.id,
+      createdBy: entry.created_by || "-",
+      createdDate: date,
+      createdTime: time,
+      notes: entry.description || "-",
+    };
+  });
+
 const ActionsCell = ({
   row,
   handleOpenEdit,
@@ -40,7 +61,9 @@ const ActionsCell = ({
   eyeIcon,
   trashIcon,
 }) => {
+  const { fetchApi } = useServices();
   const [groupDialogOpen, setGroupDialogOpen] = useState(false);
+  const [auditData, setAuditData] = useState(INITIAL_AUDIT_DATA);
 
   const handleViewClick = useCallback(() => {
     if (!canView) return;
@@ -52,13 +75,62 @@ const ActionsCell = ({
     handleDeleteClick?.(row);
   }, [canDelete, handleDeleteClick, row]);
 
+  const fetchAuditLogs = useCallback(async () => {
+    if (!row.id) return;
+    setAuditData((prev) => ({ ...prev, isLoading: true }));
+    try {
+      const { page, pageSize } = auditData;
+      const params = new URLSearchParams({
+        platform_user_id: row.id,
+        page,
+        limit: pageSize,
+      });
+      const endUrl = `/masteradmin/platformUser/audit-logs?${params.toString()}`;
+      const response = await fetchApi(endUrl);
+      if (response?.statusCode === 200 && response?.body?.audit_logs) {
+        const auditLogs = response.body.audit_logs;
+        const records = Array.isArray(auditLogs) ? auditLogs : [auditLogs];
+        const pagination = response.body.pagination;
+        setAuditData({
+          rows: transformAuditLogs(records),
+          total: pagination?.total_records || 0,
+          page: pagination?.current_page || 1,
+          pageSize: pagination?.limit || 10,
+          isLoading: false,
+        });
+      } else {
+        setAuditData({ ...INITIAL_AUDIT_DATA });
+      }
+    } catch (err) {
+      console.error("Error fetching platform user audit logs:", err);
+      setAuditData({ ...INITIAL_AUDIT_DATA });
+    }
+  }, [fetchApi, row.id, auditData.page, auditData.pageSize]);
+
+  // Re-fetch whenever the dialog is open and page/pageSize changes
+  useEffect(() => {
+    if (groupDialogOpen && row.id) {
+      fetchAuditLogs();
+    }
+  }, [auditData.page, auditData.pageSize, groupDialogOpen, row.id]);
+
+  const handleOpenAuditLog = useCallback(() => {
+    setAuditData(INITIAL_AUDIT_DATA);
+    setGroupDialogOpen(true);
+  }, []);
+
+  const handleCloseAuditLog = useCallback(() => {
+    setGroupDialogOpen(false);
+    setAuditData(INITIAL_AUDIT_DATA);
+  }, []);
+
   const viewTitle = canView ? "View" : "No permission";
 
   return (
     <>
       <Box sx={actionContainerSx}>
         <Tooltip title="Group" placement="right">
-          <IconButton size="small" onClick={() => setGroupDialogOpen(true)}>
+          <IconButton size="small" onClick={handleOpenAuditLog}>
             <img src={GroupIcon} alt="group" width={16} height={16} />
           </IconButton>
         </Tooltip>
@@ -90,7 +162,9 @@ const ActionsCell = ({
 
       <PlatformUserAuditDialog
         open={groupDialogOpen}
-        onClose={() => setGroupDialogOpen(false)}
+        onClose={handleCloseAuditLog}
+        auditData={auditData}
+        setAuditData={setAuditData}
       />
     </>
   );
