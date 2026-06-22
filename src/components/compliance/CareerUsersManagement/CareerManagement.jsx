@@ -126,10 +126,6 @@ const CareerManagement = () => {
     }
   }, [location.state]);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   const fetchUsers = async () => {
     setData((prev) => ({ ...prev, isLoading: true }));
 

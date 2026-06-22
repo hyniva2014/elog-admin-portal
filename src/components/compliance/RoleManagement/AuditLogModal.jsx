@@ -6,24 +6,17 @@ import {
   BackButton,
   BackButtonContainer,
   CreatedOnCellContainer,
-} from "./CommomRowColumnUtils.styled";
-import { ACCOUNT_HISTORY_TITLE, BACK_BUTTON_TEXT } from "./Constants";
+} from "./RoleManagement.styled";
+
+const ROLE_AUDIT_HISTORY_TITLE = "Role Audit History";
+const BACK_BUTTON_TEXT = "Back";
 
 const getRowHeight = () => "auto";
-
-const AuditLogRow = ({ entry, index }) => ({
-  id: index,
-  createdBy: entry.createdBy,
-  createdDate: entry.createdDate,
-  createdTime: entry.createdTime,
-  notes: entry.notes,
-});
 
 const CreatedOnCell = ({ params }) => {
   return (
     <CreatedOnCellContainer>
       <Typography variant="body2">{params.row.createdDate}</Typography>
-
       <Typography variant="body2" color="text.primary">
         {params.row.createdTime}
       </Typography>
@@ -31,15 +24,10 @@ const CreatedOnCell = ({ params }) => {
   );
 };
 
-const renderCreatedOnCell = (params) => <CreatedOnCell params={params} />;
-
 const AuditLogModal = ({
   open,
-
   onClose,
-
   auditData = {},
-
   setAuditData = () => {},
 }) => {
   const columns = useMemo(
@@ -51,16 +39,14 @@ const AuditLogModal = ({
         minWidth: 150,
         headerTooltip: "Created By",
       },
-
       {
         field: "createdDate",
         headerName: "Created On",
         flex: 2,
         minWidth: 150,
         headerTooltip: "Created On",
-        renderCell: renderCreatedOnCell,
+        renderCell: (params) => <CreatedOnCell params={params} />,
       },
-
       {
         field: "notes",
         headerName: "Notes",
@@ -69,14 +55,18 @@ const AuditLogModal = ({
         headerTooltip: "Notes",
       },
     ],
-
     [],
   );
 
   const rows = useMemo(
     () =>
-      auditData.rows?.map((entry, index) => AuditLogRow({ entry, index })) ||
-      [],
+      auditData.rows?.map((entry, index) => ({
+        id: index,
+        createdBy: entry.createdBy,
+        createdDate: entry.createdDate,
+        createdTime: entry.createdTime,
+        notes: entry.notes,
+      })) || [],
     [auditData.rows],
   );
 
@@ -86,10 +76,9 @@ const AuditLogModal = ({
       columns,
       total: auditData.total || 0,
       page: auditData.page || 1,
-      pageSize: auditData.pageSize || 20,
+      pageSize: auditData.pageSize || 10,
       isLoading: auditData.isLoading || false,
     }),
-
     [rows, columns, auditData],
   );
 
@@ -106,7 +95,6 @@ const AuditLogModal = ({
           disableStickyColumns={true}
           getRowHeight={getRowHeight}
         />
-
         <BackButtonContainer>
           <BackButton variant="contained" onClick={onClose}>
             {BACK_BUTTON_TEXT}
@@ -114,14 +102,13 @@ const AuditLogModal = ({
         </BackButtonContainer>
       </>
     ),
-
     [columns, rows, gridData, setAuditData],
   );
 
   return (
     <CommonDialogForm
       open={open}
-      title={ACCOUNT_HISTORY_TITLE}
+      title={ROLE_AUDIT_HISTORY_TITLE}
       content={content}
       onClose={onClose}
       mode="view"

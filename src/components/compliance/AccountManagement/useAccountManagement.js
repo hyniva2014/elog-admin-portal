@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { AccountManagementRowData } from "./CommonRowColumnUtils";
+import { formatDateTime } from "../../../common/CommonUtils";
 
 export const useAccountManagement = (
   companyId,
@@ -18,6 +19,7 @@ export const useAccountManagement = (
   setIsAddAccountOpen,
   setDialogMode,
   setSelectedCompany,
+  setIsEditing,
   fetchApi,
   createApi,
 ) => {
@@ -127,7 +129,10 @@ export const useAccountManagement = (
         formData.append("dotNumber", account.usdot || "");
         formData.append("mcNumber", account.mcNumber || "");
         formData.append("ein", account.taxId || "");
-        formData.append("company_code", (account.carrierName || "").substring(0, 4).toUpperCase());
+        formData.append(
+          "company_code",
+          (account.carrierName || "").substring(0, 4).toUpperCase(),
+        );
         formData.append("status_id", account.status || "1");
         formData.append("maxDevices", account.maxDevices || "");
         formData.append("website", account.website || "");
@@ -206,7 +211,8 @@ export const useAccountManagement = (
 
           if (company) {
             setSelectedCompany(company);
-            setDialogMode("view");
+            setDialogMode("edit");
+            setIsEditing(false);
             setIsAddAccountOpen(true);
           }
         } else {
@@ -225,7 +231,7 @@ export const useAccountManagement = (
     [
       setLoading,
       setSelectedCompany,
-      setDialogMode,
+      setIsEditing,
       setIsAddAccountOpen,
       handleSnackbar,
       fetchApi,
@@ -291,7 +297,8 @@ export const useAccountManagement = (
 
         if (response?.statusCode === 200 || response?.statusCode === 201) {
           handleSnackbar(
-            response?.body?.message || `Account ${newStatus.toLowerCase()} successfully.`,
+            response?.body?.message ||
+              `Account ${newStatus.toLowerCase()} successfully.`,
             "success",
           );
 
@@ -379,25 +386,42 @@ export const useAccountManagement = (
   );
 
   const fetchAuditLog = useCallback(
-    async (companyId) => {
+    async (companyId, page = 1, limit = 20) => {
       try {
-        const endUrl = `/masteradmin/audit-log?company_id=${companyId}`;
+        const endUrl = `/masteradmin/company/audit-logs?company_id=${companyId}&page=${page}&limit=${limit}`;
         const response = await fetchApi(endUrl);
 
-        if (response?.statusCode === 200 && response?.body?.data) {
-          const responseData = response?.body?.data;
-          const records = extractRecordsFromResponse(responseData);
-          return transformAuditLogRecords(records);
+        if (response?.statusCode === 200 && response?.body?.audit_logs) {
+          const auditLogs = response?.body?.audit_logs;
+          const records = Array.isArray(auditLogs) ? auditLogs : [auditLogs];
+          const pagination = response?.body?.pagination;
+
+          return {
+            rows: transformAuditLogRecords(records),
+            total: pagination?.total_records || 0,
+            page: pagination?.current_page || 1,
+            pageSize: pagination?.limit || 20,
+            isLoading: false,
+          };
         } else {
-          return [];
+          return {
+            rows: [],
+            total: 0,
+            page: 1,
+            pageSize: 20,
+            isLoading: false,
+          };
         }
       } catch (err) {
         console.error("Error fetching audit log:", err);
-        handleSnackbar(
-          "Failed to fetch audit log. Please try again.",
-          "error",
-        );
-        return [];
+        handleSnackbar("Failed to fetch audit log. Please try again.", "error");
+        return {
+          rows: [],
+          total: 0,
+          page: 1,
+          pageSize: 20,
+          isLoading: false,
+        };
       }
     },
     [fetchApi, handleSnackbar],
@@ -428,9 +452,13 @@ const extractRecordsFromResponse = (responseData) => {
 };
 
 const transformAuditLogRecords = (records) => {
-  return records.map((record) => ({
-    createdBy: record.created_by || record.user || "-",
-    createdOn: record.created_on || record.timestamp || "-",
-    notes: record.notes || record.details || record.action || "-",
-  }));
+  return records.map((record) => {
+    const { date, time } = formatDateTime(record.created_at);
+    return {
+      createdBy: record.created_by || "-",
+      createdDate: date,
+      createdTime: time,
+      notes: record.description || "-",
+    };
+  });
 };

@@ -12,6 +12,8 @@ export const Timefieldstext = styled(Typography)(({ theme }) => ({
 }));
 
 export const ActionIcon = styled("img")(({ theme }) => ({
+  width: 18,
+  height: 18,
   color: theme.palette.text.secondary,
 }));
 
@@ -30,4 +32,8 @@ export const BackButton = styled(Button)(({ theme }) => ({
   "&:hover": {
     backgroundColor: theme.palette.brand.dark,
   },
+}));
+
+export const CreatedOnCellContainer = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(1),
 }));

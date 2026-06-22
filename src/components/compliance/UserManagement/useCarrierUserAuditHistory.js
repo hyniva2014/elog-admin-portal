@@ -1,13 +1,18 @@
 import { useState, useCallback } from "react";
+import dayjs from "dayjs";
+import { getUserAuditLogs } from "./userManagementService";
 
 const transformAuditLogs = (apiData) =>
-  apiData.map((item) => ({
-    id: item.id,
-    created_by: item.created_by || "-",
-    created_date: item.created_at ? new Date(item.created_at).toLocaleDateString() : "-",
-    created_time: item.created_at ? new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "",
-    notes: item.description || "-",
-  }));
+  apiData.map((item) => {
+    const createdDateTime = item.created_at ? dayjs(item.created_at) : null;
+    return {
+      id: item.id,
+      createdBy: item.created_by || "-",
+      createdDate: createdDateTime ? createdDateTime.format("DD MMM YYYY") : "-",
+      createdTime: createdDateTime ? createdDateTime.format("hh:mm A") : "-",
+      notes: item.description || "-",
+    };
+  });
 
 const INITIAL_AUDIT_LOG_DATA = {
   rows: [],
@@ -17,27 +22,31 @@ const INITIAL_AUDIT_LOG_DATA = {
   isLoading: false,
 };
 
-const useDeviceHistory = (fetchApi, setLoading) => {
+const useCarrierUserAuditHistory = (fetchApi, setLoading) => {
   const [auditLogData, setAuditLogData] = useState(INITIAL_AUDIT_LOG_DATA);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-  const [currentRow, setCurrentRow] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   const fetchHistory = useCallback(
-    async (row, page = 1, pageSize = 20) => {
+    async (userId, page = 1, pageSize = 20) => {
       try {
         setLoading(true);
-        setAuditLogData(prev => ({ ...prev, isLoading: true }));
-        
-        const response = await fetchApi(
-          `/masteradmin/eld-device/audit-logs?page=${page}&limit=${pageSize}`
-        );
-        
+        setAuditLogData((prev) => ({ ...prev, isLoading: true }));
+
+        const params = {
+          page,
+          limit: pageSize,
+          user_id: userId,
+        };
+
+        const response = await getUserAuditLogs(fetchApi, params);
+
         if (response?.statusCode === 200 && response?.body?.audit_logs) {
           const records = Array.isArray(response.body.audit_logs)
             ? response.body.audit_logs
             : [response.body.audit_logs];
           const pagination = response.body.pagination;
-          
+
           setAuditLogData({
             rows: transformAuditLogs(records),
             total: pagination?.total_records || 0,
@@ -48,15 +57,15 @@ const useDeviceHistory = (fetchApi, setLoading) => {
         } else {
           setAuditLogData(INITIAL_AUDIT_LOG_DATA);
         }
-        
-        setCurrentRow(row);
+
+        setCurrentUserId(userId);
         setIsHistoryModalOpen(true);
         setLoading(false);
       } catch (error) {
-        console.error("Fetch Device History Error:", error);
+        console.error("Fetch Carrier User Audit History Error:", error);
         setLoading(false);
         setAuditLogData(INITIAL_AUDIT_LOG_DATA);
-        setCurrentRow(row);
+        setCurrentUserId(userId);
         setIsHistoryModalOpen(true);
       }
     },
@@ -65,15 +74,21 @@ const useDeviceHistory = (fetchApi, setLoading) => {
 
   const closeHistoryModal = () => {
     setIsHistoryModalOpen(false);
-    setCurrentRow(null);
+    setCurrentUserId(null);
     setAuditLogData(INITIAL_AUDIT_LOG_DATA);
   };
 
   const handlePageChange = (newPage) => {
-    fetchHistory(currentRow, newPage, auditLogData.pageSize);
+    fetchHistory(currentUserId, newPage, auditLogData.pageSize);
   };
 
-  return { auditLogData, isHistoryModalOpen, fetchHistory, closeHistoryModal, handlePageChange };
+  return {
+    auditLogData,
+    isHistoryModalOpen,
+    fetchHistory,
+    closeHistoryModal,
+    handlePageChange,
+  };
 };
 
-export default useDeviceHistory;
+export default useCarrierUserAuditHistory;

@@ -71,7 +71,7 @@ const useCareerUsers = () => {
 
         const toDateStr = toDate ? toDate.format("YYYY-MM-DD") : "";
 
-        const endpoint = `/masteradmin/superuser/get-superusers?company_id=${companyId}&user_id=${user}&status=${status}&from_date=${fromDateStr}&to_date=${toDateStr}&page=${page}&limit=${limit}&search=${encodeURIComponent(
+        const endpoint = `/masteradmin/superuser/get-superusers?user_id=${user}&status=${status}&from_date=${fromDateStr}&to_date=${toDateStr}&page=${page}&limit=${limit}&search=${encodeURIComponent(
           search,
         )}`;
 
@@ -98,7 +98,7 @@ const useCareerUsers = () => {
         setError(null);
 
         const response = await fetchApi(
-          `/masteradmin/superuser/get-superusers?company_id=${companyId}&user_id=${userId}&page=1&limit=50`,
+          `/masteradmin/superuser/get-superusers?&user_id=${userId}&page=1&limit=50`,
         );
 
         // if (response?.body?.data?.[0]) {
@@ -153,16 +153,14 @@ const useCareerUsers = () => {
   );
 
   const saveCareerUser = useCallback(
-    async (formData, companyId, userId = null) => {
+    async (formData) => {
       try {
         setLoading(true);
 
         setError(null);
 
-        const payload = transformCareerUserPayload(formData, companyId, userId);
-
         const response = await createApi(
-          payload,
+          formData,
 
           "/masteradmin/superuser/create-or-update",
         );

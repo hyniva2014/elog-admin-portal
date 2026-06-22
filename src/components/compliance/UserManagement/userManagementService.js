@@ -1,6 +1,7 @@
 export const USER_ONBOARD_ENDPOINT = "/masteradmin/onboard-admin";
 export const USER_LIST_ENDPOINT = "/masteradmin/get-admin-users";
 export const USER_GET_USER_ENDPOINT = "/masteradmin/get-admin-users";
+export const USER_AUDIT_LOGS_ENDPOINT = "/masteradmin/carrier-user/audit-logs";
 
 export const getUsers = async (fetchApi, params = {}) => {
   const query = new URLSearchParams(params).toString();
@@ -18,4 +19,10 @@ export const onboardUser = async (createApi, payload) => {
 };
 export const getCompaniesDropdown = async (fetchApi) => {
   return fetchApi("/masteradmin/dropdown/companies", {}, "GET");
+};
+
+export const getUserAuditLogs = async (fetchApi, params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  const endpoint = `${USER_AUDIT_LOGS_ENDPOINT}?${query}`;
+  return fetchApi(endpoint, {}, "GET");
 };
