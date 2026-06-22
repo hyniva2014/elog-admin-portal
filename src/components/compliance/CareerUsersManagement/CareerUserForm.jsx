@@ -39,7 +39,7 @@ const debounce = (func, delay) => {
 };
 
 const getSubmitButtonText = (mode) => {
-  return mode === "edit" ? "Update Career User" : "Add Career User";
+  return mode === "edit" ? "Update Platform User" : "Add Platform User";
 };
 
 const FormActionButtons = ({ editMode, handleCancel, mode, canUpdate }) => {

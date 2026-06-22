@@ -46,14 +46,15 @@ export const transformCDLData = (cdlData = {}) => {
  */
 export const transformCareerUserPayload = (formData, companyId, userId = null) => {
   const payload = {
-    company_id: companyId,
-    user_name: formData.user_name || "",
+    company_id: companyId || "",
+    user_name: `${formData.first_name || ""} ${formData.last_name || ""}`,
     first_name: formData.first_name || "",
+    middle_name: formData.middle_name || "",
     last_name: formData.last_name || "",
     email: formData.email || "",
-    phone: formData.phone || "",
-    role_id: formData.role_id || "",
-    status_id: formData.status_id || "",
+    phone: formData.phone?.replace(/\D/g, "") || "",
+    role_id: formData.role || "",
+    status_id: formData.status || 1,
     hire_date: formData.hire_date
       ? dayjs(formData.hire_date).format("YYYY-MM-DD")
       : null,
@@ -61,16 +62,48 @@ export const transformCareerUserPayload = (formData, companyId, userId = null) =
       ? dayjs(formData.last_drug_test).format("YYYY-MM-DD")
       : null,
     primary_address: {
-      address_line1: formData.primary_address?.address_line1 || "",
-      address_line2: formData.primary_address?.address_line2 || "",
-      city: formData.primary_address?.city || "",
-      state: formData.primary_address?.state || "",
-      zip: formData.primary_address?.zip || "",
-      country: formData.primary_address?.country || "",
+      street: formData.address_line1 || "",
+      city: formData.city || "",
+      state: formData.states || "",
+      zip: formData.zip_code || "",
+      country: formData.country || "",
+    },
+    secondary_address: {
+      street: formData.secondary_address_line || "",
+      city: formData.secondary_city || "",
+      state: formData.secondary_states || "",
+      country: formData.secondary_country || "",
+      zip: formData.secondary_zip_code || "",
     },
     emp_history: transformEmploymentHistory(formData.emp_history),
     cdl_info: transformCDLData(formData.cdl_info),
+    citizenship: formData.citizenship || 1,
+    employment_type: formData.employment_type || 1,
+    gender: formData.gender,
+    dob: formData.dob ? dayjs(formData.dob).format("YYYY-MM-DD") : null,
+    ssn: formData.ssn?.replace(/\D/g, "") || "",
+    language: Array.isArray(formData.language)
+      ? formData.language.join(",")
+      : formData.language || "1",
+    contract_information:
+      formData.employment_type === 2
+        ? formData.contract_information || ""
+        : "",
+    termination_date: formData.termination_date
+      ? dayjs(formData.termination_date).format("YYYY-MM-DD")
+      : null,
   };
+
+  if (formData.citizenship !== 1) {
+    payload.passport_number = formData.passport_visa_number || "";
+    payload.passport_expiry_date = formData.passport_visa_expiry
+      ? dayjs(formData.passport_visa_expiry).format("YYYY-MM-DD")
+      : null;
+    payload.work_permit = formData.work_permit
+      ? dayjs(formData.work_permit).format("YYYY-MM-DD")
+      : null;
+    payload.country = formData.citizenship_country || "";
+  }
 
   if (userId) {
     payload.user_id = userId;
@@ -89,24 +122,41 @@ export const transformApiToFormData = (apiData = {}) => {
     user_id: apiData.user_id || "",
     user_name: apiData.user_name || "",
     first_name: apiData.first_name || "",
+    middle_name: apiData.middle_name || "",
     last_name: apiData.last_name || "",
     email: apiData.email || "",
     phone: apiData.phone || "",
     role_id: apiData.role_id || "",
-    role: apiData.role || "",
-    status_id: apiData.status_id || "",
+    role: apiData.role_id || "",
+    status_id: apiData.status_id || 1,
     hire_date: apiData.hire_date ? dayjs(apiData.hire_date) : null,
     last_drug_test: apiData.last_drug_test ? dayjs(apiData.last_drug_test) : null,
-    profile_photo: apiData.profile_photo || "",
-    primary_address: {
-      address_line1: apiData.primary_address?.address_line1 || "",
-      address_line2: apiData.primary_address?.address_line2 || "",
-      city: apiData.primary_address?.city || "",
-      state: apiData.primary_address?.state || "",
-      zip: apiData.primary_address?.zip || "",
-      country: apiData.primary_address?.country || "",
-    },
-    emp_history: apiData.emp_history?.map((item) => ({
+    termination_date: apiData.termination_date ? dayjs(apiData.termination_date) : null,
+    profile_photo: apiData.profile_pic || "",
+    citizenship: apiData.citizenship ? Number(apiData.citizenship) : 1,
+    employment_type: apiData.employment_type ? Number(apiData.employment_type) : 1,
+    gender: apiData.gender,
+    dob: apiData.dob ? dayjs(apiData.dob) : null,
+    ssn: apiData.ssn || "",
+    language: apiData.language ? apiData.language.split(",") : ["1"],
+    contract_information: apiData.contract_information || "",
+    total_years_of_experince: apiData.total_years_of_experince || "",
+    alternate_contact_number: apiData.alternate_contact_number || "",
+    passport_visa_number: apiData.passport_number || "",
+    passport_visa_expiry: apiData.passport_expiry_date ? dayjs(apiData.passport_expiry_date) : null,
+    work_permit: apiData.work_permit ? dayjs(apiData.work_permit) : null,
+    citizenship_country: apiData.country || "",
+    address_line1: apiData.primary_address?.street || "",
+    city: apiData.primary_address?.city || "",
+    states: apiData.primary_address?.state || "",
+    zip_code: apiData.primary_address?.zipcode || "",
+    country: apiData.primary_address?.country || "",
+    secondary_address_line: apiData.secondary_address?.street || "",
+    secondary_city: apiData.secondary_address?.city || "",
+    secondary_states: apiData.secondary_address?.state || "",
+    secondary_country: apiData.secondary_address?.country || "",
+    secondary_zip_code: apiData.secondary_address?.zipcode || "",
+    emp_history: (apiData.employee_experience || []).map((item) => ({
       emp_history_details: item.emp_history_details || "",
       emp_history_start_date: item.emp_history_start_date
         ? dayjs(item.emp_history_start_date)
@@ -115,16 +165,7 @@ export const transformApiToFormData = (apiData = {}) => {
         ? dayjs(item.emp_history_end_date)
         : null,
       emp_history_duration: item.emp_history_duration || "",
-      emp_history_reason: item.emp_history_reason || "",
-    })) || [
-      {
-        emp_history_details: "",
-        emp_history_start_date: null,
-        emp_history_end_date: null,
-        emp_history_duration: "",
-        emp_history_reason: "",
-      },
-    ],
+    })),
     cdl_info: {
       cdl_number: apiData.cdl_info?.cdl_number || "",
       cdl_state: apiData.cdl_info?.cdl_state || "",
@@ -414,7 +455,7 @@ export const buildCareerUserPayload = (formValues, companyId, userId = null, cre
 
   const payloadData = {
     user_name: `${formValues.first_name} ${formValues.last_name}`,
-    company_id: companyId,
+    company_id: companyId || "",
     role_id: formValues.role,
 
     first_name: formValues.first_name || "",

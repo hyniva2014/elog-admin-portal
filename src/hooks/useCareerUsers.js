@@ -153,16 +153,14 @@ const useCareerUsers = () => {
   );
 
   const saveCareerUser = useCallback(
-    async (formData, companyId, userId = null) => {
+    async (formData) => {
       try {
         setLoading(true);
 
         setError(null);
 
-        const payload = transformCareerUserPayload(formData, companyId, userId);
-
         const response = await createApi(
-          payload,
+          formData,
 
           "/masteradmin/superuser/create-or-update",
         );
