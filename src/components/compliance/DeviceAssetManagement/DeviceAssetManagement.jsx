@@ -92,21 +92,8 @@ const DeviceAssetManagement = () => {
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [deviceToDelete, setDeviceToDelete] = useState(null);
-  const {
-    auditLogData,
-    setAuditLogData,
-    isHistoryModalOpen,
-    selectedDeviceId,
-    fetchHistory,
-    openHistory,
-    closeHistoryModal,
-  } = useDeviceHistory(fetchApi, setLoading);
-
-  useEffect(() => {
-    if (isHistoryModalOpen && selectedDeviceId) {
-      fetchHistory({ id: selectedDeviceId });
-    }
-  }, [auditLogData.page, auditLogData.pageSize, isHistoryModalOpen, selectedDeviceId]);
+  const { historyData, isHistoryModalOpen, fetchHistory, closeHistoryModal } =
+    useDeviceHistory(fetchApi, setLoading);
 
   const user_name = useSelector(
       (state) => state.loginSlice.loginDetails?.body?.data?.userdetails?.user_name,
@@ -489,8 +476,8 @@ const DeviceAssetManagement = () => {
   };
 
   const columnHandlers = useMemo(
-    () => ({ onView: handleViewClick, onDelete: handleDeleteClick, onHistory: openHistory }),
-    [handleViewClick, handleDeleteClick, openHistory],
+   () => ({ onView: handleViewClick, onDelete: handleDeleteClick, onHistory: fetchHistory }),
+    [handleViewClick, handleDeleteClick, fetchHistory],
   );
 
   const columnPermissions = useMemo(
@@ -697,8 +684,7 @@ const DeviceAssetManagement = () => {
         maxWidth="md"
         content={
           <DeviceAssetHistoryModalContent
-            auditData={auditLogData}
-            setAuditData={setAuditLogData}
+           historyData={historyData}
             onClose={closeHistoryModal}
           />
         }
