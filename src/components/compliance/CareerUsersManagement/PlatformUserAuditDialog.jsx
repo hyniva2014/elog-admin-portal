@@ -1,8 +1,8 @@
+import { useMemo } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonDataGrid from "../../../common/CommonDataGrid";
-import { STATIC_GROUP_DATA } from "./Constants"
 import {
   auditCreatedDateSx,
   auditCreatedTimeSx,
@@ -17,18 +17,14 @@ const getAuditColumns = (theme) => [
     headerName: "Created By",
     sortable: false,
     flex: 1,
-    minWidth: 0,
-    width: undefined,
-    maxWidth: undefined,
+    minWidth: 150,
   },
   {
     field: "createdDate",
     headerName: "Created On",
     sortable: false,
     flex: 1,
-    minWidth: 0,
-    width: undefined,
-    maxWidth: undefined,
+    minWidth: 150,
     renderCell: ({ row }) => (
       <Box>
         <Typography sx={auditCreatedDateSx(theme)}>{row.createdDate}</Typography>
@@ -40,35 +36,38 @@ const getAuditColumns = (theme) => [
     field: "notes",
     headerName: "Notes",
     sortable: false,
-    flex: 1,
-    minWidth: 0,
-    width: undefined,
-    maxWidth: undefined,
+    flex: 2,
+    minWidth: 200,
   },
 ];
 
-
-
-
-
-const GroupDialogContent = ({ onClose }) => {
+const AuditDialogContent = ({ auditData, setAuditData, onClose }) => {
   const theme = useTheme();
   const columns = getAuditColumns(theme);
+
+  const data = useMemo(
+    () => ({
+      page: auditData.page,
+      pageSize: auditData.pageSize,
+      total: auditData.total,
+      isLoading: auditData.isLoading,
+    }),
+    [auditData],
+  );
 
   return (
     <Box sx={tableContainerSx}>
       <CommonDataGrid
         columnsData={columns}
-        rowData={STATIC_GROUP_DATA}
-        hideFooter
+        rowData={auditData.rows}
+        data={data}
+        setData={setAuditData}
         useAutoHeight
-        showMuiLoading={false}
+        showMuiLoading={auditData.isLoading}
         showColumnSeparator={false}
         disableStickyColumns
         getRowHeight={() => "auto"}
-        data={{}}
       />
-
       <Box sx={backButtonWrapperSx}>
         <Button variant="contained" onClick={onClose} sx={backButtonSx}>
           Back
@@ -78,12 +77,20 @@ const GroupDialogContent = ({ onClose }) => {
   );
 };
 
-const PlatformUserAuditDialog = ({ open, onClose }) => {
+const PlatformUserAuditDialog = ({ open, onClose, auditData, setAuditData }) => {
+  const dialogContent = open ? (
+    <AuditDialogContent
+      auditData={auditData}
+      setAuditData={setAuditData}
+      onClose={onClose}
+    />
+  ) : null;
+
   return (
     <CommonDialogForm
       open={open}
       title="Platform User Audit History"
-      content={<GroupDialogContent onClose={onClose} />}
+      content={dialogContent}
       onCancel={onClose}
       onClose={onClose}
       mode="view"
