@@ -33,3 +33,7 @@ export const BackButton = styled(Button)(({ theme }) => ({
     backgroundColor: theme.palette.brand.dark,
   },
 }));
+
+export const CreatedOnCellContainer = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(1),
+}));

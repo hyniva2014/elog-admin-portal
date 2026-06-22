@@ -1,10 +1,47 @@
 import React, { useMemo } from "react";
+import { Box, Typography } from "@mui/material";
 import CommonDataGrid from "../../../common/CommonDataGrid";
 import CommonDialogForm from "../../../common/CommonDialogForm";
-import { BackButton, BackButtonContainer } from "./CommomRowColumnUtils.styled";
+import {
+  BackButton,
+  BackButtonContainer,
+  CreatedOnCellContainer,
+} from "./CommomRowColumnUtils.styled";
 import { ACCOUNT_HISTORY_TITLE, BACK_BUTTON_TEXT } from "./Constants";
 
-const AuditLogModal = ({ open, onClose, auditData = [] }) => {
+const getRowHeight = () => "auto";
+
+const AuditLogRow = ({ entry, index }) => ({
+  id: index,
+  createdBy: entry.createdBy,
+  createdDate: entry.createdDate,
+  createdTime: entry.createdTime,
+  notes: entry.notes,
+});
+
+const CreatedOnCell = ({ params }) => {
+  return (
+    <CreatedOnCellContainer>
+      <Typography variant="body2">{params.row.createdDate}</Typography>
+
+      <Typography variant="body2" color="text.primary">
+        {params.row.createdTime}
+      </Typography>
+    </CreatedOnCellContainer>
+  );
+};
+
+const renderCreatedOnCell = (params) => <CreatedOnCell params={params} />;
+
+const AuditLogModal = ({
+  open,
+
+  onClose,
+
+  auditData = {},
+
+  setAuditData = () => {},
+}) => {
   const columns = useMemo(
     () => [
       {
@@ -14,13 +51,16 @@ const AuditLogModal = ({ open, onClose, auditData = [] }) => {
         minWidth: 150,
         headerTooltip: "Created By",
       },
+
       {
-        field: "createdOn",
+        field: "createdDate",
         headerName: "Created On",
         flex: 2,
         minWidth: 150,
         headerTooltip: "Created On",
+        renderCell: renderCreatedOnCell,
       },
+
       {
         field: "notes",
         headerName: "Notes",
@@ -29,28 +69,28 @@ const AuditLogModal = ({ open, onClose, auditData = [] }) => {
         headerTooltip: "Notes",
       },
     ],
+
     [],
   );
 
   const rows = useMemo(
     () =>
-      auditData.map((entry, index) => ({
-        id: index,
-        createdBy: entry.createdBy,
-        createdOn: entry.createdOn,
-        notes: entry.notes,
-      })),
-    [auditData],
+      auditData.rows?.map((entry, index) => AuditLogRow({ entry, index })) ||
+      [],
+    [auditData.rows],
   );
 
   const gridData = useMemo(
     () => ({
       rows,
       columns,
-      total: rows.length,
-      isLoading: false,
+      total: auditData.total || 0,
+      page: auditData.page || 1,
+      pageSize: auditData.pageSize || 20,
+      isLoading: auditData.isLoading || false,
     }),
-    [rows, columns],
+
+    [rows, columns, auditData],
   );
 
   const content = useMemo(
@@ -60,12 +100,13 @@ const AuditLogModal = ({ open, onClose, auditData = [] }) => {
           columnsData={columns}
           rowData={rows}
           data={gridData}
-          setData={() => {}}
-          hideFooter={true}
+          setData={setAuditData}
+          hideFooter={false}
           useAutoHeight={true}
-          disableStickyColumns
-          getRowHeight={() => "auto"}
+          disableStickyColumns={true}
+          getRowHeight={getRowHeight}
         />
+
         <BackButtonContainer>
           <BackButton variant="contained" onClick={onClose}>
             {BACK_BUTTON_TEXT}
@@ -73,7 +114,8 @@ const AuditLogModal = ({ open, onClose, auditData = [] }) => {
         </BackButtonContainer>
       </>
     ),
-    [columns, rows, gridData],
+
+    [columns, rows, gridData, setAuditData],
   );
 
   return (
