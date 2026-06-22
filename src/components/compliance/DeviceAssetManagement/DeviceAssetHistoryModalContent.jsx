@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, Typography } from "@mui/material";
 import CommonDataGrid from "../../../common/CommonDataGrid";
 import {
@@ -8,54 +8,91 @@ import {
   HistoryBackButton,
 } from "./DeviceAssetManagement.styles";
 
-const CreatedOnCell = (params) => (
+const CreatedOnCell = ({ params }) => (
   <Box>
-    <Typography fontSize={14}>{params.row.created_date || "-"}</Typography>
-    <HistoryTimeText>{params.row.created_time || ""}</HistoryTimeText>
+    <Typography fontSize={14}>{params.row.createdDate || "-"}</Typography>
+    <HistoryTimeText>{params.row.createdTime || ""}</HistoryTimeText>
   </Box>
 );
 
 const getHistoryRowHeight = () => "auto";
 
-const HISTORY_COLUMNS = [
-  {
-    field: "created_by",
-    headerName: "Created By",
-    flex: 1,
-    headerTooltip: true,
-  },
-  {
-    field: "created_date",
-    headerName: "Created On",
-    flex: 1,
-    headerTooltip: true,
-    renderCell: CreatedOnCell,
-  },
-  {
-    field: "notes",
-    headerName: "Notes",
-    flex: 1,
-    headerTooltip: true,
-  },
-];
+const DeviceAssetHistoryModalContent = ({
+  auditData = {},
+  setAuditData = () => {},
+  onClose,
+}) => {
+  const columns = useMemo(
+    () => [
+      {
+        field: "createdBy",
+        headerName: "Created By",
+        flex: 2,
+        minWidth: 150,
+        headerTooltip: "Created By",
+      },
+      {
+        field: "createdDate",
+        headerName: "Created On",
+        flex: 2,
+        minWidth: 150,
+        headerTooltip: "Created On",
+        renderCell: (params) => <CreatedOnCell params={params} />,
+      },
+      {
+        field: "notes",
+        headerName: "Notes",
+        flex: 3,
+        minWidth: 200,
+        headerTooltip: "Notes",
+      },
+    ],
+    [],
+  );
 
-const DeviceAssetHistoryModalContent = ({ historyData, onClose }) => (
-  <HistoryContentWrapper>
-    <CommonDataGrid
-      columnsData={HISTORY_COLUMNS}
-      rowData={historyData}
-      data={{ total: historyData.length }}
-      hideFooter
-      useAutoHeight
-      showMuiLoading={false}
-      getRowHeight={getHistoryRowHeight}
-    />
-    <HistoryBackButtonWrapper>
-      <HistoryBackButton variant="contained" onClick={onClose}>
-        Back
-      </HistoryBackButton>
-    </HistoryBackButtonWrapper>
-  </HistoryContentWrapper>
-);
+  const rows = useMemo(
+    () =>
+      auditData.rows?.map((entry, index) => ({
+        id: entry.id ?? index,
+        createdBy: entry.createdBy,
+        createdDate: entry.createdDate,
+        createdTime: entry.createdTime,
+        notes: entry.notes,
+      })) || [],
+    [auditData.rows],
+  );
+
+  const gridData = useMemo(
+    () => ({
+      rows,
+      columns,
+      total: auditData.total || 0,
+      page: auditData.page || 1,
+      pageSize: auditData.pageSize || 20,
+      isLoading: auditData.isLoading || false,
+    }),
+    [rows, columns, auditData],
+  );
+
+  return (
+    <HistoryContentWrapper>
+      <CommonDataGrid
+        columnsData={columns}
+        rowData={rows}
+        data={gridData}
+        setData={setAuditData}
+        hideFooter={false}
+        useAutoHeight={true}
+        disableStickyColumns={true}
+        getRowHeight={getHistoryRowHeight}
+      />
+      <HistoryBackButtonWrapper>
+        <HistoryBackButton variant="contained" onClick={onClose}>
+          Back
+        </HistoryBackButton>
+      </HistoryBackButtonWrapper>
+    </HistoryContentWrapper>
+  );
+};
 
 export default DeviceAssetHistoryModalContent;
