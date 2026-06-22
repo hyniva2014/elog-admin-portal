@@ -8,7 +8,7 @@ import CommonSnackbar from "../../../common/CommonSnackbar";
 import CommonLoading from "../../../common/CommonLoading";
 import CommonConfirmDialog from "../../../common/CommonConfirmDialog";
 import AccessControl from "../../../common/AccessControl";
-import { GridContainer } from "./AccountManagement.styled";
+import { GridContainer, EditButton, CancelEditButton } from "./AccountManagement.styled";
 import AddAccountDialog from "./AddAccountDialog";
 import StatusSelectDropdown from "./StatusSelectDropdown";
 import AuditLogModal from "./AuditLogModal";
@@ -80,6 +80,7 @@ const AccountManagement = () => {
   const [isStatusChangeOpen, setIsStatusChangeOpen] = useState(false);
   const [statusChangeData, setStatusChangeData] = useState(null);
   const [selectedTargetStatus, setSelectedTargetStatus] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
   const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
   const [auditLogData, setAuditLogData] = useState({
     rows: [],
@@ -89,6 +90,14 @@ const AccountManagement = () => {
     isLoading: false,
   });
   const [selectedCompanyId, setSelectedCompanyId] = useState(null);
+
+  const handleEditClick = useCallback(() => {
+    setIsEditing(true);
+  }, []);
+
+  const handleCancelEdit = useCallback(() => {
+    setIsEditing(false);
+  }, []);
 
   const getDefaultFilters = () => {
     return {
@@ -144,6 +153,7 @@ const AccountManagement = () => {
   const handleCloseAddAccount = useCallback(() => {
     setIsAddAccountOpen(false);
     setDialogMode("add");
+    setIsEditing(false);
     setSelectedCompany(null);
   }, []);
 
@@ -151,9 +161,8 @@ const AccountManagement = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   }, []);
 
-  const handleCancelEdit = useCallback(() => {
-    setDialogMode("view");
-  }, []);
+  // Cancel edit handler is already defined above
+
 
   const handleOpenStatusChange = useCallback((data) => {
     const defaultTarget =
@@ -212,6 +221,7 @@ const AccountManagement = () => {
     setIsAddAccountOpen,
     setDialogMode,
     setSelectedCompany,
+    setIsEditing,
     fetchApi,
     createApi,
   );
@@ -399,6 +409,34 @@ const AccountManagement = () => {
     isLoading: false,
   };
 
+  const isEditMode = dialogMode === "edit";
+
+  let headerActionsElement = null;
+
+  if (isEditMode && !isEditing) {
+    headerActionsElement = (
+      <EditButton
+        variant="contained"
+        onClick={handleEditClick}
+        disabled={!canUpdate}
+      >
+        Edit
+      </EditButton>
+    );
+  }
+
+  const dialogTitle = isEditMode
+    ? isEditing
+      ? "Edit Account"
+      : "View Account"
+    : "Add New Account";
+
+  const submitButtonLabel = isEditMode
+    ? isEditing
+      ? "Update"
+      : "Save"
+    : "Add Account";
+
   return (
     <PageContainer>
       <LoadingContainer />
@@ -441,7 +479,11 @@ const AccountManagement = () => {
         onClose={handleCloseAddAccount}
         onSubmit={handleCreateAccount}
         loading={false}
-        mode={dialogMode}
+        mode={isEditMode && !isEditing ? "view" : dialogMode}
+        isEditing={isEditing}
+        title={dialogTitle}
+        submitButtonText={submitButtonLabel}
+        headerActions={headerActionsElement}
         initialData={initialFormData}
         onCancelEdit={handleCancelEdit}
         fetchCarrierOptions={fetchCarrierOptions}
