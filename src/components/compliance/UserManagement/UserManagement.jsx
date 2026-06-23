@@ -20,6 +20,8 @@ import {
   getCompaniesDropdown,
 } from "./userManagementService";
 import usePermissions from "../../../hooks/usePermissions";
+import useCarrierUserAuditHistory from "./useCarrierUserAuditHistory";
+import UserManagementGroupDialog from "./UserManagementGroupDialog";
 
 /** Format ISO date string to DD-MM-YYYY */
 const formatDate = (iso) => (iso ? dayjs(iso).format("DD-MM-YYYY") : "-");
@@ -31,6 +33,14 @@ const UserManagement = () => {
   const dispatch = useDispatch();
   const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
   const { fetchApi, createApi } = useServices();
+
+  const {
+    auditLogData,
+    isHistoryModalOpen,
+    fetchHistory,
+    closeHistoryModal,
+    handlePageChange,
+  } = useCarrierUserAuditHistory(fetchApi, setLoading);
 
   const canCreate = checkPermission("Carrier Users", "CARRIER_USER_CREATE");
   const canUpdate = checkPermission("Carrier Users", "CARRIER_USER_UPDATE");
@@ -200,10 +210,10 @@ const UserManagement = () => {
 
   const columnsWithActions = useMemo(
     () =>
-      UserManagementColumnData(canView).map((col) =>
+      UserManagementColumnData(canView, fetchHistory).map((col) =>
         col.field === "action" ? { ...col, onView: handleViewRow } : col,
       ),
-    [handleViewRow, canView],
+    [handleViewRow, canView, fetchHistory],
   );
 
   const handleAddClick = () => {
@@ -215,6 +225,12 @@ const UserManagement = () => {
   const handleClose = () => {
     setOpenForm(false);
     setSelectedUser(null);
+  };
+
+  const handleAuditDataChange = (newData) => {
+    if (newData.page !== auditLogData.page) {
+      handlePageChange(newData.page);
+    }
   };
 
   const handleGetRowHeight = () => "auto";
@@ -354,6 +370,13 @@ const UserManagement = () => {
         mode={mode}
         initialData={selectedUser}
         companyOptions={companyOptions}
+      />
+
+      <UserManagementGroupDialog
+        open={isHistoryModalOpen}
+        onClose={closeHistoryModal}
+        auditData={auditLogData}
+        setAuditData={handleAuditDataChange}
       />
 
       <CommonSnackbar

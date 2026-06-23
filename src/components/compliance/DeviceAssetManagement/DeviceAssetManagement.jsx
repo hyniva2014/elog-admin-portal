@@ -92,7 +92,7 @@ const DeviceAssetManagement = () => {
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [deviceToDelete, setDeviceToDelete] = useState(null);
-  const { historyData, isHistoryModalOpen, fetchHistory, closeHistoryModal } =
+  const { auditLogData, isHistoryModalOpen, fetchHistory, closeHistoryModal, handlePageChange } =
     useDeviceHistory(fetchApi, setLoading);
 
   const user_name = useSelector(
@@ -476,7 +476,7 @@ const DeviceAssetManagement = () => {
   };
 
   const columnHandlers = useMemo(
-    () => ({ onView: handleViewClick, onDelete: handleDeleteClick, onHistory: fetchHistory }),
+   () => ({ onView: handleViewClick, onDelete: handleDeleteClick, onHistory: fetchHistory }),
     [handleViewClick, handleDeleteClick, fetchHistory],
   );
 
@@ -681,11 +681,12 @@ const DeviceAssetManagement = () => {
         title="Device Asset Management"
         formId="deviceHistoryForm"
         loading={false}
-        maxWidth="sm"
+        maxWidth="md"
         content={
           <DeviceAssetHistoryModalContent
-            historyData={historyData}
+            auditLogData={auditLogData}
             onClose={closeHistoryModal}
+            onPageChange={handlePageChange}
           />
         }
       />

@@ -34,8 +34,8 @@ export const StatusChipSx = (isActive) => (theme) => ({
   fontSize: "12px",
   fontWeight: 500,
   background: isActive
-    ? theme.palette.success.light
-    : theme.palette.error.light,
+    ? theme.palette.success.GreenLight
+    : theme.palette.error.RedLight,
   color: isActive ? theme.palette.success.dark : theme.palette.error.main,
 });
 
@@ -44,7 +44,7 @@ export const StatusDotSx = (isActive) => (theme) => ({
   height: 6,
   borderRadius: "50%",
   backgroundColor: isActive
-    ? theme.palette.success.main
+    ? theme.palette.success.dark
     : theme.palette.error.main,
 });
 

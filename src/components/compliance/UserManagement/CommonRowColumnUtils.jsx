@@ -1,11 +1,10 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import dayjs from "dayjs";
 import { Box, IconButton, Typography, Tooltip } from "@mui/material";
 
 import eyeIcon from "../../../assets/images/svg/eyeicon.png";
 import GroupIcon from "../../../assets/images/svg/Group.png";
 
-import UserManagementGroupDialog from "./UserManagementGroupDialog";
 import { StatusText } from "./CommonRowColumnUtils.styled";
 import { USER_STATUS, USER_STATUS_COL_CONFIG } from "./Constants";
 import { getFormattedDateTime } from "../../../common/CommonUtils";
@@ -20,20 +19,24 @@ const StatusCell = (params) => {
   return <StatusText statuscolor={color}>{params.value || "-"}</StatusText>;
 };
 
-const ActionCellComponent = ({ params, canView }) => {
-  const [groupDialogOpen, setGroupDialogOpen] = useState(false);
-
+const ActionCellComponent = ({ params, canView, onAuditHistory }) => {
   const handleViewClick = useCallback(() => {
     if (canView) {
       params.colDef.onView?.(params.row);
     }
   }, [params, canView]);
 
+  const handleAuditHistoryClick = useCallback(() => {
+    if (onAuditHistory) {
+      onAuditHistory(params.row.user_id);
+    }
+  }, [onAuditHistory, params.row.user_id]);
+
   return (
     <>
       <ActionContainer>
         <Tooltip title="Group">
-          <IconButton size="small" onClick={() => setGroupDialogOpen(true)}>
+          <IconButton size="small" onClick={handleAuditHistoryClick}>
             <GroupIconImage component="img" src={GroupIcon} alt="group" />
           </IconButton>
         </Tooltip>
@@ -50,20 +53,15 @@ const ActionCellComponent = ({ params, canView }) => {
           </span>
         </Tooltip>
       </ActionContainer>
-
-      <UserManagementGroupDialog
-        open={groupDialogOpen}
-        onClose={() => setGroupDialogOpen(false)}
-      />
     </>
   );
 };
 
-const ActionCell = (canView) => (params) => (
-  <ActionCellComponent params={params} canView={canView} />
+const ActionCell = (canView, onAuditHistory) => (params) => (
+  <ActionCellComponent params={params} canView={canView} onAuditHistory={onAuditHistory} />
 );
 
-export const UserManagementColumnData = (canView = true) => [
+export const UserManagementColumnData = (canView = true, onAuditHistory) => [
   {
     field: "carrierId",
     headerName: "Carrier ID",
@@ -155,7 +153,7 @@ export const UserManagementColumnData = (canView = true) => [
     headerName: "Action",
     flex: 1,
     sortable: false,
-    renderCell: ActionCell(canView),
+    renderCell: ActionCell(canView, onAuditHistory),
   },
 ];
 

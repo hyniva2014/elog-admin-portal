@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Paper, Typography, ListItemButton, Radio } from "@mui/material";
+import { Box, Button, Grid, Paper, Typography, ListItemButton, Radio, Breadcrumbs, Link, FormControl, Pagination } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 import TelegramIcon from "@mui/icons-material/Telegram";
 
@@ -43,23 +43,13 @@ export const AlertCardContainer = styled(Paper, {
 
 // Left Sidebar - Alert List
 export const AlertList = styled(Box)(({ theme }) => ({
-  flex: "0 0 300px",
+  height: "calc(100vh - 159px)",
   overflowY: "auto",
   display: "flex",
   flexDirection: "column",
 
   "&::-webkit-scrollbar": {
     width: 6,
-  },
-  "&::-webkit-scrollbar-track": {
-    background: theme.palette.grey[100],
-  },
-  "&::-webkit-scrollbar-thumb": {
-    background: theme.palette.grey[400],
-    borderRadius: 3,
-  },
-  "&::-webkit-scrollbar-thumb:hover": {
-    background: theme.palette.grey[500],
   },
 }));
 
@@ -72,7 +62,7 @@ export const AlertCard = styled(Box, {
   background: active ? theme.palette.custom.alertActiveBackground : theme.palette.common.white,
   borderRadius: "4px",
   overflow: "hidden",
-  minHeight: 90,
+  minHeight: 130,
   border: `1px solid ${theme.palette.grey[200]}`,
   position: "relative",
   cursor: "pointer",
@@ -252,7 +242,7 @@ export const InfoSection = styled(Box)(() => ({
 export const TriggerSection = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  gap: 16,
+  gap: 5,
   backgroundColor: theme.palette.custom.triggerBackground,
   padding: 16,
   border: `1px solid ${theme.palette.custom.triggerBorder}`,
@@ -278,13 +268,13 @@ export const TriggerSectionTitle = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.primary,
   letterSpacing: 0,
   marginLeft: 0,
-  marginTop: 0,
+  marginTop: "-25px",
 }));
 
 export const InfoGrid = styled(Box)(({ theme }) => ({
   display: "grid",
   gridTemplateColumns: "repeat(3, 1fr)",
-  gap: 16,
+  gap: 10,
 
   [theme.breakpoints.down("md")]: {
     gridTemplateColumns: "repeat(2, 1fr)",
@@ -298,7 +288,7 @@ export const InfoGrid = styled(Box)(({ theme }) => ({
 export const TriggerInfoGrid = styled(Box)(() => ({
   display: "grid",
   gridTemplateColumns: "1fr 1fr",
-  gap: 16,
+  gap: 0,
 }));
 
 export const InfoCard = styled(Paper)(() => ({
@@ -400,7 +390,7 @@ export const AlertTime = styled(Typography)(({ theme }) => ({
 // Action Buttons Section
 export const ActionSection = styled(Box)(({ theme }) => ({
   display: "flex",
-  gap: 12,
+  gap: 10,
   paddingTop: 16,
   borderTop: `1px solid ${theme.palette.divider}`,
 }));
@@ -662,12 +652,12 @@ export const ChatMessages = styled(Box)(({ theme }) => ({
 
 export const CurrentUserBubble = styled(Box)(({ theme }) => ({
   maxWidth: "65%",
-  padding: "12px 16px",
-  borderRadius: "16px 16px 4px 16px",
+  padding: "10px 14px",
+  borderRadius: "16px 4px 16px 16px",
   backgroundColor: theme.palette.custom.navyBlue,
   color: theme.palette.common.white,
   fontSize: 14,
-  lineHeight: 1.5,
+  lineHeight: 1.3,
   alignSelf: "flex-end",
 }));
 
@@ -789,4 +779,123 @@ export const OperatorPrimaryText = styled(Typography)(() => ({
 
 export const OperatorSecondaryText = styled(Typography)(() => ({
   fontSize: 12,
+}));
+
+export const PanelHeader = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "7px 10px",
+  borderBottom: `1px solid ${theme.palette.divider}`,
+}));
+
+export const PanelTitle = styled(Typography)(({ theme }) => ({
+  fontSize: 20,
+  fontWeight: 700,
+  color: theme.palette.text.primary,
+  marginBottom: 4,
+}));
+
+export const PanelBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
+  "& .MuiBreadcrumbs-separator": {
+    color: theme.palette.text.disabled,
+  },
+}));
+
+export const PanelBreadcrumbLink = styled(Link)(({ theme }) => ({
+  fontSize: 13,
+  fontWeight: 500,
+  color: theme.palette.text.secondary,
+  textDecoration: "none",
+  "&:hover": {
+    textDecoration: "underline",
+  },
+}));
+
+export const PanelBreadcrumbText = styled(Typography)(({ theme }) => ({
+  fontSize: 13,
+  fontWeight: 500,
+  color: theme.palette.text.primary,
+}));
+
+export const PanelDropdown = styled(FormControl)(({ theme }) => ({
+  minWidth: 120,
+  "& .MuiOutlinedInput-root": {
+    fontSize: 13,
+  },
+}));
+
+export const PanelDescription = styled(Typography)(({ theme }) => ({
+  fontSize: 14,
+  color: theme.palette.text.secondary,
+  marginTop: 8,
+  lineHeight: 1.5,
+}));
+
+export const TriggerInformationTitle = styled(Typography)(({ theme }) => ({
+  margin: 0,
+  fontSize: 16,
+  fontWeight: 700,
+  textTransform: "none",
+  color: theme.palette.text.primary,
+  letterSpacing: 0,
+  marginLeft: 0,
+  marginTop: 0,
+}));
+
+export const NoDataContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  minHeight: "300px",
+  width: "100%",
+  fontSize: "18px",
+  fontWeight: 500,
+  borderRadius: "12px",
+  padding: theme.spacing(3),
+}));
+
+export const PaginationContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "8px 16px",
+  borderTop: `1px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.background.paper,
+}));
+
+export const PaginationText = styled(Typography)(({ theme }) => ({
+  fontSize: "14px",
+  fontWeight: 500,
+  color: theme.palette.text.secondary,
+}));
+
+export const StyledPagination = styled(Pagination)(({ theme }) => ({
+  "& .MuiPaginationItem-root": {
+    borderRadius: "6px",
+    minWidth: "32px",
+    height: "32px",
+    fontSize: "13px",
+    color: theme.palette.text.primary,
+  },
+
+  "& .MuiPaginationItem-page.Mui-selected": {
+    backgroundColor: theme.palette.brand.main, 
+    color: theme.palette.common.white,
+    fontWeight: 600,
+  },
+
+  "& .MuiPaginationItem-page.Mui-selected:hover": {
+    backgroundColor: theme.palette.brand.dark,
+  },
+
+  "& .MuiPaginationItem-previousNext": {
+    backgroundColor: theme.palette.grey[100],
+    borderRadius: "6px",
+    border: `1px solid ${theme.palette.divider}`,
+  },
+
+  "& .MuiPaginationItem-previousNext:hover": {
+    backgroundColor: theme.palette.grey[200],
+  },
 }));
