@@ -6,21 +6,59 @@ import {
 } from "./AlertCenterScreenCard.styles.jsx";
 
 const ChatMessageItem = ({ messageItem }) => {
-  const { message: msg, time, isCurrentUser } = messageItem;
+  const {
+    message,
+    fileName,
+    fileUrl,
+    time,
+    isCurrentUser,
+  } = messageItem;
+  
+
+  const content = (
+    <>
+      {message && <div>{message}</div>}
+
+      {fileUrl && (
+        <a
+          href={fileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            color: "#fff",
+            textDecoration: "underline",
+            wordBreak: "break-word",
+          }}
+        >
+          {fileName}
+        </a>
+      )}
+    </>
+  );
 
   if (isCurrentUser) {
     return (
-      <MessageContainer $isCurrentUser={isCurrentUser}>
-        <CurrentUserBubble>{msg}</CurrentUserBubble>
-        <CurrentChatTimestamp $isCurrentUser>{time}</CurrentChatTimestamp>
+      <MessageContainer $isCurrentUser>
+        <CurrentUserBubble>
+          {content}
+        </CurrentUserBubble>
+
+        <CurrentChatTimestamp $isCurrentUser>
+          {time}
+        </CurrentChatTimestamp>
       </MessageContainer>
     );
   }
 
   return (
-    <MessageContainer $isCurrentUser={isCurrentUser}>
-      <OtherUserBubble>{msg}</OtherUserBubble>
-      <CurrentChatTimestamp>{time}</CurrentChatTimestamp>
+    <MessageContainer $isCurrentUser={false}>
+      <OtherUserBubble>
+        {content}
+      </OtherUserBubble>
+
+      <CurrentChatTimestamp>
+        {time}
+      </CurrentChatTimestamp>
     </MessageContainer>
   );
 };
