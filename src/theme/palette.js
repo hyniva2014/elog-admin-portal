@@ -11,7 +11,8 @@ export const getColorVariants = (color, contrastText) => {
     lighter: lighten(color, 0.6),
 
     light: lighten(color, 0.35),
-
+    GreenLight: "#E8F8F0",
+    RedLight : "#FFF5F5",
     main: color,
 
     dark: darken(color, 0.35),

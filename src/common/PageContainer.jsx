@@ -11,7 +11,7 @@ export const PageContainer = styled(Box)(({ theme }) => {
     borderRadius: theme.shape.borderRadius * 2,
     padding: theme.spacing(2),
 
-    // height: "calc(100vh - 150px)",
+    height: "calc(100vh - 150px)",
     display: "flex",
     flexDirection: "column",
     marginTop: theme.spacing(2),
