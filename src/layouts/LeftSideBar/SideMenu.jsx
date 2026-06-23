@@ -282,6 +282,8 @@ const SideMenu = ({ menuItems: propMenuItems, isCollapsed }) => {
   const location = useLocation();
   const { settings, updateSidenav } = useLayoutContext();
   const [activeMenuItems, setActiveMenuItems] = useState([]);
+  const [manualOverride, setManualOverride] = useState(false);
+  const prevCollapsedRef = useRef(isCollapsed);
 
   const theme = useMemo(
     () => getLeftbarTheme(settings.sidenav.theme),
@@ -291,16 +293,37 @@ const SideMenu = ({ menuItems: propMenuItems, isCollapsed }) => {
   const filteredMenuItemsFromHook = useFilteredMenuItems();
   const filteredMenuItems = useMemo(() => propMenuItems || filteredMenuItemsFromHook, [propMenuItems, filteredMenuItemsFromHook]);
 
+  useEffect(() => {
+    if (prevCollapsedRef.current && !isCollapsed) {
+      const timeSinceLastToggle = Date.now() - manualToggleRef.current;
+      if (timeSinceLastToggle > 1000) {
+        setManualOverride(false);
+      }
+    }
+    prevCollapsedRef.current = isCollapsed;
+  }, [isCollapsed]);
+
   const activateMenu = useCallback(() => {
     const match = getMenuItemFromURL(filteredMenuItems, location.pathname);
     if (match) {
       const item = findMenuItem(filteredMenuItems, match.key);
       const newActive = [item.key, ...findAllParent(filteredMenuItems, item)];
-      setActiveMenuItems((prev) =>
-        JSON.stringify(prev) === JSON.stringify(newActive) ? prev : newActive,
-      );
+      
+      setActiveMenuItems((prev) => {
+        if (manualOverride) {
+          const currentPageHighlighted = newActive.every(key => prev.includes(key));
+          
+          if (currentPageHighlighted) {
+            return prev;
+          } else {
+            return newActive;
+          }
+        } else {
+          return JSON.stringify(prev) === JSON.stringify(newActive) ? prev : newActive;
+        }
+      });
     }
-  }, [location.pathname, filteredMenuItems]);
+  }, [location.pathname, filteredMenuItems, manualOverride]);
 
   const manualToggleRef = useRef(0);
 
@@ -310,26 +333,62 @@ const SideMenu = ({ menuItems: propMenuItems, isCollapsed }) => {
     }
   }, [activateMenu]);
 
+
+  useEffect(() => {
+    const currentMatch = getMenuItemFromURL(filteredMenuItems, location.pathname);
+    const timeSinceLastToggle = Date.now() - manualToggleRef.current;
+    
+    if (currentMatch && timeSinceLastToggle > 3000) {
+      const currentTopLevel = findMenuItem(filteredMenuItems, currentMatch.key);
+      const currentTopLevelKey = currentTopLevel && !currentTopLevel.parentKey ? currentTopLevel.key : null;
+      
+      const hasActiveTopLevel = activeMenuItems.some(key => {
+        const item = findMenuItem(filteredMenuItems, key);
+        return item && !item.parentKey;
+      });
+      
+      if (currentTopLevelKey && (!hasActiveTopLevel || !activeMenuItems.includes(currentTopLevelKey))) {
+        setManualOverride(false);
+      }
+    }
+  }, [location.pathname, filteredMenuItems, activeMenuItems]);
+
   const handleNavigate = useCallback(() => {
     updateSidenav({ isCollapsed: true });
   }, [updateSidenav]);
 
   const toggleMenu = useCallback((menuItem, show) => {
     manualToggleRef.current = Date.now();
+    setManualOverride(true); 
     setActiveMenuItems((prev) => {
       if (show) {
+
+        const topLevelMenuKeys = filteredMenuItems
+          .filter(item => !item.parentKey)
+          .map(item => item.key);
+        
+        const otherTopLevelKeys = topLevelMenuKeys.filter(key => 
+          key !== menuItem.key && !findAllParent(filteredMenuItems, menuItem).some(parent => parent.key === key)
+        );
+        
+        const filteredPrev = prev.filter(key => !otherTopLevelKeys.includes(key));
+        
+        const menuItemAndParents = [menuItem.key, ...findAllParent(filteredMenuItems, menuItem)];
         const currentMatch = getMenuItemFromURL(filteredMenuItems, location.pathname);
+        
         if (currentMatch) {
           const currentItem = findMenuItem(filteredMenuItems, currentMatch.key);
           const activeItems = [currentItem.key, ...findAllParent(filteredMenuItems, currentItem)];
-          return activeItems.includes(menuItem.key)
-            ? activeItems
-            : [menuItem.key, ...activeItems];
+          if (activeItems.includes(menuItem.key)) {
+            return [...filteredPrev, ...menuItemAndParents];
+          }
         }
-        return [menuItem.key, ...findAllParent(filteredMenuItems, menuItem)];
+        
+        return [...filteredPrev, ...menuItemAndParents];
       }
       return prev.filter((key) => key !== menuItem.key);
     });
+    
   }, [filteredMenuItems, location.pathname]);
 
   return (

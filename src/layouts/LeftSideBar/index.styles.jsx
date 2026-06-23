@@ -20,4 +20,12 @@ export const LeftSideBarWrapper = styled("div")(({ theme, settings }) => {
 
 export const SidebarScrollContainer = styled(SimpleBar)(() => ({
   height: "calc(100% - 70px)",
+  '& .simplebar-scrollbar': {
+    '&.simplebar-visible:before': {
+      backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    },
+  },
+  '& .simplebar-track.simplebar-vertical': {
+    width: '6px',
+  },
 }));
