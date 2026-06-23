@@ -17,7 +17,6 @@ import {
   saveRoleApi,
 } from "./RolePermissionsApi";
 import AuditLogModal from "./AuditLogModal";
-
 import {
   Container,
   Header,
@@ -28,6 +27,7 @@ import {
   FormEditButton,
 } from "./RoleManagement.styled";
 import { PageContainer } from "../../../common/PageContainer";
+import { formatDateTime } from "../../../common/CommonUtils";
 
 const RoleManagement = () => {
   const { fetchApi, createApi } = useServices();
@@ -36,9 +36,19 @@ const RoleManagement = () => {
   const { checkPermission } = usePermissions();
   const { refreshPermissions } = usePermissionRefresh();
   const dispatch = useDispatch();
-  const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
+
+  const loginDetails = useSelector(
+    (state) => state.loginSlice.loginDetails || {},
+  );
+
   const canView = checkPermission("Roles Overview", "ROLE_OVERVIEW_VIEW");
-  const canViewAll = checkPermission("Roles Overview", "ROLE_OVERVIEW_VIEW_ALL");
+
+  const canViewAll = checkPermission(
+    "Roles Overview",
+
+    "ROLE_OVERVIEW_VIEW_ALL",
+  );
+
   const canCreate = checkPermission("Roles Overview", "ROLE_OVERVIEW_CREATE");
   const canUpdate = checkPermission("Roles Overview", "ROLE_OVERVIEW_UPDATE");
   const canDelete = checkPermission("Roles Overview", "ROLE_OVERVIEW_DELETE");
@@ -61,8 +71,14 @@ const RoleManagement = () => {
     severity: "success",
   });
   const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
-  const [auditLogData, setAuditLogData] = useState([]);
-
+  const [auditLogData, setAuditLogData] = useState({
+    rows: [],
+    total: 0,
+    page: 1,
+    pageSize: 10,
+    isLoading: false,
+  });
+  const [selectedRoleId, setSelectedRoleId] = useState(null);
   const handleSnackbar = useCallback((message, severity = "info") => {
     setSnackbar({
       open: true,
@@ -85,13 +101,10 @@ const RoleManagement = () => {
   const fetchRoles = async () => {
     try {
       setLoading(true);
-
       const apiRoles = await fetchRolesApi(fetchApi);
-
       setRoles(apiRoles);
     } catch (error) {
       console.error("Fetch Roles Error:", error);
-
       handleSnackbar("Failed to fetch roles", "error");
     } finally {
       setLoading(false);
@@ -101,23 +114,16 @@ const RoleManagement = () => {
   const fetchRoleById = async (roleId) => {
     try {
       setLoading(true);
-
       const roleDetails = await fetchRoleByIdApi(fetchApi, roleId);
-
       setDefaultValues({
         id: roleDetails?.id,
-
         title: roleDetails?.name || "",
-
         description: roleDetails?.description || "",
-
         status: roleDetails?.status,
       });
 
       setIsEditMode(true);
-
       setIsEditing(false);
-
       setOpenDialog(true);
     } catch (error) {
       console.error("Fetch Role By Id Error:", error);
@@ -128,9 +134,7 @@ const RoleManagement = () => {
 
   const handleAddRole = useCallback(() => {
     setIsEditMode(false);
-
     setIsEditing(true);
-
     setDefaultValues({
       title: "",
       description: "",
@@ -146,11 +150,8 @@ const RoleManagement = () => {
 
   const handleCloseDialog = useCallback(() => {
     setOpenDialog(false);
-
     setIsEditMode(false);
-
     setIsEditing(false);
-
     setDefaultValues({
       title: "",
       description: "",
@@ -161,19 +162,13 @@ const RoleManagement = () => {
   const handleSaveRole = async (formValues) => {
     try {
       setLoading(true);
-
       const payload = {
         is_superuser: 1,
-
         name: formValues.title,
-
         description: formValues.description,
-
         is_system_role: false,
-
         status: formValues.status ?? 1,
       };
-
       if (formValues.id) {
         payload.role_id = formValues.id;
       }
@@ -185,6 +180,7 @@ const RoleManagement = () => {
           formValues.id
             ? "Role updated successfully"
             : "Role created successfully",
+
           "success",
         );
 
@@ -194,6 +190,7 @@ const RoleManagement = () => {
       } else {
         handleSnackbar(
           response?.body?.message || "Something went wrong",
+
           "warning",
         );
       }
@@ -210,6 +207,7 @@ const RoleManagement = () => {
     (role) => {
       handleEditRole(role);
     },
+
     [handleEditRole],
   );
 
@@ -221,53 +219,95 @@ const RoleManagement = () => {
     setIsEditing(false);
   }, []);
 
+  const transformAuditLogData = useCallback(
+    (records) => {
+      return records.map((record) => {
+        const { date, time } = formatDateTime(record.created_at);
+
+        return {
+          createdBy: record.created_by || "-",
+          createdDate: date,
+          createdTime: time,
+          notes: record.description || "-",
+        };
+      });
+    },
+
+    [formatDateTime],
+  );
+
   const handleOpenAuditLog = useCallback(
     async (role) => {
       setLoading(true);
+      setSelectedRoleId(role.id);
 
       try {
-        const endUrl = `/masteradmin/audit-log?role_id=${role.id}`;
+        const { page, pageSize } = auditLogData;
+        const endUrl = `/masteradmin/roles/audit-logs?role_id=${role.id}&page=${page}&limit=${pageSize}`;
         const response = await fetchApi(endUrl);
-
-        if (response?.statusCode === 200 && response?.body?.data) {
-          const responseData = response?.body?.data;
-          const records = responseData?.data
-            ? Array.isArray(responseData.data)
-              ? responseData.data
-              : [responseData.data]
-            : responseData
-              ? Array.isArray(responseData)
-                ? responseData
-                : [responseData]
-              : [];
-
-          const transformedData = records.map((record) => ({
-            createdBy: record.created_by || record.user || "-",
-            createdOn: record.created_on || record.timestamp || "-",
-            notes: record.notes || record.details || record.action || "-",
-          }));
-
-          setAuditLogData(transformedData);
-          setIsAuditLogOpen(true);
+        if (response?.statusCode === 200 && response?.body?.audit_logs) {
+          const auditLogs = response?.body?.audit_logs;
+          const records = Array.isArray(auditLogs) ? auditLogs : [auditLogs];
+          const pagination = response?.body?.pagination;
+          const transformedData = transformAuditLogData(records);
+          setAuditLogData({
+            rows: transformedData,
+            total: pagination?.total_records || 0,
+            page: pagination?.current_page || 1,
+            pageSize: pagination?.limit || 10,
+            isLoading: false,
+          });
         } else {
-          setAuditLogData([]);
-          setIsAuditLogOpen(true);
+          setAuditLogData({
+            rows: [],
+            total: 0,
+            page: 1,
+            pageSize: 10,
+            isLoading: false,
+          });
         }
       } catch (err) {
         console.error("Error fetching audit log:", err);
-        setAuditLogData([]);
-        setIsAuditLogOpen(true);
+
+        setAuditLogData({
+          rows: [],
+          total: 0,
+          page: 1,
+          pageSize: 10,
+          isLoading: false,
+        });
       } finally {
         setLoading(false);
+        setIsAuditLogOpen(true);
       }
     },
-    [fetchApi, setLoading],
+
+    [fetchApi, setLoading, auditLogData.page, auditLogData.pageSize],
   );
 
   const handleCloseAuditLog = useCallback(() => {
     setIsAuditLogOpen(false);
-    setAuditLogData([]);
+    setAuditLogData({
+      rows: [],
+      total: 0,
+      page: 1,
+      pageSize: 10,
+      isLoading: false,
+    });
+    setSelectedRoleId(null);
   }, []);
+
+  useEffect(() => {
+    if (isAuditLogOpen && selectedRoleId) {
+      handleOpenAuditLog({ id: selectedRoleId });
+    }
+  }, [
+    auditLogData.page,
+    auditLogData.pageSize,
+    isAuditLogOpen,
+    selectedRoleId,
+    handleOpenAuditLog,
+  ]);
 
   const roleCards = roles.map((role) => {
     const roleData = {
@@ -279,7 +319,16 @@ const RoleManagement = () => {
       color: theme.palette.brand.main,
     };
 
-    return <RoleCard key={role.id} role={roleData} onEdit={handleRoleEdit} onOpenAuditLog={handleOpenAuditLog} canView={canView} canUpdate={canUpdate} />;
+    return (
+      <RoleCard
+        key={role.id}
+        role={roleData}
+        onEdit={handleRoleEdit}
+        onOpenAuditLog={handleOpenAuditLog}
+        canView={canView}
+        canUpdate={canUpdate}
+      />
+    );
   });
 
   const pageTitle = isEditMode ? "Edit Role" : "Add Role";
@@ -288,7 +337,11 @@ const RoleManagement = () => {
 
   const headerActions = isEditMode ? (
     !isEditing ? (
-      <FormEditButton variant="outlined" onClick={handleEnableEdit} size="small">
+      <FormEditButton
+        variant="outlined"
+        onClick={handleEnableEdit}
+        size="small"
+      >
         Edit
       </FormEditButton>
     ) : (
@@ -307,61 +360,65 @@ const RoleManagement = () => {
   return (
     <>
       <LoadingContainer />
-    <AccessControl hasAccess={canViewAll}>
-      <PageContainer>
-        <Header>
-          <Box>
-            <Title variant="inherit">Roles Overview</Title>
 
-            <Subtitle>Quick view of all roles and their access levels</Subtitle>
-          </Box>
+      <AccessControl hasAccess={canViewAll}>
+        <PageContainer>
+          <Header>
+            <Box>
+              <Title variant="inherit">Roles Overview</Title>
 
-          <AddButton 
-            variant="contained" 
-            onClick={handleAddRole}
-            disabled={!canCreate}
-          >
-            Add Role
-          </AddButton>
-        </Header>
+              <Subtitle>
+                Quick view of all roles and their access levels
+              </Subtitle>
+            </Box>
 
-        <Box>{roleCards}</Box>
+            <AddButton
+              variant="contained"
+              onClick={handleAddRole}
+              disabled={!canCreate}
+            >
+              Add Role
+            </AddButton>
+          </Header>
 
-        <CommonDialogForm
-          open={openDialog}
-          onCancel={handleCloseDialog}
-          onClose={handleCloseDialog}
-          title={pageTitle}
-          formId="role-form"
-          submitButtonText={submitButtonLabel}
-          isEditing={isEditing}
-          disableSubmit={disableSubmit}
-          headerActions={headerActions}
-          content={
-            <RoleManagementForm
-              formId="role-form"
-              defaultValues={defaultValues}
-              isEditMode={isEditMode}
-              isEditing={isEditing}
-              onSubmit={handleSaveRole}
-            />
-          }
-        />
+          <Box>{roleCards}</Box>
 
-        <CommonSnackbar
-          open={snackbar.open}
-          message={snackbar.message}
-          severity={snackbar.severity}
-          onClose={handleSnackbarClose}
-        />
+          <CommonDialogForm
+            open={openDialog}
+            onCancel={handleCloseDialog}
+            onClose={handleCloseDialog}
+            title={pageTitle}
+            formId="role-form"
+            submitButtonText={submitButtonLabel}
+            isEditing={isEditing}
+            disableSubmit={disableSubmit}
+            headerActions={headerActions}
+            content={
+              <RoleManagementForm
+                formId="role-form"
+                defaultValues={defaultValues}
+                isEditMode={isEditMode}
+                isEditing={isEditing}
+                onSubmit={handleSaveRole}
+              />
+            }
+          />
 
-        <AuditLogModal
-          open={isAuditLogOpen}
-          onClose={handleCloseAuditLog}
-          auditData={auditLogData}
-        />
-      </PageContainer>
-    </AccessControl>
+          <CommonSnackbar
+            open={snackbar.open}
+            message={snackbar.message}
+            severity={snackbar.severity}
+            onClose={handleSnackbarClose}
+          />
+
+          <AuditLogModal
+            open={isAuditLogOpen}
+            onClose={handleCloseAuditLog}
+            auditData={auditLogData}
+            setAuditData={setAuditLogData}
+          />
+        </PageContainer>
+      </AccessControl>
     </>
   );
 };

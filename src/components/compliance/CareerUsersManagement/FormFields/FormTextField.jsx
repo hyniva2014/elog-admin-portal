@@ -64,7 +64,11 @@ const FormTextField = ({
   };
 
   const getChangeHandler = (field) => {
-    if (onChange) return (e) => onChange(e, field);
+    if (onChange) {
+      return (e) => {
+        onChange(e, field);
+      };
+    }
     const formatter = getFormatter();
     if (!formatter) return undefined;
     return createFormatChangeHandler(field, formatter);

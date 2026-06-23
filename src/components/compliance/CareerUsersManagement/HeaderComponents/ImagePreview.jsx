@@ -9,7 +9,7 @@ import { Controller } from "react-hook-form";
 import CommonFileUpload from "../../../../common/CommonFileUpload";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { extractCDLFromImage } from "../../../../utils/cdlOCR";
-import { useState } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import CommonSnackbar from "../../../../common/CommonSnackbar";
 import {
   PreviewContainerSx,
@@ -52,6 +52,17 @@ const ProfilePhotoPreview = ({
     message: "",
     severity: "success",
   });
+  
+  const objectUrlCache = useRef(new Map());
+
+  useEffect(() => {
+    return () => {
+      objectUrlCache.current.forEach((url) => {
+        URL.revokeObjectURL(url);
+      });
+      objectUrlCache.current.clear();
+    };
+  }, []);
 
   const validateFileSize = (files) => {
     if (!files || files.length === 0) return { valid: true, error: "" };
@@ -87,7 +98,15 @@ const ProfilePhotoPreview = ({
 
   const getImageUrl = (imageToShow) => {
     if (imageToShow?.url) return imageToShow.url;
-    if (imageToShow instanceof File) return URL.createObjectURL(imageToShow);
+    if (imageToShow instanceof File) {
+      const cacheKey = `${imageToShow.name}_${imageToShow.size}_${imageToShow.lastModified}`;
+      if (objectUrlCache.current.has(cacheKey)) {
+        return objectUrlCache.current.get(cacheKey);
+      }
+      const url = URL.createObjectURL(imageToShow);
+      objectUrlCache.current.set(cacheKey, url);
+      return url;
+    }
     return imageToShow || "";
   };
 
@@ -239,7 +258,7 @@ const ProfilePhotoPreview = ({
           return null;
         }
 
-        const previewUrl = getPreviewImageUrl(field);
+        const previewUrl = useMemo(() => getPreviewImageUrl(field), [field.value, existingFiles]);
         const previewLabel = getPreviewText();
         const isOcrActive = isOCRProcessing && isOCREligible();
 

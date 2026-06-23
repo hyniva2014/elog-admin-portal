@@ -22,12 +22,14 @@ export const dialogStyles = (theme) => ({
   },
 
   title: {
-    backgroundColor: theme.palette.background.default,
+    // backgroundColor: theme.palette.background.default,
+    backgroundColor: "#f3f8ff",
+    marginBottom: theme.spacing(1),
   },
 
   titleText: {
     fontSize: 20,
-    fontWeight: 500,
+    fontWeight: 700,
     color: theme.palette.text.primary,
   },
 

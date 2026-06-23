@@ -27,6 +27,7 @@ import {
   countryCodeToName,
   RegistrationState,
   DRIVER_STATUS_FORM,
+  MEXICO_STATE_SHORT_NAME_TO_CODE,
 } from "./Constants";
 import FormSection from "./HeaderComponents/FormSection";
 import { CategoryTitle } from "./CareerManagement.styled";
@@ -121,10 +122,14 @@ export const geocodeAddress = async (address) => {
           types.includes("neighborhood")
         ) {
           city = component.long_name;
-        } else if (types.includes("administrative_area_level_1")) {
-          state = component.long_name;
         } else if (types.includes("country")) {
-          country = component.long_name;
+          country = component.short_name === "US" ? "USA" : component.short_name || component.long_name;
+        } else if (types.includes("administrative_area_level_1")) {
+          if (MEXICO_STATE_SHORT_NAME_TO_CODE[component.short_name]) {
+            state = MEXICO_STATE_SHORT_NAME_TO_CODE[component.short_name];
+          } else {
+            state = component.short_name || component.long_name;
+          }
         } else if (types.includes("postal_code")) {
           zipCode = component.long_name;
         }

@@ -97,25 +97,19 @@ export const HistoryTimeText = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export const HistoryBackButtonWrapper = styled(Box)({
+export const HistoryBackButtonWrapper = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "center",
-  marginTop: 24,
-  paddingBottom: 8,
-});
+  marginTop: theme.spacing(3),
+}));
 
 export const HistoryBackButton = styled(Button)(({ theme }) => ({
-  backgroundColor: theme.palette.brand.main,
-  color: theme.palette.common.white,
   fontSize: 14,
   fontWeight: 500,
-  borderRadius: "8px",
-  padding: "10px 40px",
-  textTransform: "none",
-  minWidth: "250px",
-  boxShadow: "none",
+  color: theme.palette.common.white,
+  backgroundColor: theme.palette.brand.main,
+  width: 183,
   "&:hover": {
     backgroundColor: theme.palette.brand.dark,
-    boxShadow: "none",
   },
 }));
