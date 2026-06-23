@@ -1,4 +1,4 @@
-import { Box, Tooltip, useTheme } from "@mui/material";
+import { Box, Tooltip, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import CustomPagination from "./CustomPagination";
 import { useEffect, useRef, useState } from "react";
@@ -10,6 +10,10 @@ import {
   gridSx,
   getContainerSx,
   NoRowsOverlayContainer,
+  FooterInfoContainerSx,
+  FooterPoweredBySx,
+  FooterBrandSx,
+  FooterCopyrightSx,
 } from "./CommonDataGrid.styles";
 
 const withHeaderTooltip = (columns) =>
@@ -60,7 +64,7 @@ const CommonDataGrid = ({
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const containerRef = useRef(null);
-
+  const [collapsed, setCollapsed] = useState(false);
   const [localRows, setLocalRows] = useState(rowData || []);
   const [sortConfig, setSortConfig] = useState({
     field: null,
@@ -193,7 +197,9 @@ const CommonDataGrid = ({
     );
   };
 
-  const updatedColumns = disableStickyColumns ? columnsData : applyEqualWidth(columnsData);
+  const updatedColumns = disableStickyColumns
+    ? columnsData
+    : applyEqualWidth(columnsData);
 
   const enhancedColumns = updatedColumns.map((col) => {
     const isSortable = col.sortable !== false;
@@ -216,6 +222,23 @@ const CommonDataGrid = ({
       ),
     };
   });
+
+  const footerContent = collapsed ? (
+    <Box sx={FooterInfoContainerSx}>
+      <Typography variant="inherit" sx={FooterPoweredBySx}>
+        Powered by{" "}
+        <Box component="span" sx={FooterBrandSx}>
+          Trackpulse
+        </Box>
+      </Typography>
+
+      <Box />
+
+      <Typography variant="inherit" sx={FooterCopyrightSx}>
+        © 2026 Trackpulse Pvt Ltd. All Rights Reserved.
+      </Typography>
+    </Box>
+  ) : null;
 
   return (
     <Box
@@ -253,7 +276,12 @@ const CommonDataGrid = ({
           NoRowsOverlay,
         }}
         slots={{
-          pagination: CustomPagination,
+          pagination: () => (
+            <CustomPagination
+              collapsed={collapsed}
+              setCollapsed={setCollapsed}
+            />
+          ),
           noRowsOverlay: NoRowsOverlay,
         }}
         sx={(theme) => ({
@@ -269,9 +297,15 @@ const CommonDataGrid = ({
             "& .MuiDataGrid-iconSeparator": {
               display: "none !important",
             },
+            "& .MuiDataGrid-columnHeaders": {
+              position: "sticky",
+              top: 0,
+              zIndex: 4,
+            },
           }),
         })}
       />
+      {footerContent}
     </Box>
   );
 };
