@@ -5,9 +5,11 @@ export const PaginationContainer = styled(Box)(({ theme }) => ({
   gridTemplateColumns: "1fr auto 1fr",
   alignItems: "center",
   padding: theme.spacing(1, 2),
+  paddingBottom: theme.spacing(1),
   width: "100%",
   backgroundColor: theme.palette.background.paper,
   borderTop: `1px solid ${theme.palette.divider}`,
+  // borderBottom: `1px solid ${theme.palette.divider}`,
   position: "sticky",
   bottom: 0,
   zIndex: 1,
@@ -22,14 +24,17 @@ export const PaginationButtonWrapper = styled(Box)(() => ({
   justifyContent: "center",
 }));
 
-export const PaginationToggleButton = styled(IconButton)(() => ({
-  width: 36,
-  height: 36,
-  borderRadius: 8,
-  backgroundColor: "#EBEFF6",
+export const PaginationToggleButton = styled(IconButton)(({ theme }) => ({
+  width: 80,
+  height: 28,
+  borderRadius: "6px 6px 0 0",
+  backgroundColor: theme.palette.grey[200],
+  border: `1px solid ${theme.palette.divider}`,
+  borderBottom: "none",
+  transform: "translateY(12px)",
 
   "&:hover": {
-    backgroundColor: "#EBEFF6",
+    backgroundColor: theme.palette.grey[100],
   },
 }));
 
