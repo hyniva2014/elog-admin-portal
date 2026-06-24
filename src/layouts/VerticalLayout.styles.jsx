@@ -25,6 +25,7 @@ export const ContentWrapper = styled("div")(({ theme }) => {
 
 export const MainContent = styled("div")(({ settings }) => {
   const collapsed = settings?.sidenav?.isCollapsed;
+  const isMobile = settings?.sidenav?.mode === "mobile";
   const sidebarWidth = collapsed ? 80 : 240;
   return {
     flexDirection: "column",
@@ -32,8 +33,8 @@ export const MainContent = styled("div")(({ settings }) => {
     // height: "100vh",
     // minHeight: 0,
     // overflow: "hidden",
-    width: `calc(100% - ${sidebarWidth}px)`,
-    marginLeft: sidebarWidth,
+    width: isMobile ? "100%" : `calc(100% - ${sidebarWidth}px)`,
+    marginLeft: isMobile ? 0 : sidebarWidth,
     transition: "0.2s all",
   };
 });
