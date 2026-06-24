@@ -6,7 +6,7 @@ export const SummaryCardRoot = styled(Box)(({ theme }) => {
   return {
     flex: "1 1 200px",
     minWidth: 200,
-    minHeight: 80,
+    minHeight: 76,
 
     backgroundColor: isDark
       ? theme.palette.grey[100]
