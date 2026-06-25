@@ -32,18 +32,19 @@ const CustomPagination = ({ collapsed, setCollapsed }) => {
   };
 
   return (
-    <PaginationContainer>
-      <PaginationCount variant="body2">
-        {`${start}-${end} of ${rowCount}`}
-      </PaginationCount>
+  <PaginationContainer
+    onClick={() => setCollapsed((prev) => !prev)}
+    sx={{ cursor: "pointer" }}
+  >
+    <PaginationCount variant="body2">
+      {`${start}-${end} of ${rowCount}`}
+    </PaginationCount>
 
-      <PaginationButtonWrapper>
-        <PaginationToggleButton
-          onClick={() => setCollapsed((prev) => !prev)}
-        >
-          <ExpandMoreIcon
-            fontSize="small"
-            sx={ExpandIconSx(collapsed)}
+    <PaginationButtonWrapper>
+      <PaginationToggleButton disableRipple>
+        <ExpandMoreIcon
+          fontSize="small"
+          sx={ExpandIconSx(collapsed)}
           />
         </PaginationToggleButton>
       </PaginationButtonWrapper>
@@ -55,6 +56,7 @@ const CustomPagination = ({ collapsed, setCollapsed }) => {
           count={Math.ceil(rowCount / pageSize)}
           onChange={handlePageChange}
           size="small"
+          onClick={(e) => e.stopPropagation()}
         />
       </PaginationActions>
     </PaginationContainer>

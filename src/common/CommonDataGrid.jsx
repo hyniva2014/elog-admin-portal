@@ -1,4 +1,4 @@
-import { Box, Tooltip, Typography, useTheme } from "@mui/material";
+import { Box, Collapse, Tooltip, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import CustomPagination from "./CustomPagination";
 import { useEffect, useRef, useState } from "react";
@@ -305,7 +305,9 @@ const CommonDataGrid = ({
           }),
         })}
       />
-      {footerContent}
+      <Collapse in={collapsed} timeout={400}>
+        {footerContent}
+      </Collapse>
     </Box>
   );
 };

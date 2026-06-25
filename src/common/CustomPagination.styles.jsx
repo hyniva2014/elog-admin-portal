@@ -9,7 +9,7 @@ export const PaginationContainer = styled(Box)(({ theme }) => ({
   width: "100%",
   backgroundColor: theme.palette.background.paper,
   borderTop: `1px solid ${theme.palette.divider}`,
-  // borderBottom: `1px solid ${theme.palette.divider}`,
+  borderBottom: `1px solid ${theme.palette.divider}`,
   position: "sticky",
   bottom: 0,
   zIndex: 1,
@@ -22,16 +22,20 @@ export const PaginationCount = styled(Typography)(({ theme }) => ({
 export const PaginationButtonWrapper = styled(Box)(() => ({
   display: "flex",
   justifyContent: "center",
+  alignItems: "center",
+  width: "100%",
+  height: 40,     
+  cursor: "pointer",
 }));
 
 export const PaginationToggleButton = styled(IconButton)(({ theme }) => ({
   width: 80,
-  height: 28,
+  height: 20,
   borderRadius: "6px 6px 0 0",
   backgroundColor: theme.palette.grey[200],
   border: `1px solid ${theme.palette.divider}`,
   borderBottom: "none",
-  transform: "translateY(12px)",
+  transform: "translateY(17px)",
 
   "&:hover": {
     backgroundColor: theme.palette.grey[100],
@@ -71,5 +75,5 @@ export const StyledPagination = styled(Pagination)(({ theme }) => ({
 
 export const ExpandIconSx = (collapsed) => ({
   transition: "transform 0.2s",
-  transform: collapsed ? "rotate(180deg)" : "rotate(0deg)",
+  transform: collapsed ? "rotate(0deg)" : "rotate(180deg)",
 });
