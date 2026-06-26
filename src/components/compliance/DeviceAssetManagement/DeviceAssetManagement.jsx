@@ -257,7 +257,7 @@ const DeviceAssetManagement = () => {
         "/masteradmin/onboard-eld-device",
       );
 
-      if (response?.statusCode === 200) {
+      if (response?.statusCode === 200 && response?.body?.data?.success !== false) {
         handleSnackbar(
           formValues.deviceId
             ? "Asset updated successfully"
@@ -268,8 +268,8 @@ const DeviceAssetManagement = () => {
         fetchDeviceAssets();
       } else {
         handleSnackbar(
-          response?.body?.message || "serial number should be Unique",
-          "warning",
+          response?.body?.data?.message || response?.body?.message || "Operation failed",
+          "error",
         );
       }
     } catch (error) {
