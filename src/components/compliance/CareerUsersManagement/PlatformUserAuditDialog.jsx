@@ -66,6 +66,7 @@ const AuditDialogContent = ({ auditData, setAuditData, onClose }) => {
         showMuiLoading={auditData.isLoading}
         showColumnSeparator={false}
         disableStickyColumns
+        disableCollapse
         getRowHeight={() => "auto"}
       />
       <Box sx={backButtonWrapperSx}>

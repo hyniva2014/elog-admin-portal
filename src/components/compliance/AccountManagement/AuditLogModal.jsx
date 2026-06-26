@@ -104,6 +104,7 @@ const AuditLogModal = ({
           hideFooter={false}
           useAutoHeight={true}
           disableStickyColumns={true}
+          disableCollapse
           getRowHeight={getRowHeight}
         />
 

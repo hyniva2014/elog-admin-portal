@@ -1,8 +1,8 @@
 import { Box, styled, Pagination, Typography, IconButton } from "@mui/material";
 
-export const PaginationContainer = styled(Box)(({ theme }) => ({
+export const PaginationContainer = styled(Box)(({ theme, disablecollapse }) => ({
   display: "grid",
-  gridTemplateColumns: "1fr auto 1fr",
+  gridTemplateColumns: disablecollapse ? "1fr 1fr" : "1fr auto 1fr",
   alignItems: "center",
   padding: theme.spacing(1, 2),
   paddingBottom: theme.spacing(1),

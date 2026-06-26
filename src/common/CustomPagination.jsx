@@ -17,7 +17,7 @@ import {
   ExpandIconSx,
 } from "./CustomPagination.styles";
 
-const CustomPagination = ({ collapsed, setCollapsed }) => {
+const CustomPagination = ({ collapsed, setCollapsed, disableCollapse = false }) => {
   const apiRef = useGridApiContext();
 
   const page = useGridSelector(apiRef, gridPageSelector);
@@ -33,21 +33,24 @@ const CustomPagination = ({ collapsed, setCollapsed }) => {
 
   return (
   <PaginationContainer
-    onClick={() => setCollapsed((prev) => !prev)}
-    sx={{ cursor: "pointer" }}
+    onClick={disableCollapse ? undefined : () => setCollapsed((prev) => !prev)}
+    sx={{ cursor: disableCollapse ? "default" : "pointer" }}
+    disablecollapse={disableCollapse ? 1 : 0}
   >
     <PaginationCount variant="body2">
       {`${start}-${end} of ${rowCount}`}
     </PaginationCount>
 
-    <PaginationButtonWrapper>
-      <PaginationToggleButton disableRipple>
-        <ExpandMoreIcon
-          fontSize="small"
-          sx={ExpandIconSx(collapsed)}
+    {!disableCollapse && (
+      <PaginationButtonWrapper>
+        <PaginationToggleButton disableRipple>
+          <ExpandMoreIcon
+            fontSize="small"
+            sx={ExpandIconSx(collapsed)}
           />
         </PaginationToggleButton>
       </PaginationButtonWrapper>
+    )}
 
       <PaginationActions>
         <StyledPagination

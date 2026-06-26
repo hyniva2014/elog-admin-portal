@@ -55,6 +55,7 @@ const CommonDataGrid = ({
   isRowSelectable = null,
   showColumnSeparator = true,
   disableStickyColumns = false,
+  disableCollapse = false,
 }) => {
   const pagePaginationModel = {
     page: (data.page || 1) - 1,
@@ -280,6 +281,7 @@ const CommonDataGrid = ({
             <CustomPagination
               collapsed={collapsed}
               setCollapsed={setCollapsed}
+              disableCollapse={disableCollapse}
             />
           ),
           noRowsOverlay: NoRowsOverlay,
@@ -305,7 +307,7 @@ const CommonDataGrid = ({
           }),
         })}
       />
-      <Collapse in={collapsed} timeout={400}>
+      <Collapse in={!disableCollapse && collapsed} timeout={400}>
         {footerContent}
       </Collapse>
     </Box>
