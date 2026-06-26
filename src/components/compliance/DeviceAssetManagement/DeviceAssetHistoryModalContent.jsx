@@ -64,6 +64,7 @@ const DeviceAssetHistoryModalContent = ({ auditLogData, onClose, onPageChange })
         hideFooter={false}
         useAutoHeight
         disableStickyColumns
+        disableCollapse
         showMuiLoading={false}
         getRowHeight={getHistoryRowHeight}
       />
