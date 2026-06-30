@@ -29,7 +29,7 @@ const useDeviceHistory = (fetchApi, setLoading) => {
         setAuditLogData(prev => ({ ...prev, isLoading: true }));
         
         const response = await fetchApi(
-          `/masteradmin/eld-device/audit-logs?page=${page}&limit=${pageSize}`
+          `/masteradmin/eld-device/audit-logs?page=${page}&limit=${pageSize}&device_id=${row?.id}`
         );
         
         if (response?.statusCode === 200 && response?.body?.audit_logs) {
