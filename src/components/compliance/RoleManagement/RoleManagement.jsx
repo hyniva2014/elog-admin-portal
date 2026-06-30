@@ -317,6 +317,7 @@ const RoleManagement = () => {
       users: role.user_count,
       status: role.status === 1 ? "Active" : "Inactive",
       color: theme.palette.brand.main,
+      roleIds: role.role_ids || String(role.id),
     };
 
     return (
