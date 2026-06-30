@@ -24,7 +24,8 @@ const RoleCard = ({ role, onEdit, onOpenAuditLog, canView, canUpdate }) => {
   const navigate = useNavigate();
 
   const handleUsersClick = () => {
-    navigate(`/role-user-management?roleId=${role.id}&roleName=${role.title}`);
+    const roleIds = role.roleIds || String(role.id);
+    navigate(`/role-user-management?roleId=${role.id}&roleName=${role.title}&roleIds=${encodeURIComponent(roleIds)}`);
   };
 
   const handleViewClick = () => {
