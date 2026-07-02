@@ -12,7 +12,7 @@ import CommonSnackbar from "../../../common/CommonSnackbar";
 import CommonConfirmDialog from "../../../common/CommonConfirmDialog";
 import DeviceAssetManagementHeader from "./DeviceAssetManagementHeader";
 import DeviceAssetManagementForm from "./DeviceAssetManagementForm";
-import { EditButton, CancelEditButton } from "./DeviceAssetManagement.styles";
+import { EditButton } from "./DeviceAssetManagement.styles";
 import { GridContainer } from "../AccountManagement/AccountManagement.styled";
 import { useServices } from "../../../services/services";
 import { usePermissions } from "../../../hooks/usePermissions";
@@ -25,6 +25,7 @@ import {
 } from "./DeviceAssetManagementTable.utils";
 import BulkUploadForm from "./BulkUploadForm";
 import AssignDevicesToCarriers from "../DeviceManagement/AssignDevicesToCarriers";
+import useUnsavedChangesDialog from "../useUnsavedChangesDialog";
 
 const isDeviceAssetSelectable = (params) => {
   return params.row.status?.toLowerCase() === "in stock";
@@ -92,8 +93,11 @@ const DeviceAssetManagement = () => {
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [deviceToDelete, setDeviceToDelete] = useState(null);
+  const [originalValues, setOriginalValues] = useState({});
+  const [hasChanges, setHasChanges] = useState(false);
   const { auditLogData, isHistoryModalOpen, fetchHistory, closeHistoryModal, handlePageChange } =
     useDeviceHistory(fetchApi, setLoading);
+    
 
   const user_name = useSelector(
       (state) => state.loginSlice.loginDetails?.body?.data?.userdetails?.user_name,
@@ -224,9 +228,9 @@ const DeviceAssetManagement = () => {
     setIsEditing(true);
   }, []);
 
-  const handleCancelEdit = useCallback(() => {
-    setIsEditing(false);
-  }, []);
+  // const handleCancelEdit = useCallback(() => {
+  //   setIsEditing(false);
+  // }, []);
 
   const handleAddSubmit = async (formValues) => {
     try {
@@ -290,7 +294,7 @@ const DeviceAssetManagement = () => {
       );
 
       const deviceData = response?.body;
-      setDefaultValues({
+      const formattedData = {
         deviceId: deviceData?.device_id || "",
         modelName: deviceData?.device_model_id || "",
         serialNumber: deviceData?.device_serial_number || "",
@@ -308,7 +312,11 @@ const DeviceAssetManagement = () => {
           deviceData?.status !== undefined && deviceData?.status !== null
             ? String(deviceData.status)
             : "",
-      });
+      };
+
+      setDefaultValues(formattedData);
+      setOriginalValues(formattedData);
+      setHasChanges(false);
 
       setIsAddModalOpen(true);
 
@@ -447,7 +455,9 @@ const DeviceAssetManagement = () => {
     }
   };
 
-  const handleAddCancel = useCallback(() => {
+  
+
+  const closeAssetDialog = () => {
     setIsAddModalOpen(false);
 
     setDefaultValues({
@@ -464,11 +474,28 @@ const DeviceAssetManagement = () => {
       providerDeviceId: "",
       integrationType: "",
       networkStatus: "",
+      status: "1",
     });
 
+    setOriginalValues({});
+    setHasChanges(false);
     setIsEditMode(false);
     setIsEditing(false);
-  }, []);
+  };
+
+  const closeDialog = () => {
+    setIsAddModalOpen(false);
+    setIsEditMode(false);
+    setIsEditing(false);
+    setHasChanges(false);
+  };
+
+  const { handleCancel, UnsavedChangesDialog } =
+    useUnsavedChangesDialog(closeDialog);
+
+  const handleAddCancel = useCallback(() => {
+    handleCancel(isEditing && hasChanges);
+  }, [handleCancel, isEditing, hasChanges]);
 
   const handleSetMode = useCallback(() => {}, []);
   const handleRowSelectionChange = (newSelection) => {
@@ -505,16 +532,10 @@ const DeviceAssetManagement = () => {
         variant="contained"
         onClick={handleEditClick}
         disabled={!canUpdate}
-        sx={!canUpdate ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+        sx={!canUpdate ? { opacity: 0.5, cursor: "not-allowed" } : {}}
       >
         Edit
       </EditButton>
-    );
-  } else if (isEditMode && isEditing) {
-    headerActionsElement = (
-      <CancelEditButton variant="outlined" onClick={handleCancelEdit}>
-        Cancel Edit
-      </CancelEditButton>
     );
   }
 
@@ -526,11 +547,8 @@ const DeviceAssetManagement = () => {
       : "View Asset"
     : "Add Asset";
 
-  const submitButtonLabel = isEditMode
-    ? isEditing
-      ? "Update"
-      : "Save"
-    : "Add Asset";
+  const submitButtonLabel =
+    isEditMode && isEditing ? "Update" : !isEditMode ? "Add Asset" : "";
 
   const handleAssignCancel = () => {
     setIsAssignDialogOpen(false);
@@ -575,44 +593,57 @@ const DeviceAssetManagement = () => {
     setIsAssignDialogOpen(true);
   }, [selectedRows, handleSnackbar]);
 
+  // const {
+  //   watch,
+  //   formState: { isDirty },
+  // } = useForm({
+  //   defaultValues,
+  // });
+
+  // useEffect(() => {
+  //   setHasChanges(isDirty);
+  // }, [isDirty]);
+
+  
+
   return (
     <>
       <LoadingContainer />
-    <AccessControl hasAccess={canViewAll}>
-      <PageContainer>
-        <DeviceAssetManagementHeader
-          data={gridData}
-          setData={setData}
-          searchKey={0}
-          summaryCards={[]}
-          mode=""
-          setMode={handleSetMode}
-          handleClick={handleClick}
-          handleAddAsset={handleBulkClick}
-          modelOptions={deviceModelOptions}
-          handleAssignDevices={handleAssignDevices}
-          statusOptions={DEVICE_ASSET_STATUS_FILTER_OPTIONS}
-          isAssignDeviceEnabled={selectedRows.length > 0}
-          canCreate={canCreate}
-          canAssignDevices={canAssignDevices}
-          canAddBulkAsset={canAddBulkAsset}
-        />
-        <GridContainer>
-          <CommonDataGrid
-            columnsData={columns}
-            rowData={allRows}
+      <AccessControl hasAccess={canViewAll}>
+        <PageContainer>
+          <DeviceAssetManagementHeader
             data={gridData}
             setData={setData}
-            paginationMode="server"
-            getRowHeight={getRowHeight}
-            checkboxSelection
-            rowSelectionModel={selectedRows}
-            onRowSelectionModelChange={handleRowSelectionChange}
-            isRowSelectable={isDeviceAssetSelectable}
+            searchKey={0}
+            summaryCards={[]}
+            mode=""
+            setMode={handleSetMode}
+            handleClick={handleClick}
+            handleAddAsset={handleBulkClick}
+            modelOptions={deviceModelOptions}
+            handleAssignDevices={handleAssignDevices}
+            statusOptions={DEVICE_ASSET_STATUS_FILTER_OPTIONS}
+            isAssignDeviceEnabled={selectedRows.length > 0}
+            canCreate={canCreate}
+            canAssignDevices={canAssignDevices}
+            canAddBulkAsset={canAddBulkAsset}
           />
-        </GridContainer>
-      </PageContainer>
-    </AccessControl>
+          <GridContainer>
+            <CommonDataGrid
+              columnsData={columns}
+              rowData={allRows}
+              data={gridData}
+              setData={setData}
+              paginationMode="server"
+              getRowHeight={getRowHeight}
+              checkboxSelection
+              rowSelectionModel={selectedRows}
+              onRowSelectionModelChange={handleRowSelectionChange}
+              isRowSelectable={isDeviceAssetSelectable}
+            />
+          </GridContainer>
+        </PageContainer>
+      </AccessControl>
 
       <CommonSnackbar
         open={snackbar.open}
@@ -631,6 +662,8 @@ const DeviceAssetManagement = () => {
         isEditing={isEditing}
         headerActions={headerActionsElement}
         submitButtonText={submitButtonLabel}
+        disableSubmit={isEditMode && isEditing && !hasChanges}
+        showSubmitButton={!isEditMode || isEditing}
         content={
           <DeviceAssetManagementForm
             formId="addAssetForm"
@@ -638,6 +671,8 @@ const DeviceAssetManagement = () => {
             isEditing={isEditing}
             isEditMode={isEditMode}
             onSubmit={handleAddSubmit}
+            setHasChanges={setHasChanges}
+            originalValues={originalValues}
           />
         }
       />
@@ -672,6 +707,7 @@ const DeviceAssetManagement = () => {
         onConfirm={handleConfirmDelete}
         onCancel={handleCloseDeleteConfirm}
       />
+      {UnsavedChangesDialog}
 
       <CommonDialogForm
         open={isHistoryModalOpen}

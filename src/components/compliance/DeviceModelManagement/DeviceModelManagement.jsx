@@ -22,6 +22,7 @@ import useDeviceModelManagement from "@src/hooks/useDeviceModelManagement";
 import { usePermissions } from "@src/hooks/usePermissions";
 import { useServices } from "@src/services/services";
 import { usePermissionRefresh } from "@src/hooks/usePermissionRefresh";
+import useUnsavedChangesDialog from "../useUnsavedChangesDialog";
 
 const getDialogTitle = (isEditMode, isEditing) => {
   if (!isEditMode) return "Add Device Model";
@@ -41,19 +42,20 @@ const getHeaderActionsElement = (
   isEditMode,
   isEditing,
   handleEditClick,
-  handleCancelEdit,
   canUpdate,
 ) => {
-  if (!isEditMode) return null;
-  if (!isEditing)
- return <HeaderEditButton onClick={handleEditClick} disabled={!canUpdate} />;
-  return <HeaderCancelEditButton onClick={handleCancelEdit} />;
+  if (!isEditMode || isEditing) {
+    return null;
+  }
+
+  return <HeaderEditButton onClick={handleEditClick} disabled={!canUpdate} />;
 };
 
 const DeviceModelManagement = () => {
   const { setLoading, LoadingContainer } = CommonLoading();
   const { checkPermission, permissions } = usePermissions();
   const dispatch = useDispatch();
+  const [hasChanges, setHasChanges] = useState(false);
   const loginDetails = useSelector(
     (state) => state.loginSlice.loginDetails || {},
   );
@@ -146,42 +148,56 @@ const DeviceModelManagement = () => {
     isEditMode,
     isEditing,
     handleEditClick,
-    handleCancelEdit,
     canUpdate,
   );
 
   const dialogMode = isEditMode ? "edit" : "add";
   const dialogTitle = getDialogTitle(isEditMode, isEditing);
   const submitButtonLabel = getSubmitButtonLabel(isEditMode, isEditing);
-  const formKey = getFormKey(formDefaultValues.deviceModelId);
+  const formKey = `${getFormKey(formDefaultValues.deviceModelId)}-${isEditing}`;
+
+  const { handleCancel: handleUnsavedCancel, UnsavedChangesDialog } =
+    useUnsavedChangesDialog(() => {
+      setHasChanges(false);
+      handleCancelEdit();
+    });
+
+  const handleCancel = useCallback(() => {
+    if (isEditMode && isEditing) {
+      handleUnsavedCancel(hasChanges);
+      return;
+    }
+
+    handleAddCancel();
+  }, [isEditMode, isEditing, hasChanges, handleUnsavedCancel, handleAddCancel]);
 
   return (
     <>
       <LoadingContainer />
-    <AccessControl hasAccess={canViewAll}>
-      <PageContainer>
-        <DeviceModelManagementHeader
-          data={gridData}
-          setData={setData}
-          searchKey={0}
-          summaryCards={[]}
-          handleClick={handleClick}
-          modelOptions={modelOptions}
-          statusOptions={DEVICE_MODEL_STATUS_FILTER_OPTIONS}
-          assetTypeOptions={ASSET_TYPE_FILTER_OPTIONS}
-          canCreate={canCreate}
-        />
-        <GridContainer>
-          <CommonDataGrid
-            columnsData={columns}
-            rowData={allRows}
+      <AccessControl hasAccess={canViewAll}>
+        <PageContainer>
+          <DeviceModelManagementHeader
             data={gridData}
             setData={setData}
-            getRowHeight={getRowHeight}
+            searchKey={0}
+            summaryCards={[]}
+            handleClick={handleClick}
+            modelOptions={modelOptions}
+            statusOptions={DEVICE_MODEL_STATUS_FILTER_OPTIONS}
+            assetTypeOptions={ASSET_TYPE_FILTER_OPTIONS}
+            canCreate={canCreate}
           />
-        </GridContainer>
-      </PageContainer>
-    </AccessControl>
+          <GridContainer>
+            <CommonDataGrid
+              columnsData={columns}
+              rowData={allRows}
+              data={gridData}
+              setData={setData}
+              getRowHeight={getRowHeight}
+            />
+          </GridContainer>
+        </PageContainer>
+      </AccessControl>
 
       <CommonSnackbar
         open={snackbar.open}
@@ -192,13 +208,14 @@ const DeviceModelManagement = () => {
 
       <CommonDialogForm
         open={isAddModalOpen}
-        onCancel={handleAddCancel}
+        onCancel={handleCancel}
         mode={dialogMode}
         title={dialogTitle}
         formId="addDeviceModelForm"
         isEditing={isEditing}
         headerActions={headerActionsElement}
         submitButtonText={submitButtonLabel}
+        disableSubmit={isEditMode && isEditing && !hasChanges}
         content={
           <DeviceModelManagementForm
             key={formKey}
@@ -207,9 +224,11 @@ const DeviceModelManagement = () => {
             isEditing={isEditing}
             isEditMode={isEditMode}
             onSubmit={handleAddSubmit}
+            onDirtyChange={setHasChanges}
           />
         }
       />
+      {UnsavedChangesDialog}
     </>
   );
 };

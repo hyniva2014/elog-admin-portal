@@ -264,7 +264,7 @@ export const userManagementValidationSchema = yup.object().shape({
     .string()
     .required("SSN is required")
     .matches(/^\d{3}-\d{2}-\d{4}$/, "SSN must be in format XXX-XX-XXXX"),
-  role: yup.number().optional("Role is required").typeError("Role is required"),
+  role: yup.number().required("Role is required").typeError("Role is required"),
   language: yup
     .array()
     .of(yup.number())

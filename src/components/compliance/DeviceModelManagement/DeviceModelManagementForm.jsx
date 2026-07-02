@@ -54,6 +54,7 @@ const DeviceModelManagementForm = ({
   isEditing,
   isEditMode,
   onSubmit,
+  onDirtyChange,
 }) => {
   const isDisabled = isEditMode && !isEditing;
 
@@ -61,11 +62,15 @@ const DeviceModelManagementForm = ({
     control,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: defaultValues || initialValues,
   });
+
+  useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
 
   useEffect(() => {
     reset(defaultValues || initialValues);
@@ -133,7 +138,10 @@ const DeviceModelManagementForm = ({
         error={!!errors.assetType}
         helperText={errors.assetType?.message}
         fullWidth
-        InputLabelProps={{ shrink: getShrinkValue(field.value, isDisabled), required: true }}
+        InputLabelProps={{
+          shrink: getShrinkValue(field.value, isDisabled),
+          required: true,
+        }}
       >
         {assetTypeOptions}
       </CommonTextFieldStyled>
@@ -153,7 +161,10 @@ const DeviceModelManagementForm = ({
         error={!!errors.supportsElogs}
         helperText={errors.supportsElogs?.message}
         fullWidth
-        InputLabelProps={{ shrink: getShrinkValue(field.value, isDisabled), required: true }}
+        InputLabelProps={{
+          shrink: getShrinkValue(field.value, isDisabled),
+          required: true,
+        }}
       >
         {elogsOptions}
       </CommonTextFieldStyled>
