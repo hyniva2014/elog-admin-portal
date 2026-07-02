@@ -24,6 +24,7 @@ import {
 } from "./Constants";
 import FormSelect from "./FormSelect";
 import FormFieldsSection from "./FormFieldsSection";
+import useUnsavedChangesDialog from "../useUnsavedChangesDialog";
 
 const ADD_ACCOUNT_FORM_ID = "add-account-form";
 
@@ -196,7 +197,7 @@ const AddAccountDialog = ({
     reset,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues,
@@ -214,11 +215,30 @@ const AddAccountDialog = ({
   }, [open, mode, initialData, reset]);
 
   useEffect(() => {
+    if (open) {
+      reset(initialData || defaultValues, {
+        keepDirty: false,
+      });
+    }
+  }, [open, initialData, reset]);
+
+  useEffect(() => {
     if (!initialData && prevInitialDataRef.current) {
       reset(defaultValues);
     }
     prevInitialDataRef.current = initialData;
   }, [initialData, reset]);
+
+
+  const { handleCancel: handleUnsavedCancel, UnsavedChangesDialog } =
+    useUnsavedChangesDialog(() => {
+      if (isEditMode && isEditing && onCancelEdit) {
+        onCancelEdit();
+        reset(initialData);
+      } else {
+        onClose();
+      }
+    });
 
   const selectedStatus = watch("status");
 
@@ -238,12 +258,13 @@ const AddAccountDialog = ({
   );
 
   const handleCancel = useCallback(() => {
-    if (isEditMode && isEditing && onCancelEdit) {
-      onCancelEdit();
-    } else {
-      onClose();
+    if (isEditMode && isEditing) {
+      handleUnsavedCancel(isDirty);
+      return;
     }
-  }, [isEditMode, isEditing, onCancelEdit, onClose]);
+
+    onClose();
+  }, [isEditMode, isEditing, isDirty, handleUnsavedCancel, onClose]);
 
   const submitHandler = useCallback(
     (data) => {
@@ -339,20 +360,24 @@ const AddAccountDialog = ({
   );
 
   return (
-    <CommonDialogForm
-      open={open}
-      title={title || dialogTitle}
-      content={formContent}
-      formId={ADD_ACCOUNT_FORM_ID}
-      onCancel={handleCancel}
-      onSubmit={handleSubmit(submitHandler)}
-      loading={loading}
-      maxWidth="md"
-      headerActions={headerActions}
-      isEditing={isEditing}
-      submitButtonText={submitButtonText}
-      mode={mode}
-    />
+    <>
+      <CommonDialogForm
+        open={open}
+        title={title || dialogTitle}
+        content={formContent}
+        formId={ADD_ACCOUNT_FORM_ID}
+        onCancel={handleCancel}
+        onSubmit={handleSubmit(submitHandler)}
+        loading={loading}
+        maxWidth="md"
+        headerActions={headerActions}
+        isEditing={isEditing}
+        submitButtonText={submitButtonText}
+        mode={mode}
+        disableSubmit={mode === "edit" && isEditing && !isDirty}
+      />
+      {UnsavedChangesDialog}
+    </>
   );
 };
 
