@@ -1,3 +1,4 @@
+import { useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   gridPageSelector,
@@ -19,6 +20,7 @@ import {
 
 const CustomPagination = ({ collapsed, setCollapsed, disableCollapse = false }) => {
   const apiRef = useGridApiContext();
+  const [isHovered, setIsHovered] = useState(false);
 
   const page = useGridSelector(apiRef, gridPageSelector);
   const pageSize = useGridSelector(apiRef, gridPageSizeSelector);
@@ -34,6 +36,8 @@ const CustomPagination = ({ collapsed, setCollapsed, disableCollapse = false }) 
   return (
   <PaginationContainer
     onClick={disableCollapse ? undefined : () => setCollapsed((prev) => !prev)}
+    onMouseEnter={() => setIsHovered(true)}
+    onMouseLeave={() => setIsHovered(false)}
     sx={{ cursor: disableCollapse ? "default" : "pointer" }}
     disablecollapse={disableCollapse ? 1 : 0}
   >
@@ -43,7 +47,13 @@ const CustomPagination = ({ collapsed, setCollapsed, disableCollapse = false }) 
 
     {!disableCollapse && (
       <PaginationButtonWrapper>
-        <PaginationToggleButton disableRipple>
+        <PaginationToggleButton 
+          disableRipple
+          sx={{
+            opacity: isHovered ? 1 : 0,
+            transition: "opacity 0.2s ease-in-out",
+          }}
+        >
           <ExpandMoreIcon
             fontSize="small"
             sx={ExpandIconSx(collapsed)}
