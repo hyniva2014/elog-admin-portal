@@ -355,7 +355,7 @@ const UserManagement = () => {
     <>
       <LoadingContainer />
       <AccessControl hasAccess={canViewAll}>
-        <PageContainer>
+        <PageContainer hideFooter>
           <UserManagementHeader
             data={data}
             setData={setData}

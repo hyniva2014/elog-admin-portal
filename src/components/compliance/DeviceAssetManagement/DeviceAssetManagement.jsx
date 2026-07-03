@@ -610,7 +610,7 @@ const DeviceAssetManagement = () => {
     <>
       <LoadingContainer />
       <AccessControl hasAccess={canViewAll}>
-        <PageContainer>
+        <PageContainer hideFooter>
           <DeviceAssetManagementHeader
             data={gridData}
             setData={setData}

@@ -175,7 +175,7 @@ const DeviceModelManagement = () => {
     <>
       <LoadingContainer />
       <AccessControl hasAccess={canViewAll}>
-        <PageContainer>
+        <PageContainer hideFooter>
           <DeviceModelManagementHeader
             data={gridData}
             setData={setData}

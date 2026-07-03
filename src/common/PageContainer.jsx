@@ -1,6 +1,8 @@
 import { Box, styled } from "@mui/material";
+import { useEffect } from "react";
+import { useFooterContext } from "@src/states/useFooterContext";
 
-export const PageContainer = styled(Box)(({ theme }) => {
+const StyledPageContainer = styled(Box)(({ theme }) => {
   const isDark = theme.palette.mode === "dark";
 
   return {
@@ -17,3 +19,14 @@ export const PageContainer = styled(Box)(({ theme }) => {
     marginTop: theme.spacing(2),
   };
 });
+
+export const PageContainer = ({ children, hideFooter = false, ...props }) => {
+  const { setHideFooter } = useFooterContext();
+
+  useEffect(() => {
+    setHideFooter(hideFooter);
+    return () => setHideFooter(false);
+  }, [hideFooter, setHideFooter]);
+
+  return <StyledPageContainer {...props}>{children}</StyledPageContainer>;
+};
