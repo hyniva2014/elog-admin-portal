@@ -230,7 +230,7 @@ const CareerManagement = () => {
     <>
       <LoadingContainer />
       <AccessControl hasAccess={canViewAll}>
-        <PageContainer>
+        <PageContainer hideFooter>
             <CareerManagementHeader
               data={data}
               setData={setData}

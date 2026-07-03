@@ -6,6 +6,7 @@
 
 import { Suspense, lazy } from "react";
 import { useLayoutContext } from "@src/states";
+import { FooterProvider } from "@src/states/useFooterContext";
 import {
   ContentWrapper,
   MainContent,
@@ -19,28 +20,32 @@ const Footer = lazy(() => import("@src/layouts/Footer"));
 const VerticalLayout = ({ children }) => {
   const { settings } = useLayoutContext();
   return (
-    <div>
-      <Suspense fallback={<div />}>
-        <LeftSideBar />
-      </Suspense>
-      <MainContent settings={settings}>
+    <FooterProvider>
+      <div>
         <Suspense fallback={<div />}>
-          <Topbar />
+          <LeftSideBar />
         </Suspense>
-
-        <ContentWrapper>
-          <Suspense fallback={<LoadingProgress color="primary" />}>
-            {children}
+        <MainContent settings={settings}>
+          <Suspense fallback={<div />}>
+            <Topbar />
           </Suspense>
-        </ContentWrapper>
 
-        <Suspense fallback={<div />}>{/* <Footer /> */}</Suspense>
+          <ContentWrapper>
+            <Suspense fallback={<LoadingProgress color="primary" />}>
+              {children}
+            </Suspense>
+          </ContentWrapper>
 
-        <Suspense fallback={<div />}>
-          <RightSideBar />
-        </Suspense>
-      </MainContent>
-    </div>
+          <Suspense fallback={<div />}>
+            <Footer />
+          </Suspense>
+
+          <Suspense fallback={<div />}>
+            <RightSideBar />
+          </Suspense>
+        </MainContent>
+      </div>
+    </FooterProvider>
   );
 };
 export default VerticalLayout;

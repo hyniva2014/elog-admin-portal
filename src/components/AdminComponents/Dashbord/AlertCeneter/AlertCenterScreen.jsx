@@ -56,7 +56,7 @@ const AlertCenterScreen = () => {
   }, [data.search, data.fromDate, data.toDate, data.category, data.severity]);
 
   return (
-    <PageContainer>
+    <PageContainer hideFooter>
       <AlertCenterScreenHeader
         data={data}
         setData={setData}

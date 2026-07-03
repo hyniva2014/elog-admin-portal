@@ -147,7 +147,7 @@ const RoleUserManagement = () => {
   }, [filteredRows]);
 
   return (
-    <PageContainer>
+    <PageContainer hideFooter>
       <LoadingContainer />
         <CommonPageHeader
           title={roleName}

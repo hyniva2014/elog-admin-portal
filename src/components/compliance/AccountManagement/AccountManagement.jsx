@@ -438,7 +438,7 @@ const AccountManagement = () => {
     : "Add Account";
 
   return (
-    <PageContainer>
+    <PageContainer hideFooter>
       <LoadingContainer />
       <AccessControl hasAccess={canViewAll}>
         <>
