@@ -22,6 +22,7 @@ import {
 import usePermissions from "../../../hooks/usePermissions";
 import useCarrierUserAuditHistory from "./useCarrierUserAuditHistory";
 import UserManagementGroupDialog from "./UserManagementGroupDialog";
+import useUnsavedChangesDialog from "../useUnsavedChangesDialog";
 
 /** Format ISO date string to DD-MM-YYYY */
 const formatDate = (iso) => (iso ? dayjs(iso).format("DD-MM-YYYY") : "-");
@@ -33,6 +34,8 @@ const UserManagement = () => {
   const dispatch = useDispatch();
   const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
   const { fetchApi, createApi } = useServices();
+  const [hasChanges, setHasChanges] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const {
     auditLogData,
@@ -47,6 +50,14 @@ const UserManagement = () => {
   const canDelete = checkPermission("Carrier Users", "CARRIER_USER_DELETE");
   const canView = checkPermission("Carrier Users", "CARRIER_USER_VIEW");
   const canViewAll = checkPermission("Carrier Users", "CARRIER_USER_VIEW_ALL");
+
+  const { handleCancel: handleUnsavedCancel, UnsavedChangesDialog } =
+  useUnsavedChangesDialog(() => {
+    setHasChanges(false);
+    setIsEditing(false);
+    setOpenForm(false);
+    setSelectedUser(null);
+  });
 
   useEffect(() => {
     refreshPermissions(fetchApi);
@@ -222,10 +233,17 @@ const UserManagement = () => {
     setOpenForm(true);
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
+    if (mode === "view" && isEditing) {
+      handleUnsavedCancel(hasChanges);
+      return;
+    }
+
     setOpenForm(false);
     setSelectedUser(null);
-  };
+    setHasChanges(false);
+    setIsEditing(false);
+  }, [mode, isEditing, hasChanges, handleUnsavedCancel]);
 
   const handleAuditDataChange = (newData) => {
     if (newData.page !== auditLogData.page) {
@@ -336,31 +354,31 @@ const UserManagement = () => {
   return (
     <>
       <LoadingContainer />
-    <AccessControl hasAccess={canViewAll}>
-      <PageContainer hideFooter>
-        <UserManagementHeader
-          data={data}
-          setData={setData}
-          summaryCards={summaryCards}
-          mode={mode}
-          setMode={setMode}
-          handleClick={handleAddClick}
-          companyOptions={companyOptions}
-          canCreate={canCreate}
-        />
-        <CommonDataGrid
-          columnsData={columnsWithActions}
-          rowData={data.rows}
-          data={data}
-          setData={setData}
-          paginationMode="server"
-          getRowHeight={handleGetRowHeight}
-          checkboxSelection={false}
-          showMuiLoading={false}
-          useAutoHeight={true}
-        />
-      </PageContainer>
-    </AccessControl>
+      <AccessControl hasAccess={canViewAll}>
+        <PageContainer hideFooter>
+          <UserManagementHeader
+            data={data}
+            setData={setData}
+            summaryCards={summaryCards}
+            mode={mode}
+            setMode={setMode}
+            handleClick={handleAddClick}
+            companyOptions={companyOptions}
+            canCreate={canCreate}
+          />
+          <CommonDataGrid
+            columnsData={columnsWithActions}
+            rowData={data.rows}
+            data={data}
+            setData={setData}
+            paginationMode="server"
+            getRowHeight={handleGetRowHeight}
+            checkboxSelection={false}
+            showMuiLoading={false}
+            // useAutoHeight={true}
+          />
+        </PageContainer>
+      </AccessControl>
 
       <UserManagementForm
         open={openForm}
@@ -370,7 +388,11 @@ const UserManagement = () => {
         mode={mode}
         initialData={selectedUser}
         companyOptions={companyOptions}
+        isEditing={isEditing}
+        setIsEditing={setIsEditing}
+        onDirtyChange={setHasChanges}
       />
+      {UnsavedChangesDialog}
 
       <UserManagementGroupDialog
         open={isHistoryModalOpen}

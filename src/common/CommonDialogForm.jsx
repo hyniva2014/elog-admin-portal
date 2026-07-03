@@ -41,9 +41,9 @@ const CommonDialogForm = ({
 
   const isEditMode = mode === DIALOG_MODES.EDIT;
 
-  const shouldShowActions =
-    mode === DIALOG_MODES.ADD || mode === DIALOG_MODES.EDIT || isEditing;
-
+ const shouldShowActions =
+   mode === DIALOG_MODES.ADD || (mode === DIALOG_MODES.EDIT && isEditing);
+   
   const handleDialogClose = () => {
     if (loading) {
       return;
