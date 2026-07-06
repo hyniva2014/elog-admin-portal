@@ -2,6 +2,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import {
   Avatar,
   Box,
+  Divider,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -14,7 +15,7 @@ import avatar2 from "@src/assets/images/avatars/avatar2.png";
 import { useDropdownMenu } from "@src/hooks";
 import { useAuthContext, useLayoutContext } from "@src/states";
 import { useNavigate } from "react-router-dom";
-import { LuLogOut } from "react-icons/lu";
+import { LuLogOut, LuUserCircle2, LuKeyRound } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
 import { useServices } from "@src/services/services";
 import { logout } from "@src/components/LoginScreen/Loginstore/Login.slice";
@@ -37,9 +38,14 @@ const UserProfile = () => {
 
   const profileDropdownOptions = [
     {
-      icon: LuLogOut,
-      label: "Logout",
-      action: "logout",
+      icon: LuUserCircle2,
+      label: "My Profile",
+      action: "profile",
+    },
+    {
+      icon: LuKeyRound,
+      label: "Change Password",
+      action: "changePassword",
     },
   ];
 
@@ -148,6 +154,8 @@ const UserProfile = () => {
                 overflow: "visible",
                 filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
                 mt: 1.5,
+                minWidth: 220,
+                // borderRadius: "12px",
                 "& .MuiAvatar-root": {
                   width: 32,
                   height: 32,
@@ -172,25 +180,70 @@ const UserProfile = () => {
         >
           {profileDropdownOptions.map((option, idx) => {
             const IconComponent = option.icon;
-
             return (
               <MenuItem
                 key={idx}
                 onClick={() => {
                   handleClose();
-
-                  if (option.action === "logout") {
-                    handleLogout();
+                  if (option.action === "profile") {
+                    navigate(`/platform-users/edit/${userDetails?.user_id}`);
+                  } else if (option.action === "changePassword") {
+                    navigate("/auth/login", {
+                      state: {
+                        showForgotPassword: true,
+                        prefillEmail: userDetails?.user_name || "",
+                      },
+                    });
                   }
                 }}
+                sx={{
+                  py: 1,
+                  px: 3,
+                  gap: 1.5,
+                  "&:hover": { backgroundColor: "rgba(63, 81, 181, 0.06)" },
+                }}
               >
-                <ListItemIcon>
-                  <IconComponent size={18} />
+                <ListItemIcon sx={{ minWidth: 0, color: "text.secondary" }}>
+                  <IconComponent size={22} />
                 </ListItemIcon>
-                <ListItemText>{option.label}</ListItemText>
+                <ListItemText
+                  primaryTypographyProps={{
+                    fontWeight: 500,
+                    fontSize: "0.95rem",
+                  }}
+                >
+                  {option.label}
+                </ListItemText>
               </MenuItem>
             );
           })}
+          <Divider />
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              handleLogout();
+            }}
+            sx={{
+              py: 1,
+              px: 3,
+              gap: 1.5,
+              color: "#3F51B5",
+              "&:hover": { backgroundColor: "rgba(63, 81, 181, 0.06)" },
+            }}
+          >
+            <ListItemIcon sx={{ minWidth: 0, color: "#3F51B5" }}>
+              <LuLogOut size={22} />
+            </ListItemIcon>
+            <ListItemText
+              primaryTypographyProps={{
+                fontWeight: 600,
+                fontSize: "0.95rem",
+                color: "#3F51B5",
+              }}
+            >
+              Logout
+            </ListItemText>
+          </MenuItem>
         </Menu>
       </Box>
     </>
