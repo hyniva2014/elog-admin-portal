@@ -24,7 +24,7 @@ const CareerManagement = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const {fetchApi } = useServices();
+  const {fetchApi,createApi } = useServices();
   const { refreshPermissions } = usePermissionRefresh();
   const { checkPermission } = usePermissions();
   const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
@@ -179,25 +179,25 @@ const CareerManagement = () => {
   };
 
   const confirmDelete = async () => {
-    // if (!deleteRow?.user_id) return;
-    // setLoading(true);
-    // try {
-    //   const endUrl = `/user/delete-user?user_id=${deleteRow.user_id}`;
-    //   const response = await createApi({}, endUrl);
-    //   if (response?.statusCode === 200) {
-    //     showSnackbar("User deleted successfully", "success");
-    //     fetchUsers();
-    //   } else {
-    //     showSnackbar("Failed to delete user", "error");
-    //   }
-    // } catch (error) {
-    //   console.error("Delete error", error);
-    //   showSnackbar("Error deleting user", "error");
-    // } finally {
-    //   setLoading(false);
-    //   setConfirmOpen(false);
-    //   setDeleteRow(null);
-    // }
+    if (!deleteRow?.user_id) return;
+    setLoading(true);
+    try {
+      const endUrl = `/masteradmin/user/delete-user?user_id=${deleteRow.user_id}`;
+      const response = await createApi({}, endUrl);
+      if (response?.statusCode === 200) {
+        showSnackbar("User deleted successfully", "success");
+        fetchUsers();
+      } else {
+        showSnackbar("Failed to delete user", "error");
+      }
+    } catch (error) {
+      console.error("Delete error", error);
+      showSnackbar("Error deleting user", "error");
+    } finally {
+      setLoading(false);
+      setConfirmOpen(false);
+      setDeleteRow(null);
+    }
   };
 
   const handleCancelConfirm = () => {
@@ -230,7 +230,7 @@ const CareerManagement = () => {
     <>
       <LoadingContainer />
       <AccessControl hasAccess={canViewAll}>
-        <PageContainer>
+        <PageContainer hideFooter>
             <CareerManagementHeader
               data={data}
               setData={setData}

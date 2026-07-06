@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import eyeIcon from "../../../assets/images/svg/eye.svg";
 import GroupIcon from "../../../assets/images/svg/Group.png";
 import trashLight from "../../../assets/images/svg/trash.png";
@@ -70,10 +70,18 @@ const ActionsCell = ({
     handleOpenEdit(row);
   }, [handleOpenEdit, row, canView]);
 
+  const isInactive = row.status === "Inactive";
+
+  const deleteTooltipTitle = useMemo(() => {
+    if (isInactive) return "Already deleted";
+    if (canDelete) return "Delete";
+    return "No permission";
+  }, [isInactive, canDelete]);
+
   const handleDeleteAction = useCallback(() => {
-    if (!canDelete) return;
+    if (!canDelete || isInactive) return;
     handleDeleteClick?.(row);
-  }, [canDelete, handleDeleteClick, row]);
+  }, [canDelete, isInactive, handleDeleteClick, row]);
 
   const fetchAuditLogs = useCallback(async () => {
     if (!row.id) return;
@@ -146,13 +154,13 @@ const ActionsCell = ({
             </IconButton>
           </span>
         </Tooltip>
-        <Tooltip title={canDelete ? "Delete" : "No permission"}>
+        <Tooltip title={deleteTooltipTitle} placement="right">
           <span>
             <IconButton
               size="small"
-              disabled={!canDelete}
+              disabled={!canDelete || isInactive}
               onClick={handleDeleteAction}
-              sx={getActionButtonSx(canDelete)}
+              sx={getActionButtonSx(canDelete && !isInactive)}
             >
               <img src={trashIcon} alt="delete" width={16} height={16} />
             </IconButton>

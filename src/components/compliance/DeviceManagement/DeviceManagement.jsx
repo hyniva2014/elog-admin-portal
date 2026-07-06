@@ -151,7 +151,7 @@ const DeviceManagement = () => {
     <>
       <LoadingContainer />
     <AccessControl hasAccess={canViewAll}>
-      <PageContainer>
+      <PageContainer hideFooter>
         <DeviceManagementHeader
           data={data}
           setData={setData}

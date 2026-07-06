@@ -7,7 +7,7 @@ export const AlertContainer = styled(Paper)(({ theme }) => ({
   padding: "16px",
   border: `1px solid ${theme.palette.grey[200]}`,
   borderRadius: "16px",
-  height: 376,
+  height: 360,
   overflow: "auto",
   boxShadow: "none",
 

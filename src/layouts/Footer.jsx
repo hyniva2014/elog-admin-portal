@@ -4,45 +4,36 @@
  * Author: Coderthemes
  */
 
-import { Stack, Typography, styled } from "@mui/material";
+import { Typography, styled } from "@mui/material";
 import { useLayoutContext } from "@src/states";
-const FooterWrapper = styled("div")(({ theme, settings }) => {
+import { useFooterContext } from "@src/states/useFooterContext";
+
+const FooterWrapper = styled("div")(({ theme }) => {
   return {
-    backgroundColor: theme.palette.background.paper,
-    height: "60px",
-    minHeight: "60px",
+    backgroundColor: "transparent",
+    height: "30px",
+    minHeight: "30px",
     marginTop: "auto",
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
-    padding: "0px 24px",
+    // borderTop: `1px solid ${theme.palette.divider}`,
   };
 });
+
 const Footer = () => {
   const { settings } = useLayoutContext();
+  const { hideFooter } = useFooterContext();
+
+  if (hideFooter) return null;
+
   return (
     <FooterWrapper settings={settings} className="footer-do-not-remove">
-      <Typography variant="subtitle2" color={"text.primary"}>
-        {/* 2016 - {new Date().getFullYear()} © Attex - Coderthemes */}
+      <Typography variant="subtitle2" color="text.secondary">
+        © {new Date().getFullYear()} Trackpulse Pvt Ltd. All Rights Reserved.
       </Typography>
-      <Stack
-        direction={"row"}
-        spacing={2}
-        sx={{
-          display: "flex",
-        }}
-      >
-        <Typography variant="subtitle2" color={"text.primary"}>
-          About
-        </Typography>
-        <Typography variant="subtitle2" color={"text.primary"}>
-          Support
-        </Typography>
-        <Typography variant="subtitle2" color={"text.primary"}>
-          Contact Us
-        </Typography>
-      </Stack>
     </FooterWrapper>
   );
 };
+
 export default Footer;

@@ -6,7 +6,7 @@ export const SummaryCardRoot = styled(Box)(({ theme }) => {
   return {
     flex: "1 1 200px",
     minWidth: 200,
-    minHeight: 80,
+    minHeight: 76,
 
     backgroundColor: isDark
       ? theme.palette.grey[100]
@@ -58,7 +58,7 @@ export const ValueText = styled(Typography, {
   color: isdashboard
     ? theme.palette.text.primary
     : theme.palette.text.secondary,
-  paddingLeft: isdashboard ? theme.spacing(6) : 0,
+  paddingLeft: 0,
 }));
 
 export const CardContentWrapper = styled(Box)(({ theme }) => ({

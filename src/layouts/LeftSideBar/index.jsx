@@ -1,75 +1,109 @@
-import { useCallback, useEffect } from "react";
-import { Drawer } from "@mui/material";
+import { useCallback, useEffect, useRef } from "react";
+import { Drawer, useTheme, useMediaQuery } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import LogoBox from "./LogoBox";
 import SideMenu from "./SideMenu";
 import { changeHTMLAttribute, getMenuItems } from "@src/helpers/menu";
 import { useLayoutContext } from "@src/states";
-import { useViewPort } from "@src/hooks";
 import { LeftSideBarWrapper, SidebarScrollContainer } from "./index.styles";
 
+const SIDEBAR_WIDTHS = {
+  COLLAPSED: 80,
+  EXPANDED: 240,
+};
+
+const MobileDrawer = styled(Drawer)(({ sidebarWidth }) => ({
+  width: sidebarWidth,
+  flexShrink: 0,
+  "& .MuiDrawer-paper": {
+    width: sidebarWidth,
+    boxSizing: "border-box",
+  },
+}));
+
 const SideBarContent = ({ isCollapsed, isVisible }) => {
+  if (!isVisible) return null;
   const allMenuItems = getMenuItems();
-  return isVisible ? (
-    <SideMenu menuItems={allMenuItems} isCollapsed={isCollapsed} />
-  ) : null;
+  return <SideMenu menuItems={allMenuItems} isCollapsed={isCollapsed} />;
 };
 
 const LeftSideBarMenu = () => {
   const { settings } = useLayoutContext();
+  const { sidenav } = settings;
+  const isMobile = sidenav.mode === "mobile";
+  const isCollapsed = isMobile ? false : sidenav.isCollapsed;
 
   return (
     <LeftSideBarWrapper
       settings={settings}
       className="app-menu-do-not-remove"
     >
-      <LogoBox backgroundColor isCollapsed={settings.sidenav.isCollapsed} />
+      <LogoBox backgroundColor isCollapsed={isCollapsed} />
       <SidebarScrollContainer>
-        <SideBarContent isCollapsed={settings.sidenav.isCollapsed} isVisible />
+        <SideBarContent isCollapsed={isCollapsed} isVisible />
       </SidebarScrollContainer>
     </LeftSideBarWrapper>
   );
 };
 
 const LeftSideBar = () => {
-  const { width } = useViewPort();
   const { settings, updateSidenav } = useLayoutContext();
-  const showMobileMenu = settings.sidenav.showMobileMenu;
+  const { sidenav } = settings;
+  const showMobileMenu = sidenav.showMobileMenu;
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const hasInitializedCollapse = useRef(false);
+
+  const getSidebarWidth = useCallback(() => {
+    if (sidenav.mode === "mobile") return SIDEBAR_WIDTHS.EXPANDED;
+    return sidenav.isCollapsed ? SIDEBAR_WIDTHS.COLLAPSED : SIDEBAR_WIDTHS.EXPANDED;
+  }, [sidenav.mode, sidenav.isCollapsed]);
+
+  const hideSideNavMobile = useCallback(() => {
+    updateSidenav({ showMobileMenu: false });
+  }, [updateSidenav]);
+
+  const updateSidenavMode = useCallback(() => {
+    if (isMobile && sidenav.mode !== "mobile") {
+      updateSidenav({ mode: "mobile" });
+    } else if (!isMobile && sidenav.mode === "mobile") {
+      updateSidenav({ mode: "default" });
+    }
+  }, [isMobile, sidenav.mode, updateSidenav]);
 
   useEffect(() => {
-    updateSidenav({ isCollapsed: true });
-  }, []);
+    if (!hasInitializedCollapse.current && isMobile) {
+      updateSidenav({ isCollapsed: true });
+      hasInitializedCollapse.current = true;
+    }
+  }, [isMobile, updateSidenav]);
 
   useEffect(() => {
     changeHTMLAttribute("data-mode", settings.theme);
-  }, [settings.theme]);
+    changeHTMLAttribute("data-menu-color", sidenav.theme);
+    changeHTMLAttribute("data-sidenav-view", sidenav.mode);
+  }, [settings.theme, sidenav.theme, sidenav.mode]);
+
   useEffect(() => {
-    changeHTMLAttribute("data-menu-color", settings.sidenav.theme);
-  }, [settings.sidenav.theme]);
-  useEffect(() => {
-    changeHTMLAttribute("data-sidenav-view", settings.sidenav.mode);
-  }, [settings.sidenav.mode]);
-  useEffect(() => {
-    if (width < 1140) {
-      updateSidenav({
-        mode: "mobile",
-      });
-    } else if (width >= 1140 && settings.sidenav.mode === "mobile") {
-      updateSidenav({
-        mode: "default",
-      });
-    }
-  }, [width, updateSidenav, settings.sidenav.mode]);
-  const hideSideNavMobile = useCallback(() => {
-    updateSidenav({
-      showMobileMenu: false,
-    });
-  }, [updateSidenav]);
-  return settings.sidenav.mode === "default" ? (
-    <LeftSideBarMenu />
-  ) : (
-    <Drawer open={showMobileMenu} onClose={hideSideNavMobile}>
+    updateSidenavMode();
+  }, [updateSidenavMode]);
+
+  const sidebarWidth = getSidebarWidth();
+
+  if (sidenav.mode === "default") {
+    return <LeftSideBarMenu />;
+  }
+
+  return (
+    <MobileDrawer
+      variant="temporary"
+      open={showMobileMenu}
+      onClose={hideSideNavMobile}
+      ModalProps={{ keepMounted: true }}
+      sidebarWidth={sidebarWidth}
+    >
       <LeftSideBarMenu />
-    </Drawer>
+    </MobileDrawer>
   );
 };
 

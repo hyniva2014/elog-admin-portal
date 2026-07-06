@@ -142,9 +142,9 @@ export const gridSx = (theme) => ({
     display: "none", // Hide scrollbar (Chrome, Safari, Edge)
   },
   "& .MuiDataGrid-virtualScroller": {
-    scrollbarWidth: "none", // Hide scrollbar (Firefox)
-    msOverflowStyle: "none", // Hide scrollbar (IE/Edge)
-  },
+  overflowY: "auto",
+  overflowX: "auto",
+},
 
   "& .MuiDataGrid-cell.sticky-col-left-1": {
     position: "sticky",
@@ -206,14 +206,38 @@ export const gridSx = (theme) => ({
 });
 
 export const getContainerSx = (hasRows, useAutoHeight = false) => ({
+  width: "100%",
+  height: useAutoHeight ? "auto" : "100%",
   display: "flex",
   flexDirection: "column",
-  flex: 1,
-  minHeight: 0,
-  width: "100%",
-  ...(useAutoHeight
-    ? { height: "auto" }
-    : hasRows
-      ? { height: "auto" }
-      : { minHeight: 240 }),
+  overflow: "hidden",
 });
+
+export const FooterInfoContainerSx = {
+  display: "grid",
+  gridTemplateColumns: "1fr auto 1fr",
+  alignItems: "center",
+  px: 2,
+  py: 1,
+  borderTop: "1px solid",
+  borderColor: "divider",
+  backgroundColor: "background.paper",
+  width: "100%",
+};
+
+export const FooterPoweredBySx = {
+  color: "text.secondary",
+  fontSize: "14px",
+};
+
+export const FooterBrandSx = {
+  color: "brand.main",
+  fontWeight: 600,
+};
+
+export const FooterCopyrightSx = {
+  color: "text.secondary",
+  fontSize: "14px",
+  textAlign: "right",
+  marginRight: 2,
+};

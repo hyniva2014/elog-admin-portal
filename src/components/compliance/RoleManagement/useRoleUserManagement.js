@@ -1,9 +1,9 @@
 import { USER_STATUS } from "../UserManagement/Constants";
 
-export const getUsersByRoleApi = async (fetchApi, roleId) => {
+export const getUsersByRoleApi = async (fetchApi, roleIds) => {
   try {
     const response = await fetchApi(
-      `/masteradmin/superuser/get-superusers?role_id=${roleId}`,
+      `/masteradmin/superuser/get-superusers?role_id=${roleIds}`,
     );
 
     const records = response?.body?.users || [];
