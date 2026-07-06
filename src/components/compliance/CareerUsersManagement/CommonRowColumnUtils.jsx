@@ -81,7 +81,7 @@ const ActionsCell = ({
     try {
       const { page, pageSize } = auditData;
       const params = new URLSearchParams({
-        platform_user_id: row.id,
+        user_id: row.id,
         page,
         limit: pageSize,
       });
@@ -129,12 +129,12 @@ const ActionsCell = ({
   return (
     <>
       <Box sx={actionContainerSx}>
-        <Tooltip title="Group" placement="right">
+        <Tooltip title="Audit History">
           <IconButton size="small" onClick={handleOpenAuditLog}>
             <img src={GroupIcon} alt="group" width={16} height={16} />
           </IconButton>
         </Tooltip>
-        <Tooltip title={viewTitle} placement="right">
+        <Tooltip title={viewTitle}>
           <span>
             <IconButton
               size="small"
@@ -146,7 +146,7 @@ const ActionsCell = ({
             </IconButton>
           </span>
         </Tooltip>
-        <Tooltip title={canDelete ? "Delete" : "No permission"} placement="right">
+        <Tooltip title={canDelete ? "Delete" : "No permission"}>
           <span>
             <IconButton
               size="small"
