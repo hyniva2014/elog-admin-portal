@@ -84,9 +84,13 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({});
-  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(
+    location.state?.showForgotPassword === true,
+  );
   const [forgotStep, setForgotStep] = useState(1);
-  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotEmail, setForgotEmail] = useState(
+    location.state?.prefillEmail || "",
+  );
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
