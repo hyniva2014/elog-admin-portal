@@ -154,7 +154,7 @@ const ActionsCell = ({
             </IconButton>
           </span>
         </Tooltip>
-        <Tooltip title={deleteTooltipTitle} placement="right">
+        <Tooltip title={deleteTooltipTitle}>
           <span>
             <IconButton
               size="small"
