@@ -1,15 +1,16 @@
 import { useState, useCallback } from "react";
 import dayjs from "dayjs";
 import { getUserAuditLogs } from "./userManagementService";
+import { getFormattedDateTime } from "../../../common/CommonUtils";
 
 const transformAuditLogs = (apiData) =>
   apiData.map((item) => {
-    const createdDateTime = item.created_at ? dayjs(item.created_at) : null;
+    const { date, time } = getFormattedDateTime(item.created_at);
     return {
       id: item.id,
       createdBy: item.created_by || "-",
-      createdDate: createdDateTime ? createdDateTime.format("DD MMM YYYY") : "-",
-      createdTime: createdDateTime ? createdDateTime.format("hh:mm A") : "-",
+      createdDate: date,
+      createdTime: time,
       notes: item.description || "-",
     };
   });
