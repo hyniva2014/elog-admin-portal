@@ -1,4 +1,10 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  useLayoutEffect,
+} from "react";
 import { Grid } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -138,7 +144,6 @@ const UserManagementForm = ({
       initializedRef.current = false;
       return;
     }
-    if (initializedRef.current) return;
 
     const initForm = async () => {
       const roles = await fetchRoles();
@@ -150,6 +155,19 @@ const UserManagementForm = ({
         : CARRIER_ADMIN_ROLE_ID;
 
       if (isViewMode && initialData) {
+        const currentRoleId = String(initialData.role_id || "");
+        const currentRoleName = initialData.userProfile || "Carrier Admin";
+        const roleExists = roles.some(
+          (r) => String(r.role_id) === currentRoleId,
+        );
+
+        if (currentRoleId && !roleExists) {
+          setRoleOptions((prev) => [
+            ...prev,
+            { label: currentRoleName, value: currentRoleId },
+          ]);
+        }
+
         reset(rowToFormValues(initialData));
       } else {
         reset({
@@ -162,7 +180,13 @@ const UserManagementForm = ({
     };
 
     initForm();
-  }, [open]);
+  }, [open, mode, initialData]);
+
+  useLayoutEffect(() => {
+    if (open && !isViewMode) {
+      reset(EMPTY_DEFAULTS);
+    }
+  }, [open, mode, reset, isViewMode]);
 
   const handleFormSubmit = (data) => {
     const submitMode = isViewMode && isEditing ? "edit" : mode;
