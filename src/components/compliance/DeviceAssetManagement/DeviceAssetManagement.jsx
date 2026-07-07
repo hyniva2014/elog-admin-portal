@@ -345,7 +345,7 @@ const DeviceAssetManagement = () => {
     setDeviceToDelete(null);
   }, []);
 
-  const handleConfirmDelete = useCallback(async () => {
+  const handleConfirmDelete = useCallback(async (deactivationReason) => {
     if (!deviceToDelete) return;
 
     try {
@@ -369,6 +369,10 @@ const DeviceAssetManagement = () => {
         device_model_id: deviceData.device_model_id,
         status: 3,
       };
+
+      if (deactivationReason?.trim()) {
+        payload.deactivation_reason = deactivationReason.trim();
+      }
 
       if (deviceData.imei_number?.trim()) {
         payload.imei_number = deviceData.imei_number.trim();
@@ -706,6 +710,8 @@ const DeviceAssetManagement = () => {
         cancelText="Cancel"
         onConfirm={handleConfirmDelete}
         onCancel={handleCloseDeleteConfirm}
+        showReasonField
+        reasonLabel="Reason for Deactivation"
       />
       {UnsavedChangesDialog}
 
