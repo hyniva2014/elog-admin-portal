@@ -35,7 +35,7 @@ const ActionCellComponent = ({ params, canView, onAuditHistory }) => {
   return (
     <>
       <ActionContainer>
-        <Tooltip title="Group">
+        <Tooltip title="Audit History">
           <IconButton size="small" onClick={handleAuditHistoryClick}>
             <GroupIconImage component="img" src={GroupIcon} alt="group" />
           </IconButton>
