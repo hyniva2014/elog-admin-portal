@@ -230,7 +230,7 @@ export const ProgressBarFill = styled(Box, {
 }));
 
 export const ProgressCount = styled(Typography)(({ theme }) => ({
-  color: theme.palette.common.black,
+  color: theme.palette.common.white,
   fontSize: "15px",
   fontWeight: 700,
 }));
