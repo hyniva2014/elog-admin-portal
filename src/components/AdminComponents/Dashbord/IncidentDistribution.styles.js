@@ -139,13 +139,13 @@ export const LegendGrid = styled(Box)(({ theme }) => ({
 }));
 
 export const LegendRow = styled(Box)(({ theme }) => ({
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+  display: "flex",
+  flexWrap: "wrap",
   gap: "16px",
   padding: "8px",
   width: "100%",
+  justifyContent: "center",
   [theme.breakpoints.down("sm")]: {
-    gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
     gap: "12px",
   },
 }));
@@ -154,7 +154,6 @@ export const LegendItem = styled(Box)({
   display: "flex",
   alignItems: "center",
   gap: "8px",
-  width: "100%", // Take full width of grid cell
   minWidth: 0, // Allow text truncation if needed
 });
 

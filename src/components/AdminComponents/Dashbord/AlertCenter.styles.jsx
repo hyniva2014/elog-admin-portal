@@ -49,9 +49,11 @@ export const ChartHeader = styled(Box)(({ theme }) => ({
 }));
 
 export const AlertTitle = styled(Typography)(({ theme }) => ({
-  fontSize: 18,
   fontWeight: 700,
   color: theme.palette.text.primary,
+  fontSize: "1rem",
+  [theme.breakpoints.up("sm")]: { fontSize: "1.125rem" },
+  [theme.breakpoints.up("md")]: { fontSize: "1.25rem" },
 }));
 
 export const ViewAllText = styled(Typography)(({ theme }) => ({
@@ -146,6 +148,7 @@ export const HeaderContainer = styled(Box)(() => ({
 export const HeaderLeft = styled(Box)(() => ({
   display: "flex",
   flexDirection: "column",
+  gap: "4px",
 }));
 
 export const ComplianceTitle = styled(Typography)(({ theme }) => ({
