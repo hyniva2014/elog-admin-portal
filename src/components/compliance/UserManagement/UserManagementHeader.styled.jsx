@@ -7,10 +7,10 @@ export const HeaderContainer = styled(Box)(({ theme }) => ({
 
 export const AddUserButton = styled(Button)(({ theme }) => ({
   color: theme.palette.common.white,
-  backgroundColor: theme.palette.primary.main,
+  backgroundColor: theme.palette.brand.main,
 
   "&:hover": {
-    backgroundColor: theme.palette.primary.dark,
+    backgroundColor: theme.palette.brand.dark,
   },
 }));
 
