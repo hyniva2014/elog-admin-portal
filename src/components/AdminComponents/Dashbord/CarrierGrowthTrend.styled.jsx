@@ -19,8 +19,10 @@ export const ChartContainer = styled(Paper, {
 export const ChartTitle = styled(Typography, {
   shouldForwardProp: (prop) => prop !== "isdark",
 })(({ isdark, theme }) => ({
-  fontSize: 18,
   fontWeight: 700,
+  fontSize: "18px",
+  lineHeight: "100%",
+  letterSpacing: "-0.02em",
   color: isdark ? theme.palette.common.white : theme.palette.grey[900],
 }));
 
