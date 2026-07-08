@@ -8,15 +8,18 @@ import {
   AlertDetailItem,
   AlertTime,
   AlertIcon,
+  AlertCardChevron,
 } from "../AlertCenter.styles";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 import CarrierIcon from "../../../../assets/images/active/Icon-1.png";
 import LocationIcon from "../../../../assets/images/active/Icon-3.png";
 import DeviceIcon from "../../../../assets/images/active/Icon-4.png";
 import TruckIcon from "../../../../assets/images/active/Truck.png";
 import IdIcon from "../../../../assets/images/active/Icon-2.png";
+import { getIncidentTitle } from "../../../compliance/DeviceAssetManagement/Constants.js";
 
-const SimpleAlertCardItem = ({ item }) => {
+const SimpleAlertCardItem = ({ item, onClick }) => {
   const {
     title,
     message,
@@ -30,11 +33,11 @@ const SimpleAlertCardItem = ({ item }) => {
   } = item;
 
   return (
-    <AlertCard>
+    <AlertCard onClick={onClick}>
       <AlertAccentBar />
       <AlertContent>
         <AlertDetails>
-          <AlertCardTitle>{title || message}</AlertCardTitle>
+          <AlertCardTitle>{getIncidentTitle(title) || message}</AlertCardTitle>
 
           <AlertDetailRow>
             <AlertDetailItem>
@@ -69,6 +72,9 @@ const SimpleAlertCardItem = ({ item }) => {
           <AlertTime>{date || time}</AlertTime>
         </AlertDetails>
       </AlertContent>
+      <AlertCardChevron>
+        <ChevronRightIcon fontSize="small" />
+      </AlertCardChevron>
     </AlertCard>
   );
 };

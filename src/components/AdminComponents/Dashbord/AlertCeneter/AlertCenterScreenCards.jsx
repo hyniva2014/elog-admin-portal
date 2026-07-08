@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import AlertListPanel from "./AlertListPanel";
 import AlertDetailsPanel from "./AlertDetailsPanel";
@@ -10,20 +10,18 @@ import {
 import { useServices } from "../../../../services/services.js";
 import CommonLoading from "../../../../common/CommonLoading.jsx";
 
-const AlertCenterScreenCards = ({ alerts = [] }) => {
+const AlertCenterScreenCards = ({ alerts = [], initialNotificationId = null, page, setPage, totalPages, isLoading = false }) => {
   const [selectedAlert, setSelectedAlert] = useState(null);
   const { fetchApi } = useServices();
   const { LoadingContainer, setLoading } = CommonLoading();
   const [selectedNotificationId, setSelectedNotificationId] = useState(null);
-  const [page, setPage] = useState(1);
+  const initialHandledRef = useRef(false);
 
   useEffect(() => {
-    if (alerts.length > 0 && !selectedNotificationId) {
-      handleAlertSelect(alerts[0]);
-    }
-  }, [alerts]);
+    setLoading(isLoading);
+  }, [isLoading, setLoading]);
 
-  const fetchNotificationDetails = async (
+  const fetchNotificationDetails = useCallback(async (
     notificationId,
     fromDate,
     toDate,
@@ -37,9 +35,9 @@ const AlertCenterScreenCards = ({ alerts = [] }) => {
       `&search=${search}`;
 
     return await fetchApi(endUrl);
-  };
+  }, [fetchApi]);
 
-  const handleAlertSelect = async (alert) => {
+  const handleAlertSelect = useCallback(async (alert) => {
     try {
       setLoading(true);
       setSelectedNotificationId(alert.notification_id);
@@ -71,7 +69,26 @@ const AlertCenterScreenCards = ({ alerts = [] }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchNotificationDetails, setLoading]);
+
+  useEffect(() => {
+    if (alerts.length === 0) return;
+
+    if (initialNotificationId && !initialHandledRef.current) {
+      initialHandledRef.current = true;
+      const target = alerts.find(
+        (a) => (a.notification_id ?? a.id) === initialNotificationId,
+      );
+      if (target) {
+        handleAlertSelect(target);
+        return;
+      }
+    }
+
+    if (!selectedNotificationId) {
+      handleAlertSelect(alerts[0]);
+    }
+  }, [alerts, handleAlertSelect]);
 
   return (
   <>
@@ -85,6 +102,7 @@ const AlertCenterScreenCards = ({ alerts = [] }) => {
             handleAlertSelect={handleAlertSelect}
             page={page}
             setPage={setPage}
+            totalPages={totalPages}
           />
         </AlertGridColumn>
 

@@ -79,6 +79,21 @@ export const AlertCard = styled(Box)(({ theme }) => ({
   minHeight: 90,
   border: `1px solid ${theme.palette.grey[200]}`,
   position: "relative",
+  cursor: "pointer",
+  transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
+  "&:hover": {
+    transform: "translateY(-3px)",
+    borderColor: theme.palette.primary.main,
+    boxShadow: `0 8px 24px 0 rgba(0,0,0,0.12)`,
+  },
+}));
+
+export const AlertCardChevron = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  paddingRight: "12px",
+  color: theme.palette.text.secondary,
+  flexShrink: 0,
 }));
 
 export const AlertAccentBar = styled(Box)(({ theme }) => ({

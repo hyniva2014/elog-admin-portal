@@ -8,21 +8,14 @@ import {
 } from "./AlertCenterScreenCard.styles.jsx";
 import AlertCardItem from "./AlertCardItem.jsx";
 
-const PAGE_SIZE = 10;
-
 const AlertListPanel = ({
   alerts,
   selectedAlert,
   handleAlertSelect,
   page,
   setPage,
+  totalPages = 1,
 }) => {
-  const totalPages = Math.ceil(alerts.length / PAGE_SIZE);
-
-  const paginatedAlerts = alerts.slice(
-    (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE,
-  );
 
   const renderAlertCard = useCallback(
     (item, index) => {
@@ -40,18 +33,16 @@ const AlertListPanel = ({
     [selectedAlert, handleAlertSelect],
   );
 
+  const PAGE_SIZE = 10;
   const paginationText =
     alerts.length === 0
       ? "0-0 of 0"
-      : `${(page - 1) * PAGE_SIZE + 1}-${Math.min(
-          page * PAGE_SIZE,
-          alerts.length,
-        )} of ${alerts.length}`;
+      : `${(page - 1) * PAGE_SIZE + 1}-${(page - 1) * PAGE_SIZE + alerts.length} of ${totalPages * PAGE_SIZE}`;
 
   const handlePageChange = (_, value) => {
     setPage(value);
   };
-  const alertCards = paginatedAlerts.map(renderAlertCard);
+  const alertCards = alerts.map(renderAlertCard);
 
   return (
     <AlertCardContainer>

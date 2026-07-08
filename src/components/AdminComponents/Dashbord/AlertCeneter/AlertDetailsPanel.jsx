@@ -75,7 +75,7 @@ import OperatorItem from "./OperatorItem.jsx";
 import AssignOperatorContent from "./AssignOperatorContent.jsx";
 import CommonSnackbar from "../../../../common/CommonSnackbar.jsx";
 import CommonLoading from "../../../../common/CommonLoading.jsx";
-import { INCIDENT_EVENT_TITLES } from "../../../compliance/DeviceAssetManagement/Constants.js";
+import { getIncidentTitle } from "../../../compliance/DeviceAssetManagement/Constants.js";
 
 const PANEL_STATE = {
   DETAILS: "details",
@@ -448,24 +448,6 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
     </>
     );
   }
-
-  const getIncidentTitle = (title) => {
-    if (!title) return "Alert Details";
-
-    const match = title.match(/(\d+)$/);
-
-    if (!match) {
-      return title;
-    }
-
-    const incidentTypeId = Number(match[1]);
-
-    const incidentName = INCIDENT_EVENT_TITLES[incidentTypeId];
-
-    return incidentName
-      ? `A new incident requires your review : ${incidentName}`
-      : title;
-  };
 
   const headerTitle = getIncidentTitle(title);
 
