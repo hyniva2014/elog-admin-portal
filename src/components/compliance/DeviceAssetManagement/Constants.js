@@ -106,3 +106,19 @@ export const INCIDENT_EVENT_TITLES = {
   [INCIDENT_EVENT_TYPES.REPORTS]: "Reports",
   [INCIDENT_EVENT_TYPES.FLEET_MANAGEMENT]: "Fleet Management",
 };
+
+export const getIncidentTitle = (title) => {
+  if (!title) return "Alert Details";
+
+  const match = title.match(/(\d+)$/);
+  if (!match) {
+    return title;
+  }
+
+  const incidentTypeId = Number(match[1]);
+  const incidentName = INCIDENT_EVENT_TITLES[incidentTypeId];
+
+  return incidentName
+    ? `A new incident requires your review : ${incidentName}`
+    : title;
+};
