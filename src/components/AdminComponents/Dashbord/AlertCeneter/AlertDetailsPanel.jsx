@@ -75,7 +75,7 @@ import OperatorItem from "./OperatorItem.jsx";
 import AssignOperatorContent from "./AssignOperatorContent.jsx";
 import CommonSnackbar from "../../../../common/CommonSnackbar.jsx";
 import CommonLoading from "../../../../common/CommonLoading.jsx";
-import { getIncidentTitle } from "../../../compliance/DeviceAssetManagement/Constants.js";
+import { getIncidentTitle, getIncidentMessage } from "../../../compliance/DeviceAssetManagement/Constants.js";
 
 const PANEL_STATE = {
   DETAILS: "details",
@@ -260,6 +260,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
     formData.append("message", messageText);
     formData.append("initiated_by", "superadmin");
     formData.append("is_chat", "1");
+    formData.append("is_superadmin", "1")
     files.forEach((file, index) => {
       formData.append(`file${index + 1}`, file);
     });
@@ -478,7 +479,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
 
         <Box>
           <PanelDescription>
-            {message || "No description available"}
+            {getIncidentMessage(message)}
           </PanelDescription>
         </Box>
 
