@@ -30,7 +30,7 @@ const useUnsavedChangesDialog = (onDiscard) => {
       open={open}
       title="Unsaved Changes"
       message="You have unsaved changes. Are you sure you want to cancel the edit?"
-      confirmText="Yes,,Continue"
+      confirmText="Yes,Continue"
       cancelText="No,KeepEditing"
       onConfirm={handleConfirm}
       onCancel={handleClose}

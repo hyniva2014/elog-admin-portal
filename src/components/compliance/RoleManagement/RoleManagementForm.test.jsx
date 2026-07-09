@@ -1,20 +1,18 @@
 import React from "react";
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-} from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
 import RoleManagementForm from "./RoleManagementForm";
 
 jest.mock("../../../common/CommonTextField", () => (props) => (
-  <input
-    data-testid={props.label}
-    value={props.value || ""}
-    onChange={props.onChange}
-    disabled={props.disabled}
-  />
+  <div>
+    <input
+      data-testid={props.label}
+      value={props.value || ""}
+      onChange={props.onChange}
+      disabled={props.disabled}
+    />
+    {props.helperText ? <span>{props.helperText}</span> : null}
+  </div>
 ));
 
 jest.mock("../DeviceAssetManagement/Constants", () => ({
@@ -32,6 +30,7 @@ jest.mock("../DeviceAssetManagement/Constants", () => ({
 
 describe("RoleManagementForm Component", () => {
   const mockOnSubmit = jest.fn();
+  const mockOnDirtyChange = jest.fn();
 
   const defaultProps = {
     formId: "role-form",
@@ -51,43 +50,30 @@ describe("RoleManagementForm Component", () => {
   });
 
   const renderComponent = (props = {}) =>
-    render(
-      <RoleManagementForm
-        {...defaultProps}
-        {...props}
-      />,
-    );
+    render(<RoleManagementForm {...defaultProps} {...props} />);
 
   test("renders form fields correctly", () => {
     renderComponent();
 
-    expect(
-      screen.getByTestId("Role Title"),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("Role Title")).toBeInTheDocument();
 
-    expect(
-      screen.getByTestId("Description"),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("Description")).toBeInTheDocument();
 
-    expect(screen.getByLabelText("Status"))
-      .toBeInTheDocument();
+    expect(screen.getByLabelText("Status")).toBeInTheDocument();
   });
 
   test("renders default values correctly", () => {
     renderComponent();
 
-    expect(screen.getByTestId("Role Title"))
-      .toHaveValue("Admin");
+    expect(screen.getByTestId("Role Title")).toHaveValue("Admin");
 
-    expect(screen.getByTestId("Description"))
-      .toHaveValue("Administrator Role");
+    expect(screen.getByTestId("Description")).toHaveValue("Administrator Role");
   });
 
   test("updates title field correctly", () => {
     renderComponent();
 
-    const titleField =
-      screen.getByTestId("Role Title");
+    const titleField = screen.getByTestId("Role Title");
 
     fireEvent.change(titleField, {
       target: {
@@ -101,8 +87,7 @@ describe("RoleManagementForm Component", () => {
   test("updates description field correctly", () => {
     renderComponent();
 
-    const descriptionField =
-      screen.getByTestId("Description");
+    const descriptionField = screen.getByTestId("Description");
 
     fireEvent.change(descriptionField, {
       target: {
@@ -110,9 +95,19 @@ describe("RoleManagementForm Component", () => {
       },
     });
 
-    expect(descriptionField).toHaveValue(
-      "Manager Description",
-    );
+    expect(descriptionField).toHaveValue("Manager Description");
+  });
+
+  test("reports dirty state when form values change", () => {
+    renderComponent({ onDirtyChange: mockOnDirtyChange });
+
+    expect(mockOnDirtyChange).toHaveBeenCalledWith(false);
+
+    fireEvent.change(screen.getByTestId("Role Title"), {
+      target: { value: "Manager" },
+    });
+
+    expect(mockOnDirtyChange).toHaveBeenLastCalledWith(true);
   });
 
   test("renders status dropdown only in edit mode", () => {
@@ -120,9 +115,7 @@ describe("RoleManagementForm Component", () => {
       isEditMode: false,
     });
 
-    expect(
-      screen.queryByLabelText("Status"),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Status")).not.toBeInTheDocument();
   });
 
   test("disables fields when not editing", () => {
@@ -131,24 +124,20 @@ describe("RoleManagementForm Component", () => {
       isEditing: false,
     });
 
-    expect(
-      screen.getByTestId("Role Title"),
-    ).toBeDisabled();
+    expect(screen.getByTestId("Role Title")).toBeDisabled();
 
-    expect(
-      screen.getByTestId("Description"),
-    ).toBeDisabled();
+    expect(screen.getByTestId("Description")).toBeDisabled();
 
-    expect(screen.getByLabelText("Status"))
-      .toBeDisabled();
+    expect(screen.getByRole("combobox")).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
   });
 
   test("submits form correctly", async () => {
     renderComponent();
 
-    fireEvent.submit(
-      document.getElementById("role-form"),
-    );
+    fireEvent.submit(document.getElementById("role-form"));
 
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalledWith({
@@ -176,13 +165,11 @@ describe("RoleManagementForm Component", () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByTestId("Role Title"),
-      ).toHaveValue("Manager");
+      expect(screen.getByTestId("Role Title")).toHaveValue("Manager");
 
-      expect(
-        screen.getByTestId("Description"),
-      ).toHaveValue("Manager Description");
+      expect(screen.getByTestId("Description")).toHaveValue(
+        "Manager Description",
+      );
     });
   });
 
@@ -195,31 +182,22 @@ describe("RoleManagementForm Component", () => {
       },
     });
 
-    fireEvent.submit(
-      document.getElementById("role-form"),
-    );
+    fireEvent.submit(document.getElementById("role-form"));
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Role Title is required"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Role Title is required")).toBeInTheDocument();
 
-      expect(
-        screen.getByText("Description is required"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Description is required")).toBeInTheDocument();
     });
   });
 
-  test("renders status options correctly", () => {
+  test("renders status options correctly", async () => {
     renderComponent();
 
-    expect(
-      screen.getByText("Active"),
-    ).toBeInTheDocument();
+    fireEvent.mouseDown(screen.getByRole("combobox"));
 
-    expect(
-      screen.getByText("Inactive"),
-    ).toBeInTheDocument();
+    expect(await screen.findAllByText("Active")).toHaveLength(2);
+    expect(await screen.findByText("Inactive")).toBeInTheDocument();
   });
 
   test("matches snapshot", () => {
@@ -228,4 +206,3 @@ describe("RoleManagementForm Component", () => {
     expect(asFragment()).toMatchSnapshot();
   });
 });
-

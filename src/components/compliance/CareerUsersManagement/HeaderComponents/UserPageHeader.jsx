@@ -33,21 +33,9 @@ const EditActionButton = ({ canUpdate, handleStartEdit }) => (
   </Button>
 );
 
-const CancelEditButton = ({ handleCancelEdit }) => (
-  <Button variant="outlined" onClick={handleCancelEdit}>
-    Cancel Edit
-  </Button>
-);
-
-const EditButtonSection = ({
-  mode,
-  editMode,
-  canUpdate,
-  handleStartEdit,
-  handleCancelEdit,
-}) => {
+const EditButtonSection = ({ mode, editMode, canUpdate, handleStartEdit }) => {
   if (mode === "add") return null;
-  if (editMode) return <CancelEditButton handleCancelEdit={handleCancelEdit} />;
+  if (editMode) return null;
   return (
     <EditActionButton canUpdate={canUpdate} handleStartEdit={handleStartEdit} />
   );
@@ -93,7 +81,6 @@ const UserPageHeader = ({
           editMode={editMode}
           canUpdate={canUpdate}
           handleStartEdit={handleStartEdit}
-          handleCancelEdit={handleCancelEdit}
         />
       </Box>
     </Box>

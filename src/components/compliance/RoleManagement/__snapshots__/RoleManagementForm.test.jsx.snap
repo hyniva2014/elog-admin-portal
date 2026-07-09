@@ -11,18 +11,22 @@ exports[`RoleManagementForm Component matches snapshot 1`] = `
       <div
         class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 css-1hzi63y-MuiGrid-root"
       >
-        <input
-          data-testid="Role Title"
-          value="Admin"
-        />
+        <div>
+          <input
+            data-testid="Role Title"
+            value="Admin"
+          />
+        </div>
       </div>
       <div
         class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 css-1idn90j-MuiGrid-root"
       >
-        <input
-          data-testid="Description"
-          value="Administrator Role"
-        />
+        <div>
+          <input
+            data-testid="Description"
+            value="Administrator Role"
+          />
+        </div>
       </div>
       <div
         class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 css-1idn90j-MuiGrid-root"
@@ -33,8 +37,8 @@ exports[`RoleManagementForm Component matches snapshot 1`] = `
           <label
             class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined css-1jy569b-MuiFormLabel-root-MuiInputLabel-root"
             data-shrink="true"
-            for=":ri:"
-            id=":ri:-label"
+            for=":rk:"
+            id=":rk:-label"
           >
             Status
           </label>
@@ -42,12 +46,12 @@ exports[`RoleManagementForm Component matches snapshot 1`] = `
             class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-md26zr-MuiInputBase-root-MuiOutlinedInput-root"
           >
             <div
-              aria-controls=":rj:"
+              aria-controls=":rl:"
               aria-expanded="false"
               aria-haspopup="listbox"
-              aria-labelledby=":ri:-label :ri:"
+              aria-labelledby=":rk:-label :rk:"
               class="MuiSelect-select MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall css-jedpe8-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input"
-              id=":ri:"
+              id=":rk:"
               role="combobox"
               tabindex="0"
             >

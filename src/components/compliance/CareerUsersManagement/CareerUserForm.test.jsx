@@ -1,16 +1,13 @@
 import React from "react";
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-} from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { useForm } from "react-hook-form";
 
 import CareerUserForm from "./CareerUserForm";
+import useUnsavedChangesDialog from "../useUnsavedChangesDialog";
 
 const mockSetEditMode = jest.fn();
+const mockHandleUnsavedCancel = jest.fn();
 
 const createStore = (state) => ({
   getState: () => state,
@@ -31,6 +28,11 @@ jest.mock("../../../services/services", () => ({
   }),
 }));
 
+jest.mock("../useUnsavedChangesDialog", () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
 jest.mock("./HeaderComponents/UserPageHeader", () => {
   return function MockHeader() {
     return <div data-testid="user-page-header" />;
@@ -44,9 +46,7 @@ jest.mock("./CareerUserFormFields", () => {
     <div data-testid="career-user-form-fields">
       <button
         type="button"
-        onClick={() =>
-          props.setValue("first_name", "John")
-        }
+        onClick={() => props.setValue("first_name", "John")}
       >
         Set Value
       </button>
@@ -104,16 +104,16 @@ const renderComponent = (props = {}) => {
 describe("CareerUserForm", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    useUnsavedChangesDialog.mockReturnValue({
+      handleCancel: mockHandleUnsavedCancel,
+      UnsavedChangesDialog: <div>Unsaved Changes Dialog</div>,
+    });
   });
 
   test("renders form fields component", () => {
     renderComponent();
 
-    expect(
-      screen.getByTestId(
-        "career-user-form-fields",
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("career-user-form-fields")).toBeInTheDocument();
   });
 
   test("renders add button in add mode", () => {
@@ -159,9 +159,7 @@ describe("CareerUserForm", () => {
       }),
     );
 
-    expect(
-      mockSetEditMode,
-    ).toHaveBeenCalled();
+    expect(mockSetEditMode).toHaveBeenCalled();
   });
 
   test("renders header only mode", () => {
@@ -169,11 +167,7 @@ describe("CareerUserForm", () => {
       headerOnly: true,
     });
 
-    expect(
-      screen.getByTestId(
-        "user-page-header",
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("user-page-header")).toBeInTheDocument();
   });
 
   test("does not render form fields in headerOnly mode", () => {
@@ -182,9 +176,7 @@ describe("CareerUserForm", () => {
     });
 
     expect(
-      screen.queryByTestId(
-        "career-user-form-fields",
-      ),
+      screen.queryByTestId("career-user-form-fields"),
     ).not.toBeInTheDocument();
   });
 
@@ -212,6 +204,22 @@ describe("CareerUserForm", () => {
     ).toBeEnabled();
   });
 
+  test("shows unsaved changes confirmation when cancel is clicked after editing", () => {
+    renderComponent({
+      mode: "edit",
+      formData: {
+        user_id: 1,
+        first_name: "John",
+        last_name: "Doe",
+      },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /set value/i }));
+    fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
+
+    expect(mockHandleUnsavedCancel).toHaveBeenCalledWith(true);
+  });
+
   test("renders without crashing when formData exists", () => {
     renderComponent({
       mode: "edit",
@@ -222,11 +230,7 @@ describe("CareerUserForm", () => {
       },
     });
 
-    expect(
-      screen.getByTestId(
-        "career-user-form-fields",
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("career-user-form-fields")).toBeInTheDocument();
   });
 
   test("handles empty formData", () => {
@@ -234,19 +238,12 @@ describe("CareerUserForm", () => {
       formData: {},
     });
 
-    expect(
-      screen.getByTestId(
-        "career-user-form-fields",
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("career-user-form-fields")).toBeInTheDocument();
   });
 
   test("renders form element", () => {
-    const { container } =
-      renderComponent();
+    const { container } = renderComponent();
 
-    expect(
-      container.querySelector("form"),
-    ).toBeInTheDocument();
+    expect(container.querySelector("form")).toBeInTheDocument();
   });
 });

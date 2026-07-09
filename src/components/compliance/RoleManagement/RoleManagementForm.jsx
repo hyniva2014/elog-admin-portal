@@ -28,6 +28,7 @@ const RoleManagementForm = ({
   isEditing,
   isEditMode,
   onSubmit,
+  onDirtyChange,
 }) => {
   const isDisabled = isEditMode && !isEditing;
 
@@ -35,7 +36,7 @@ const RoleManagementForm = ({
     control,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm({
     resolver: yupResolver(validationSchema),
 
@@ -45,6 +46,10 @@ const RoleManagementForm = ({
   useEffect(() => {
     reset(defaultValues || initialValues);
   }, [defaultValues, reset]);
+
+  useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
 
   const submitHandler = (data) => {
     const payload = {
