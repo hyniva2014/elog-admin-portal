@@ -100,6 +100,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
     severity: "success",
   });
   const [operators, setOperators] = useState([]);
+  const [address, setAddress] = useState("-");
 
   useEffect(() => {
     setPanelState(PANEL_STATE.DETAILS);
@@ -355,26 +356,26 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
     location1,
     location2,
     city,
+    status,
   } = selectedAlert;
 
   const displayTitle = title || message;
   const displaySeverity = severity || "Critical";
-  const primaryLocation =
-    latitude && longitude ? `${latitude}, ${longitude}` : "-";
+  const primaryLocation = address;
 
   const driverInfo = [
     {
       label: "Driver Name",
-      value: selectedAlert.driver_name || "Linda Garcia",
+      value: selectedAlert.driver_name || "-",
     },
     {
       label: "Driver Status",
-      value: selectedAlert.driver_status || "Active",
+      value: status === 1 ? "Active" : status === 0 ? "Inactive" : "-",
       isStatus: true,
     },
     {
       label: "Carrier",
-      value: selectedAlert.company_name || "J.B. Hunt",
+      value: selectedAlert.company_name || "-",
     },
     {
       label: "Device ID",
@@ -385,6 +386,39 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
       value: truck_number || "-",
     },
   ];
+
+  useEffect(() => {
+    if (!latitude || !longitude) {
+      setAddress("-");
+      return;
+    }
+
+    const controller = new AbortController();
+    const fetchAddress = async () => {
+      setAddress("Loading...");
+      try {
+        const response = await fetch(
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
+          { signal: controller.signal },
+        );
+        const data = await response.json();
+        const parts = [
+          data.city || data.locality,
+          data.principalSubdivision,
+          data.countryName,
+        ].filter(Boolean);
+        setAddress(
+          parts.length ? parts.join(", ") : `${latitude}, ${longitude}`,
+        );
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setAddress(`${latitude}, ${longitude}`);
+        }
+      }
+    };
+    fetchAddress();
+    return () => controller.abort();
+  }, [latitude, longitude]);
 
   const triggerInfo = [
     {
