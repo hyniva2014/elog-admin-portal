@@ -21,10 +21,14 @@ export const HeaderTitle = styled(Typography)(({ theme }) => ({
 
 export const HeaderSubtitle = styled(Typography, {
   shouldForwardProp: (prop) => prop !== "isvisible",
-})(({ theme, isvisible }) => ({
+})(({ isvisible }) => ({
+  fontFamily: "Roboto, sans-serif",
   fontSize: 13,
-  color: theme.palette.text.secondary,
+  color: "#202027",
   fontWeight: 400,
+  lineHeight: "100%",
+  letterSpacing: "0%",
+  marginTop: 4,
   minHeight: 20,
   visibility: isvisible ? "visible" : "hidden",
   display: isvisible ? "block" : "none",
