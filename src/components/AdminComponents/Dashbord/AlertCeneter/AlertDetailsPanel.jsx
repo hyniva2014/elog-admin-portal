@@ -387,38 +387,38 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
     },
   ];
 
-  useEffect(() => {
-    if (!latitude || !longitude) {
-      setAddress("-");
-      return;
-    }
+  // useEffect(() => {
+  //   if (!latitude || !longitude) {
+  //     setAddress("-");
+  //     return;
+  //   }
 
-    const controller = new AbortController();
-    const fetchAddress = async () => {
-      setAddress("Loading...");
-      try {
-        const response = await fetch(
-          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
-          { signal: controller.signal },
-        );
-        const data = await response.json();
-        const parts = [
-          data.city || data.locality,
-          data.principalSubdivision,
-          data.countryName,
-        ].filter(Boolean);
-        setAddress(
-          parts.length ? parts.join(", ") : `${latitude}, ${longitude}`,
-        );
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          setAddress(`${latitude}, ${longitude}`);
-        }
-      }
-    };
-    fetchAddress();
-    return () => controller.abort();
-  }, [latitude, longitude]);
+  //   const controller = new AbortController();
+  //   const fetchAddress = async () => {
+  //     setAddress("Loading...");
+  //     try {
+  //       const response = await fetch(
+  //         `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
+  //         { signal: controller.signal },
+  //       );
+  //       const data = await response.json();
+  //       const parts = [
+  //         data.city || data.locality,
+  //         data.principalSubdivision,
+  //         data.countryName,
+  //       ].filter(Boolean);
+  //       setAddress(
+  //         parts.length ? parts.join(", ") : `${latitude}, ${longitude}`,
+  //       );
+  //     } catch (error) {
+  //       if (!controller.signal.aborted) {
+  //         setAddress(`${latitude}, ${longitude}`);
+  //       }
+  //     }
+  //   };
+  //   fetchAddress();
+  //   return () => controller.abort();
+  // }, [latitude, longitude]);
 
   const triggerInfo = [
     {
