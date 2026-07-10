@@ -72,12 +72,20 @@ export const HeaderStack = styled(Stack)(({ theme }) => ({
     alignItems: "center",
     gap: theme.spacing(2),
   },
+  [theme.breakpoints.between("md", "lg")]: {
+    flexDirection: "column",
+    alignItems: "stretch",
+    gap: theme.spacing(1),
+  },
 }));
 
-export const TitleBox = styled(Box)({
+export const TitleBox = styled(Box)(({ theme }) => ({
   minWidth: 0,
   flex: 1,
-});
+  [theme.breakpoints.between("md", "lg")]: {
+    width: "100%",
+  },
+}));
 
 export const ChartTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
@@ -99,18 +107,24 @@ export const FiltersStack = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "stretch",
-  gap: theme.spacing(1.5),
+  gap: theme.spacing(1),
   [theme.breakpoints.up("sm")]: {
     width: "auto",
     flexDirection: "row",
     alignItems: "center",
+  },
+  [theme.breakpoints.between("md", "lg")]: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
   },
 }));
 
 export const FilterControl = styled(FormControl)(({ theme }) => ({
   width: "100%",
   [theme.breakpoints.up("sm")]: {
-    minWidth: 150,
+    minWidth: 130,
     width: "auto",
   },
 }));
