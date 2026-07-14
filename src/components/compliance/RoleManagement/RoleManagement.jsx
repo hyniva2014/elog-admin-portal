@@ -23,11 +23,11 @@ import {
   Title,
   Subtitle,
   AddButton,
-  CancelEditButton,
   FormEditButton,
 } from "./RoleManagement.styled";
 import { PageContainer } from "../../../common/PageContainer";
 import { formatDateTime } from "../../../common/CommonUtils";
+import useUnsavedChangesDialog from "../useUnsavedChangesDialog";
 
 const RoleManagement = () => {
   const { fetchApi, createApi } = useServices();
@@ -63,8 +63,15 @@ const RoleManagement = () => {
     description: "",
     status: 1,
   });
+  const [formInitialValues, setFormInitialValues] = useState({
+    title: "",
+    description: "",
+    status: 1,
+  });
   const [isEditMode, setIsEditMode] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const [pendingDialogAction, setPendingDialogAction] = useState(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -115,12 +122,15 @@ const RoleManagement = () => {
     try {
       setLoading(true);
       const roleDetails = await fetchRoleByIdApi(fetchApi, roleId);
-      setDefaultValues({
+      const roleValues = {
         id: roleDetails?.id,
         title: roleDetails?.name || "",
         description: roleDetails?.description || "",
         status: roleDetails?.status,
-      });
+      };
+
+      setDefaultValues(roleValues);
+      setFormInitialValues(roleValues);
 
       setIsEditMode(true);
       setIsEditing(false);
@@ -135,11 +145,15 @@ const RoleManagement = () => {
   const handleAddRole = useCallback(() => {
     setIsEditMode(false);
     setIsEditing(true);
-    setDefaultValues({
+    setIsFormDirty(false);
+    const emptyValues = {
       title: "",
       description: "",
       status: 1,
-    });
+    };
+
+    setDefaultValues(emptyValues);
+    setFormInitialValues(emptyValues);
 
     setOpenDialog(true);
   }, []);
@@ -152,12 +166,51 @@ const RoleManagement = () => {
     setOpenDialog(false);
     setIsEditMode(false);
     setIsEditing(false);
-    setDefaultValues({
+    setIsFormDirty(false);
+    setPendingDialogAction(null);
+    const emptyValues = {
       title: "",
       description: "",
       status: 1,
-    });
+    };
+
+    setDefaultValues(emptyValues);
+    setFormInitialValues(emptyValues);
   }, []);
+
+  const handleDiscardRoleChanges = useCallback(() => {
+    if (pendingDialogAction === "close") {
+      handleCloseDialog();
+      setPendingDialogAction(null);
+      return;
+    }
+
+    setIsEditing(false);
+    setIsFormDirty(false);
+    setDefaultValues(formInitialValues);
+    setPendingDialogAction(null);
+  }, [pendingDialogAction, handleCloseDialog, formInitialValues]);
+
+  const { handleCancel: handleUnsavedCancel, UnsavedChangesDialog } =
+    useUnsavedChangesDialog(() => {
+      handleDiscardRoleChanges();
+    });
+
+  const handleDialogCancelRequest = useCallback(() => {
+    if (isEditMode && isEditing && isFormDirty) {
+      setPendingDialogAction("close");
+      handleUnsavedCancel(true);
+      return;
+    }
+
+    handleCloseDialog();
+  }, [
+    isEditMode,
+    isEditing,
+    isFormDirty,
+    handleUnsavedCancel,
+    handleCloseDialog,
+  ]);
 
   const handleSaveRole = async (formValues) => {
     try {
@@ -213,10 +266,7 @@ const RoleManagement = () => {
 
   const handleEnableEdit = useCallback(() => {
     setIsEditing(true);
-  }, []);
-
-  const handleCancelEdit = useCallback(() => {
-    setIsEditing(false);
+    setIsFormDirty(false);
   }, []);
 
   const transformAuditLogData = useCallback(
@@ -317,6 +367,7 @@ const RoleManagement = () => {
       users: role.user_count,
       status: role.status === 1 ? "Active" : "Inactive",
       color: theme.palette.brand.main,
+      roleIds: role.role_ids || String(role.id),
     };
 
     return (
@@ -335,8 +386,8 @@ const RoleManagement = () => {
 
   const submitButtonLabel = isEditMode ? "Update" : "Save";
 
-  const headerActions = isEditMode ? (
-    !isEditing ? (
+  const headerActions =
+    isEditMode && !isEditing ? (
       <FormEditButton
         variant="outlined"
         onClick={handleEnableEdit}
@@ -344,16 +395,7 @@ const RoleManagement = () => {
       >
         Edit
       </FormEditButton>
-    ) : (
-      <CancelEditButton
-        variant="outlined"
-        onClick={handleCancelEdit}
-        size="small"
-      >
-        Cancel Edit
-      </CancelEditButton>
-    )
-  ) : null;
+    ) : null;
 
   const disableSubmit = isEditMode && !isEditing;
 
@@ -385,8 +427,8 @@ const RoleManagement = () => {
 
           <CommonDialogForm
             open={openDialog}
-            onCancel={handleCloseDialog}
-            onClose={handleCloseDialog}
+            onCancel={handleDialogCancelRequest}
+            onClose={handleDialogCancelRequest}
             title={pageTitle}
             formId="role-form"
             submitButtonText={submitButtonLabel}
@@ -400,6 +442,7 @@ const RoleManagement = () => {
                 isEditMode={isEditMode}
                 isEditing={isEditing}
                 onSubmit={handleSaveRole}
+                onDirtyChange={setIsFormDirty}
               />
             }
           />
@@ -417,6 +460,8 @@ const RoleManagement = () => {
             auditData={auditLogData}
             setAuditData={setAuditLogData}
           />
+
+          {UnsavedChangesDialog}
         </PageContainer>
       </AccessControl>
     </>

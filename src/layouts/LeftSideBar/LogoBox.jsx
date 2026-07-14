@@ -1,3 +1,4 @@
+import React from "react";
 import { Link } from "react-router-dom";
 import logo from "@src/assets/images/logo.png";
 import logoDark from "@src/assets/images/logo-dark.png";
@@ -6,29 +7,32 @@ import { styled } from "@mui/system";
 import { Typography } from "@mui/material";
 import LogoSmall from "../../assets/images/Logo-small.png";
 import LogoBig from "../../assets/images/Logo-big.png";
+
+const LogoBoxWrapper = styled("div")(({ settings, themeMode, backgroundColor }) => {
+  return {
+    backgroundColor: backgroundColor
+      ? themeMode === "light"
+        ? "#284394"
+        : "#212428"
+      : "transparent",
+    height: "70px",
+    position: "sticky",
+    top: 0,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 2,
+  };
+});
+
 const LogoBox = ({ defaultTheme, backgroundColor, isCollapsed = false }) => {
   const { settings, themeMode } = useLayoutContext();
   const {
     sidenav: { theme },
   } = settings;
-  const LogoBoxWrapper = styled("div")(({ settings, themeMode }) => {
-    return {
-      backgroundColor: backgroundColor
-        ? themeMode === "light"
-          ? "#284394"
-          : "#212428"
-        : "transparent",
-      height: "70px",
-      position: "sticky",
-      top: 0,
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      zIndex: 2,
-    };
-  });
+
   return (
-    <LogoBoxWrapper settings={settings} themeMode={themeMode}>
+    <LogoBoxWrapper settings={settings} themeMode={themeMode} backgroundColor={backgroundColor}>
       <Link
         to="/"
         style={{
@@ -66,4 +70,5 @@ const LogoBox = ({ defaultTheme, backgroundColor, isCollapsed = false }) => {
     </LogoBoxWrapper>
   );
 };
-export default LogoBox;
+
+export default React.memo(LogoBox);

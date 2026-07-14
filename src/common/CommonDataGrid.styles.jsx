@@ -218,7 +218,7 @@ export const FooterInfoContainerSx = {
   gridTemplateColumns: "1fr auto 1fr",
   alignItems: "center",
   px: 2,
-  py: 1.5,
+  py: 1,
   borderTop: "1px solid",
   borderColor: "divider",
   backgroundColor: "background.paper",

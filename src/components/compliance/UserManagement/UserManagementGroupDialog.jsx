@@ -56,6 +56,7 @@ const GroupDialogContent = ({ auditData, setAuditData, onClose }) => {
         useAutoHeight
         showMuiLoading={auditData.isLoading}
         paginationMode="server"
+        disableCollapse
       />
       <ActionBox>
         <BackButton variant="contained" onClick={onClose}>

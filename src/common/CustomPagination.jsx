@@ -1,3 +1,4 @@
+import { useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   gridPageSelector,
@@ -17,8 +18,9 @@ import {
   ExpandIconSx,
 } from "./CustomPagination.styles";
 
-const CustomPagination = ({ collapsed, setCollapsed }) => {
+const CustomPagination = ({ collapsed, setCollapsed, disableCollapse = false }) => {
   const apiRef = useGridApiContext();
+  const [isHovered, setIsHovered] = useState(false);
 
   const page = useGridSelector(apiRef, gridPageSelector);
   const pageSize = useGridSelector(apiRef, gridPageSizeSelector);
@@ -32,14 +34,25 @@ const CustomPagination = ({ collapsed, setCollapsed }) => {
   };
 
   return (
-    <PaginationContainer>
-      <PaginationCount variant="body2">
-        {`${start}-${end} of ${rowCount}`}
-      </PaginationCount>
+  <PaginationContainer
+    onClick={disableCollapse ? undefined : () => setCollapsed((prev) => !prev)}
+    onMouseEnter={() => setIsHovered(true)}
+    onMouseLeave={() => setIsHovered(false)}
+    sx={{ cursor: disableCollapse ? "default" : "pointer" }}
+    disablecollapse={disableCollapse ? 1 : 0}
+  >
+    <PaginationCount variant="body2">
+      {`${start}-${end} of ${rowCount}`}
+    </PaginationCount>
 
+    {!disableCollapse && (
       <PaginationButtonWrapper>
-        <PaginationToggleButton
-          onClick={() => setCollapsed((prev) => !prev)}
+        <PaginationToggleButton 
+          disableRipple
+          sx={{
+            opacity: isHovered ? 1 : 0,
+            transition: "opacity 0.2s ease-in-out",
+          }}
         >
           <ExpandMoreIcon
             fontSize="small"
@@ -47,6 +60,7 @@ const CustomPagination = ({ collapsed, setCollapsed }) => {
           />
         </PaginationToggleButton>
       </PaginationButtonWrapper>
+    )}
 
       <PaginationActions>
         <StyledPagination
@@ -55,6 +69,7 @@ const CustomPagination = ({ collapsed, setCollapsed }) => {
           count={Math.ceil(rowCount / pageSize)}
           onChange={handlePageChange}
           size="small"
+          onClick={(e) => e.stopPropagation()}
         />
       </PaginationActions>
     </PaginationContainer>

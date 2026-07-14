@@ -25,7 +25,7 @@ export const FormBox = styled(Box)(({ theme }) => ({
 }));
 
 export const StatusTypography = styled(Typography)(({ theme, value }) => ({
-  color: value === "Assigned" ? theme.palette.success.dark : theme.palette.error.dark,
+  color: value === "Assigned" ? theme.palette.success.dark : value === "Allocated" ? "#FFA726" : theme.palette.error.dark,
 }));
 
 export const DialogFormContainer = styled(Box)(({ theme }) => ({

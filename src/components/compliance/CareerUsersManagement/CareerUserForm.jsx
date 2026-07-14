@@ -29,6 +29,7 @@ import CareerUserFormFields, {
   userManagementValidationSchema,
   geocodeAddress,
 } from "./CareerUserFormFields";
+import useUnsavedChangesDialog from "../useUnsavedChangesDialog";
 
 const debounce = (func, delay) => {
   let timeoutId;
@@ -117,6 +118,8 @@ const CareerUserForm = ({
   const [loadingSecondaryStates, setLoadingSecondaryStates] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
   const deletedIdsRef = useRef([]);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [originalFormData, setOriginalFormData] = useState(null);
   const { fetchApi } = useServices();
 
   // console.log("roles:", roles);
@@ -139,7 +142,7 @@ const CareerUserForm = ({
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
     setValue,
     trigger,
@@ -175,6 +178,12 @@ const CareerUserForm = ({
       onFormValuesChange(formValues);
     }
   }, [formValues, onFormValuesChange]);
+
+  useEffect(() => {
+    if (mode === "edit" && formData && Object.keys(formData).length > 0 && !isInitializing) {
+      setOriginalFormData(JSON.parse(JSON.stringify(formData)));
+    }
+  }, [formData, mode, isInitializing]);
 
   useEffect(() => {
     if (!headerOnly && secondaryCountry) {
@@ -383,6 +392,14 @@ const CareerUserForm = ({
   };
 
   useEffect(() => {
+    if (mode === "edit" && originalFormData && !isInitializing) {
+      const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(prepareFormResetData(originalFormData));
+      const hasFileChanges = files.length > 0 || deletedDocumentIds.length > 0;
+      setHasUnsavedChanges(hasFormChanges || hasFileChanges);
+    }
+  }, [formValues, files, deletedDocumentIds, mode, originalFormData, isInitializing, prepareFormResetData]);
+
+  useEffect(() => {
     if (mode === "edit" && formData && Object.keys(formData).length > 0) {
       setIsInitializing(true);
       setFiles([]);
@@ -569,51 +586,7 @@ const CareerUserForm = ({
 
   useEffect(() => {}, [existingMedicalFiles]);
 
-  const handleCancel = useCallback(() => {
-    navigate("/platform-users");
-  }, [navigate]);
-
-  // const handleCancelEdit = useCallback(async () => {
-  //   if (mode === "edit" && formData && Object.keys(formData).length > 0) {
-  //     if (fetchUserData) {
-  //       await fetchUserData();
-  //     }
-  //     setDeletedDocumentIds([]);
-  //   } else {
-  //     reset({
-  //       language: [1],
-  //       emp_history: [
-  //         {
-  //           emp_history_details: "",
-  //           emp_history_start_date: null,
-  //           emp_history_end_date: null,
-  //           emp_history_duration: "",
-  //         },
-  //       ],
-  //     });
-  //     setFiles([]);
-  //     setExistingProfileFiles([]);
-  //     setExistingMedicalFiles([]);
-  //     setMedicalUploaded(false);
-  //     setImageUploaded(false);
-  //   }
-  //   setEditMode(false);
-  //   if (setEditMode) setEditMode(false);
-  // }, [
-  //   mode,
-  //   formData,
-  //   fetchUserData,
-  //   reset,
-  //   setEditMode,
-  //   setFiles,
-  //   setExistingProfileFiles,
-  //   setExistingMedicalFiles,
-  //   setMedicalUploaded,
-  //   setImageUploaded,
-  //   setDeletedDocumentIds,
-  // ]);
-
-  const handleCancelEdit = useCallback(async () => {
+  const handleDiscardChanges = useCallback(() => {
     if (mode === "add") {
       navigate("/platform-users");
       return;
@@ -621,16 +594,12 @@ const CareerUserForm = ({
 
     if (mode === "edit" && formData && Object.keys(formData).length > 0) {
       if (fetchUserData) {
-        await fetchUserData();
+        fetchUserData();
       }
 
       setDeletedDocumentIds([]);
     }
 
-    setEditMode(false);
-  }, [mode, navigate, formData, fetchUserData, setDeletedDocumentIds]);
-
-  const handleDiscard = useCallback(() => {
     if (formData && Object.keys(formData).length > 0) {
       reset(prepareFormResetData(formData));
       setDeletedDocumentIds([]);
@@ -709,7 +678,9 @@ const CareerUserForm = ({
       setImageUploaded(false);
     }
     setEditMode(false);
+    setHasUnsavedChanges(false);
   }, [
+    mode,
     formData,
     reset,
     prepareFormResetData,
@@ -720,7 +691,67 @@ const CareerUserForm = ({
     setMedicalUploaded,
     setImageUploaded,
     setEditMode,
+    navigate,
+    fetchUserData,
   ]);
+
+  const pendingBackRef = useRef(false);
+
+  const handleDiscardAndMaybeNavigate = useCallback(() => {
+    handleDiscardChanges();
+    if (pendingBackRef.current) {
+      pendingBackRef.current = false;
+      handleBack();
+    }
+  }, [handleDiscardChanges, handleBack]);
+
+  const { handleCancel: handleUnsavedCancel, UnsavedChangesDialog } =
+    useUnsavedChangesDialog(handleDiscardAndMaybeNavigate, () => {
+      pendingBackRef.current = false;
+    });
+
+  const handleBackNavigation = useCallback(() => {
+    console.log('handleBackNavigation called:', { mode, editMode, hasUnsavedChanges, isDirty, files: files.length, deletedDocumentIds: deletedDocumentIds.length });
+    if (mode === "edit" && editMode && hasUnsavedChanges) {
+      console.log('Triggering unsaved changes dialog');
+      pendingBackRef.current = true;
+      handleUnsavedCancel(true);
+      return;
+    }
+
+    console.log('No unsaved changes, navigating back');
+    handleBack();
+  }, [editMode, handleBack, handleUnsavedCancel, hasUnsavedChanges, mode]);
+
+  const handleCancel = useCallback(() => {
+    if (mode === "edit" && editMode && hasUnsavedChanges) {
+      handleUnsavedCancel(true);
+      return;
+    }
+
+    if (mode === "edit" && editMode) {
+      handleDiscardChanges();
+      return;
+    }
+
+    navigate("/platform-users");
+  }, [
+    mode,
+    editMode,
+    hasUnsavedChanges,
+    handleUnsavedCancel,
+    navigate,
+    handleDiscardChanges,
+  ]);
+
+  const handleCancelEdit = useCallback(() => {
+    if (mode === "edit" && editMode && hasUnsavedChanges) {
+      handleUnsavedCancel(true);
+      return;
+    }
+
+    handleDiscardChanges();
+  }, [mode, editMode, hasUnsavedChanges, handleUnsavedCancel, handleDiscardChanges]);
 
   const handleSaveChanges = useCallback(() => {
     handleSubmit(submitHandler)();
@@ -1026,77 +1057,83 @@ const CareerUserForm = ({
 
   if (headerOnly) {
     return (
-      <UserPageHeader
-        handleBack={handleBack}
-        editMode={editMode}
-        setEditMode={setEditMode}
-        handleCancelEdit={handleDiscard}
-        // handleCancel={handleCancel}
-        // handleDiscard={handleDiscard}
-        handleSaveChanges={handleSaveChanges}
-        canUpdate={canUpdate}
-        formData={formData}
-        mode={mode}
-      />
+      <>
+        <UserPageHeader
+          handleBack={handleBackNavigation}
+          editMode={editMode}
+          setEditMode={setEditMode}
+          handleCancelEdit={handleCancelEdit}
+          // handleCancel={handleCancel}
+          // handleDiscard={handleDiscard}
+          handleSaveChanges={handleSaveChanges}
+          canUpdate={canUpdate}
+          formData={formData}
+          mode={mode}
+        />
+        {UnsavedChangesDialog}
+      </>
     );
   }
 
   return (
-    <form id="userForm" onSubmit={handleSubmit(submitHandler)}>
-      <CareerUserFormFields
-        control={control}
-        errors={errors}
-        watch={watch}
-        setValue={setValue}
-        trigger={trigger}
-        clearErrors={clearErrors}
-        editMode={editMode}
-        existingProfileFiles={existingProfileFiles}
-        setExistingProfileFiles={setExistingProfileFiles}
-        handleImagePreview={handleImagePreview}
-        handleRemoveExistingFile={handleRemoveExistingFile}
-        dynamicStates={dynamicStates}
-        loadingStates={loadingStates}
-        secondaryDynamicStates={secondaryDynamicStates}
-        loadingSecondaryStates={loadingSecondaryStates}
-        existingMedicalFiles={existingMedicalFiles}
-        setExistingMedicalFiles={setExistingMedicalFiles}
-        medicalUploaded={medicalUploaded}
-        setMedicalUploaded={setMedicalUploaded}
-        imageUploaded={imageUploaded}
-        setImageUploaded={setImageUploaded}
-        // filteredRoles={filteredRoles}
-        roles={roles}
-        handleAddressChange={handleAddressChange}
-        handleSecondaryAddressChange={handleSecondaryAddressChange}
-        handleAddEmployment={handleAddEmployment}
-        handleRemoveEmployment={handleRemoveEmployment}
-        isInitializing={isInitializing}
-        mode={mode}
-        sameAsPrimary={sameAsPrimary}
-        selectedCountry={selectedCountry}
-        selectedCitizenship={selectedCitizenship}
-        selectedEmploymentType={selectedEmploymentType}
-        selectedStatus={selectedStatus}
-        selectedSecondaryCountry={selectedSecondaryCountry}
-        handleSameAddressToggle={handleSameAddressToggle}
-      />
+    <>
+      <form id="userForm" onSubmit={handleSubmit(submitHandler)}>
+        <CareerUserFormFields
+          control={control}
+          errors={errors}
+          watch={watch}
+          setValue={setValue}
+          trigger={trigger}
+          clearErrors={clearErrors}
+          editMode={editMode}
+          existingProfileFiles={existingProfileFiles}
+          setExistingProfileFiles={setExistingProfileFiles}
+          handleImagePreview={handleImagePreview}
+          handleRemoveExistingFile={handleRemoveExistingFile}
+          dynamicStates={dynamicStates}
+          loadingStates={loadingStates}
+          secondaryDynamicStates={secondaryDynamicStates}
+          loadingSecondaryStates={loadingSecondaryStates}
+          existingMedicalFiles={existingMedicalFiles}
+          setExistingMedicalFiles={setExistingMedicalFiles}
+          medicalUploaded={medicalUploaded}
+          setMedicalUploaded={setMedicalUploaded}
+          imageUploaded={imageUploaded}
+          setImageUploaded={setImageUploaded}
+          // filteredRoles={filteredRoles}
+          roles={roles}
+          handleAddressChange={handleAddressChange}
+          handleSecondaryAddressChange={handleSecondaryAddressChange}
+          handleAddEmployment={handleAddEmployment}
+          handleRemoveEmployment={handleRemoveEmployment}
+          isInitializing={isInitializing}
+          mode={mode}
+          sameAsPrimary={sameAsPrimary}
+          selectedCountry={selectedCountry}
+          selectedCitizenship={selectedCitizenship}
+          selectedEmploymentType={selectedEmploymentType}
+          selectedStatus={selectedStatus}
+          selectedSecondaryCountry={selectedSecondaryCountry}
+          handleSameAddressToggle={handleSameAddressToggle}
+        />
 
-      <FormActionButtons
-        editMode={editMode}
-        handleCancel={handleCancel}
-        mode={mode}
-        canUpdate={canUpdate}
-      />
+        <FormActionButtons
+          editMode={editMode}
+          handleCancel={handleCancel}
+          mode={mode}
+          canUpdate={canUpdate}
+        />
 
-      <ImagePreviewModalWrapper
-        showImagePreview={showImagePreview}
-        previewImage={previewImage}
-        handlePreviewModalClick={handlePreviewModalClick}
-        stopPreviewContainerPropagation={stopPreviewContainerPropagation}
-        handleClosePreview={handleClosePreview}
-      />
-    </form>
+        <ImagePreviewModalWrapper
+          showImagePreview={showImagePreview}
+          previewImage={previewImage}
+          handlePreviewModalClick={handlePreviewModalClick}
+          stopPreviewContainerPropagation={stopPreviewContainerPropagation}
+          handleClosePreview={handleClosePreview}
+        />
+      </form>
+      {UnsavedChangesDialog}
+    </>
   );
 };
 

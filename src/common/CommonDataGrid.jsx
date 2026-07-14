@@ -1,4 +1,4 @@
-import { Box, Tooltip, Typography, useTheme } from "@mui/material";
+import { Box, Collapse, Tooltip, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import CustomPagination from "./CustomPagination";
 import { useEffect, useRef, useState } from "react";
@@ -55,6 +55,7 @@ const CommonDataGrid = ({
   isRowSelectable = null,
   showColumnSeparator = true,
   disableStickyColumns = false,
+  disableCollapse = false,
 }) => {
   const pagePaginationModel = {
     page: (data.page || 1) - 1,
@@ -280,6 +281,7 @@ const CommonDataGrid = ({
             <CustomPagination
               collapsed={collapsed}
               setCollapsed={setCollapsed}
+              disableCollapse={disableCollapse}
             />
           ),
           noRowsOverlay: NoRowsOverlay,
@@ -305,7 +307,9 @@ const CommonDataGrid = ({
           }),
         })}
       />
-      {footerContent}
+      <Collapse in={!disableCollapse && collapsed} timeout={400}>
+        {footerContent}
+      </Collapse>
     </Box>
   );
 };

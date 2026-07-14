@@ -1,13 +1,18 @@
 import { useState, useCallback } from "react";
 
+import { getFormattedDateTime } from "../../../common/CommonUtils";
+
 const transformAuditLogs = (apiData) =>
-  apiData.map((item) => ({
-    id: item.id,
-    created_by: item.created_by || "-",
-    created_date: item.created_at ? new Date(item.created_at).toLocaleDateString() : "-",
-    created_time: item.created_at ? new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "",
-    notes: item.description || "-",
-  }));
+  apiData.map((item) => {
+    const { date, time } = getFormattedDateTime(item.created_at);
+    return {
+      id: item.id,
+      created_by: item.created_by || "-",
+      created_date: date,
+      created_time: time,
+      notes: item.description || "-",
+    };
+  });
 
 const INITIAL_AUDIT_LOG_DATA = {
   rows: [],
@@ -29,7 +34,7 @@ const useDeviceHistory = (fetchApi, setLoading) => {
         setAuditLogData(prev => ({ ...prev, isLoading: true }));
         
         const response = await fetchApi(
-          `/masteradmin/eld-device/audit-logs?page=${page}&limit=${pageSize}`
+          `/masteradmin/eld-device/audit-logs?page=${page}&limit=${pageSize}&device_id=${row?.id}`
         );
         
         if (response?.statusCode === 200 && response?.body?.audit_logs) {

@@ -34,8 +34,8 @@ export const periodOptions = [
 
 // Legend Helpers
 export const splitLegendItems = (series) => {
-  const topLegendItems = series?.slice(0, 3) || [];
-  const bottomLegendItems = series?.slice(3) || [];
+  const topLegendItems = series || [];
+  const bottomLegendItems = [];
   return { topLegendItems, bottomLegendItems };
 };
 

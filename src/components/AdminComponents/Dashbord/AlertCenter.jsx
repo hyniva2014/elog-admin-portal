@@ -35,7 +35,15 @@ const AlertCenter = ({
 
         <AlertList>
           {alerts.map((item) => (
-            <SimpleAlertCardItem key={item.id} item={item} />
+            <SimpleAlertCardItem
+              key={item.id}
+              item={item}
+              onClick={() =>
+                navigate("/alert-center", {
+                  state: { notificationId: item.notification_id ?? item.id },
+                })
+              }
+            />
           ))}
         </AlertList>
       </Box>

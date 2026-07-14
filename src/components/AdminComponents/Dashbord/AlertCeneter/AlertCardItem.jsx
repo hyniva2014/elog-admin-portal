@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import {
   AlertCard,
   AlertCardTitle,
@@ -25,6 +25,15 @@ import { calculateAlertId } from "./AlertDetailsPanel.utils";
 import { INCIDENT_EVENT_TITLES } from "../../../compliance/DeviceAssetManagement/Constants.js";
 
 const AlertCardItem = ({ item, isSelected, onSelect }) => {
+  const cardRef = useRef(null);
+
+  useEffect(() => {
+    if (isSelected && cardRef.current) {
+      setTimeout(() => {
+        cardRef.current?.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+      }, 50);
+    }
+  }, [isSelected]);
   const {
     notification_id,
     title,
@@ -107,7 +116,7 @@ const statusLabel = showStatusLabel ? (
 ) : null;
 
   return (
-    <AlertCard accentcolor={color} active={isSelected} onClick={handleClick}>
+    <AlertCard ref={cardRef} accentcolor={color} active={isSelected} onClick={handleClick}>
       <AlertContent>
         <AlertTopRow>
           <AlertCardTitle>{displayTitle}</AlertCardTitle>
@@ -124,10 +133,12 @@ const statusLabel = showStatusLabel ? (
             {company}
           </AlertDetailItem>
 
-          <AlertDetailItem>
-            <AlertIcon src={TruckIcon} alt="Truck" />
-            {displayTruckNumber}
-          </AlertDetailItem>
+          {truck_number && (
+            <AlertDetailItem>
+              <AlertIcon src={TruckIcon} alt="Truck" />
+              {displayTruckNumber}
+            </AlertDetailItem>
+          )}
 
           <AlertDetailItem>
             <AlertIcon src={DeviceIcon} alt="Device" />
@@ -148,10 +159,6 @@ const statusLabel = showStatusLabel ? (
             {displayCreatedAt}
           </AlertDetailItem>
 
-          <AlertDetailItem>
-            <AlertIdIcon src={IdIcon} alt="ID" />
-            {alertIdNumber}
-          </AlertDetailItem>
         </LocationRow>
       </AlertContent>
     </AlertCard>

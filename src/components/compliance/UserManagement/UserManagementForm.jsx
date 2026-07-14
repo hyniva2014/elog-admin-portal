@@ -1,4 +1,10 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  useLayoutEffect,
+} from "react";
 import { Grid } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -62,6 +68,9 @@ const UserManagementForm = ({
   mode = "add",
   initialData = null,
   companyOptions = [],
+  isEditing,
+  setIsEditing,
+  onDirtyChange,
 }) => {
   const { fetchApi } = useServices();
   const [roleOptions, setRoleOptions] = useState([]);
@@ -70,7 +79,7 @@ const UserManagementForm = ({
   const isViewMode = mode === "view";
 
   // Internal editing state — only relevant when mode === "view"
-  const [isEditing, setIsEditing] = useState(false);
+  // const [isEditing, setIsEditing] = useState(false);
   const loginPermissions = useSelector(
     (state) => state.loginSlice.permissions || {},
   );
@@ -79,9 +88,10 @@ const UserManagementForm = ({
     (state) => state.rolePermissions?.permissions || {},
   );
 
-  const permissions = Object.keys(rolePermissions).length > 0
-    ? rolePermissions
-    : loginPermissions;
+  const permissions =
+    Object.keys(rolePermissions).length > 0
+      ? rolePermissions
+      : loginPermissions;
 
   const canUpdate = hasPermission(
     permissions,
@@ -95,7 +105,7 @@ const UserManagementForm = ({
   const {
     handleSubmit,
     register,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
     setValue,
     watch,
@@ -104,9 +114,15 @@ const UserManagementForm = ({
     defaultValues: EMPTY_DEFAULTS,
   });
 
+  useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
+
   const fetchRoles = useCallback(async () => {
     try {
-      const response = await fetchApi("/masteradmin/roles/get-all-superusers-roles");
+      const response = await fetchApi(
+        "/masteradmin/roles/get-all-superusers-roles",
+      );
       if (response?.body?.roles) {
         const options = response.body.roles.map((r) => ({
           label: r.role_name,
@@ -128,16 +144,30 @@ const UserManagementForm = ({
       initializedRef.current = false;
       return;
     }
-    if (initializedRef.current) return;
 
     const initForm = async () => {
       const roles = await fetchRoles();
       const carrierAdmin = roles?.find(
-        (r) => r.role_name.trim() === "Carrier Admin"
+        (r) => r.role_name.trim() === "Carrier Admin",
       );
-      const carrierAdminId = carrierAdmin ? String(carrierAdmin.role_id) : CARRIER_ADMIN_ROLE_ID;
+      const carrierAdminId = carrierAdmin
+        ? String(carrierAdmin.role_id)
+        : CARRIER_ADMIN_ROLE_ID;
 
       if (isViewMode && initialData) {
+        const currentRoleId = String(initialData.role_id || "");
+        const currentRoleName = initialData.userProfile || "Carrier Admin";
+        const roleExists = roles.some(
+          (r) => String(r.role_id) === currentRoleId,
+        );
+
+        if (currentRoleId && !roleExists) {
+          setRoleOptions((prev) => [
+            ...prev,
+            { label: currentRoleName, value: currentRoleId },
+          ]);
+        }
+
         reset(rowToFormValues(initialData));
       } else {
         reset({
@@ -150,7 +180,13 @@ const UserManagementForm = ({
     };
 
     initForm();
-  }, [open]);
+  }, [open, mode, initialData]);
+
+  useLayoutEffect(() => {
+    if (open && !isViewMode) {
+      reset(EMPTY_DEFAULTS);
+    }
+  }, [open, mode, reset, isViewMode]);
 
   const handleFormSubmit = (data) => {
     const submitMode = isViewMode && isEditing ? "edit" : mode;
@@ -158,30 +194,46 @@ const UserManagementForm = ({
   };
 
   const handleClose = () => {
-    reset(EMPTY_DEFAULTS);
-    setIsEditing(false);
     onClose();
   };
 
-  const handleCancelEdit = () => {
-    if (initialData) reset(rowToFormValues(initialData));
-    setIsEditing(false);
-  };
+  // const handleCancelEdit = () => {
+  //   if (initialData) reset(rowToFormValues(initialData));
+  //   setIsEditing(false);
+  // };
 
   const handleAccountChange = useCallback(
-    (value) => setValue("company_id", value, { shouldValidate: true }),
-    [setValue]
+    (value) =>
+      setValue("company_id", value, {
+        shouldValidate: true,
+        shouldDirty: true,
+      }),
+    [setValue],
   );
 
   const handleUserProfileChange = useCallback(
-    (value) => setValue("role_id", value, { shouldValidate: true }),
-    [setValue]
+    (value) =>
+      setValue("role_id", value, {
+        shouldValidate: true,
+        shouldDirty: true,
+      }),
+    [setValue],
   );
 
   const handleStatusChange = useCallback(
-    (value) => setValue("status_id", value, { shouldValidate: true }),
-    [setValue]
+    (value) =>
+      setValue("status_id", value, {
+        shouldValidate: true,
+        shouldDirty: true,
+      }),
+    [setValue],
   );
+
+  useEffect(() => {
+    if (!isEditing && initialData && open) {
+      reset(rowToFormValues(initialData));
+    }
+  }, [isEditing, initialData, open, reset]);
 
   const handleEditClick = useCallback(() => setIsEditing(true), []);
 
@@ -331,7 +383,6 @@ const UserManagementForm = ({
             />
           </Grid>
         )}
-      
       </Grid>
     </FormContainer>
   );
@@ -357,13 +408,14 @@ const UserManagementForm = ({
       content={formContent}
       formId="user-management-form"
       onClose={handleClose}
-      onCancel={isEditing ? handleCancelEdit : handleClose}
+      onCancel={handleClose}
       loading={loading}
       mode={isEditing ? "edit" : mode}
       submitButtonText={submitButtonText}
       headerActions={editHeaderButton}
       maxWidth="sm"
       isEditing={isEditing}
+      disableSubmit={isEditing && !isDirty}
     />
   );
 };

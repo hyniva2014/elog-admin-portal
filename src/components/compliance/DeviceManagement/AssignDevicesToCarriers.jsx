@@ -27,7 +27,7 @@ const AssignDevicesToCarriers = ({
 
   const fetchCarriers = async () => {
     try {
-      const response = await fetchApi("/masteradmin/dropdown/companies");
+      const response = await fetchApi("/masteradmin/dropdown/companies?is_active=1");
       const dropdownData = response?.body?.data || [];
       const formattedOptions = dropdownData.map((item) => ({
         value: item.company_id,

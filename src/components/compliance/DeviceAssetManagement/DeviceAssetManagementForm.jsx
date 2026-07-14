@@ -40,6 +40,8 @@ const DeviceAssetManagementForm = ({
   isEditing,
   isEditMode,
   onSubmit,
+  setHasChanges,
+  originalValues,
 }) => {
   const isDisabled = isEditMode && !isEditing;
 
@@ -56,6 +58,24 @@ const DeviceAssetManagementForm = ({
   });
   const [modelOptions, setModelOptions] = useState([]);
   const { fetchApi } = useServices();
+
+  const watchedValues = watch();
+
+  useEffect(() => {
+    if (!isEditing) {
+      setHasChanges(false);
+      return;
+    }
+
+    const changed =
+      watchedValues.modelName !== originalValues.modelName ||
+      watchedValues.serialNumber !== originalValues.serialNumber ||
+      watchedValues.imei_number !== originalValues.imei_number ||
+      watchedValues.iccid !== originalValues.iccid ||
+      watchedValues.BLE_MAC_ADDRESS !== originalValues.BLE_MAC_ADDRESS;
+
+    setHasChanges(changed);
+  }, [watchedValues, originalValues, isEditing]);
 
   useEffect(() => {
     reset(defaultValues || initialValues);

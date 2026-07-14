@@ -870,7 +870,7 @@ const CareerForm = () => {
 
       const response = await saveCareerUser(payload);
 
-      if (response?.statusCode === 200) {
+      if (response?.statusCode === 200 || response?.statusCode === 201) {
         navigate("/platform-users", {
           state: {
             snackbar: {

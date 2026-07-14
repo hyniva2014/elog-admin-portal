@@ -53,6 +53,7 @@ const RoleUserManagement = () => {
   const [searchParams] = useSearchParams();
   const roleId = searchParams.get("roleId");
   const roleName = searchParams.get("roleName") || "Role";
+  const roleIds = searchParams.get("roleIds") || roleId;
 
   const { fetchApi } = useServices();
   const { setLoading, LoadingContainer } = CommonLoading();
@@ -107,7 +108,7 @@ const RoleUserManagement = () => {
     setLoading(true);
     setGridData((prev) => ({ ...prev, isLoading: true }));
     try {
-      const result = await getUsersByRoleApi(fetchApi, roleId);
+      const result = await getUsersByRoleApi(fetchApi, roleIds);
       setAllUsers(result.users);
       setGridData((prev) => ({
         ...prev,
@@ -125,7 +126,7 @@ const RoleUserManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [fetchApi, roleId, setLoading]);
+  }, [fetchApi, roleId, roleIds, setLoading]);
 
   useEffect(() => {
     fetchUsers();
@@ -146,7 +147,7 @@ const RoleUserManagement = () => {
   }, [filteredRows]);
 
   return (
-    <PageContainer>
+    <PageContainer hideFooter>
       <LoadingContainer />
         <CommonPageHeader
           title={roleName}

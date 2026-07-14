@@ -220,7 +220,7 @@ const RequestDevice = () => {
     <>
       <LoadingContainer />
     <AccessControl hasAccess={canViewAll}>
-      <PageContainer>
+      <PageContainer hideFooter>
         <RequestDeviceHeader
           data={gridData}
           setData={handleDataChange}

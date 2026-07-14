@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+
 import CommonPageHeader from "../../../common/CommonPageHeader";
 import CommonFilters from "../../../common/CommonFilters";
 import { DEVICE_STATUS_FILTER_OPTIONS } from "./Constants";
@@ -62,15 +62,13 @@ const DeviceManagementHeader = (props) => {
     <HeaderContainer>
       <CommonPageHeader
         title="Device Management"
+        subtitle="Assign unassigned devices to carriers"
         handleClick={handleClick}
         addButton={true}
         rightContent={null}
       />
-      <Typography variant="h6" fontWeight="300">
-        Assign unassigned devices to carriers
-      </Typography>
       <SummaryCardBox>
-        <CommonSummaryCardGroup cards={summaryCards} showAccentBar={true} />
+        <CommonSummaryCardGroup cards={summaryCards} showAccentBar={true} layout="default" />
       </SummaryCardBox>
       <CommonFilters
         data={data}

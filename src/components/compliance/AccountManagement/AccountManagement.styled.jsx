@@ -6,14 +6,14 @@ export const HeaderContainer = styled(Box)(() => ({
 }));
 
 export const AddAccountButton = styled(Button)(({ theme }) => ({
-  color: theme.palette.primary.contrastText,
-  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.common.white,
+  backgroundColor: theme.palette.brand.main,
   textTransform: "none",
   fontWeight: 600,
   minWidth: 102,
   height: 36,
   "&:hover": {
-    backgroundColor: theme.palette.primary.dark,
+    backgroundColor: theme.palette.brand.dark,
   },
 }));
 
