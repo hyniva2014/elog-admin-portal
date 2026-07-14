@@ -118,6 +118,8 @@ const CareerUserForm = ({
   const [loadingSecondaryStates, setLoadingSecondaryStates] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
   const deletedIdsRef = useRef([]);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [originalFormData, setOriginalFormData] = useState(null);
   const { fetchApi } = useServices();
 
   // console.log("roles:", roles);
@@ -158,11 +160,6 @@ const CareerUserForm = ({
     },
   });
 
-  const { handleCancel: handleUnsavedCancel, UnsavedChangesDialog } =
-    useUnsavedChangesDialog(() => {
-      handleDiscardChanges();
-    });
-
   const selectedCountry = watch("country");
   const secondaryCountry = watch("secondary_country");
   const sameAsPrimary = watch("same_as_primary");
@@ -181,6 +178,12 @@ const CareerUserForm = ({
       onFormValuesChange(formValues);
     }
   }, [formValues, onFormValuesChange]);
+
+  useEffect(() => {
+    if (mode === "edit" && formData && Object.keys(formData).length > 0 && !isInitializing) {
+      setOriginalFormData(JSON.parse(JSON.stringify(formData)));
+    }
+  }, [formData, mode, isInitializing]);
 
   useEffect(() => {
     if (!headerOnly && secondaryCountry) {
@@ -387,6 +390,14 @@ const CareerUserForm = ({
       created_by: data.created_by || "",
     };
   };
+
+  useEffect(() => {
+    if (mode === "edit" && originalFormData && !isInitializing) {
+      const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(prepareFormResetData(originalFormData));
+      const hasFileChanges = files.length > 0 || deletedDocumentIds.length > 0;
+      setHasUnsavedChanges(hasFormChanges || hasFileChanges);
+    }
+  }, [formValues, files, deletedDocumentIds, mode, originalFormData, isInitializing, prepareFormResetData]);
 
   useEffect(() => {
     if (mode === "edit" && formData && Object.keys(formData).length > 0) {
@@ -667,6 +678,7 @@ const CareerUserForm = ({
       setImageUploaded(false);
     }
     setEditMode(false);
+    setHasUnsavedChanges(false);
   }, [
     mode,
     formData,
@@ -683,8 +695,36 @@ const CareerUserForm = ({
     fetchUserData,
   ]);
 
+  const pendingBackRef = useRef(false);
+
+  const handleDiscardAndMaybeNavigate = useCallback(() => {
+    handleDiscardChanges();
+    if (pendingBackRef.current) {
+      pendingBackRef.current = false;
+      handleBack();
+    }
+  }, [handleDiscardChanges, handleBack]);
+
+  const { handleCancel: handleUnsavedCancel, UnsavedChangesDialog } =
+    useUnsavedChangesDialog(handleDiscardAndMaybeNavigate, () => {
+      pendingBackRef.current = false;
+    });
+
+  const handleBackNavigation = useCallback(() => {
+    console.log('handleBackNavigation called:', { mode, editMode, hasUnsavedChanges, isDirty, files: files.length, deletedDocumentIds: deletedDocumentIds.length });
+    if (mode === "edit" && editMode && hasUnsavedChanges) {
+      console.log('Triggering unsaved changes dialog');
+      pendingBackRef.current = true;
+      handleUnsavedCancel(true);
+      return;
+    }
+
+    console.log('No unsaved changes, navigating back');
+    handleBack();
+  }, [editMode, handleBack, handleUnsavedCancel, hasUnsavedChanges, mode]);
+
   const handleCancel = useCallback(() => {
-    if (mode === "edit" && editMode && isDirty) {
+    if (mode === "edit" && editMode && hasUnsavedChanges) {
       handleUnsavedCancel(true);
       return;
     }
@@ -698,20 +738,20 @@ const CareerUserForm = ({
   }, [
     mode,
     editMode,
-    isDirty,
+    hasUnsavedChanges,
     handleUnsavedCancel,
     navigate,
     handleDiscardChanges,
   ]);
 
   const handleCancelEdit = useCallback(() => {
-    if (mode === "edit" && editMode && isDirty) {
+    if (mode === "edit" && editMode && hasUnsavedChanges) {
       handleUnsavedCancel(true);
       return;
     }
 
     handleDiscardChanges();
-  }, [mode, editMode, isDirty, handleUnsavedCancel, handleDiscardChanges]);
+  }, [mode, editMode, hasUnsavedChanges, handleUnsavedCancel, handleDiscardChanges]);
 
   const handleSaveChanges = useCallback(() => {
     handleSubmit(submitHandler)();
@@ -1019,7 +1059,7 @@ const CareerUserForm = ({
     return (
       <>
         <UserPageHeader
-          handleBack={handleBack}
+          handleBack={handleBackNavigation}
           editMode={editMode}
           setEditMode={setEditMode}
           handleCancelEdit={handleCancelEdit}
