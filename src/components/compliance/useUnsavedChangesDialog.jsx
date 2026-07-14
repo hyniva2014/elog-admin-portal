@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import CommonConfirmDialog from "../../common/CommonConfirmDialog";
 // import CommonConfirmDialog from "../common/CommonConfirmDialog";
 
-const useUnsavedChangesDialog = (onDiscard) => {
+const useUnsavedChangesDialog = (onDiscard, onCancel) => {
   const [open, setOpen] = useState(false);
 
   const handleCancel = useCallback(
@@ -23,15 +23,16 @@ const useUnsavedChangesDialog = (onDiscard) => {
 
   const handleClose = useCallback(() => {
     setOpen(false);
-  }, []);
+    onCancel?.();
+  }, [onCancel]);
 
   const UnsavedChangesDialog = (
     <CommonConfirmDialog
       open={open}
       title="Unsaved Changes"
       message="You have unsaved changes. Are you sure you want to cancel the edit?"
-      confirmText="Yes,Continue"
-      cancelText="No,KeepEditing"
+      confirmText="Yes, Cancel"
+      cancelText="No, Keep Editing"
       onConfirm={handleConfirm}
       onCancel={handleClose}
     />
