@@ -17,7 +17,7 @@ export const useAlertCenter = (setAlertData, fetchApi) => {
 
       const response = await fetchApi(endUrl);
 
-      const records = Array.isArray(response?.body) ? response.body : [];
+      const records = Array.isArray(response?.body?.data) ? response.body.data : [];
 
       const rowData = AlertCenterRowData(records);
 

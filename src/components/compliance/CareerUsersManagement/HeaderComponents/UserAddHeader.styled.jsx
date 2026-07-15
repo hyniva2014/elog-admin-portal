@@ -53,7 +53,7 @@ export const ActiveStatusSx = (theme) => ({
   borderRadius: "16px",
   fontSize: "12px",
   fontWeight: 500,
-  background: theme.palette.success.light,
+  background: theme.palette.success.GreenLight,
   color: theme.palette.success.dark,
 });
 
@@ -118,7 +118,7 @@ export const StatusItemSx = (completed) => (theme) => ({
   py: 0.75,
   borderRadius: "999px",
   backgroundColor: completed
-    ? theme.palette.success.light
+    ? theme.palette.success.GreenLight
     : theme.palette.common.white,
   border: completed
     ? `1px solid ${theme.palette.success.main}`
@@ -128,7 +128,7 @@ export const StatusItemSx = (completed) => (theme) => ({
 export const StatusItemTextSx = (completed) => (theme) => ({
   fontSize: "13px",
   fontWeight: 500,
-  color: completed ? theme.palette.success.main : theme.palette.text.secondary,
+  color: completed ? theme.palette.success.dark : theme.palette.text.secondary,
 });
 
 export const StepperWrapperSx = (theme) => ({
@@ -174,7 +174,7 @@ export const ProgressBarWrapperSx = {
   flexGrow: 1,
 };
 
-export const CompletedIconSx = {
+export const CompletedIconSx = (theme) => ({
   fontSize: 18,
-  color: "success.main",
-};
+  color:theme.palette.success.dark,
+});
