@@ -801,11 +801,15 @@ const CareerForm = () => {
 
         role: data.role || "",
 
-        language:
-          typeof data.language === "string"
+        language: Array.isArray(data.language)
+          ? data.language.map(Number).filter(Boolean)
+          : typeof data.language === "string"
             ? data.language
                 .split(",")
-                .map((l) => languageMap[l.trim().toLowerCase()])
+                .map((l) => {
+                  const trimmed = l.trim();
+                  return languageMap[trimmed.toLowerCase()] ?? (isNaN(Number(trimmed)) ? null : Number(trimmed));
+                })
                 .filter(Boolean)
             : [Number(data.language) || 1],
 

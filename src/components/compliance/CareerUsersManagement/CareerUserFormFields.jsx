@@ -178,7 +178,13 @@ export const userManagementValidationSchema = yup.object().shape({
   first_name: yup.string().required("First Name is required"),
   middle_name: yup.string().optional("Middle name is required"),
   last_name: yup.string().required("Last Name is required"),
-  dob: yup.mixed().required("Date of Birth is required"),
+  dob: yup.mixed()
+    .required("Date of Birth is required")
+    .test("min-age", "Age must be at least 18 years", (value) => {
+      if (!value) return true;
+      const dob = dayjs(value);
+      return dayjs().diff(dob, "year") >= 18;
+    }),
   gender: yup.mixed().required("Gender is required"),
   email: yup
     .string()
