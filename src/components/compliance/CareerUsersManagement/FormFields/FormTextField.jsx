@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Grid } from "@mui/material";
 import { Controller } from "react-hook-form";
 import CommonTextField from "../../../../common/CommonTextField";
@@ -11,8 +11,11 @@ import {
 import { formatPhoneNumber } from "../../AccountManagement/utils";
 import { formatSSN } from "../../../../common/CommonUtils";
 
-const createFormatChangeHandler = (field, formatter) => (event) => {
-  field.onChange(formatter(event.target.value));
+const createFormatChangeHandler = (field, formatter, previousValueRef) => (event) => {
+  const previousValue = previousValueRef.current;
+  const formattedValue = formatter(event.target.value, previousValue);
+  previousValueRef.current = formattedValue;
+  field.onChange(formattedValue);
 };
 
 const getNestedError = (errors, name) => {
@@ -63,7 +66,7 @@ const FormTextField = ({
     return null;
   };
 
-  const getChangeHandler = (field) => {
+  const getChangeHandler = (field, previousValueRef) => {
     if (onChange) {
       return (e) => {
         onChange(e, field);
@@ -71,7 +74,7 @@ const FormTextField = ({
     }
     const formatter = getFormatter();
     if (!formatter) return undefined;
-    return createFormatChangeHandler(field, formatter);
+    return createFormatChangeHandler(field, formatter, previousValueRef);
   };
 
   return (
@@ -80,7 +83,8 @@ const FormTextField = ({
         name={name}
         control={control}
         render={({ field }) => {
-          const changeHandler = getChangeHandler(field);
+          const previousValueRef = useRef(field.value);
+          const changeHandler = getChangeHandler(field, previousValueRef);
           const error = getNestedError(errors, name);
 
           const textFieldProps = {

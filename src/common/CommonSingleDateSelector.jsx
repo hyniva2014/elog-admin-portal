@@ -1,10 +1,11 @@
 import { Box, IconButton, Popover, TextField } from "@mui/material";
 import { LocalizationProvider, StaticDatePicker } from "@mui/x-date-pickers";
+import { PickerDay } from "@mui/x-date-pickers/PickerDay";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef } from "react";
 import {
   getCalendarIconSx,
   getTextFieldSx,
@@ -68,6 +69,20 @@ const CommonSingleDateSelector = ({
   const textFieldVariant = getTextFieldVariant(hideBorder);
   const textFieldLabel = getTextFieldLabel(hideBorder, label);
   const shouldOpenPopover = getShouldOpenPopover();
+
+  const CustomDay = forwardRef((props, ref) => {
+    const { onClick, ...other } = props;
+    return (
+      <PickerDay
+        ref={ref}
+        {...other}
+        onClick={(event) => {
+          onClick?.(event);
+          closePopover();
+        }}
+      />
+    );
+  });
 
   const calendarIcon = (
     <IconButton size="small" onClick={openPopover}>
@@ -159,6 +174,9 @@ const CommonSingleDateSelector = ({
               minDate={effectiveMinDate}
               maxDate={maxDate || undefined}
               disablePast={disablePast}
+              slots={{
+                day: CustomDay,
+              }}
               slotProps={{
                 actionBar: { actions: [] },
               }}
