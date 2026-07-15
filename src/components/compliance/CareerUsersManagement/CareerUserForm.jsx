@@ -43,7 +43,7 @@ const getSubmitButtonText = (mode) => {
   return mode === "edit" ? "Update Platform User" : "Add Platform User";
 };
 
-const FormActionButtons = ({ editMode, handleCancel, mode, canUpdate }) => {
+const FormActionButtons = ({ editMode, handleCancel, mode, canUpdate, isDirty }) => {
   if (!editMode) return null;
 
   return (
@@ -51,7 +51,7 @@ const FormActionButtons = ({ editMode, handleCancel, mode, canUpdate }) => {
       <CancelButton variant="outlined" onClick={handleCancel}>
         Cancel
       </CancelButton>
-      <SubmitButton type="submit" variant="contained" disabled={!canUpdate}>
+      <SubmitButton type="submit" variant="contained" disabled={!canUpdate || (mode === "edit" && !isDirty)}>
         {getSubmitButtonText(mode)}
       </SubmitButton>
     </ButtonContainer>
@@ -103,6 +103,7 @@ const CareerUserForm = ({
   const [files, setFiles] = useState([]);
   const [existingMedicalFiles, setExistingMedicalFiles] = useState([]);
   const [deletedDocumentIds, setDeletedDocumentIds] = useState([]);
+  const [externalDirty, setExternalDirty] = useState(false);
   const [medicalUploaded, setMedicalUploaded] = useState(false);
   const [showImagePreview, setShowImagePreview] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
@@ -938,6 +939,7 @@ const CareerUserForm = ({
       if (id) {
         deletedIdsRef.current = [...deletedIdsRef.current, id];
         setDeletedDocumentIds(deletedIdsRef.current);
+        setExternalDirty(true);
       }
     },
     [existingMedicalFiles, setDeletedDocumentIds],
@@ -1122,6 +1124,7 @@ const CareerUserForm = ({
           handleCancel={handleCancel}
           mode={mode}
           canUpdate={canUpdate}
+          isDirty={isDirty || externalDirty}
         />
 
         <ImagePreviewModalWrapper

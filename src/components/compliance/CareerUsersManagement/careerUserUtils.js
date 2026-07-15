@@ -47,7 +47,7 @@ export const transformCDLData = (cdlData = {}) => {
 export const transformCareerUserPayload = (formData, companyId, userId = null) => {
   const payload = {
     company_id: companyId || "",
-    user_name: `${formData.first_name || ""} ${formData.last_name || ""}`,
+    user_name: formData.email || "",
     first_name: formData.first_name || "",
     middle_name: formData.middle_name || "",
     last_name: formData.last_name || "",
@@ -139,10 +139,10 @@ export const transformApiToFormData = (apiData = {}) => {
     gender: apiData.gender,
     dob: apiData.dob ? dayjs(apiData.dob) : null,
     ssn: apiData.ssn || "",
-    language: apiData.language ? apiData.language.split(",") : ["1"],
+    language: apiData.language ? apiData.language.split(",").map(Number) : [1],
     contract_information: apiData.contract_information || "",
     total_years_of_experince: apiData.total_years_of_experince || "",
-    alternate_contact_number: apiData.alternate_contact_number || "",
+    alternate_contact_number: apiData.emergency_contact_number || apiData.alternate_contact_number || "",
     passport_visa_number: apiData.passport_number || "",
     passport_visa_expiry: apiData.passport_expiry_date ? dayjs(apiData.passport_expiry_date) : null,
     work_permit: apiData.work_permit ? dayjs(apiData.work_permit) : null,
@@ -456,7 +456,7 @@ export const buildCareerUserPayload = (formValues, companyId, userId = null, cre
   }));
 
   const payloadData = {
-    user_name: `${formValues.first_name} ${formValues.last_name}`,
+    user_name: formValues.email || "",
     company_id: companyId || "",
     role_id: formValues.role,
 
