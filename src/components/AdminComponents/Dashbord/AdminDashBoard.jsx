@@ -54,10 +54,12 @@ const AdminDashboard = () => {
   const { setLoading, LoadingContainer } = CommonLoading();
   const { checkPermission, permissions } = usePermissions();
   const dispatch = useDispatch();
-  const loginDetails = useSelector((state) => state.loginSlice.loginDetails || {});
+  const loginDetails = useSelector(
+    (state) => state.loginSlice.loginDetails || {},
+  );
   const { fetchApi } = useServices();
   const canViewMetrics = checkPermission("Dashboard", "DASHBOARD_METRICS");
-  const canViewAll = canViewMetrics; 
+  const canViewAll = canViewMetrics;
   const { refreshPermissions } = usePermissionRefresh();
   useEffect(() => {
     refreshPermissions(fetchApi);
@@ -72,13 +74,18 @@ const AdminDashboard = () => {
     isLoading: false,
   });
 
-  const { fetchData: fetchAlerts } = useAlertCenter(setAlertData, fetchApi);
+  const { fetchData: fetchAlerts, fetchAllData: fetchAllAlerts } =
+    useAlertCenter(setAlertData, fetchApi);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchAlerts();
   }, []);
 
-  const navigate = useNavigate();
+  const handleViewAllAlerts = useCallback(() => {
+    navigate("/alert-center", { state: { viewAll: true } });
+  }, [navigate]);
 
   const handleAccountManagementNavigation = useCallback(() => {
     navigate("/account-management", {
@@ -161,47 +168,48 @@ const AdminDashboard = () => {
       <LoadingContainer />
       <AccessControl hasAccess={canViewAll}>
         <PageContainer>
-      {/* Header */}
-      <HeaderContainer>
-        <HeaderLeft>
-          <ComplianceTitle variant="inherit">Dashboard</ComplianceTitle>
-          <HeaderSubtitle variant="inherit">
-            Overview of key metrics and alerts
-          </HeaderSubtitle>
-          {/* <DateRangeText>{dateLabel}</DateRangeText> */}
-        </HeaderLeft>
+          {/* Header */}
+          <HeaderContainer>
+            <HeaderLeft>
+              <ComplianceTitle variant="inherit">Dashboard</ComplianceTitle>
+              <HeaderSubtitle variant="inherit">
+                Overview of key metrics and alerts
+              </HeaderSubtitle>
+              {/* <DateRangeText>{dateLabel}</DateRangeText> */}
+            </HeaderLeft>
 
-        {/* <DateRangeSelector onDateRangeChange={handleDateChange} /> */}
-      </HeaderContainer>
+            {/* <DateRangeSelector onDateRangeChange={handleDateChange} /> */}
+          </HeaderContainer>
 
-      <CommonSummaryCardGroup
-        cards={summaryCards}
-        showAccentBar={false}
-        layout="dashboard"
-      />
-
-      <StretchGridContainer container spacing={2}>
-        <ChartGrid item xs={12} md={7}>
-          <CarrierGrowthTrend />
-        </ChartGrid>
-
-        <AlertGrid item xs={12} md={5}>
-          <CommonAlertCenter
-            title="Alert Center"
-            alerts={alertData.alerts}
-            isLoading={alertData.isLoading}
+          <CommonSummaryCardGroup
+            cards={summaryCards}
+            showAccentBar={false}
+            layout="dashboard"
           />
-        </AlertGrid>
 
-        <IncidentGrid item xs={12} md={6}>
-          <IncidentDistribution />
-        </IncidentGrid>
+          <StretchGridContainer container spacing={2}>
+            <ChartGrid item xs={12} md={7}>
+              <CarrierGrowthTrend />
+            </ChartGrid>
 
-        <DeviceGrid item xs={12} md={6}>
-          <DeviceLifecycleStatus />
-        </DeviceGrid>
-      </StretchGridContainer>
-    </PageContainer>
+            <AlertGrid item xs={12} md={5}>
+              <CommonAlertCenter
+                title="Alert Center"
+                alerts={alertData.alerts}
+                isLoading={alertData.isLoading}
+                onViewAll={handleViewAllAlerts}
+              />
+            </AlertGrid>
+
+            <IncidentGrid item xs={12} md={6}>
+              <IncidentDistribution />
+            </IncidentGrid>
+
+            <DeviceGrid item xs={12} md={6}>
+              <DeviceLifecycleStatus />
+            </DeviceGrid>
+          </StretchGridContainer>
+        </PageContainer>
       </AccessControl>
     </>
   );

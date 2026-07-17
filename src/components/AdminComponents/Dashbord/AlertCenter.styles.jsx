@@ -1,4 +1,4 @@
-import { Box, ButtonGroup, Button, Paper, Typography } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 // ─── Alert Center ────────────────────────────────────────────────────────────
@@ -39,12 +39,13 @@ export const ChartHeader = styled(Box)(({ theme }) => ({
   justifyContent: "space-between",
   alignItems: "center",
   gap: "16px",
-  marginBottom: "16px",
+  marginBottom: "12px",
+  marginTop: "8px",
   position: "sticky",
   top: -16,
   backgroundColor: theme.palette.common.white,
   zIndex: 1,
-  paddingTop: "16px",
+  paddingTop: "8px",
   paddingBottom: "8px",
 }));
 
@@ -56,12 +57,14 @@ export const AlertTitle = styled(Typography)(({ theme }) => ({
   [theme.breakpoints.up("md")]: { fontSize: "1.25rem" },
 }));
 
-export const ViewAllText = styled(Typography)(({ theme }) => ({
+export const ViewAllText = styled(Typography)(({ theme, isLoading }) => ({
   fontSize: 11,
   fontWeight: 500,
   color: theme.palette.text.secondary,
-  cursor: "pointer",
+  cursor: isLoading ? "not-allowed" : "pointer",
   textDecoration: "underline",
+  pointerEvents: isLoading ? "none" : "auto",
+  opacity: isLoading ? 0.5 : 1,
 }));
 
 export const AlertList = styled(Box)(() => ({
@@ -84,6 +87,7 @@ export const AlertCard = styled(Box)(({ theme }) => ({
   "&:hover": {
     transform: "translateY(-3px)",
     borderColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.grey[100],
     boxShadow: `0 8px 24px 0 rgba(0,0,0,0.12)`,
   },
 }));
@@ -120,6 +124,86 @@ export const AlertCardTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
   color: theme.palette.text.primary,
   lineHeight: 1.2,
+  flex: 1,
+}));
+
+export const AlertTitleRow = styled(Box)(() => ({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "flex-start",
+  gap: "12px",
+  marginBottom: "8px",
+}));
+
+export const SeverityBadge = styled(Box)(({ theme, severity }) => {
+  const getBadgeColor = (sev) => {
+    switch (sev?.toLowerCase()) {
+      case "critical":
+        return {
+          bg: "#FEE2E2",
+          text: "#DC2626",
+          border: "#FCA5A5",
+        };
+      case "high":
+        return {
+          bg: "#FFEDD5",
+          text: "#EA580C",
+          border: "#FDBA74",
+        };
+      case "medium":
+        return {
+          bg: "#FEF3C7",
+          text: "#D97706",
+          border: "#FCD34D",
+        };
+      case "low":
+        return {
+          bg: "#DBEAFE",
+          text: "#2563EB",
+          border: "#BFDBFE",
+        };
+      case "info":
+        return {
+          bg: "#E0F2FE",
+          text: "#0284C7",
+          border: "#BAE6FD",
+        };
+      default:
+        return {
+          bg: "#F3F4F6",
+          text: "#374151",
+          border: "#D1D5DB",
+        };
+    }
+  };
+
+  const colors = getBadgeColor(severity);
+
+  return {
+    padding: "4px 12px",
+    borderRadius: "12px",
+    fontSize: "12px",
+    fontWeight: 600,
+    backgroundColor: colors.bg,
+    color: colors.text,
+    border: `1px solid ${colors.border}`,
+    whiteSpace: "nowrap",
+    textTransform: "capitalize",
+  };
+});
+
+export const CategoryBadge = styled(Box)(({ theme }) => ({
+  padding: "4px 12px",
+  borderRadius: "12px",
+  fontSize: "12px",
+  fontWeight: 500,
+  backgroundColor: "#F3F4F6",
+  color: "#374151",
+  border: `1px solid #D1D5DB`,
+  display: "flex",
+  alignItems: "center",
+  gap: "4px",
+  whiteSpace: "nowrap",
 }));
 
 export const AlertDetailRow = styled(Box)(() => ({
@@ -127,6 +211,9 @@ export const AlertDetailRow = styled(Box)(() => ({
   flexWrap: "wrap",
   gap: "16px",
   alignItems: "center",
+  paddingBottom: 8,
+  marginBottom: 8,
+  borderBottom: "none",
 }));
 
 export const AlertDetailItem = styled(Box)(({ theme }) => ({
@@ -149,6 +236,14 @@ export const AlertIcon = styled("img")({
   width: 14,
   height: 14,
 });
+
+export const AlertIconWrapper = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: theme.palette.text.secondary,
+  fontSize: 14,
+}));
 
 // ─── AdminDashBoard Header ────────────────────────────────────────────────────
 

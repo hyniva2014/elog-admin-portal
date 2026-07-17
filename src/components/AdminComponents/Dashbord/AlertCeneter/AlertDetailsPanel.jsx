@@ -75,7 +75,10 @@ import OperatorItem from "./OperatorItem.jsx";
 import AssignOperatorContent from "./AssignOperatorContent.jsx";
 import CommonSnackbar from "../../../../common/CommonSnackbar.jsx";
 import CommonLoading from "../../../../common/CommonLoading.jsx";
-import { getIncidentTitle, getIncidentMessage } from "../../../compliance/DeviceAssetManagement/Constants.js";
+import {
+  getIncidentTitle,
+  getIncidentMessage,
+} from "../../../compliance/DeviceAssetManagement/Constants.js";
 
 const PANEL_STATE = {
   DETAILS: "details",
@@ -101,14 +104,35 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
   });
   const [operators, setOperators] = useState([]);
   const [address, setAddress] = useState("-");
+  const [resolvedLocation, setResolvedLocation] = useState("-");
 
   useEffect(() => {
-    setPanelState(PANEL_STATE.DETAILS);
-    setMessages(defaultConversations);
-    setChatInput("");
-    setAlertStatus("");
-    setAssignOpen(false);
-    setSelectedOperator(null);
+    if (selectedAlert) {
+      const lat = parseFloat(selectedAlert.latitude);
+      const lon = parseFloat(selectedAlert.longitude);
+
+      if (!isNaN(lat) && !isNaN(lon)) {
+        setResolvedLocation(`${lat.toFixed(4)}, ${lon.toFixed(4)}`);
+
+        const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+        if (key) {
+          fetch(
+            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${key}`,
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.status === "OK" && data.results?.[0]) {
+                setResolvedLocation(data.results[0].formatted_address);
+              }
+            })
+            .catch((err) => console.error("Geocoding failed:", err));
+        }
+      } else {
+        setResolvedLocation("-");
+      }
+    } else {
+      setResolvedLocation("-");
+    }
   }, [selectedAlert]);
 
   const formatChatTime = (dateTime) => {
@@ -261,7 +285,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
     formData.append("message", messageText);
     formData.append("initiated_by", "superadmin");
     formData.append("is_chat", "1");
-    formData.append("is_superadmin", "1")
+    formData.append("is_superadmin", "1");
     files.forEach((file, index) => {
       formData.append(`file${index + 1}`, file);
     });
@@ -387,39 +411,6 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
     },
   ];
 
-  // useEffect(() => {
-  //   if (!latitude || !longitude) {
-  //     setAddress("-");
-  //     return;
-  //   }
-
-  //   const controller = new AbortController();
-  //   const fetchAddress = async () => {
-  //     setAddress("Loading...");
-  //     try {
-  //       const response = await fetch(
-  //         `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
-  //         { signal: controller.signal },
-  //       );
-  //       const data = await response.json();
-  //       const parts = [
-  //         data.city || data.locality,
-  //         data.principalSubdivision,
-  //         data.countryName,
-  //       ].filter(Boolean);
-  //       setAddress(
-  //         parts.length ? parts.join(", ") : `${latitude}, ${longitude}`,
-  //       );
-  //     } catch (error) {
-  //       if (!controller.signal.aborted) {
-  //         setAddress(`${latitude}, ${longitude}`);
-  //       }
-  //     }
-  //   };
-  //   fetchAddress();
-  //   return () => controller.abort();
-  // }, [latitude, longitude]);
-
   const triggerInfo = [
     {
       label: "Alert Source",
@@ -461,26 +452,26 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
 
             <ChatMessages>{messages.map(renderChatMessage)}</ChatMessages>
 
-          <ChatInputRow>
-            <ChatInput
-              placeholder="Type a message..."
-              value={chatInput}
-              onChange={handleChatInputChange}
-              onKeyDown={handleKeyDown}
-            />
-            <ChatSendButton onClick={handleSend}>
-              <TelegramIconStyled />
-            </ChatSendButton>
-          </ChatInputRow>
-        </ChatContainer>
-      </AlertCardContainer>
-      <CommonSnackbar
-        open={snackbar.open}
-        message={snackbar.message}
-        severity={snackbar.severity}
-        onClose={handleSnackbarClose}
-      />
-    </>
+            <ChatInputRow>
+              <ChatInput
+                placeholder="Type a message..."
+                value={chatInput}
+                onChange={handleChatInputChange}
+                onKeyDown={handleKeyDown}
+              />
+              <ChatSendButton onClick={handleSend}>
+                <TelegramIconStyled />
+              </ChatSendButton>
+            </ChatInputRow>
+          </ChatContainer>
+        </AlertCardContainer>
+        <CommonSnackbar
+          open={snackbar.open}
+          message={snackbar.message}
+          severity={snackbar.severity}
+          onClose={handleSnackbarClose}
+        />
+      </>
     );
   }
 
@@ -512,9 +503,7 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
         </PanelHeader>
 
         <Box>
-          <PanelDescription>
-            {getIncidentMessage(message)}
-          </PanelDescription>
+          <PanelDescription>{getIncidentMessage(message)}</PanelDescription>
         </Box>
 
         <InfoSectionSpaced>
@@ -533,17 +522,17 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
                 mt: 0.5,
               }}
             >
-              {primaryLocation || "-"}
+              {resolvedLocation}
             </Typography>
           </Box>
         </InfoSectionSpaced>
 
-      <TriggerSection>
-        <TriggerInformationTitle>Trigger Information</TriggerInformationTitle>
-        <TriggerInfoGrid>
-          {triggerInfo.map(renderTriggerInfo)}
-        </TriggerInfoGrid>
-      </TriggerSection>
+        <TriggerSection>
+          <TriggerInformationTitle>Trigger Information</TriggerInformationTitle>
+          <TriggerInfoGrid>
+            {triggerInfo.map(renderTriggerInfo)}
+          </TriggerInfoGrid>
+        </TriggerSection>
 
         <ActionSection>
           <ActionButton isAssignOperator onClick={handleOpenAssign}>
@@ -566,24 +555,24 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
           }
         />
 
-      <CommonDialogForm
-        open={assignOpen}
-        title="Assign Operator"
-        onCancel={handleCloseAssign}
-        onClose={handleCloseAssign}
-        onSubmit={handleAssignOperator}
-        submitButtonText="Assign"
-        disableSubmit={!selectedOperator}
-        loading={assignLoading}
-        maxWidth="xs"
-        content={
-          <AssignOperatorContent
-            operators={operators}
-            renderOperator={renderOperator}
-          />
-        }
-      />
-    </AlertCardContainer>
+        <CommonDialogForm
+          open={assignOpen}
+          title="Assign Operator"
+          onCancel={handleCloseAssign}
+          onClose={handleCloseAssign}
+          onSubmit={handleAssignOperator}
+          submitButtonText="Assign"
+          disableSubmit={!selectedOperator}
+          loading={assignLoading}
+          maxWidth="xs"
+          content={
+            <AssignOperatorContent
+              operators={operators}
+              renderOperator={renderOperator}
+            />
+          }
+        />
+      </AlertCardContainer>
     </DetailsPanelWrapper>
   );
 };
