@@ -22,6 +22,7 @@ export const useAccountManagement = (
   setIsEditing,
   fetchApi,
   createApi,
+  selectedCompany,
 ) => {
   const buildFetchUrl = useCallback(() => {
     const queryParams = {
@@ -131,7 +132,9 @@ export const useAccountManagement = (
         formData.append("ein", account.taxId || "");
         formData.append(
           "company_code",
-          (account.carrierName || "").substring(0, 4).toUpperCase(),
+          isUpdate
+            ? selectedCompany?.company_code || (account.carrierName || "").substring(0, 4).toUpperCase()
+            : (account.carrierName || "").substring(0, 4).toUpperCase(),
         );
         formData.append("status_id", account.status || "1");
         formData.append("maxDevices", account.maxDevices || "");
