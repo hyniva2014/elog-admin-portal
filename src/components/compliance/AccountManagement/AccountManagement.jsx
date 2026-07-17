@@ -224,6 +224,7 @@ const AccountManagement = () => {
     setIsEditing,
     fetchApi,
     createApi,
+    selectedCompany,
   );
 
   const handleOpenAuditLog = useCallback(
