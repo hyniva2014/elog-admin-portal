@@ -14,13 +14,18 @@ const AlertCenter = ({
   viewAllText = "View All",
   alerts = [],
   isLoading = false,
+  onViewAll,
 }) => {
   const navigate = useNavigate();
 
   const handleViewAll = () => {
-     if (!isLoading) {
-       navigate("/alert-center");
-     }
+    if (!isLoading) {
+      if (onViewAll) {
+        onViewAll();
+      } else {
+        navigate("/alert-center");
+      }
+    }
   };
 
   return (

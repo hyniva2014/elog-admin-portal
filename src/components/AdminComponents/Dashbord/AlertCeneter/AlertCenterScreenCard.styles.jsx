@@ -66,11 +66,13 @@ export const AlertCard = styled(Box, {
   border: `1px solid ${theme.palette.grey[200]}`,
   position: "relative",
   cursor: "pointer",
+  transition: "background-color 0.2s ease, border-color 0.2s ease",
   "&:hover": {
-    backgroundColor: active ? theme.palette.custom.alertActiveBackground : theme.palette.common.white,
+    backgroundColor: active ? theme.palette.custom.alertActiveBackground : theme.palette.grey[100],
+    borderColor: theme.palette.primary.main,
   },
   "&:active": {
-    backgroundColor: active ? theme.palette.custom.alertActiveBackground : theme.palette.common.white,
+    backgroundColor: active ? theme.palette.custom.alertActiveBackground : theme.palette.grey[200],
   },
 }));
 
@@ -338,11 +340,21 @@ export const StatusBadge = styled(Box)(({ theme }) => ({
 
 // Alert Card Title in List
 export const AlertCardTitle = styled(Typography)(({ theme }) => ({
-  margin: 0,
-  fontSize: 14,
-  fontWeight: 600,
+  // margin: 0,
+  // fontSize: 14,
+  // fontWeight: 600,
+  // color: theme.palette.text.primary,
+  // lineHeight: 1.4,
+  fontSize: "22px",
+  fontWeight: 700,
   color: theme.palette.text.primary,
-  lineHeight: 1.4,
+
+  flex: 1,
+  minWidth: 0,
+
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
 }));
 
 // Alert Detail Items
@@ -359,6 +371,9 @@ export const AlertDetailRow = styled(Box)(() => ({
   alignItems: "center",
   gap: 12,
   flexWrap: "wrap",
+  paddingBottom: 8,
+  marginBottom: 8,
+  borderBottom: "none",
 }));
 
 // Alert Icon
@@ -367,6 +382,14 @@ export const AlertIcon = styled("img")({
   height: 16,
   objectFit: "contain",
 });
+
+export const AlertIconWrapper = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: theme.palette.text.secondary,
+  fontSize: 16,
+}));
 
 export const DetailAlertIcon = styled("img")({
   width: 24,
@@ -454,18 +477,184 @@ export const AlertTopRow = styled(Box)(() => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "flex-start",
+  gap:"16px",
 }));
 
 export const AlertRight = styled(Box)(() => ({
   display: "flex",
   alignItems: "center",
   gap: "16px",
+  flexShrink:0,
 }));
 
-export const AlertStatus = styled(Typography)(({ theme }) => ({
-  fontSize: "14px",
-  fontWeight: 600,
-  color: theme.palette.error.main,
+// const SEVERITY_STYLES = {
+//   critical: {
+//     text: "#DC2626",
+//     background: "transparent",
+//     border: "#DC2626",
+//     dot: "#DC2626",
+//   },
+//   high: {
+//     text: "#CA8A04",
+//     background: "transparent",
+//     border: "#CA8A04",
+//     dot: "#CA8A04",
+//   },
+//   medium: {
+//     text: "#EA580C",
+//     background: "transparent",
+//     border: "#EA580C",
+//     dot: "#EA580C",
+//   },
+//   info: {
+//     text: "#2563EB",
+//     background: "transparent",
+//     border: "#2563EB",
+//     dot: "#2563EB",
+//   },
+// };
+
+// export const AlertStatus = styled(Box, {
+//   shouldForwardProp: (prop) => prop !== "severity",
+// })(({ severity = "info" }) => {
+//   const style =
+//     SEVERITY_STYLES[severity?.toLowerCase()] ||
+//     SEVERITY_STYLES.info;
+
+//   return {
+//     display: "inline-flex",
+//     alignItems: "center",
+//     justifyContent: "center",
+//     gap: "6px",
+
+//     padding: "4px 12px",
+//     minWidth: "90px",
+
+//     borderRadius: "6px",
+//     border: `1px solid ${style.border}`,
+
+//     background: style.background,
+//     color: style.text,
+
+//     fontSize: "12px",
+//     fontWeight: 600,
+//     textTransform: "capitalize",
+
+//     whiteSpace: "nowrap",
+//     lineHeight: 1,
+//   };
+// });
+
+const SEVERITY_STYLES = {
+  critical: {
+    color: "#EF4444",
+    border: "#EF4444",
+  },
+  high: {
+    color: "#F97316",
+    border: "#F97316",
+  },
+  medium: {
+    color: "#F59E0B",
+    border: "#F59E0B",
+  },
+  low: {
+    color: "#2563EB",
+    border: "#2563EB",
+  },
+  info: {
+    color: "#2563EB",
+    border: "#2563EB",
+  },
+};
+
+export const AlertStatus = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "severity",
+})(({ severity = "info" }) => {
+  const getBadgeColors = (sev) => {
+    switch (sev?.toLowerCase()) {
+      case "critical":
+        return {
+          bg: "#FEE2E2",
+          text: "#DC2626",
+          border: "#FCA5A5",
+        };
+      case "high":
+        return {
+          bg: "#FFEDD5",
+          text: "#EA580C",
+          border: "#FDBA74",
+        };
+      case "medium":
+        return {
+          bg: "#FEF3C7",
+          text: "#D97706",
+          border: "#FCD34D",
+        };
+      case "low":
+        return {
+          bg: "#DBEAFE",
+          text: "#2563EB",
+          border: "#BFDBFE",
+        };
+      case "info":
+        return {
+          bg: "#E0F2FE",
+          text: "#0284C7",
+          border: "#BAE6FD",
+        };
+      default:
+        return {
+          bg: "#F3F4F6",
+          text: "#374151",
+          border: "#D1D5DB",
+        };
+    }
+  };
+
+  const colors = getBadgeColors(severity);
+
+  return {
+    padding: "6px 18px",
+    height: "34px",
+    minWidth: "84px",
+    borderRadius: "10px",
+    fontSize: "15px",
+    fontWeight: 600,
+    backgroundColor: colors.bg,
+    color: colors.text,
+    border: `1px solid ${colors.border}`,
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    whiteSpace: "nowrap",
+    flexShrink: 0,
+    textTransform: "capitalize",
+  };
+});
+
+export const SeverityIndicator = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "severity",
+})(({ severity = "info" }) => {
+  const style =
+    SEVERITY_STYLES[severity?.toLowerCase()] ||
+    SEVERITY_STYLES.info;
+
+  return {
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    backgroundColor: style.color,
+    flexShrink: 0,
+  };
+});
+
+export const AlertCardChevron = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  paddingRight: "12px",
+  color: theme.palette.text.secondary,
+  flexShrink: 0,
 }));
 
 export const AlertOpen = styled(Typography, {
@@ -505,6 +694,17 @@ export const AlertScreenHeaderContainer = styled(Box)(({ theme }) => ({
 
 export const AlertSummaryCardBox = styled(Box)(({ theme }) => ({
   marginTop: theme.spacing(2),
+  "& > .MuiBox-root": {
+    display: "grid",
+    gridTemplateColumns: {
+      xs: "repeat(1, 1fr)",
+      sm: "repeat(2, 1fr)",
+      md: "repeat(3, 1fr)",
+      lg: "repeat(4, 1fr)",
+      xl: "repeat(5, 1fr)",
+    },
+    gap: theme.spacing(2),
+  },
 }));
 
 // Add these to your existing styles file

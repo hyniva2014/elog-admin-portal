@@ -140,16 +140,46 @@ export const AlertCenterCards = [
   },
 ];
 
+export const ALERT_CENTRE_MODULES = {
+  MOBILE_MODULE: 1,
+  CARRIER_REQUESTS: 2,
+  ASSET_MANAGEMENT: 3,
+  ELD_DEVICE_MONITORING: 4,
+  INCIDENT_MANAGEMENT: 5,
+  SYSTEM_MONITORING: 6,
+  APPLICATION_ERRORS: 7,
+  SECURITY: 8,
+  INTEGRATION: 9,
+  TRACKPULSE_PLATFORM: 10,
+};
+
+export const ALERT_CENTRE_SEVERITY = {
+  CRITICAL: 1,
+  HIGH: 2,
+  MEDIUM: 3,
+  LOW: 4,
+  INFORMATION: 5,
+};
+
 export const alertCategoryOptions = [
-  { value: "maintenance", label: "Maintenance" },
-  { value: "safety", label: "Safety" },
-  { value: "performance", label: "Performance" },
+  { value: ALERT_CENTRE_MODULES.MOBILE_MODULE, label: "Mobile Module" },
+  { value: ALERT_CENTRE_MODULES.CARRIER_REQUESTS, label: "Carrier Requests" },
+  { value: ALERT_CENTRE_MODULES.ASSET_MANAGEMENT, label: "Asset Management" },
+  { value: ALERT_CENTRE_MODULES.ELD_DEVICE_MONITORING, label: "ELD Device Monitoring" },
+  { value: ALERT_CENTRE_MODULES.INCIDENT_MANAGEMENT, label: "Incident Management" },
+  { value: ALERT_CENTRE_MODULES.SYSTEM_MONITORING, label: "System Monitoring" },
+  { value: ALERT_CENTRE_MODULES.APPLICATION_ERRORS, label: "Application Errors" },
+  { value: ALERT_CENTRE_MODULES.SECURITY, label: "Security" },
+  { value: ALERT_CENTRE_MODULES.INTEGRATION, label: "Integration" },
+  { value: ALERT_CENTRE_MODULES.TRACKPULSE_PLATFORM, label: "TrackPulse Platform" },
 ];
 
 export const alertSeverityOptions = [
-  { value: "low", label: "Low" },
-  { value: "medium", label: "Medium" },
-  { value: "high", label: "High" },
+  { value: ALERT_CENTRE_SEVERITY.CRITICAL, label: "Critical" },
+  { value: ALERT_CENTRE_SEVERITY.HIGH, label: "High" },
+  { value: ALERT_CENTRE_SEVERITY.MEDIUM, label: "Medium" },
+  { value: ALERT_CENTRE_SEVERITY.LOW, label: "Low" },
+  { value: ALERT_CENTRE_SEVERITY.INFORMATION, label: "Information" },
 ];
 
 export const alertCenterAlerts = [

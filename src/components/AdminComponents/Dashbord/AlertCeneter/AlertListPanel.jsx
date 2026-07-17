@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { Box, Typography } from "@mui/material";
 import {
   AlertList,
   AlertCardContainer,
@@ -15,8 +16,8 @@ const AlertListPanel = ({
   page,
   setPage,
   totalPages = 1,
+  totalRecords = 0,
 }) => {
-
   const renderAlertCard = useCallback(
     (item, index) => {
       const isSelected = selectedAlert === item.notification_id;
@@ -35,9 +36,9 @@ const AlertListPanel = ({
 
   const PAGE_SIZE = 10;
   const paginationText =
-    alerts.length === 0
+    totalRecords === 0
       ? "0-0 of 0"
-      : `${(page - 1) * PAGE_SIZE + 1}-${(page - 1) * PAGE_SIZE + alerts.length} of ${totalPages * PAGE_SIZE}`;
+      : `${(page - 1) * PAGE_SIZE + 1}-${Math.min(page * PAGE_SIZE, totalRecords)} of ${totalRecords}`;
 
   const handlePageChange = (_, value) => {
     setPage(value);
@@ -46,19 +47,34 @@ const AlertListPanel = ({
 
   return (
     <AlertCardContainer>
-      <AlertList>{alertCards}</AlertList>
+      {alerts.length === 0 ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="200px"
+        >
+          <Typography variant="body1" color="textSecondary">
+            No records to display
+          </Typography>
+        </Box>
+      ) : (
+        <>
+          <AlertList>{alertCards}</AlertList>
 
-      <PaginationContainer>
-        <PaginationText>{paginationText}</PaginationText>
+          <PaginationContainer>
+            <PaginationText>{paginationText}</PaginationText>
 
-        <StyledPagination
-          page={page}
-          count={totalPages}
-          onChange={handlePageChange}
-          color="primary"
-          size="small"
-        />
-      </PaginationContainer>
+            <StyledPagination
+              page={page}
+              count={totalPages}
+              onChange={handlePageChange}
+              color="primary"
+              size="small"
+            />
+          </PaginationContainer>
+        </>
+      )}
     </AlertCardContainer>
   );
 };
