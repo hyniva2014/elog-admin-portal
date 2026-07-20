@@ -21,7 +21,7 @@ import {
 import { getCompaniesDropdown } from "../../../compliance/UserManagement/userManagementService";
 import dayjs from "dayjs";
 
-const AlertCenterScreen = () => {
+const AlertCenterScreen = ({ title = "Alert Center", hideCards = false, defaultCategory = null }) => {
   const location = useLocation();
   const initialNotificationId = location.state?.notificationId ?? null;
   const viewAll = location.state?.viewAll ?? false;
@@ -42,7 +42,7 @@ const AlertCenterScreen = () => {
   const [search, setSearch] = useState("");
   const [fromDate, setFromDate] = useState(today);
   const [toDate, setToDate] = useState(todayEnd);
-  const [category, setCategory] = useState(null);
+  const [category, setCategory] = useState(defaultCategory);
   const [severity, setSeverity] = useState(null);
   const [company, setCompany] = useState(null);
   const [companyOptions, setCompanyOptions] = useState([]);
@@ -124,7 +124,7 @@ const AlertCenterScreen = () => {
         setTotalPages(response?.body?.pagination?.total_pages || 1);
         setTotalRecords(response?.body?.pagination?.total_records || 0);
         console.log("Set totalRecords to:", response?.body?.pagination?.total_records || 0);
-        
+
         // Process summary data for cards
         const summaryData = response?.body?.summary || [];
         const cards = buildSummaryCards(summaryData);
@@ -185,6 +185,8 @@ const AlertCenterScreen = () => {
   return (
     <PageContainer>
       <AlertCenterScreenHeader
+        title={title}
+        hideCards={hideCards}
         search={search}
         setSearch={setSearch}
         fromDate={fromDate}
@@ -200,10 +202,11 @@ const AlertCenterScreen = () => {
         page={page}
         setPage={setPage}
         searchKey={0}
-        categoryOptions={alertCategoryOptions}
+        categoryOptions={defaultCategory ? alertCategoryOptions.filter(opt => opt.value === defaultCategory) : alertCategoryOptions}
         severityOptions={alertSeverityOptions}
         companyOptions={companyOptions}
         summaryCards={summaryCards}
+        defaultCategory={defaultCategory}
       />
       <AlertCenterScreenCards
         alerts={alerts}
