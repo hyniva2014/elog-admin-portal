@@ -5,6 +5,8 @@ import CommonFilters from "../../../../common/CommonFilters";
 import { AlertScreenHeaderContainer, AlertSummaryCardBox } from "./AlertCenterScreenCard.styles.jsx";
 
 const AlertCenterScreenHeader = ({
+  title = "Alert Center",
+  hideCards = false,
   search,
   setSearch,
   fromDate,
@@ -24,6 +26,7 @@ const AlertCenterScreenHeader = ({
   severityOptions,
   companyOptions,
   summaryCards,
+  defaultCategory,
 }) => {
   const data = {
     search,
@@ -52,36 +55,38 @@ const AlertCenterScreenHeader = ({
   return (
     <AlertScreenHeaderContainer>
       <CommonPageHeader
-        title="Alert Center"
+        title={title}
         subtitle={false}
         rightContent={false}
       />
-      <AlertSummaryCardBox>
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: {
-              xs: "repeat(1, 1fr)",
-              sm: "repeat(2, 1fr)",
-              md: "repeat(3, 1fr)",
-              lg: "repeat(4, 1fr)",
-              xl: "repeat(5, 1fr)",
-            },
-            gap: 1.5,
-          }}
-        >
-          {summaryCards.map((card) => (
-            <CommonSummaryCard
-              key={card.id}
-              title={card.title}
-              value={card.value}
-              icon={card.icon}
-              showAccentBar={false}
-              layout="default"
-            />
-          ))}
-        </Box>
-      </AlertSummaryCardBox>
+      {!hideCards && (
+        <AlertSummaryCardBox>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "repeat(1, 1fr)",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(3, 1fr)",
+                lg: "repeat(4, 1fr)",
+                xl: "repeat(5, 1fr)",
+              },
+              gap: 1.5,
+            }}
+          >
+            {summaryCards.map((card) => (
+              <CommonSummaryCard
+                key={card.id}
+                title={card.title}
+                value={card.value}
+                icon={card.icon}
+                showAccentBar={false}
+                layout="default"
+              />
+            ))}
+          </Box>
+        </AlertSummaryCardBox>
+      )}
 
       <CommonFilters
         data={data}
@@ -99,7 +104,7 @@ const AlertCenterScreenHeader = ({
             label: "Category",
             dataKey: "category",
             options: categoryOptions,
-            clearable: true,
+            disableClearable: !!defaultCategory,
           },
           {
             label: "Severity",
