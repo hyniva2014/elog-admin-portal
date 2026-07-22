@@ -2,6 +2,7 @@ import { MdDashboard } from "react-icons/md";
 import GroupIcon from "@mui/icons-material/Group";
 import TabletMacIcon from "@mui/icons-material/TabletMac";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import VideoSettingsIcon from '@mui/icons-material/VideoSettings';
 
 const MENU_ITEMS = [
   {
@@ -70,7 +71,18 @@ const MENU_ITEMS = [
         url: "/role-management",
         parentKey: "user-management",
       },
+      // {
+      //   key: "training-vidoes",
+      //   label: "Training Videos",
+      //   url: "/training-videos",
+      //   parentKey: "user-management",
+      // },
     ],
+  },
+  {key: "training-vidoes",
+    label: "Training Videos",
+    url: "/training-videos",
+    icon: VideoSettingsIcon,
   },
 ];
 export { MENU_ITEMS };

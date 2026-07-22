@@ -919,6 +919,16 @@ const adminRoutes = [
       />
     ),
   },
+  {
+    path: "/training-videos",
+    element: (
+      <LoadComponent
+        component={lazy(
+          () => import("../components/compliance/TrainingVideos/TrainingVideos.jsx"),
+        )}
+      />
+    ),
+  },
 ];
 export const defaultLayoutRoutes = [...otherRotes, ...authRoutes];
 export const verticalLayoutRoutes = [
