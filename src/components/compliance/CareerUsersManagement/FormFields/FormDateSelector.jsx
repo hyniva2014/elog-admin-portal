@@ -2,6 +2,7 @@ import React from "react";
 import { Grid } from "@mui/material";
 import { Controller } from "react-hook-form";
 import CommonSingleDateSelector from "../../../../common/CommonSingleDateSelector";
+import CommonTextField from "../../../../common/CommonTextField";
 import dayjs from "dayjs";
 
 const getNestedError = (errors, name) => {
@@ -42,6 +43,22 @@ const FormDateSelector = ({
         control={control}
         render={({ field }) => {
           const error = getNestedError(errors, name);
+          
+          if (disabled) {
+            const displayValue = field.value ? dayjs(field.value).format("MM/DD/YYYY") : "";
+            return (
+              <CommonTextField
+                name={name}
+                label={getLabel(label, required)}
+                value={displayValue}
+                disabled={true}
+                shrinkLabel={Boolean(displayValue)}
+                error={!!error}
+                helperText={error?.message}
+              />
+            );
+          }
+
           const dateSelectorProps = {
             ...field,
             label: getLabel(label, required),
