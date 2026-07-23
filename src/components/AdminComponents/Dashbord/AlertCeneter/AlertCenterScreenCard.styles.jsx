@@ -704,6 +704,9 @@ export const AlertSummaryCardBox = styled(Box)(({ theme }) => ({
       xl: "repeat(5, 1fr)",
     },
     gap: theme.spacing(2),
+    "& > .MuiBox-root": {
+      minWidth: 0,
+    },
   },
 }));
 
