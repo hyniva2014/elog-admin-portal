@@ -51,6 +51,7 @@ const TrainingVideosHeader = ({
           cards={summaryCards}
           showAccentBar={true}
           layout="default"
+          compact
         />
       </Box>
 

@@ -1,12 +1,15 @@
 import { Box, styled, Typography } from "@mui/material";
 
-export const SummaryCardRoot = styled(Box)(({ theme }) => {
+export const SummaryCardRoot = styled(Box, {
+  shouldForwardProp: (prop) =>
+    prop !== "isinteractive" && prop !== "iscompact",
+})(({ theme, isinteractive, iscompact }) => {
   const isDark = theme.palette.mode === "dark";
 
   return {
     flex: "1 1 200px",
     minWidth: 200,
-    minHeight: 76,
+    minHeight: iscompact ? 64 : 76,
 
     backgroundColor: isDark
       ? theme.palette.grey[100]
@@ -21,8 +24,16 @@ export const SummaryCardRoot = styled(Box)(({ theme }) => {
     display: "flex",
     alignItems: "center",
 
-    padding: theme.spacing(1.5, 2),
+    padding: iscompact ? theme.spacing(1, 2) : theme.spacing(1.5, 2),
     position: "relative",
+
+    border: `1px solid transparent`,
+    cursor: isinteractive ? "pointer" : "default",
+    transition: "background-color 0.2s ease, box-shadow 0.2s ease",
+    "&:hover": {
+      backgroundColor: theme.palette.custom.alertActiveBackground,
+      boxShadow: "none",
+    },
   };
 });
 
@@ -50,14 +61,17 @@ export const ContentWrapper = styled(Box)(({ theme }) => ({
 }));
 
 export const ValueText = styled(Typography, {
-  shouldForwardProp: (prop) => prop !== "isdashboard",
-})(({ theme, isdashboard }) => ({
+  shouldForwardProp: (prop) =>
+    prop !== "isdashboard" && prop !== "iscompact",
+})(({ theme, isdashboard, iscompact }) => ({
   fontSize: isdashboard ? 44 : 22,
   fontWeight: isdashboard ? 700 : 500,
   lineHeight: isdashboard ? 1 : "normal",
-  color: isdashboard
-    ? theme.palette.text.primary
-    : theme.palette.text.secondary,
+  color: iscompact
+    ? theme.palette.common.black
+    : isdashboard
+      ? theme.palette.text.primary
+      : theme.palette.text.secondary,
   paddingLeft: 0,
 }));
 
@@ -85,11 +99,13 @@ export const TitleRow = styled(Box, {
   marginBottom: isdashboard ? theme.spacing(1) : 0,
 }));
 
-export const TitleText = styled(Typography)(({ theme }) => ({
+export const TitleText = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== "iscompact",
+})(({ theme, iscompact }) => ({
   ...theme.typography.body2,
   fontSize: 14,
   fontWeight: 400,
-  color: theme.palette.text.secondary,
+  color: iscompact ? theme.palette.common.black : theme.palette.text.secondary,
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
@@ -105,4 +121,8 @@ export const ViewAllText = styled(Typography)(({ theme }) => ({
   // paddingLeft: theme.spacing(30),
   whiteSpace: "nowrap",
   flexShrink: 0,
+  transition: "color 0.2s ease",
+  "&:hover": {
+    color: theme.palette.primary.main,
+  },
 }));

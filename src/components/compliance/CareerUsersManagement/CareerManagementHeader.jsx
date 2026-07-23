@@ -12,7 +12,15 @@ import {
 } from "./CareerManagementHeader.styled";
 
 const CareerManagementHeader = (props) => {
-  const { data = [], setData, searchKey = {}, summaryCards, addData, canCreate = true } = props;
+  const {
+    data = [],
+    setData,
+    searchKey = {},
+    summaryCards = [],
+    onSummaryCardClick,
+    addData,
+    canCreate = true,
+  } = props;
   const { getDriverOptions } = useCareerUsers();
   const [driverOptions, setDriverOptions] = useState([]);
 
@@ -75,9 +83,13 @@ const CareerManagementHeader = (props) => {
 
       <Box mt={2}>
         <CommonSummaryCardGroup
-          cards={summaryCards}
+          cards={summaryCards.map((card) => ({
+            ...card,
+            onClick: () => onSummaryCardClick?.(card.id),
+          }))}
           showAccentBar={true}
           layout="default"
+          compact
         />
       </Box>
 

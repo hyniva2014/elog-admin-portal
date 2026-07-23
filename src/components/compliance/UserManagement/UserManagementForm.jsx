@@ -238,6 +238,17 @@ const UserManagementForm = ({
   const handleEditClick = useCallback(() => setIsEditing(true), []);
 
   const companyId = watch("company_id");
+  const roleId = watch("role_id");
+  const statusId = watch("status_id");
+  const companyLabel =
+    companyOptions.find((option) => String(option.value) === String(companyId))
+      ?.label || initialData?.carrierName || "";
+  const roleLabel =
+    roleOptions.find((option) => String(option.value) === String(roleId))
+      ?.label || initialData?.userProfile || "";
+  const statusLabel =
+    STATUS_OPTIONS.find((option) => String(option.value) === String(statusId))
+      ?.label || initialData?.status || "";
 
   // useEffect(() => {
   //   let isMounted = true;
@@ -303,31 +314,50 @@ const UserManagementForm = ({
     >
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <CommonAutocompleteDropdown
-            name="company_id"
-            label="Select Account"
-            value={watch("company_id")}
-            options={companyOptions}
-            onChange={handleAccountChange}
-            error={!!errors.company_id}
-            helperText={errors.company_id?.message}
-            required={!isReadOnly}
-            disabled={isReadOnly}
-          />
+          {isReadOnly ? (
+            <CommonTextField
+              name="company_id"
+              label="Select Account"
+              value={companyLabel}
+              disabled
+              shrinkLabel={Boolean(companyLabel)}
+            />
+          ) : (
+            <CommonAutocompleteDropdown
+              name="company_id"
+              label="Select Account"
+              value={companyId}
+              options={companyOptions}
+              onChange={handleAccountChange}
+              error={!!errors.company_id}
+              helperText={errors.company_id?.message}
+              required
+            />
+          )}
         </Grid>
 
         <Grid item xs={12}>
-          <CommonAutocompleteDropdown
-            name="role_id"
-            label="User Profile"
-            value={watch("role_id")}
-            options={roleOptions}
-            onChange={handleUserProfileChange}
-            error={!!errors.role_id}
-            helperText={errors.role_id?.message}
-            required={true}
-            disabled={true}
-          />
+          {isReadOnly ? (
+            <CommonTextField
+              name="role_id"
+              label="User Profile"
+              value={roleLabel}
+              disabled
+              shrinkLabel={Boolean(roleLabel)}
+              required
+            />
+          ) : (
+            <CommonAutocompleteDropdown
+              name="role_id"
+              label="User Profile"
+              value={roleId}
+              options={roleOptions}
+              onChange={handleUserProfileChange}
+              error={!!errors.role_id}
+              helperText={errors.role_id?.message}
+              required
+            />
+          )}
         </Grid>
 
         <Grid item xs={12}>
@@ -370,17 +400,26 @@ const UserManagementForm = ({
         </Grid>
         {isViewMode && (
           <Grid item xs={12}>
-            <CommonAutocompleteDropdown
-              name="status_id"
-              label="Status"
-              value={watch("status_id")}
-              options={STATUS_OPTIONS}
-              onChange={handleStatusChange}
-              error={!!errors.status_id}
-              helperText={errors.status_id?.message}
-              required={!isReadOnly}
-              disabled={isReadOnly}
-            />
+            {isReadOnly ? (
+              <CommonTextField
+                name="status_id"
+                label="Status"
+                value={statusLabel}
+                disabled
+                shrinkLabel={Boolean(statusLabel)}
+              />
+            ) : (
+              <CommonAutocompleteDropdown
+                name="status_id"
+                label="Status"
+                value={statusId}
+                options={STATUS_OPTIONS}
+                onChange={handleStatusChange}
+                error={!!errors.status_id}
+                helperText={errors.status_id?.message}
+                required
+              />
+            )}
           </Grid>
         )}
       </Grid>

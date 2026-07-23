@@ -17,8 +17,10 @@ const CommonSummaryCard = ({
   icon,
   showAccentBar = true,
   layout = "default",
+  compact = false,
   showViewAll = false,
   onViewAll,
+  onClick,
 }) => {
   const isDashboard = layout === "dashboard";
 
@@ -32,7 +34,11 @@ const CommonSummaryCard = ({
     ) : null;
 
   return (
-    <SummaryCardRoot>
+    <SummaryCardRoot
+      onClick={onClick}
+      isinteractive={Boolean(onClick)}
+      iscompact={compact}
+    >
       {showAccentBar && <AccentBar accentcolor={accentcolor} />}
 
       <ContentWrapper>
@@ -54,12 +60,18 @@ const CommonSummaryCard = ({
             <TitleRow isdashboard={isDashboard}>
               {dashboardIconElement}
 
-              <TitleText variant="inherit">{title}</TitleText>
+              <TitleText variant="inherit" iscompact={compact}>
+                {title}
+              </TitleText>
 
               {viewAllElement}
             </TitleRow>
 
-            <ValueText variant="inherit" isdashboard={isDashboard}>
+            <ValueText
+              variant="inherit"
+              isdashboard={isDashboard}
+              iscompact={compact}
+            >
               {value}
             </ValueText>
           </TextContainer>

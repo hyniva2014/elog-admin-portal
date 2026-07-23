@@ -226,6 +226,20 @@ const CareerManagement = () => {
 
   const mockcards = { TotalUser: 800, Active: 700, InActive: 100 };
 
+  const handleSummaryCardClick = (cardId) => {
+    const statusByCardId = {
+      active: 1,
+      inactive: 2,
+      totalCount: "",
+    };
+
+    setData((prev) => ({
+      ...prev,
+      page: 1,
+      status: statusByCardId[cardId] ?? "",
+    }));
+  };
+
   return (
     <>
       <LoadingContainer />
@@ -236,6 +250,7 @@ const CareerManagement = () => {
               setData={setData}
               searchKey={searchKey}
               summaryCards={summaryCards}
+              onSummaryCardClick={handleSummaryCardClick}
               addData={canCreate ? handleClick : undefined}
               canCreate={canCreate}
             />

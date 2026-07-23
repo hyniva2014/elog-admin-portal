@@ -5,6 +5,7 @@ const CommonSummaryCardGroup = ({
   cards = [],
   showAccentBar = true,
   layout = "dashboard",
+  compact = false,
 }) => {
   if (!cards.length) return null;
 
@@ -32,8 +33,10 @@ const CommonSummaryCardGroup = ({
           icon={card.icon}
           showAccentBar={showAccentBar}
           layout={layout}
+          compact={compact}
           showViewAll={card.showViewAll}
           onViewAll={card.onViewAll}
+          onClick={card.onClick}
         />
       ))}
     </Box>

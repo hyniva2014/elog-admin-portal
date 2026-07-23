@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Grid, TextField, MenuItem } from "@mui/material";
+import {
+  CircularProgress,
+  Grid,
+  InputAdornment,
+  MenuItem,
+  TextField,
+} from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -57,6 +63,7 @@ const DeviceAssetManagementForm = ({
     defaultValues: defaultValues || initialValues,
   });
   const [modelOptions, setModelOptions] = useState([]);
+  const [isModelOptionsLoading, setIsModelOptionsLoading] = useState(false);
   const { fetchApi } = useServices();
 
   const watchedValues = watch();
@@ -86,6 +93,8 @@ const DeviceAssetManagementForm = ({
   };
 
   const fetchDeviceModels = async () => {
+    setIsModelOptionsLoading(true);
+
     try {
       const response = await fetchApi("/masteradmin/get-device-model-dropdown");
       if (response?.statusCode === 200) {
@@ -98,6 +107,8 @@ const DeviceAssetManagementForm = ({
       }
     } catch (error) {
       console.error("Failed to fetch model dropdown", error);
+    } finally {
+      setIsModelOptionsLoading(false);
     }
   };
   useEffect(() => {
@@ -110,26 +121,49 @@ const DeviceAssetManagementForm = ({
     });
   };
 
+  const modelName = watch("modelName");
+  const modelLabel = modelOptions.find(
+    (option) => String(option.value) === String(modelName),
+  )?.label;
+
   return (
     <StyledForm id={formId} onSubmit={handleSubmit(submitHandler)}>
       <Grid container spacing={2}>
         {/* Model Name Dropdown */}
         <Grid item xs={12}>
-          <CommonAutocompleteDropdown
-            name="modelName"
-            label="Model Name"
-            value={watch("modelName")}
-            options={modelOptions}
-            onChange={(value) =>
-              setValue("modelName", value, {
-                shouldValidate: true,
-              })
-            }
-            disabled={isDisabled}
-            error={!!errors.modelName}
-            helperText={errors.modelName?.message}
-            required
-          />
+          {isDisabled ? (
+            <CommonTextField
+              name="modelName"
+              label="Model Name"
+              value={modelLabel}
+              disabled
+              shrinkLabel={!!modelName}
+              InputProps={{
+                endAdornment: isModelOptionsLoading && (
+                  <InputAdornment position="end">
+                    <CircularProgress size={16} />
+                  </InputAdornment>
+                ),
+              }}
+              required
+            />
+          ) : (
+            <CommonAutocompleteDropdown
+              name="modelName"
+              label="Model Name"
+              value={watch("modelName")}
+              options={modelOptions}
+              onChange={(value) =>
+                setValue("modelName", value, {
+                  shouldValidate: true,
+                })
+              }
+              retainOptionHighlightOnClear
+              error={!!errors.modelName}
+              helperText={errors.modelName?.message}
+              required
+            />
+          )}
         </Grid>
 
         {/* Serial Number */}

@@ -3,7 +3,9 @@ import {
   TextField,
   CircularProgress,
   createFilterOptions,
+  useTheme,
 } from "@mui/material";
+import { useEffect, useState } from "react";
 import {
   StyledAutocomplete,
   StyledTextField,
@@ -28,7 +30,11 @@ const CommonAutocompleteDropdown = ({
   required,
   loading = false,
   disabled = false,
+  retainOptionHighlightOnClear = false,
 }) => {
+  const theme = useTheme();
+  const [lastSelectedValue, setLastSelectedValue] = useState(null);
+
   const uniqueOptions = options.filter(
     (opt, index, self) =>
       opt?.value !== undefined &&
@@ -38,6 +44,12 @@ const CommonAutocompleteDropdown = ({
 
   const selectedOption =
     uniqueOptions.find((opt) => opt.value === value) || null;
+
+  useEffect(() => {
+    if (selectedOption) {
+      setLastSelectedValue(selectedOption.value);
+    }
+  }, [selectedOption]);
 
   return (
     <StyledAutocomplete
@@ -49,8 +61,22 @@ const CommonAutocompleteDropdown = ({
       value={selectedOption}
       openOnFocus
       renderOption={(props, option) => {
+        const isPreviouslySelected =
+          retainOptionHighlightOnClear && option.value === lastSelectedValue;
+
         return (
-          <li {...props} key={`${option.value}-${option.label}`}>
+          <li
+            {...props}
+            key={`${option.value}-${option.label}`}
+            style={{
+              ...props.style,
+              ...(isPreviouslySelected && {
+                backgroundColor:
+                  theme.palette.custom?.alertActiveBackground ||
+                  theme.palette.action.selected,
+              }),
+            }}
+          >
             {option.label}
           </li>
         );
@@ -58,6 +84,10 @@ const CommonAutocompleteDropdown = ({
       getOptionLabel={(option) => option.label || ""}
       isOptionEqualToValue={(option, val) => option.value === val?.value}
       onChange={(_, newValue) => {
+        if (newValue) {
+          setLastSelectedValue(newValue.value);
+        }
+
         if (onChange) {
           onChange(newValue ? newValue.value : "");
           return;

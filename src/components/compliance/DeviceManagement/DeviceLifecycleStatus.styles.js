@@ -220,7 +220,7 @@ export const ProgressBarFill = styled(Box, {
   width: barwidth,
   height: "100%",
   background: barcolor,
-  borderRadius: "14px",
+  borderRadius: "14px 0 0 14px",
   display: "flex",
   alignItems: "center",
   paddingLeft: "22px",

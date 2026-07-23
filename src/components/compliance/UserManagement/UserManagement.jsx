@@ -253,6 +253,20 @@ const UserManagement = () => {
 
   const handleGetRowHeight = () => "auto";
 
+  const handleSummaryCardClick = useCallback((cardId) => {
+    const statusByCardId = {
+      active_users: "1",
+      inactive_users: "2",
+      total_users: "",
+    };
+
+    setData((prev) => ({
+      ...prev,
+      page: 1,
+      status_id: statusByCardId[cardId] ?? "",
+    }));
+  }, []);
+
   const buildFormData = (formValues, isEdit = false) => {
     const formData = new FormData();
 
@@ -360,6 +374,7 @@ const UserManagement = () => {
             data={data}
             setData={setData}
             summaryCards={summaryCards}
+            onSummaryCardClick={handleSummaryCardClick}
             mode={mode}
             setMode={setMode}
             handleClick={handleAddClick}

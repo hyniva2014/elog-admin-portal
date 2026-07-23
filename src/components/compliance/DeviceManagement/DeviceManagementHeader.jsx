@@ -68,7 +68,12 @@ const DeviceManagementHeader = (props) => {
         rightContent={null}
       />
       <SummaryCardBox>
-        <CommonSummaryCardGroup cards={summaryCards} showAccentBar={true} layout="default" />
+        <CommonSummaryCardGroup
+          cards={summaryCards}
+          showAccentBar={true}
+          layout="default"
+          compact
+        />
       </SummaryCardBox>
       <CommonFilters
         data={data}

@@ -266,7 +266,10 @@ export const AccountManagementRowData = (response = []) => {
       secondaryContact = {},
     } = company;
 
-    const { street } = address;
+    const { street, city, state, zip, country } = address;
+    const carrierAddress = [street, city, state, zip, country]
+      .filter(Boolean)
+      .join(", ");
     const {
       name: primaryContactName,
       phone: primaryContactNumber,
@@ -288,7 +291,7 @@ export const AccountManagementRowData = (response = []) => {
       taxId: ein || "-",
       usdot: dotNumber || "-",
       mcNumber: mcNumber || "-",
-      carrierAddress: street || "-",
+      carrierAddress: carrierAddress || "-",
       primaryContactName: primaryContactName || "-",
       primaryContactNumber: primaryContactNumber || "-",
       primaryContactEmail: primaryContactEmail || "-",
