@@ -1,6 +1,7 @@
 import { Grid } from "@mui/material";
 import { Controller } from "react-hook-form";
 import CommonMultiSelectDropdown from "../../../../common/CommonMultiSelectDropdown";
+import CommonTextField from "../../../../common/CommonTextField";
 
 const FormMultiSelect = ({
   name,
@@ -23,6 +24,28 @@ const FormMultiSelect = ({
         name={name}
         control={control}
         render={({ field }) => {
+          if (disabled) {
+            const displayValue = Array.isArray(field.value)
+              ? field.value
+                  .map((val) => {
+                    const opt = (options || []).find((o) => String(o.value) === String(val));
+                    return opt ? opt.label : val;
+                  })
+                  .join(", ")
+              : (field.value || "");
+            return (
+              <CommonTextField
+                name={name}
+                label={label}
+                value={displayValue}
+                disabled={true}
+                shrinkLabel={Boolean(displayValue)}
+                error={!!errors[name]}
+                helperText={errors[name]?.message}
+              />
+            );
+          }
+
           const multiSelectProps = {
             label,
             required,

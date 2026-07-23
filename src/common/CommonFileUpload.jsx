@@ -113,7 +113,7 @@ const FilePreview = ({ fileUrl, fileName, onPreview }) => (
   </Box>
 );
 
-const FilePreviewItem = ({ file, index, isExisting, onPreview, onRemove }) => {
+const FilePreviewItem = ({ file, index, isExisting, onPreview, onRemove, disabled }) => {
   const fileName = file.name;
   const fileUrl = getFileUrl(file, isExisting);
   const isImage = isImageFile(fileName);
@@ -128,15 +128,17 @@ const FilePreviewItem = ({ file, index, isExisting, onPreview, onRemove }) => {
     <Box sx={FilePreviewContainerSx}>
       {previewContent}
 
-      <IconButton
-        size="small"
-        data-index={index}
-        data-is-existing={String(isExisting)}
-        onClick={onRemove}
-        sx={RemoveButtonSx}
-      >
-        <CloseIcon fontSize="small" />
-      </IconButton>
+      {!disabled && (
+        <IconButton
+          size="small"
+          data-index={index}
+          data-is-existing={String(isExisting)}
+          onClick={onRemove}
+          sx={RemoveButtonSx}
+        >
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      )}
     </Box>
   );
 };
@@ -289,7 +291,7 @@ const CommonFileUpload = ({
   };
 
   const UploadArea = () => {
-    if (shouldHideUploadArea) return null;
+    if (shouldHideUploadArea || disabled) return null;
     return (
       <Box
         onDrop={handleDrop}
@@ -337,6 +339,7 @@ const CommonFileUpload = ({
           isExisting
           onPreview={handlePreviewClick}
           onRemove={handleRemoveClick}
+          disabled={disabled}
         />
       ))}
     </>
@@ -352,6 +355,7 @@ const CommonFileUpload = ({
           isExisting={false}
           onPreview={handlePreviewClick}
           onRemove={handleRemoveClick}
+          disabled={disabled}
         />
       ))}
     </>
