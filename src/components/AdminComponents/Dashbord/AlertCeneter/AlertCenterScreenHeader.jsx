@@ -82,6 +82,7 @@ const AlertCenterScreenHeader = ({
                 icon={card.icon}
                 showAccentBar={false}
                 layout="default"
+                compact
               />
             ))}
           </Box>

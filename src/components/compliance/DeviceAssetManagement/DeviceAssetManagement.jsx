@@ -707,6 +707,7 @@ const DeviceAssetManagement = () => {
         title="Delete Asset"
         message={`Are you sure you want to delete ${deviceToDelete?.serialNumber || "this asset"}?`}
         confirmText="Delete"
+        confirmColor="primary"
         cancelText="Cancel"
         onConfirm={handleConfirmDelete}
         onCancel={handleCloseDeleteConfirm}

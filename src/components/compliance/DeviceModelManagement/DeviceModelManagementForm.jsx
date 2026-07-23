@@ -127,65 +127,124 @@ const DeviceModelManagementForm = ({
   );
 
   const renderAssetTypeField = useCallback(
-    ({ field }) => (
-      <CommonTextFieldStyled
-        {...field}
-        size="small"
-        label="Asset Type"
-        select
-        required
-        disabled={isDisabled}
-        error={!!errors.assetType}
-        helperText={errors.assetType?.message}
-        fullWidth
-        InputLabelProps={{
-          shrink: getShrinkValue(field.value, isDisabled),
-          required: true,
-        }}
-      >
-        {assetTypeOptions}
-      </CommonTextFieldStyled>
-    ),
+    ({ field }) => {
+      const assetTypeLabel = ASSET_TYPE_FILTER_OPTIONS.find(
+        (option) => String(option.value) === String(field.value),
+      )?.label;
+
+      if (isDisabled) {
+        return (
+          <CommonTextField
+            {...field}
+            value={assetTypeLabel || ""}
+            label="Asset Type"
+            required
+            disabled
+            fullWidth
+            size="small"
+            shrinkLabel={Boolean(assetTypeLabel)}
+          />
+        );
+      }
+
+      return (
+        <CommonTextFieldStyled
+          {...field}
+          size="small"
+          label="Asset Type"
+          select
+          required
+          error={!!errors.assetType}
+          helperText={errors.assetType?.message}
+          fullWidth
+          InputLabelProps={{
+            shrink: getShrinkValue(field.value, false),
+            required: true,
+          }}
+        >
+          {assetTypeOptions}
+        </CommonTextFieldStyled>
+      );
+    },
     [isDisabled, errors.assetType],
   );
 
   const renderSupportsElogsField = useCallback(
-    ({ field }) => (
-      <CommonTextFieldStyled
-        {...field}
-        size="small"
-        label="Select E-Log"
-        select
-        required
-        disabled={isDisabled}
-        error={!!errors.supportsElogs}
-        helperText={errors.supportsElogs?.message}
-        fullWidth
-        InputLabelProps={{
-          shrink: getShrinkValue(field.value, isDisabled),
-          required: true,
-        }}
-      >
-        {elogsOptions}
-      </CommonTextFieldStyled>
-    ),
+    ({ field }) => {
+      const elogsLabel = ELOGS_FILTER_OPTIONS.find(
+        (option) => String(option.value) === String(field.value),
+      )?.label;
+
+      if (isDisabled) {
+        return (
+          <CommonTextField
+            {...field}
+            value={elogsLabel || ""}
+            label="Select E-Log"
+            required
+            disabled
+            fullWidth
+            size="small"
+            shrinkLabel={Boolean(elogsLabel)}
+          />
+        );
+      }
+
+      return (
+        <CommonTextFieldStyled
+          {...field}
+          size="small"
+          label="Select E-Log"
+          select
+          required
+          error={!!errors.supportsElogs}
+          helperText={errors.supportsElogs?.message}
+          fullWidth
+          InputLabelProps={{
+            shrink: getShrinkValue(field.value, false),
+            required: true,
+          }}
+        >
+          {elogsOptions}
+        </CommonTextFieldStyled>
+      );
+    },
     [isDisabled, errors.supportsElogs],
   );
 
   const renderStatusField = useCallback(
-    ({ field }) => (
-      <CommonTextFieldStyled
-        {...field}
-        size="small"
-        label="Status"
-        select
-        disabled={isDisabled}
-        fullWidth
-        InputLabelProps={{ shrink: getShrinkValue(field.value, isDisabled) }}
-      >
-        {statusOptions}
-      </CommonTextFieldStyled>
-    ),
+    ({ field }) => {
+      const statusLabel = DEVICE_MODEL_STATUS_FILTER_OPTIONS.find(
+        (option) => String(option.value) === String(field.value),
+      )?.label;
+
+      if (isDisabled) {
+        return (
+          <CommonTextField
+            {...field}
+            value={statusLabel || ""}
+            label="Status"
+            disabled
+            fullWidth
+            size="small"
+            shrinkLabel={Boolean(statusLabel)}
+          />
+        );
+      }
+
+      return (
+        <CommonTextFieldStyled
+          {...field}
+          size="small"
+          label="Status"
+          select
+          fullWidth
+          InputLabelProps={{ shrink: getShrinkValue(field.value, false) }}
+        >
+          {statusOptions}
+        </CommonTextFieldStyled>
+      );
+    },
     [isDisabled],
   );
 

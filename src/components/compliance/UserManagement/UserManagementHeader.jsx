@@ -14,6 +14,7 @@ const UserManagementHeader = (props) => {
     setData,
     searchKey = {},
     summaryCards = [],
+    onSummaryCardClick,
     handleClick,
     companyOptions = [],
     canCreate = false,
@@ -39,9 +40,13 @@ const UserManagementHeader = (props) => {
       />
       <SummaryCardWrapper>
         <CommonSummaryCardGroup
-          cards={summaryCards}
+          cards={summaryCards.map((card) => ({
+            ...card,
+            onClick: () => onSummaryCardClick?.(card.id),
+          }))}
           showAccentBar={true}
           layout="default"
+          compact
         />
       </SummaryCardWrapper>
 

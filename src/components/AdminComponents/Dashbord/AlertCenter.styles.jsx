@@ -65,6 +65,10 @@ export const ViewAllText = styled(Typography)(({ theme, isLoading }) => ({
   textDecoration: "underline",
   pointerEvents: isLoading ? "none" : "auto",
   opacity: isLoading ? 0.5 : 1,
+  transition: "color 0.2s ease",
+  "&:hover": {
+    color: theme.palette.primary.main,
+  },
 }));
 
 export const AlertList = styled(Box)(() => ({
@@ -251,7 +255,7 @@ export const HeaderContainer = styled(Box)(() => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  marginBottom: 20,
+  marginBottom: 16,
   width: "100%",
 }));
 
@@ -271,7 +275,7 @@ export const HeaderSubtitle = styled(Typography)(({ theme }) => ({
   fontSize: "14px",
   fontWeight: 400,
   color: theme.palette.text.secondary,
-  marginBottom: 16,
+  marginBottom: 0,
 }));
 
 export const DateRangeText = styled(Typography)(({ theme }) => ({

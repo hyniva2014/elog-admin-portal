@@ -498,6 +498,7 @@ const AccountManagement = () => {
         }
         confirmText="Update Status"
         cancelText="Cancel"
+        confirmColor="primary"
         showReasonField={true}
         reasonLabel="Reason for Status Change"
         onConfirm={handleConfirmStatusChange}

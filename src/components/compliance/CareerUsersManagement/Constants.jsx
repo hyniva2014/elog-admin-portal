@@ -35,12 +35,12 @@ export const USER_SUMMARY_CARDS = {
   },
   active: {
     id: "active",
-    title: "Active",
+    title: "Active users",
     accentcolor: "success",
   },
   inactive: {
     id: "inactive",
-    title: "In Active",
+    title: "Inactive users",
     accentcolor: "error",
   },
 };

@@ -23,6 +23,7 @@ const CommonConfirmDialog = ({
   message = "Are you sure?",
   confirmText = "OK",
   cancelText = "Cancel",
+  confirmColor = "error",
   onConfirm,
   onCancel,
   showReasonField = false,
@@ -98,7 +99,7 @@ const CommonConfirmDialog = ({
 
         <Button
           variant="contained"
-          color="error"
+          color={confirmColor}
           onClick={handleConfirm}
           sx={ActionButtonSx}
         >

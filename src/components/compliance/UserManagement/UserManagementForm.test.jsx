@@ -41,7 +41,7 @@ jest.mock("../../../common/CommonTextField", () => {
         <input
           data-testid={props.name}
           disabled={props.disabled}
-          {...props.register(props.name)}
+          {...(props.register ? props.register(props.name) : {})}
         />
 
         {props.helperText && <span>{props.helperText}</span>}

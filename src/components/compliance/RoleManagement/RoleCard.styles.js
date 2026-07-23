@@ -30,6 +30,15 @@ export const RoleRow = styled(
   minHeight: 40,
 
   gap: theme.spacing(2),
+
+  transition: theme.transitions.create(["background-color", "box-shadow"], {
+    duration: theme.transitions.duration.shortest,
+  }),
+
+  "&:hover": {
+    backgroundColor: theme.palette.custom.hoverBackground,
+    boxShadow: "none",
+  },
 }));
 
 export const EqualColumn = styled(Box)(() => ({

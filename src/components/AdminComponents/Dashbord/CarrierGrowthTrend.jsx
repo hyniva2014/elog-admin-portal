@@ -147,7 +147,12 @@ const CarrierGrowthTrend = () => {
                 r: 5,
                 fill: chartLineColor,
               }}
-              activeDot={{ r: 7 }}
+              activeDot={{
+                r: 10,
+                stroke: theme.palette.common.white,
+                strokeWidth: 3,
+                fill: chartLineColor,
+              }}
             />
           </LineChart>
         </ResponsiveContainer>
