@@ -163,8 +163,8 @@ const CommonDateRangeSelector = (props) => {
     const sx = {};
 
     if (inRange) {
-      sx.backgroundColor = `${theme.palette.info.light} !important`;
-      sx["&:hover"] = { backgroundColor: `${theme.palette.info.light} !important` };
+      sx.backgroundColor = `#F3F8FF !important`;
+      sx["&:hover"] = { backgroundColor: `#F3F8FF !important` };
     }
 
     if (isEnd) {

@@ -54,9 +54,13 @@ const UserManagement = () => {
   const { handleCancel: handleUnsavedCancel, UnsavedChangesDialog } =
   useUnsavedChangesDialog(() => {
     setHasChanges(false);
-    setIsEditing(false);
-    setOpenForm(false);
-    setSelectedUser(null);
+    if (mode === "view" && isEditing) {
+      setIsEditing(false);
+    } else {
+      setIsEditing(false);
+      setOpenForm(false);
+      setSelectedUser(null);
+    }
   });
 
   useEffect(() => {
