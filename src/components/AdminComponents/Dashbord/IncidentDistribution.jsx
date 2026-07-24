@@ -76,6 +76,24 @@ const IncidentDistribution = () => {
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const menuSx = {
+    "& .MuiMenuItem-root": {
+      "&:hover": {
+        backgroundColor: `${theme.palette.primary.main}1A`,
+        color: theme.palette.primary.main,
+      },
+      "&.Mui-selected": {
+        backgroundColor: `${theme.palette.primary.main}26`,
+        color: theme.palette.primary.main,
+        fontWeight: 600,
+      },
+      "&.Mui-selected:hover": {
+        backgroundColor: `${theme.palette.primary.main}33`,
+        color: theme.palette.primary.main,
+      },
+    },
+  };
+
   const [incidentScope, setIncidentScope] = useState("all");
 
   const [period, setPeriod] = useState("7d");
@@ -166,6 +184,7 @@ const IncidentDistribution = () => {
         value={incidentScope}
         onChange={handleIncidentChange}
         disabled={isLoading}
+        MenuProps={{ PaperProps: { sx: menuSx } }}
       >
         <MenuItem value="all">All Incident</MenuItem>
         <MenuItem value="open">Open Only</MenuItem>
@@ -184,6 +203,7 @@ const IncidentDistribution = () => {
         value={period}
         onChange={handlePeriodChange}
         disabled={isLoading}
+        MenuProps={{ PaperProps: { sx: menuSx } }}
       >
         <MenuItem value="7d">7 Days</MenuItem>
         <MenuItem value="30d">30 Days</MenuItem>
