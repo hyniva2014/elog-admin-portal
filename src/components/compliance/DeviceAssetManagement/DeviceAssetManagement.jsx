@@ -494,12 +494,23 @@ const DeviceAssetManagement = () => {
     setHasChanges(false);
   };
 
-  const { handleCancel, UnsavedChangesDialog } =
-    useUnsavedChangesDialog(closeDialog);
+  const { handleCancel: handleUnsavedCancel, UnsavedChangesDialog } =
+    useUnsavedChangesDialog(() => {
+      setHasChanges(false);
+      if (isEditMode && isEditing) {
+        setIsEditing(false);
+      } else {
+        closeDialog();
+      }
+    });
 
   const handleAddCancel = useCallback(() => {
-    handleCancel(isEditing && hasChanges);
-  }, [handleCancel, isEditing, hasChanges]);
+    if (isEditMode && isEditing) {
+      handleUnsavedCancel(hasChanges);
+      return;
+    }
+    closeDialog();
+  }, [isEditMode, isEditing, hasChanges, handleUnsavedCancel]);
 
   const handleSetMode = useCallback(() => {}, []);
   const handleRowSelectionChange = (newSelection) => {

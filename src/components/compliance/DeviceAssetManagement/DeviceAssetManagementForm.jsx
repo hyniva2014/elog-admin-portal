@@ -88,6 +88,12 @@ const DeviceAssetManagementForm = ({
     reset(defaultValues || initialValues);
   }, [defaultValues, reset]);
 
+  useEffect(() => {
+    if (!isEditing && isEditMode) {
+      reset(defaultValues || initialValues);
+    }
+  }, [isEditing, isEditMode, defaultValues, reset]);
+
   const submitHandler = (data) => {
     onSubmit(data);
   };
