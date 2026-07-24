@@ -53,6 +53,24 @@ const CarrierGrowthTrend = () => {
   const chartLineColor = theme.palette.primary.main;
   const downSm = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const menuSx = {
+    "& .MuiMenuItem-root": {
+      "&:hover": {
+        backgroundColor: `${theme.palette.primary.main}1A`,
+        color: theme.palette.primary.main,
+      },
+      "&.Mui-selected": {
+        backgroundColor: `${theme.palette.primary.main}26`,
+        color: theme.palette.primary.main,
+        fontWeight: 600,
+      },
+      "&.Mui-selected:hover": {
+        backgroundColor: `${theme.palette.primary.main}33`,
+        color: theme.palette.primary.main,
+      },
+    },
+  };
+
   const trendData = useMemo(() => {
     const parsedTrend = getTrendArray(carrierGrowthTrend || {});
 
@@ -112,6 +130,7 @@ const CarrierGrowthTrend = () => {
           size="small"
           value={selectedYear}
           onChange={handleYearChange}
+          SelectProps={{ MenuProps: { PaperProps: { sx: menuSx } } }}
         >
           {AVAILABLE_YEARS.map((year) => (
             <MenuItem key={year} value={year}>

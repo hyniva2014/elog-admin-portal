@@ -51,6 +51,32 @@ const CommonAutocompleteDropdown = ({
     }
   }, [selectedOption]);
 
+  const optionHoverSx = {
+    "& .MuiAutocomplete-option": {
+      "&:hover": {
+        backgroundColor: `${theme.palette.primary.main}1A !important`,
+        color: `${theme.palette.primary.main} !important`,
+      },
+      "&.Mui-focused": {
+        backgroundColor: `${theme.palette.primary.main}1A !important`,
+        color: `${theme.palette.primary.main} !important`,
+      },
+      '&[aria-selected="true"]': {
+        backgroundColor: `${theme.palette.primary.main}26 !important`,
+        color: `${theme.palette.primary.main} !important`,
+        fontWeight: 600,
+      },
+      '&[aria-selected="true"]:hover': {
+        backgroundColor: `${theme.palette.primary.main}33 !important`,
+        color: `${theme.palette.primary.main} !important`,
+      },
+      '&[aria-selected="true"].Mui-focused': {
+        backgroundColor: `${theme.palette.primary.main}33 !important`,
+        color: `${theme.palette.primary.main} !important`,
+      },
+    },
+  };
+
   return (
     <StyledAutocomplete
       key={`${dataKey}-${uniqueOptions.length}`}
@@ -60,6 +86,7 @@ const CommonAutocompleteDropdown = ({
       filterOptions={filter}
       value={selectedOption}
       openOnFocus
+      ListboxProps={{ sx: optionHoverSx }}
       renderOption={(props, option) => {
         const isPreviouslySelected =
           retainOptionHighlightOnClear && option.value === lastSelectedValue;
