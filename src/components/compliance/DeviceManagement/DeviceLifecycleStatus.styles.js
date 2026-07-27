@@ -212,6 +212,13 @@ export const ProgressBarWrapper = styled(Box)(({ theme }) => ({
   borderRadius: "14px",
   position: "relative",
   overflow: "hidden",
+  border: "1px solid transparent",
+  cursor: "pointer",
+  transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
+  "&:hover": {
+    transform: "translateY(-3px)",
+    boxShadow: `0 8px 24px 0 rgba(0,0,0,0.12)`,
+  },
 }));
 
 export const ProgressBarFill = styled(Box, {

@@ -138,12 +138,20 @@ export const PeriodControl = styled(FormControl)(({ theme }) => ({
 }));
 
 
-export const ChartWrapper = styled(Box)({
+export const ChartWrapper = styled(Box)(({ theme }) => ({
   width: "100%",
   height: 260,
   flexGrow: 1,
   minWidth: 0,
-});
+  "& .recharts-bar-rectangle": {
+    transition: "transform 0.2s ease, filter 0.2s ease",
+    cursor: "pointer",
+  },
+  "& .recharts-bar-rectangle:hover": {
+    transform: "translateY(-3px)",
+    filter: `drop-shadow(0px 8px 24px rgba(0,0,0,0.12))`,
+  }
+}));
 
 export const LegendGrid = styled(Box)(({ theme }) => ({
   width: "100%",
