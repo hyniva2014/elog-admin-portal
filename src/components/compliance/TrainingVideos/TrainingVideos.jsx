@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Box, styled, Button } from "@mui/material";
+import { useSelector } from "react-redux";
 import { PageContainer } from "../../../common/PageContainer";
 import CommonDataGrid from "../../../common/CommonDataGrid";
 import CommonLoading from "../../../common/CommonLoading";
@@ -8,8 +9,9 @@ import CommonConfirmDialog from "../../../common/CommonConfirmDialog";
 import TrainingVideosHeader from "./TrainingVideosHeader";
 import UploadVideoDialog from "./UploadVideoDialog";
 import { buildSummaryCards } from "../../../common/CommonUtils";
-import { defaultPageSize, TRAINING_VIDEOS_SUMMARY_CARDS, MOCK_TRAINING_VIDEOS } from "./Constants";
+import { defaultPageSize, TRAINING_VIDEOS_SUMMARY_CARDS } from "./Constants";
 import { TrainingVideosColumnsData, TrainingVideosRowData } from "./CommonRowColumnUtils";
+import { useServices } from "../../../services/services";
 
 const GridContainer = styled(Box)(() => ({
   flex: 1,
@@ -18,6 +20,15 @@ const GridContainer = styled(Box)(() => ({
 
 const TrainingVideos = () => {
   const { setLoading, LoadingContainer } = CommonLoading();
+  const { fetchApi, createApi } = useServices();
+
+  const userId = useSelector(
+    (state) => state.loginSlice.loginDetails?.body?.data?.userdetails?.user_id,
+  );
+  const companyId = useSelector(
+    (state) => state.loginSlice.loginDetails?.body?.data?.userdetails?.company_id ?? 1,
+  );
+
   const [searchKey, setSearchKey] = useState(0);
   const [summaryCards, setSummaryCards] = useState([]);
   const [snackbar, setSnackbar] = useState({
@@ -62,62 +73,53 @@ const TrainingVideos = () => {
     setData((prev) => ({ ...prev, isLoading: true }));
 
     try {
-      // Simulate API call with mock data
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      let filteredVideos = [...MOCK_TRAINING_VIDEOS];
-
-      // Apply search filter
-      if (search) {
-        const searchLower = search.toLowerCase();
-        filteredVideos = filteredVideos.filter(
-          (video) =>
-            video.title.toLowerCase().includes(searchLower) ||
-            video.description.toLowerCase().includes(searchLower) ||
-            video.module.toLowerCase().includes(searchLower) ||
-            video.uploadedBy.toLowerCase().includes(searchLower)
-        );
-      }
-
-      // Apply module filter
-      if (module) {
-        filteredVideos = filteredVideos.filter((video) => video.module === module);
-      }
-
-      // Apply status filter
-      if (status) {
-        filteredVideos = filteredVideos.filter((video) => video.status === status);
-      }
-
-      // Calculate summary cards
-      const summaryData = {
-        totalVideos: filteredVideos.length,
-        published: filteredVideos.filter((v) => v.status === "Published").length,
-        drafts: filteredVideos.filter((v) => v.status === "Draft").length,
-        totalModules: [...new Set(filteredVideos.map((v) => v.module))].length,
+      const queryParams = {
+        company_id: 1,
+        page,
+        limit: pageSize,
+        ...(search && { search: encodeURIComponent(search) }),
+        ...(module && { module_id: module }),
+        ...(status && { status: status === "Published" ? 1 : status === "Draft" ? 0 : status }),
       };
 
-      setSummaryCards(buildSummaryCards(summaryData, TRAINING_VIDEOS_SUMMARY_CARDS));
+      const params = new URLSearchParams(queryParams);
+      const endUrl = `/masteradmin/training-videos?${params.toString()}`;
 
-      // Apply pagination
-      const startIndex = (page - 1) * pageSize;
-      const endIndex = startIndex + pageSize;
-      const paginatedVideos = filteredVideos.slice(startIndex, endIndex);
+      const response = await fetchApi(endUrl);
 
-      const { TrainingVideosColumnData, TrainingVideosRowData } = TrainingVideosTableData(
-        paginatedVideos,
-        handleEditClick,
-        handleDeleteClick
-      );
+      if (response?.statusCode === 200) {
+        const responseData = response?.body;
+        const videos = responseData?.data || [];
+        const stats = responseData?.stats || {};
+        const pagination = responseData?.pagination || {};
 
-      setData((prev) => ({
-        ...prev,
-        isLoading: false,
-        rows: TrainingVideosRowData,
-        columns: TrainingVideosColumnData,
-        total: filteredVideos.length,
-      }));
+        const summaryData = {
+          totalVideos: stats.total_videos || 0,
+          published: stats.published_videos || 0,
+          drafts: stats.draft_videos || 0,
+          totalModules: stats.total_modules || 0,
+        };
+
+        setSummaryCards(buildSummaryCards(summaryData, TRAINING_VIDEOS_SUMMARY_CARDS));
+
+        const { TrainingVideosColumnData, TrainingVideosRowData } = TrainingVideosTableData(
+          videos,
+          handleEditClick,
+          handleDeleteClick
+        );
+
+        setData((prev) => ({
+          ...prev,
+          isLoading: false,
+          rows: TrainingVideosRowData,
+          columns: TrainingVideosColumnData,
+          total: pagination.total_records || videos.length,
+        }));
+      } else {
+        throw new Error(response?.body?.message || "Failed to fetch training videos");
+      }
     } catch (err) {
+      console.error(err);
       setData((prev) => ({ ...prev, isLoading: false }));
       showSnackbar("Failed to fetch training videos", "error");
     }
@@ -130,7 +132,15 @@ const TrainingVideos = () => {
   };
 
   const handleEditClick = (row) => {
-    setSelectedVideo(row);
+    // Map row data into the shape that UploadVideoDialog form expects
+    setSelectedVideo({
+      id: row.id,
+      title: row.title !== "-" ? row.title : "",
+      module: row.module_id ?? null,  // numeric ID to match MODULE_OPTIONS values
+      description: row.description !== "-" ? row.description : "",
+      videoFile: null,
+      videoUrl: row.videoUrl || "",
+    });
     setIsEditing(false);
     setIsEditDialogOpen(true);
   };
@@ -195,16 +205,38 @@ const TrainingVideos = () => {
     </Button>
   );
 
+  const buildVideoFormData = (videoData, videoId = null) => {
+    const formData = new FormData();
+    formData.append("title", videoData.title || "");
+    formData.append("module_id", videoData.module || "");
+    formData.append("description", videoData.description || "");
+    formData.append("status", 1);
+    formData.append("user_id", userId || "");
+    formData.append("company_id", companyId || 1);
+    if (videoData.videoFile) {
+      formData.append("video", videoData.videoFile);
+    }
+    if (videoId) {
+      formData.append("id", videoId);
+    }
+    return formData;
+  };
+
   const handleUploadSubmit = async (videoData) => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Video data to upload:", videoData);
-      showSnackbar("Video uploaded successfully", "success");
-      setIsUploadDialogOpen(false);
-      fetchVideos();
+      const formData = buildVideoFormData(videoData);
+      const response = await createApi(formData, "/masteradmin/training-videos/create-or-update");
+
+      if (response?.statusCode === 200 || response?.statusCode === 201) {
+        showSnackbar(response?.body?.message || "Video uploaded successfully", "success");
+        setIsUploadDialogOpen(false);
+        fetchVideos();
+      } else {
+        showSnackbar(response?.body?.message || "Error uploading video", "error");
+      }
     } catch (error) {
+      console.error("Error uploading video:", error);
       showSnackbar("Error uploading video", "error");
     } finally {
       setLoading(false);
@@ -214,14 +246,19 @@ const TrainingVideos = () => {
   const handleEditSubmit = async (videoData) => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Video data to update:", videoData);
-      showSnackbar("Video updated successfully", "success");
-      setIsEditDialogOpen(false);
-      setSelectedVideo(null);
-      fetchVideos();
+      const formData = buildVideoFormData(videoData, selectedVideo?.id);
+      const response = await createApi(formData, "/masteradmin/training-videos/create-or-update");
+
+      if (response?.statusCode === 200 || response?.statusCode === 201) {
+        showSnackbar(response?.body?.message || "Video updated successfully", "success");
+        setIsEditDialogOpen(false);
+        setSelectedVideo(null);
+        fetchVideos();
+      } else {
+        showSnackbar(response?.body?.message || "Error updating video", "error");
+      }
     } catch (error) {
+      console.error("Error updating video:", error);
       showSnackbar("Error updating video", "error");
     } finally {
       setLoading(false);

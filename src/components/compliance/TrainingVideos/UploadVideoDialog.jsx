@@ -1,14 +1,27 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Grid, Box, Typography, styled } from "@mui/material";
+import { Grid, Box, Typography, styled, IconButton, Tooltip } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
+import CloseIcon from "@mui/icons-material/Close";
 
 import CommonDialogForm from "../../../common/CommonDialogForm";
 import CommonTextField from "../../../common/CommonTextField";
 import CommonAutocompleteDropdown from "../../../common/CommonAutocompleteDropdown";
 import useUnsavedChangesDialog from "../useUnsavedChangesDialog";
+import { MODULE_OPTIONS } from "./Constants";
+import {
+  UploadZone,
+  PreviewContainer,
+  PreviewVideo,
+  RemoveButton,
+  UploadIcon,
+  UploadPrimaryText,
+  UploadSecondaryText,
+  UploadSupportText,
+  ErrorText,
+} from "./UploadVideoDialog.styles";
 
 const UPLOAD_VIDEO_FORM_ID = "upload-video-form";
 
@@ -20,7 +33,8 @@ const validationSchema = yup.object({
     .max(100, "Title must not exceed 100 characters"),
   
   module: yup
-    .string()
+    .number()
+    .typeError("Module is required")
     .required("Module is required"),
   
   description: yup
@@ -30,40 +44,21 @@ const validationSchema = yup.object({
     .max(500, "Description must not exceed 500 characters"),
   
   videoFile: yup
-    .mixed()
+    .mixed(),
     // .required("Video file is required"),
 });
 
 const defaultValues = {
   title: "",
-  module: "",
+  module: null,
   description: "",
   videoFile: null,
 };
 
-const UploadZone = styled(Box)(({ theme, isDragging }) => ({
-  border: `2px dashed ${isDragging ? theme.palette.primary.main : theme.palette.divider}`,
-  borderRadius: theme.shape.borderRadius * 2,
-  padding: theme.spacing(4),
-  textAlign: "center",
-  cursor: "pointer",
-  backgroundColor: isDragging ? theme.palette.action.hover : theme.palette.background.paper,
-  transition: "all 0.3s ease",
-  "&:hover": {
-    borderColor: theme.palette.primary.main,
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
 
-const MODULE_OPTIONS = [
-  { value: "Getting Started", label: "Getting Started" },
-  { value: "HOS", label: "HOS" },
-  { value: "DVIR", label: "DVIR" },
-  { value: "Performance", label: "Performance" },
-  { value: "Compliance", label: "Compliance" },
-  { value: "Safety Training", label: "Safety Training" },
-  { value: "Driver Wellness", label: "Driver Wellness" },
-];
+
+
+
 
 const UploadVideoDialog = ({
   open,
@@ -78,6 +73,8 @@ const UploadVideoDialog = ({
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const isEditMode = mode === "edit";
   const isViewMode = mode === "view";
   const isFieldDisabled = loading || isViewMode || (isEditMode && !isEditing);
@@ -98,12 +95,25 @@ const UploadVideoDialog = ({
       if (initialData) {
         reset(initialData);
         setSelectedFile(initialData.videoFile);
+        setShowPreview(!!initialData.videoUrl);
       } else {
         reset(defaultValues);
         setSelectedFile(null);
+        setShowPreview(false);
       }
     }
   }, [open, initialData, reset]);
+
+  useEffect(() => {
+    if (selectedFile) {
+      const url = URL.createObjectURL(selectedFile);
+      setPreviewUrl(url);
+      setShowPreview(true);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setPreviewUrl(initialData?.videoUrl || null);
+    }
+  }, [selectedFile, initialData]);
 
   const handleDragEnter = useCallback((e) => {
     e.preventDefault();
@@ -166,6 +176,7 @@ const UploadVideoDialog = ({
 
     reset(defaultValues);
     setSelectedFile(null);
+    setShowPreview(false);
     onClose();
   }, [isEditMode, isEditing, isDirty, handleUnsavedCancel, onClose, reset, initialData]);
 
@@ -177,6 +188,7 @@ const UploadVideoDialog = ({
       });
       reset(defaultValues);
       setSelectedFile(null);
+      setShowPreview(false);
     },
     [onSubmit, selectedFile, reset],
   );
@@ -261,42 +273,60 @@ const UploadVideoDialog = ({
           </Grid>
 
           <Grid item xs={12}>
-            <input
-              type="file"
-              accept="video/mp4,video/mov,video/avi,video/mkv"
-              style={{ display: "none" }}
-              id="video-file-input"
-              onChange={handleFileSelect}
-              disabled={isFieldDisabled}
-            />
-            <label htmlFor="video-file-input" style={{ pointerEvents: isFieldDisabled ? "none" : "auto" }}>
-              <UploadZone
-                isDragging={isDragging && !isFieldDisabled}
-                onDragEnter={isFieldDisabled ? undefined : handleDragEnter}
-                onDragLeave={isFieldDisabled ? undefined : handleDragLeave}
-                onDragOver={isFieldDisabled ? undefined : handleDragOver}
-                onDrop={isFieldDisabled ? undefined : handleDrop}
-                component="div"
-                sx={{ opacity: isFieldDisabled ? 0.5 : 1 }}
-              >
-                <CloudUploadOutlinedIcon
-                  sx={{ fontSize: 48, color: "primary.main", mb: 2 }}
+            {showPreview ? (
+              <PreviewContainer>
+                <PreviewVideo src={previewUrl} controls />
+                {!isFieldDisabled && (
+                  <Tooltip title="Remove Video">
+                    <RemoveButton
+                      onClick={() => {
+                        setShowPreview(false);
+                        setSelectedFile(null);
+                      }}
+                    >
+                      <CloseIcon />
+                    </RemoveButton>
+                  </Tooltip>
+                )}
+              </PreviewContainer>
+            ) : (
+              <>
+                <input
+                  type="file"
+                  accept="video/mp4,video/mov,video/avi,video/mkv"
+                  style={{ display: "none" }}
+                  id="video-file-input"
+                  onChange={handleFileSelect}
+                  disabled={isFieldDisabled}
                 />
-                <Typography variant="body1" sx={{ fontWeight: 500, mb: 1 }}>
-                  {selectedFile ? selectedFile.name : "Drag & drop a video file here"}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  or click to browse
-                </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1 }}>
-                  Supported: mp4, mov, avi, mkv
-                </Typography>
-              </UploadZone>
-            </label>
-            {errors.videoFile && (
-              <Typography variant="caption" color="error" sx={{ mt: 1, display: "block" }}>
-                {errors.videoFile.message}
-              </Typography>
+                <label htmlFor="video-file-input" style={{ pointerEvents: isFieldDisabled ? "none" : "auto" }}>
+                  <UploadZone
+                    isDragging={isDragging && !isFieldDisabled}
+                    isFieldDisabled={isFieldDisabled}
+                    onDragEnter={isFieldDisabled ? undefined : handleDragEnter}
+                    onDragLeave={isFieldDisabled ? undefined : handleDragLeave}
+                    onDragOver={isFieldDisabled ? undefined : handleDragOver}
+                    onDrop={isFieldDisabled ? undefined : handleDrop}
+                    component="div"
+                  >
+                    <UploadIcon />
+                    <UploadPrimaryText>
+                      {selectedFile ? selectedFile.name : "Drag & drop a video file here"}
+                    </UploadPrimaryText>
+                    <UploadSecondaryText>
+                      or click to browse
+                    </UploadSecondaryText>
+                    <UploadSupportText>
+                      Supported: mp4, mov, avi, mkv
+                    </UploadSupportText>
+                  </UploadZone>
+                </label>
+                {errors.videoFile && (
+                  <ErrorText variant="caption">
+                    {errors.videoFile.message}
+                  </ErrorText>
+                )}
+              </>
             )}
           </Grid>
         </Grid>
