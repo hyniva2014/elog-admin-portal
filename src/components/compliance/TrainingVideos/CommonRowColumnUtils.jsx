@@ -7,6 +7,13 @@ import dayjs from "dayjs";
 
 const VideoTitleCell = ({ row }) => {
   const theme = useTheme();
+
+  const handleTitleClick = () => {
+    if (row.videoUrl) {
+      window.open(row.videoUrl, "_blank", "noopener,noreferrer");
+    }
+  };
+
   return (
     <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.5 }}>
       <Box
@@ -20,7 +27,11 @@ const VideoTitleCell = ({ row }) => {
           justifyContent: "center",
           flexShrink: 0,
           position: "relative",
+          cursor: row.videoUrl ? "pointer" : "default",
+          transition: "opacity 0.2s",
+          "&:hover": row.videoUrl ? { opacity: 0.85 } : {},
         }}
+        onClick={handleTitleClick}
       >
         <PlayArrowIcon sx={{ fontSize: 24, color: "white" }} />
         <Typography
@@ -40,6 +51,7 @@ const VideoTitleCell = ({ row }) => {
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Typography
           variant="body2"
+          onClick={handleTitleClick}
           sx={{
             fontWeight: 600,
             overflow: "hidden",
@@ -47,6 +59,13 @@ const VideoTitleCell = ({ row }) => {
             whiteSpace: "nowrap",
             fontSize: "15px",
             mb: 0.5,
+            cursor: row.videoUrl ? "pointer" : "default",
+            "&:hover": row.videoUrl
+              ? {
+                  textDecoration: "underline",
+                  color: "primary.main",
+                }
+              : {},
           }}
         >
           {row.title}
@@ -55,9 +74,8 @@ const VideoTitleCell = ({ row }) => {
           variant="caption"
           sx={{
             color: "text.secondary",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
+            whiteSpace: "normal",
+            wordBreak: "break-word",
             display: "block",
             fontSize: "13px",
           }}
@@ -215,10 +233,12 @@ export const TrainingVideosRowData = (videos = []) => {
     id: video.id,
     title: video.title || "-",
     description: video.description || "-",
-    module: video.module || "-",
+    module_id: video.module_id ?? null,
+    module: video.module || (video.module_id != null ? String(video.module_id) : "-"),
     duration: video.duration || "-",
-    status: video.status || "Draft",
-    uploadedBy: video.uploadedBy || "-",
-    uploadDate: video.uploadDate || "-",
+    status: video.status === 1 ? "Published" : video.status === 0 ? "Draft" : video.status || "Draft",
+    uploadedBy: video.uploadedBy || video.uploaded_by_name || "-",
+    uploadDate: video.uploadDate || video.created_at || "-",
+    videoUrl: video.video_url || video.videoUrl || "",
   }));
 };
