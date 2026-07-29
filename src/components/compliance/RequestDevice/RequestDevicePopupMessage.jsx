@@ -27,9 +27,9 @@ const RequestDevicePopupMessage = ({
 
 return (
       <PopupMessageContainer>
-        Are you sure you want to approve{" "}
-        <RequestedCountText>{requested}</RequestedCountText> requested devices
-        to <CarrierNameText>{carrierName}</CarrierNameText>?
+       <CarrierNameText>{carrierName}</CarrierNameText>{" "} has requested {" "} 
+         <RequestedCountText>{requested}</RequestedCountText> devices.
+         
       </PopupMessageContainer>
     );
 };
