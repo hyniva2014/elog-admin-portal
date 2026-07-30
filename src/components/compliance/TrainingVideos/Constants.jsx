@@ -70,8 +70,8 @@ export const VIDEO_STATUS_CONFIG = {
 
 export const MODULE_OPTIONS = [
   { value: 1,  label: "Compliance Dashboard" },
-  { value: 2,  label: "Log Management" },
-  { value: 3,  label: "HOS Violation" },
+  { value: 2,  label: "Log" },
+  { value: 3,  label: "HOS" },
   { value: 4,  label: "DVIR" },
   { value: 5,  label: "DOT" },
   { value: 6,  label: "Accidents" },
