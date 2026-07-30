@@ -356,6 +356,7 @@ const UserManagementForm = ({
               error={!!errors.role_id}
               helperText={errors.role_id?.message}
               required
+              disabled
             />
           )}
         </Grid>

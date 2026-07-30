@@ -2,7 +2,7 @@ import { Box, IconButton, Tooltip, Typography, useTheme } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { VIDEO_STATUS_CONFIG } from "./Constants";
+import { VIDEO_STATUS_CONFIG, MODULE_OPTIONS } from "./Constants";
 import dayjs from "dayjs";
 
 const VideoTitleCell = ({ row }) => {
@@ -29,24 +29,28 @@ const VideoTitleCell = ({ row }) => {
           position: "relative",
           cursor: row.videoUrl ? "pointer" : "default",
           transition: "opacity 0.2s",
+          overflow: "hidden",
           "&:hover": row.videoUrl ? { opacity: 0.85 } : {},
         }}
         onClick={handleTitleClick}
       >
-        <PlayArrowIcon sx={{ fontSize: 24, color: "white" }} />
-        <Typography
-          variant="caption"
-          sx={{
-            color: "white",
-            fontWeight: 600,
-            fontSize: "11px",
-            position: "absolute",
-            bottom: 4,
-            right: 6,
-          }}
-        >
-          {row.duration}
-        </Typography>
+        {row.videoUrl && (
+          <video 
+            src={row.videoUrl} 
+            poster={row.thumbnailUrl}
+            preload="metadata"
+            style={{
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              zIndex: 0
+            }}
+          />
+        )}
+        <Box sx={{ zIndex: 1, display: 'flex' }}>
+          <PlayArrowIcon sx={{ fontSize: 24, color: "white", filter: "drop-shadow(0px 0px 2px rgba(0,0,0,0.5))" }} />
+        </Box>
       </Box>
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Typography
@@ -179,12 +183,12 @@ export const TrainingVideosColumnsData = (
     flex: 1,
     minWidth: 180,
   },
-  {
-    field: "duration",
-    headerName: "DURATION",
-    flex: 1,
-    minWidth: 180,
-  },
+  // {
+  //   field: "duration",
+  //   headerName: "DURATION",
+  //   flex: 1,
+  //   minWidth: 180,
+  // },
   {
     field: "status",
     headerName: "STATUS",
@@ -229,16 +233,22 @@ export const TrainingVideosColumnsData = (
 export const TrainingVideosRowData = (videos = []) => {
   const videosArray = Array.isArray(videos) ? videos : [videos];
   
-  return videosArray.map((video) => ({
-    id: video.id,
-    title: video.title || "-",
-    description: video.description || "-",
-    module_id: video.module_id ?? null,
-    module: video.module || (video.module_id != null ? String(video.module_id) : "-"),
-    duration: video.duration || "-",
-    status: video.status === 1 ? "Published" : video.status === 0 ? "Draft" : video.status || "Draft",
-    uploadedBy: video.uploadedBy || video.uploaded_by_name || "-",
-    uploadDate: video.uploadDate || video.created_at || "-",
-    videoUrl: video.video_url || video.videoUrl || "",
-  }));
+  return videosArray.map((video) => {
+    const moduleOption = MODULE_OPTIONS.find(opt => opt.value === video.module_id);
+    const moduleName = moduleOption ? moduleOption.label : (video.module || (video.module_id != null ? String(video.module_id) : "-"));
+
+    return {
+      id: video.id,
+      title: video.title || "-",
+      description: video.description || "-",
+      module_id: video.module_id ?? null,
+      module: moduleName,
+      duration: video.duration || "-",
+      status: video.status === 1 ? "Published" : video.status === 0 ? "Draft" : video.status || "Draft",
+      uploadedBy: video.uploadedBy || video.uploaded_by_name || "-",
+      uploadDate: video.uploadDate || video.created_at || "-",
+      videoUrl: video.video_url || video.videoUrl || "",
+      thumbnailUrl: video.thumbnail_url || video.thumbnailUrl || "",
+    };
+  });
 };
