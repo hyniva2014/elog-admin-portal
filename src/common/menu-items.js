@@ -3,6 +3,7 @@ import GroupIcon from "@mui/icons-material/Group";
 import TabletMacIcon from "@mui/icons-material/TabletMac";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import VideoSettingsIcon from '@mui/icons-material/VideoSettings';
+import { LuMailOpen } from "react-icons/lu";
 
 const MENU_ITEMS = [
   {
@@ -83,6 +84,12 @@ const MENU_ITEMS = [
     label: "Training Videos",
     url: "/training-videos",
     icon: VideoSettingsIcon,
+  },
+  {
+    key: "template-configuration",
+    label: "Template Configuration",
+    url: "/template-configuration",
+    icon: LuMailOpen,
   },
 ];
 export { MENU_ITEMS };
