@@ -66,6 +66,55 @@ const STATUS_COLORS = {
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 /**
+ * Parse section_config from the API.
+ * Handles object, JSON string, and double-encoded JSON string responses.
+ * Accepts both camelCase and snake_case keys.
+ */
+function parseSectionConfig(raw) {
+  let config = raw ?? {};
+  try {
+    // Unwrap string / double-encoded JSON (common when FE stringifies and BE stringifies again)
+    if (typeof config === 'string') {
+      config = JSON.parse(config);
+      if (typeof config === 'string') config = JSON.parse(config);
+    }
+  } catch {
+    config = {};
+  }
+  if (!config || typeof config !== 'object' || Array.isArray(config)) config = {};
+
+  const rowsRaw =
+    config.accessDetailsRows ??
+    config.access_details_rows ??
+    null;
+
+  const rows = Array.isArray(rowsRaw)
+    ? rowsRaw
+        .map((r) => ({
+          label: r?.label ?? r?.field_label ?? '',
+          variable: r?.variable ?? r?.field_variable ?? r?.value ?? '',
+        }))
+        .filter((r) => r.label || r.variable)
+    : null;
+
+  return {
+    accessDetailsTitle:
+      config.accessDetailsTitle ??
+      config.access_details_title ??
+      'Your Portal Access Details',
+    accessDetailsRows: rows && rows.length > 0 ? rows : [...DEFAULT_ACCESS_ROWS],
+    importantNoteText:
+      config.importantNoteText ??
+      config.important_note_text ??
+      'For security reasons, please change your password after your first login.',
+    signoffNote:
+      config.signoffNote ??
+      config.signoff_note ??
+      'If you have any questions, feel free to contact our support team.',
+  };
+}
+
+/**
  * Convert an API row (snake_case) to the local template shape used by the UI.
  */
 function normalizeTemplate(row) {
@@ -76,12 +125,7 @@ function normalizeTemplate(row) {
       : [];
   } catch { variables = []; }
 
-  let sectionConfig = {};
-  try {
-    sectionConfig = row.section_config
-      ? (typeof row.section_config === 'string' ? JSON.parse(row.section_config) : row.section_config)
-      : {};
-  } catch { sectionConfig = {}; }
+  const sectionConfig = parseSectionConfig(row.section_config);
 
   const statusMap = { 1: 'Active', 2: 'Draft', 0: 'Inactive' };
   const status = statusMap[row.status] ?? (row.status_label ?? 'Active');
@@ -106,10 +150,10 @@ function normalizeTemplate(row) {
     // Logo from API response (not editable by user)
     carrierLogo:         row.carrier_logo                  ?? '',
     // Editable section config
-    accessDetailsTitle: sectionConfig.accessDetailsTitle ?? 'Your Portal Access Details',
-    accessDetailsRows:  sectionConfig.accessDetailsRows  ?? [...DEFAULT_ACCESS_ROWS],
-    importantNoteText:  sectionConfig.importantNoteText  ?? 'For security reasons, please change your password after your first login.',
-    signoffNote:        sectionConfig.signoffNote        ?? 'If you have any questions, feel free to contact our support team.',
+    accessDetailsTitle: sectionConfig.accessDetailsTitle,
+    accessDetailsRows:  sectionConfig.accessDetailsRows,
+    importantNoteText:  sectionConfig.importantNoteText,
+    signoffNote:        sectionConfig.signoffNote,
   };
 }
 
@@ -122,6 +166,28 @@ function buildPayload(mode, templateId, {
   showAccessDetails, showImportantNote, variables,
   accessDetailsTitle, accessDetailsRows, importantNoteText, signoffNote,
 }, status) {
+  // Send as a plain object (NOT pre-stringified). Axios JSON-encodes the body once.
+  // Pre-stringifying caused double-encoding → backend couldn't restore custom rows.
+  const sectionConfig = {
+    accessDetailsTitle: accessDetailsTitle ?? 'Your Portal Access Details',
+    accessDetailsRows:  Array.isArray(accessDetailsRows) && accessDetailsRows.length > 0
+      ? accessDetailsRows.map((r) => ({
+          label: r.label ?? '',
+          variable: r.variable ?? '',
+        }))
+      : [...DEFAULT_ACCESS_ROWS],
+    importantNoteText:  importantNoteText  ?? 'For security reasons, please change your password after your first login.',
+    signoffNote:        signoffNote        ?? 'If you have any questions, feel free to contact our support team.',
+  };
+
+  // Keep variables array in sync with access-detail row variables
+  const rowVars = sectionConfig.accessDetailsRows
+    .map((r) => r.variable)
+    .filter((v) => typeof v === 'string' && v.includes('{{'));
+  const mergedVariables = Array.from(
+    new Set([...(Array.isArray(variables) ? variables : []), ...rowVars]),
+  );
+
   const payload = {
     template_name: name,
     subject,
@@ -131,13 +197,8 @@ function buildPayload(mode, templateId, {
     icon_type: iconType ?? 'agency',
     show_access_details: showAccessDetails ? 1 : 0,
     show_important_note: showImportantNote ? 1 : 0,
-    variables: Array.isArray(variables) ? variables : [],
-    section_config: JSON.stringify({
-      accessDetailsTitle: accessDetailsTitle ?? 'Your Portal Access Details',
-      accessDetailsRows:  accessDetailsRows  ?? [...DEFAULT_ACCESS_ROWS],
-      importantNoteText:  importantNoteText  ?? 'For security reasons, please change your password after your first login.',
-      signoffNote:        signoffNote        ?? 'If you have any questions, feel free to contact our support team.',
-    }),
+    variables: mergedVariables,
+    section_config: sectionConfig,
     status: status ?? 1,
   };
   if (mode === 'update') payload.template_id = Number(templateId);
@@ -486,13 +547,10 @@ export default function EmailTemplates() {
         // API returned no data — still optimistic but warn via snackbar
       }
 
-      // Always preserve the current editor's section config fields (accessDetailsRows,
-      // accessDetailsTitle, importantNoteText, signoffNote) because the API may not
-      // echo section_config back in its response. normalizeTemplate would otherwise
-      // fall back to DEFAULT_ACCESS_ROWS and silently drop any newly added rows.
+      // Preserve current editor section config even if the API response omits / mangles it.
       const sectionConfigOverride = {
         accessDetailsTitle,
-        accessDetailsRows,
+        accessDetailsRows: accessDetailsRows.map((r) => ({ label: r.label ?? '', variable: r.variable ?? '' })),
         importantNoteText,
         signoffNote,
       };
@@ -590,7 +648,11 @@ export default function EmailTemplates() {
       setShowAccessDetails(selectedTemplate.showAccessDetails ?? false);
       setShowImportantNote(selectedTemplate.showImportantNote ?? false);
       setAccessDetailsTitle(selectedTemplate.accessDetailsTitle ?? 'Your Portal Access Details');
-      setAccessDetailsRows(selectedTemplate.accessDetailsRows  ?? [...DEFAULT_ACCESS_ROWS]);
+      setAccessDetailsRows(
+        Array.isArray(selectedTemplate.accessDetailsRows) && selectedTemplate.accessDetailsRows.length > 0
+          ? selectedTemplate.accessDetailsRows.map((r) => ({ label: r.label ?? '', variable: r.variable ?? '' }))
+          : DEFAULT_ACCESS_ROWS.map((r) => ({ ...r })),
+      );
       setImportantNoteText(selectedTemplate.importantNoteText  ?? 'For security reasons, please change your password after your first login.');
       setSignoffNote(selectedTemplate.signoffNote              ?? 'If you have any questions, feel free to contact our support team.');
       setHasChanges(false);
