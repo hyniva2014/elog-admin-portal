@@ -22,6 +22,7 @@ export const AVAILABLE_VARIABLES = [
   { key: '{{carrier_logo}}', description: 'Carrier logo' },
   { key: '{{role}}', description: 'User role' },
   { key: '{{otp}}', description: 'OTP Code' },
+  { key: '{{code}}', description: 'Code' },
 
 ];
 
@@ -40,6 +41,7 @@ export const DEFAULT_PREVIEW_VALUES = {
   '{{role}}': 'Admin',
   '{{carrier_logo}}': 'https://allwaystrack.com/logo.png',
   '{{otp}}': '123456',
+  '{{code}}': '123456',
 };
 
 export const DEFAULT_TEMPLATES = [
@@ -55,7 +57,7 @@ export const DEFAULT_TEMPLATES = [
     bodyHtml: `<p>Your carrier <strong>{{carrier_name}}</strong> has been successfully onboarded to our platform. You can now log in to the portal and start managing your operations efficiently.</p><p>If you have any questions, feel free to contact our support team at <a href="mailto:{{support_email}}">{{support_email}}</a>.</p>`,
     showAccessDetails: true,
     showImportantNote: true,
-    variables: ['{{first_name}}', '{{carrier_name}}', '{{portal_url}}', '{{username}}', '{{temp_password}}', '{{support_email}}', '{{current_year}}'],
+    variables: ['{{first_name}}', '{{carrier_name}}', '{{portal_url}}', '{{username}}', '{{temp_password}}', '{{support_email}}', '{{current_year}}', '{{code}}', '{{otp}}','{{role}}','{{carrier_logo}}','{{support_phone}}','{{reset_link}}'],
   },
   {
     id: '2',
@@ -91,6 +93,7 @@ export const DEFAULT_ACCESS_ROWS = [
   { label: 'Portal URL',         variable: '{{portal_url}}' },
   { label: 'Username',           variable: '{{username}}' },
   { label: 'Temporary Password', variable: '{{temp_password}}' },
+  { label: 'Code', variable: '{{code}}' },
 ];
 
 export function generateEmailPreviewHtml(template, previewValues, isDark) {
