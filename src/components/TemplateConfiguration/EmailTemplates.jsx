@@ -486,8 +486,19 @@ export default function EmailTemplates() {
         // API returned no data — still optimistic but warn via snackbar
       }
 
+      // Always preserve the current editor's section config fields (accessDetailsRows,
+      // accessDetailsTitle, importantNoteText, signoffNote) because the API may not
+      // echo section_config back in its response. normalizeTemplate would otherwise
+      // fall back to DEFAULT_ACCESS_ROWS and silently drop any newly added rows.
+      const sectionConfigOverride = {
+        accessDetailsTitle,
+        accessDetailsRows,
+        importantNoteText,
+        signoffNote,
+      };
+
       const updated = response?.body?.data
-        ? normalizeTemplate(response.body.data)
+        ? { ...normalizeTemplate(response.body.data), ...sectionConfigOverride }
         : {
             ...selectedTemplate,
             name: templateName,
@@ -497,8 +508,7 @@ export default function EmailTemplates() {
             showImportantNote,
             status: statusValue === 2 ? 'Draft' : 'Active',
             updatedAt: 'Just now',
-            // Preserve current editor section config so labels don't reset
-            accessDetailsTitle, accessDetailsRows, importantNoteText, signoffNote,
+            ...sectionConfigOverride,
           };
 
       setTemplates((prev) => prev.map((t) => (t.id === selectedTemplate.id ? updated : t)));

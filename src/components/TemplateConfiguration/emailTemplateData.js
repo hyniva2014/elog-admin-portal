@@ -21,6 +21,7 @@ export const AVAILABLE_VARIABLES = [
   { key: '{{support_phone}}', description: 'Support number' },
   { key: '{{carrier_logo}}', description: 'Carrier logo' },
   { key: '{{role}}', description: 'User role' },
+  { key: '{{otp}}', description: 'OTP Code' },
 
 ];
 
@@ -38,6 +39,7 @@ export const DEFAULT_PREVIEW_VALUES = {
   '{{support_phone}}': '+1 (555) 123-4567',
   '{{role}}': 'Admin',
   '{{carrier_logo}}': 'https://allwaystrack.com/logo.png',
+  '{{otp}}': '123456',
 };
 
 export const DEFAULT_TEMPLATES = [
