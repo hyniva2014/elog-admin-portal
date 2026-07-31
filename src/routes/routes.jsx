@@ -929,6 +929,16 @@ const adminRoutes = [
       />
     ),
   },
+  {
+    path: "/template-configuration",
+    element: (
+      <LoadComponent
+        component={lazy(
+          () => import("../components/TemplateConfiguration/TemplateConfiguration.jsx"),
+        )}
+      />
+    ),
+  },
 ];
 export const defaultLayoutRoutes = [...otherRotes, ...authRoutes];
 export const verticalLayoutRoutes = [
