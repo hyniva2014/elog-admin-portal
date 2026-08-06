@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Box, Tabs, Tab, Typography, useTheme, alpha } from '@mui/material';
 import { LuMail, LuMessageSquare, LuBell } from 'react-icons/lu';
 import { PageContainer } from '@src/common/PageContainer';
+import CommonLoading from '@src/common/CommonLoading';
 import EmailTemplates from './EmailTemplates';
 import SmsTemplates from './SmsTemplates';
 import PushNotificationTemplates from './PushNotificationTemplates';
@@ -31,6 +32,8 @@ export default function TemplateConfiguration() {
   const [activeTab, setActiveTab] = useState(0);
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+
+  const { setLoading, LoadingContainer } = CommonLoading();
 
   const ActiveComponent = TAB_CONFIG[activeTab].component;
 
@@ -64,7 +67,7 @@ export default function TemplateConfiguration() {
             '& .MuiTab-root': {
               textTransform: 'none',
               fontWeight: 500,
-              fontSize: 13,
+              fontSize: 14,
               minHeight: 44,
               py: 0,
               gap: 0.75,
@@ -91,8 +94,10 @@ export default function TemplateConfiguration() {
 
       {/* Tab Content */}
       <Box sx={{ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <ActiveComponent />
+        <ActiveComponent setLoading={setLoading} />
       </Box>
+      
+      <LoadingContainer />
     </PageContainer>
   );
 }

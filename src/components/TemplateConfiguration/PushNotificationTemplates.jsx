@@ -128,7 +128,7 @@ export default function PushNotificationTemplates() {
             value={search} onChange={(e) => setSearch(e.target.value)}
             InputProps={{
               startAdornment: <InputAdornment position="start"><LuSearch size={14} /></InputAdornment>,
-              sx: { fontSize: 13, borderRadius: 1.5 },
+              sx: { fontSize: 14, borderRadius: 1.5 },
             }}
           />
         </Box>
@@ -152,7 +152,7 @@ export default function PushNotificationTemplates() {
                 </Avatar>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-                    <Typography variant="body2" fontWeight={600} noWrap sx={{ color: selected?.id === tpl.id ? 'primary.main' : 'text.primary', fontSize: 13 }}>
+                    <Typography variant="body2" fontWeight={600} noWrap sx={{ color: selected?.id === tpl.id ? 'primary.main' : 'text.primary', fontSize: 14 }}>
                       {tpl.name}
                     </Typography>
                     <Chip label={tpl.status} size="small" sx={{ height: 18, fontSize: '10px', fontWeight: 600, bgcolor: STATUS_COLORS[tpl.status]?.bg, color: STATUS_COLORS[tpl.status]?.text, borderRadius: '4px', flexShrink: 0 }} />
@@ -165,7 +165,7 @@ export default function PushNotificationTemplates() {
         </Box>
         <Divider />
         <Box sx={{ p: 1.5 }}>
-          <Button variant="outlined" fullWidth startIcon={<LuPlus size={15} />} size="small" sx={{ borderRadius: 1.5, fontSize: 13, fontWeight: 600 }}>
+          <Button variant="outlined" fullWidth startIcon={<LuPlus size={15} />} size="small" sx={{ borderRadius: 1.5, fontSize: 14, fontWeight: 600 }}>
             Create New Template
           </Button>
         </Box>
@@ -180,7 +180,7 @@ export default function PushNotificationTemplates() {
         <Box sx={{ px: 3, py: 2, flex: 1, overflow: 'auto' }}>
           <Box sx={{ mb: 2 }}>
             <Typography variant="caption" fontWeight={600} color="text.secondary" display="block" mb={0.5}>Template Name</Typography>
-            <TextField size="small" fullWidth value={templateName} onChange={(e) => { setTemplateName(e.target.value); setHasChanges(true); }} InputProps={{ sx: { fontSize: 13, borderRadius: 1.5 } }} />
+            <TextField size="small" fullWidth value={templateName} onChange={(e) => { setTemplateName(e.target.value); setHasChanges(true); }} InputProps={{ sx: { fontSize: 14, borderRadius: 1.5 } }} />
           </Box>
           <Box sx={{ mb: 2 }}>
             <Typography variant="caption" fontWeight={600} color="text.secondary" display="block" mb={0.5}>
@@ -190,7 +190,7 @@ export default function PushNotificationTemplates() {
               size="small" fullWidth value={title}
               onChange={(e) => { setTitle(e.target.value); setHasChanges(true); }}
               placeholder="e.g., Claim Update – {{claim_number}}"
-              InputProps={{ sx: { fontSize: 13, borderRadius: 1.5 } }}
+              InputProps={{ sx: { fontSize: 14, borderRadius: 1.5 } }}
             />
           </Box>
           <Box sx={{ mb: 2 }}>
@@ -201,7 +201,7 @@ export default function PushNotificationTemplates() {
               multiline minRows={3} fullWidth value={body}
               onChange={(e) => { setBody(e.target.value); setHasChanges(true); }}
               placeholder="Brief message shown in the notification..."
-              InputProps={{ sx: { fontSize: 13, borderRadius: 1.5 } }}
+              InputProps={{ sx: { fontSize: 14, borderRadius: 1.5 } }}
             />
           </Box>
           <Box sx={{ mb: 2 }}>
@@ -210,7 +210,7 @@ export default function PushNotificationTemplates() {
               size="small" fullWidth value={actionUrl}
               onChange={(e) => { setActionUrl(e.target.value); setHasChanges(true); }}
               placeholder="/claims/{{claim_number}}"
-              InputProps={{ sx: { fontSize: 13, borderRadius: 1.5 } }}
+              InputProps={{ sx: { fontSize: 14, borderRadius: 1.5 } }}
             />
           </Box>
 
@@ -226,8 +226,8 @@ export default function PushNotificationTemplates() {
           </Box>
         </Box>
         <Box sx={{ px: 3, py: 1.5, borderTop: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-          <Button variant="outlined" size="small" startIcon={<LuSend size={14} />} sx={{ borderRadius: 1.5, fontSize: 13 }}>Send Test Push</Button>
-          <Button variant="contained" size="small" startIcon={<LuSave size={14} />} disabled={!hasChanges} sx={{ borderRadius: 1.5, fontSize: 13 }}>Save Template</Button>
+          <Button variant="outlined" size="small" startIcon={<LuSend size={14} />} sx={{ borderRadius: 1.5, fontSize: 14 }}>Send Test Push</Button>
+          <Button variant="contained" size="small" startIcon={<LuSave size={14} />} disabled={!hasChanges} sx={{ borderRadius: 1.5, fontSize: 14 }}>Save Template</Button>
         </Box>
       </Box>
 
