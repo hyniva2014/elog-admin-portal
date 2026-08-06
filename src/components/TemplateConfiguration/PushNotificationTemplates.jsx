@@ -78,6 +78,12 @@ export default function PushNotificationTemplates() {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
+  const STATUS_COLORS = {
+    Active: { bg: isDark ? alpha('#2e7d32', 0.2) : '#e8f5e9', text: isDark ? '#81c784' : '#2e7d32' },
+    Draft: { bg: isDark ? alpha('#ef6c00', 0.2) : '#fff3e0', text: isDark ? '#ffb74d' : '#ef6c00' },
+    Inactive: { bg: isDark ? alpha('#c62828', 0.2) : '#ffebee', text: isDark ? '#e57373' : '#c62828' },
+  };
+
   const [templates] = useState(PUSH_TEMPLATES);
   const [selected, setSelected] = useState(PUSH_TEMPLATES[0]);
   const [search, setSearch] = useState('');
@@ -143,7 +149,7 @@ export default function PushNotificationTemplates() {
                 border: '1px solid',
                 borderColor: selected?.id === tpl.id ? 'primary.main' : 'transparent',
                 bgcolor: selected?.id === tpl.id ? alpha(theme.palette.primary.main, 0.07) : 'transparent',
-                '&:hover': { bgcolor: alpha(theme.palette.grey[500], 0.06) },
+                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.06) },
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
@@ -165,7 +171,7 @@ export default function PushNotificationTemplates() {
         </Box>
         <Divider />
         <Box sx={{ p: 1.5 }}>
-          <Button variant="outlined" fullWidth startIcon={<LuPlus size={15} />} size="small" sx={{ borderRadius: 1.5, fontSize: 14, fontWeight: 600 }}>
+          <Button variant="outlined" fullWidth startIcon={<LuPlus size={15} />} size="small" sx={{ borderRadius: 1.5, fontSize: 14, fontWeight: 600, '&:hover': { backgroundColor: 'primary.main', color: 'white' } }}>
             Create New Template
           </Button>
         </Box>
@@ -226,7 +232,7 @@ export default function PushNotificationTemplates() {
           </Box>
         </Box>
         <Box sx={{ px: 3, py: 1.5, borderTop: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-          <Button variant="outlined" size="small" startIcon={<LuSend size={14} />} sx={{ borderRadius: 1.5, fontSize: 14 }}>Send Test Push</Button>
+          <Button variant="outlined" size="small" startIcon={<LuSend size={14} />} sx={{ borderRadius: 1.5, fontSize: 14, '&:hover': { backgroundColor: 'primary.main', color: 'white' } }}>Send Test Push</Button>
           <Button variant="contained" size="small" startIcon={<LuSave size={14} />} disabled={!hasChanges} sx={{ borderRadius: 1.5, fontSize: 14 }}>Save Template</Button>
         </Box>
       </Box>

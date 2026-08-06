@@ -41,5 +41,9 @@ export const createButtonContainerStyle = {
 };
 
 export const createButtonStyle = {
-  borderRadius: 1.5, fontSize: 14, fontWeight: 600
+  borderRadius: 1.5, fontSize: 14, fontWeight: 600,
+  '&:hover': {
+    backgroundColor: 'primary.main',
+    color: 'white',
+  }
 };

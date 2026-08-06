@@ -61,18 +61,16 @@ export const CreateTemplateDialog = ({ open, onClose, onCreate, isCreating, type
             placeholder="e.g., Claim Assignment Notification"
             disabled={isCreating}
           />
-          {type !== 'sms' && (
-            <FormControl size="small" fullWidth>
-              <Typography variant="caption" color="text.secondary" sx={styles.getLabelStyle()}>
-                Category
-              </Typography>
-              <Select value={category} onChange={(e) => setCategory(e.target.value)} disabled={isCreating}>
-                {TEMPLATE_CATEGORIES.filter((c) => c.value !== 'all').map((c) => (
-                  <MenuItem key={c.value} value={c.value}>{c.label}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
+          <FormControl size="small" fullWidth>
+            <Typography variant="caption" color="text.secondary" sx={styles.getLabelStyle()}>
+              Category
+            </Typography>
+            <Select value={category} onChange={(e) => setCategory(e.target.value)} disabled={isCreating}>
+              {TEMPLATE_CATEGORIES.filter((c) => c.value !== 'all').map((c) => (
+                <MenuItem key={c.value} value={c.value}>{c.label}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <TextField
             label="Description (optional)"
             value={description}

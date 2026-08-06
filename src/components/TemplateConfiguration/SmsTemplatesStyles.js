@@ -24,7 +24,7 @@ export const getListItemStyle = (isSelected, theme, alpha) => ({
   border: '1px solid',
   borderColor: isSelected ? 'primary.main' : 'transparent',
   bgcolor: isSelected ? alpha(theme.palette.primary.main, 0.07) : 'transparent',
-  '&:hover': { bgcolor: alpha(theme.palette.grey[500], 0.06) },
+  '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.06) },
 });
 
 export const getListItemAvatarStyle = (isSelected, theme, alpha) => ({
@@ -49,7 +49,13 @@ export const getStatusChipStyle = (statusColor) => ({
 });
 
 export const createButtonContainerStyle = { p: 1.5 };
-export const createButtonStyle = { borderRadius: 1.5, fontSize: 14, fontWeight: 600 };
+export const createButtonStyle = {
+  borderRadius: 1.5, fontSize: 14, fontWeight: 600,
+  '&:hover': {
+    backgroundColor: 'primary.main',
+    color: 'white',
+  }
+};
 
 export const middlePanelStyle = { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRight: '1px solid', borderColor: 'divider' };
 export const middlePanelHeaderStyle = { px: 3, pt: 2.5, pb: 1.5, borderBottom: '1px solid', borderColor: 'divider' };
@@ -68,7 +74,13 @@ export const getVariableChipStyle = (isDark, alpha) => ({
 });
 
 export const editorFooterStyle = { px: 3, py: 1.5, borderTop: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'flex-end', gap: 1 };
-export const editorFooterButtonStyle = { borderRadius: 1.5, fontSize: 14 };
+export const editorFooterButtonStyle = {
+  borderRadius: 1.5, fontSize: 14,
+  '&:hover': {
+    backgroundColor: 'primary.main',
+    color: 'white',
+  }
+};
 
 export const rightPanelStyle = { width: 320, flexShrink: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' };
 export const rightPanelHeaderStyle = { px: 2, pt: 2, pb: 1.5, borderBottom: '1px solid', borderColor: 'divider' };
