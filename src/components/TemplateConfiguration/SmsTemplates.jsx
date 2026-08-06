@@ -7,6 +7,7 @@ import {
 import { LuSearch, LuPlus, LuSmartphone, LuSend, LuSave, LuFilter, LuMessageSquare, LuRefreshCw } from 'react-icons/lu';
 import { useServices } from '@src/services/services';
 import CommonSnackbar from '@src/common/CommonSnackbar';
+import CommonTextField from '@src/common/CommonTextField';
 import useUnsavedChangesDialog from '../compliance/useUnsavedChangesDialog';
 import { ListItemSkeleton } from './TemplateListItem';
 import { CreateTemplateDialog } from './CreateTemplateDialog';
@@ -107,6 +108,7 @@ export default function SmsTemplates({ setLoading }) {
   const [isSaving, setIsSaving] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [previewPhone, setPreviewPhone] = useState('');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   const showSnackbar = (message, severity = 'success') =>
@@ -206,13 +208,14 @@ export default function SmsTemplates({ setLoading }) {
     }
   };
 
-  const executeCreateTemplate = async ({ name, description }) => {
+  const executeCreateTemplate = async ({ name, description, category }) => {
     setIsCreating(true);
     try {
       const payload = {
         template_name: name,
         body: '',
         description: description || 'Custom SMS template',
+        category: category,
         variables: [],
         status: 2, // Draft
       };
@@ -229,7 +232,7 @@ export default function SmsTemplates({ setLoading }) {
     } catch (err) {
       console.warn('[SmsTemplates] Create API failed, using fallback.', err);
       showSnackbar('API unavailable: using local fallback data', 'warning');
-      const fallback = { id: Date.now().toString(), name: name, description: description || 'Custom SMS template', status: 'Draft', body: '', variables: [] };
+      const fallback = { id: Date.now().toString(), name: name, description: description || 'Custom SMS template', category: category, status: 'Draft', body: '', variables: [] };
       setTemplates((prev) => [fallback, ...prev]);
       setSelected(fallback);
       setCreateDialogOpen(false);
@@ -456,6 +459,22 @@ export default function SmsTemplates({ setLoading }) {
       <Box sx={styles.rightPanelStyle}>
         <Box sx={styles.rightPanelHeaderStyle}>
           <Typography variant="subtitle2" fontWeight={700}>SMS Preview</Typography>
+        </Box>
+        <Box sx={{ px: 2, pt: 2, pb: 1.5, borderBottom: '1px solid', borderColor: 'divider', bgcolor: isDark ? 'background.paper' : '#fafbfc' }}>
+          <CommonTextField
+            size="small" fullWidth label="Preview SMS To"
+            placeholder="e.g., +1234567890"
+            value={previewPhone} 
+            onChange={(e) => {
+              const val = e.target.value.replace(/[^0-9]/g, '');
+              setPreviewPhone(val.slice(0, 10));
+            }}
+            inputProps={{ maxLength: 10 }}
+            InputProps={{ sx: { fontSize: 14, borderRadius: 1.5 } }}
+          />
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, lineHeight: 1.2 }}>
+            This is how your SMS will appear to recipients.
+          </Typography>
         </Box>
         <Box sx={styles.getPhoneContainerStyle(isDark)}>
           {/* Phone Frame */}

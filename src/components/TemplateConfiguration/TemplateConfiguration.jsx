@@ -71,13 +71,19 @@ export default function TemplateConfiguration() {
               minHeight: 44,
               py: 0,
               gap: 0.75,
+              transition: 'background-color 0.2s, color 0.2s',
+              '&:hover': {
+                bgcolor: 'primary.main',
+                color: 'white',
+              },
             },
             '& .Mui-selected': {
               fontWeight: 700,
+              bgcolor: 'primary.main',
+              color: 'white !important',
             },
             '& .MuiTabs-indicator': {
-              height: 2.5,
-              borderRadius: '2px 2px 0 0',
+              display: 'none',
             },
           }}
         >
