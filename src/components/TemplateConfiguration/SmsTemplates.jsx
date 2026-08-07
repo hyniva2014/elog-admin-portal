@@ -1,505 +1,469 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import {
-  Box, Grid, Paper, Typography, TextField, Button, Chip,
-  Avatar, InputAdornment, Divider, useTheme, alpha,
-  FormControl, Select, MenuItem, IconButton, Tooltip, CircularProgress,
-} from '@mui/material';
-import { LuSearch, LuPlus, LuSmartphone, LuSend, LuSave, LuFilter, LuMessageSquare, LuRefreshCw } from 'react-icons/lu';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import axios from 'axios';
 import { useServices } from '@src/services/services';
+import { ELOG_API_GATEWAY_URL } from '@src/services/serviceUtils';
 import CommonSnackbar from '@src/common/CommonSnackbar';
-import CommonTextField from '@src/common/CommonTextField';
 import useUnsavedChangesDialog from '../compliance/useUnsavedChangesDialog';
-import { ListItemSkeleton } from './TemplateListItem';
+import {
+  AppContainer,
+  DragHandle,
+  DragHandleDotsContainer,
+  DragHandleDot,
+} from './SmsTemplates.styles';
+import SmsTemplatesSidebar from './SmsTemplatesSidebar';
+import SmsTemplateEditor from './SmsTemplateEditor';
+import SmsTemplatePreview from './SmsTemplatePreview';
 import { CreateTemplateDialog } from './CreateTemplateDialog';
-import * as styles from './SmsTemplatesStyles';
+import {
+  DEFAULT_SMS_TEMPLATES,
+  DEFAULT_SMS_PREVIEW_VALUES,
+  normalizeSmsTemplate,
+} from './emailTemplateData';
 
-const SMS_TEMPLATES = [
+function buildSmsPayload(
+  mode,
+  templateId,
   {
-    id: 's1',
-    name: 'Welcome SMS',
-    description: 'Sent after agency/user creation',
-    status: 'Active',
-    body: 'Welcome to {{carrier_name}}! Your account for {{carrier_name}} is ready. Login at {{portal_url}} using {{username}}. Temp password: {{temp_password}}',
-    variables: ['{{carrier_name}}', '{{portal_url}}', '{{username}}', '{{temp_password}}'],
+    name,
+    category,
+    body,
+    description,
+    subject,
+    iconType,
+    showAccessDetails,
+    showImportantNote,
   },
-  {
-    id: 's2',
-    name: 'OTP Verification',
-    description: 'One-time password for login',
-    status: 'Active',
-    body: 'Your {{company_name}} OTP is {{otp_code}}. Valid for 10 minutes. Do not share this with anyone.',
-    variables: ['{{company_name}}', '{{otp_code}}'],
-  },
-  {
-    id: 's3',
-    name: 'Password Reset',
-    description: 'Password reset link via SMS',
-    status: 'Active',
-    body: 'Reset your {{company_name}} password: {{reset_link}} — Link expires in 1 hour.',
-    variables: ['{{company_name}}', '{{reset_link}}'],
-  },
-  {
-    id: 's4',
-    name: 'Claim Assigned',
-    description: 'Notify adjuster of new claim',
-    status: 'Active',
-    body: 'Hi {{adjuster_name}}, claim {{claim_number}} has been assigned to you. Login to {{portal_url}} to view details.',
-    variables: ['{{adjuster_name}}', '{{claim_number}}', '{{portal_url}}'],
-  },
-  {
-    id: 's5',
-    name: 'Policy Renewal Reminder',
-    description: 'SMS reminder before renewal date',
-    status: 'Draft',
-    body: 'Hi {{first_name}}, your policy {{policy_number}} renews on {{renewal_date}}. Premium: {{premium_amount}}. Login to renew: {{portal_url}}',
-    variables: ['{{first_name}}', '{{policy_number}}', '{{renewal_date}}', '{{premium_amount}}', '{{portal_url}}'],
-  },
-];
+  status
+) {
+  const parsedVariables = body ? body.match(/\{\{[a-zA-Z0-9_]+\}\}/g) || [] : [];
+  const cleanVariables = [...new Set(parsedVariables)].map((v) => v.replace(/[{}]/g, ''));
 
-const SMS_VARIABLES = [
-  '{{first_name}}', '{{carrier_name}}',
-  '{{portal_url}}', '{{username}}', '{{temp_password}}',
-  '{{otp_code}}', '{{reset_link}}', '{{claim_number}}',
-  '{{adjuster_name}}', '{{policy_number}}', '{{renewal_date}}',
-  '{{premium_amount}}',
-];
-
-const STATUS_COLORS = {
-  Active: { bg: '#dcfce7', text: '#15803d' },
-  Draft: { bg: '#fef9c3', text: '#854d0e' },
-  Inactive: { bg: '#fee2e2', text: '#991b1b' },
-};
-
-const MAX_SMS_CHARS = 160;
-
-function normalizeSmsTemplate(row) {
-  let variables = [];
-  try {
-    variables = row.variables
-      ? (typeof row.variables === 'string' ? JSON.parse(row.variables) : row.variables)
-      : [];
-  } catch { variables = []; }
-
-  const statusMap = { 1: 'Active', 2: 'Draft', 0: 'Inactive' };
-  const status = statusMap[row.status] ?? (row.status_label ?? 'Active');
-
-  return {
-    id: String(row.template_id || row.id || ''),
-    name: row.template_name ?? row.name ?? '',
-    description: row.description ?? '',
-    status,
-    body: row.body ?? row.content ?? '',
-    variables,
+  const payload = {
+    template_name: name,
+    subject: subject ?? name,
+    body_html: body ?? '',
+    category: category ?? 'general',
+    description: description ?? '',
+    icon_type: iconType ?? 'message-square',
+    show_access_details: showAccessDetails === 1 || showAccessDetails === true ? 1 : 0,
+    show_important_note: showImportantNote === 1 || showImportantNote === true ? 1 : 0,
+    variables: cleanVariables,
+    status: status ?? 1,
+    sort_order: 0,
+    created_by: localStorage.getItem('user_id') || 1,
   };
+  if (templateId) {
+    payload.template_id = isNaN(templateId) ? templateId : Number(templateId);
+  }
+  return payload;
 }
 
 export default function SmsTemplates({ setLoading }) {
-  const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
   const { fetchApi, createApi } = useServices();
 
+  /* ── Data state ── */
   const [templates, setTemplates] = useState([]);
   const [isFetching, setIsFetching] = useState(true);
-  const [selected, setSelected] = useState(null);
-  const [search, setSearch] = useState('');
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+
+  /* ── Editor state ── */
   const [templateName, setTemplateName] = useState('');
+  const [templateSubject, setTemplateSubject] = useState('');
   const [body, setBody] = useState('');
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  /* ── Dialog & UI state ── */
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
-  const [previewPhone, setPreviewPhone] = useState('');
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [isSendingTest, setIsSendingTest] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success',
+  });
+
+  const bodyInputRef = useRef(null);
+  const subjectInputRef = useRef(null);
+  const focusFieldRef = useRef(null);
+
+  /* ── Preview states ── */
+  const [previewDevice, setPreviewDevice] = useState('mobile');
+  const [isDarkPreview, setIsDarkPreview] = useState(false);
+  const [previewPhone, setPreviewPhone] = useState('+1 (555) 019-2834');
+  const [previewWidth, setPreviewWidth] = useState(320);
+
+  /* ── Drag-resize handle ── */
+  const dragRef = useRef({ active: false, startX: 0, startWidth: 0 });
+  const previewWidthRef = useRef(previewWidth);
+  useEffect(() => {
+    previewWidthRef.current = previewWidth;
+  }, [previewWidth]);
+
+  const handleResizeMouseDown = useCallback((e) => {
+    dragRef.current = {
+      active: true,
+      startX: e.clientX,
+      startWidth: previewWidthRef.current,
+    };
+    e.preventDefault();
+  }, []);
+
+  useEffect(() => {
+    const onMove = (e) => {
+      if (!dragRef.current.active) return;
+      const delta = dragRef.current.startX - e.clientX;
+      setPreviewWidth(
+        Math.max(260, Math.min(760, dragRef.current.startWidth + delta))
+      );
+    };
+    const onUp = () => {
+      dragRef.current.active = false;
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    return () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+  }, []);
+
+  const pendingTemplateRef = useRef(null);
+  const { handleCancel: triggerUnsavedChanges, UnsavedChangesDialog } =
+    useUnsavedChangesDialog(
+      () => {
+        if (pendingTemplateRef.current === 'CREATE') {
+          setCreateDialogOpen(true);
+        } else if (pendingTemplateRef.current) {
+          setSelectedTemplate(pendingTemplateRef.current);
+        }
+        pendingTemplateRef.current = null;
+      },
+      () => {
+        pendingTemplateRef.current = null;
+      }
+    );
 
   const showSnackbar = (message, severity = 'success') =>
     setSnackbar({ open: true, message, severity });
 
   useEffect(() => {
     if (setLoading) {
-      setLoading(isFetching || isSaving || isCreating);
+      setLoading(isFetching || isSaving || isCreating || isSendingTest);
     }
-  }, [isFetching, isSaving, isCreating, setLoading]);
+  }, [isFetching, isSaving, isCreating, isSendingTest, setLoading]);
 
-  const hasFetched = useRef(false);
+  /* ── API helpers ── */
+  const fetchTemplates = useCallback(
+    async (keepSelection = false) => {
+      setIsFetching(true);
+      try {
+        const response = await fetchApi('/masteradmin/sms-templates', false);
+        const raw = response?.body?.data ?? response?.body ?? [];
+        const list = Array.isArray(raw) ? raw.map(normalizeSmsTemplate) : [];
 
-  const fetchTemplates = useCallback(async (keepSelection = false) => {
-    setIsFetching(true);
-    try {
-      const response = await fetchApi('/masteradmin/sms-templates', false);
-      
-      if (response?.statusCode >= 400 || response?.message) {
-        throw new Error(response?.body?.message || response?.message || 'Failed to fetch');
+        setTemplates(list);
+
+        if (!keepSelection) {
+          const first =
+            list.find((t) => t.status === 'Active') ?? list[0] ?? null;
+          setSelectedTemplate(first);
+        }
+      } catch (err) {
+        console.warn(
+          '[SmsTemplates] API unavailable – using seed data.',
+          err?.message
+        );
+        setTemplates(DEFAULT_SMS_TEMPLATES);
+        if (!keepSelection) setSelectedTemplate(DEFAULT_SMS_TEMPLATES[0] ?? null);
+      } finally {
+        setIsFetching(false);
       }
-
-      const raw = response?.body?.data ?? response?.body ?? [];
-      const list = Array.isArray(raw) ? raw.map(normalizeSmsTemplate) : [];
-
-      setTemplates(list);
-
-      if (!keepSelection) {
-        const first = list.find((t) => t.status === 'Active') ?? list[0] ?? null;
-        setSelected(first);
-      }
-    } catch (err) {
-      console.warn('[SmsTemplates] API unavailable – using seed data.', err?.message);
-      setTemplates(SMS_TEMPLATES);
-      if (!keepSelection) setSelected(SMS_TEMPLATES[0] ?? null);
-    } finally {
-      setIsFetching(false);
-    }
-  }, [fetchApi]);
-
-  useEffect(() => {
-    if (hasFetched.current) return;
-    hasFetched.current = true;
-    fetchTemplates();
-  }, [fetchTemplates]);
-
-
-
-  useEffect(() => {
-    if (selected) {
-      setTemplateName(selected.name);
-      setBody(selected.body);
-      setHasChanges(false);
-    } else {
-      setTemplateName('');
-      setBody('');
-      setHasChanges(false);
-    }
-  }, [selected]);
-
-  const [pendingAction, setPendingAction] = useState(null);
-
-  const { handleCancel, UnsavedChangesDialog } = useUnsavedChangesDialog(
-    () => {
-      if (pendingAction === 'CREATE') {
-        setCreateDialogOpen(true);
-      } else if (pendingAction) {
-        executeSelect(pendingAction);
-      }
-      setPendingAction(null);
     },
-    () => setPendingAction(null)
+    [fetchApi]
   );
 
-  const executeSelect = (tpl) => {
-    setSelected(tpl);
-    setTemplateName(tpl.name);
-    setBody(tpl.body);
-    setHasChanges(false);
-  };
-
-  const handleSelect = (tpl) => {
-    if (hasChanges && selected?.id !== tpl.id) {
-      setPendingAction(tpl);
-      handleCancel(true);
-    } else {
-      executeSelect(tpl);
-    }
-  };
-
-  const handleCreateTemplate = () => {
-    if (hasChanges) {
-      setPendingAction('CREATE');
-      handleCancel(true);
-    } else {
-      setCreateDialogOpen(true);
-    }
-  };
-
-  const executeCreateTemplate = async ({ name, description, category }) => {
-    setIsCreating(true);
-    try {
-      const payload = {
-        template_name: name,
-        body: '',
-        description: description || 'Custom SMS template',
-        category: category,
-        variables: [],
-        status: 2, // Draft
-      };
-
-      const response = await createApi(payload, '/masteradmin/sms-templates', false);
-
-      if (response?.statusCode >= 400 || response?.message || !response?.body?.data) {
-        throw new Error(response?.body?.message || response?.message || 'Failed to create template');
-      }
-
-      setCreateDialogOpen(false);
-      showSnackbar('Template created successfully');
-      await fetchTemplates();
-    } catch (err) {
-      console.warn('[SmsTemplates] Create API failed, using fallback.', err);
-      showSnackbar('API unavailable: using local fallback data', 'warning');
-      const fallback = { id: Date.now().toString(), name: name, description: description || 'Custom SMS template', category: category, status: 'Draft', body: '', variables: [] };
-      setTemplates((prev) => [fallback, ...prev]);
-      setSelected(fallback);
-      setCreateDialogOpen(false);
-    } finally {
-      setIsCreating(false);
-    }
-  };
-
-  const handleSave = async () => {
-    if (!selected || isSaving) return;
+  const handleSave = async (statusValue = 1) => {
+    if (!selectedTemplate || isSaving) return;
     setIsSaving(true);
     try {
-      // Extract unique variables (e.g., {{carrier_name}}) from the body text
-      const extractedVars = body.match(/\{\{[^}]+\}\}/g) || [];
-      const uniqueVars = Array.from(new Set(extractedVars));
+      const payload = buildSmsPayload(
+        'update',
+        selectedTemplate.id,
+        {
+          ...selectedTemplate,
+          name: templateName,
+          subject: templateSubject,
+          body,
+        },
+        statusValue
+      );
 
-      const payload = {
-        template_id: Number(selected.id),
-        template_name: templateName,
-        body: body,
-        description: selected.description,
-        variables: uniqueVars,
-        status: selected.status === 'Draft' ? 2 : (selected.status === 'Inactive' ? 0 : 1),
-      };
+      const response = await createApi(
+        payload,
+        '/masteradmin/sms-templates/update',
+        false
+      );
 
-      const response = await createApi(payload, '/masteradmin/sms-templates/update', false);
+      const extractedVars = body
+        ? body.match(/\{\{[a-zA-Z0-9_]+\}\}/g) || []
+        : [];
+      const uniqueVars = [...new Set(extractedVars)].map((v) => v.replace(/[{}]/g, ''));
 
-      if (response?.statusCode >= 400 || response?.message || !response?.body?.data) {
-        throw new Error(response?.body?.message || response?.message || 'Failed to save template');
-      }
+      const updated = response?.body?.data
+        ? normalizeSmsTemplate(response.body.data)
+        : {
+            ...selectedTemplate,
+            name: templateName,
+            subject: templateSubject,
+            body,
+            variables: uniqueVars,
+            status: statusValue === 2 ? 'Draft' : 'Active',
+            updatedAt: 'Just now',
+          };
 
+      setTemplates((prev) =>
+        prev.map((t) => (t.id === selectedTemplate.id ? updated : t))
+      );
+      setSelectedTemplate(updated);
       setHasChanges(false);
-      showSnackbar('Template saved successfully');
-      await fetchTemplates(true);
+      showSnackbar(statusValue === 2 ? 'Saved as draft' : 'Template saved successfully');
     } catch (err) {
-      console.warn('[SmsTemplates] Save API failed, using fallback.', err);
-      showSnackbar('API unavailable: using local fallback data', 'warning');
-      const fallback = { ...selected, name: templateName, body };
-      setTemplates((prev) => prev.map((t) => (t.id === selected.id ? fallback : t)));
-      setSelected(fallback);
-      setHasChanges(false);
+      console.error('[SmsTemplates] Save failed', err);
+      showSnackbar(
+        err?.response?.data?.message ??
+          err?.message ??
+          'Failed to save template',
+        'error'
+      );
     } finally {
       setIsSaving(false);
     }
   };
 
-  const filtered = templates.filter(
-    (t) => !search || t.name.toLowerCase().includes(search.toLowerCase()),
+  const handleCreateTemplate = async ({
+    name,
+    category,
+    description,
+  }) => {
+    setIsCreating(true);
+    try {
+      const payload = buildSmsPayload(
+        'create',
+        null,
+        {
+          name,
+          category,
+          description,
+          body: '',
+          variables: [],
+          subject: name,
+          iconType: 'message-square',
+          showAccessDetails: 0,
+          showImportantNote: 1,
+        },
+        2 // Draft status
+      );
+
+      const response = await createApi(payload, '/masteradmin/sms-templates', false);
+
+      const created = response?.body?.data
+        ? normalizeSmsTemplate(response.body.data)
+        : {
+            id: Date.now().toString(),
+            name,
+            description,
+            category,
+            status: 'Draft',
+            subject: name,
+            body: '',
+            variables: [],
+            iconType: 'message-square',
+            updatedAt: 'Just now',
+          };
+
+      setTemplates((prev) => [created, ...prev]);
+      setSelectedTemplate(created);
+      setCreateDialogOpen(false);
+      showSnackbar('Template created successfully');
+    } catch (err) {
+      console.error('[SmsTemplates] Create failed', err);
+      showSnackbar(
+        err?.response?.data?.message ??
+          err?.message ??
+          'Failed to create template',
+        'error'
+      );
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  // Initial Load
+  useEffect(() => {
+    fetchTemplates();
+  }, [fetchTemplates]);
+
+  // Sync state with selected template
+  useEffect(() => {
+    if (selectedTemplate) {
+      setTemplateName(selectedTemplate.name);
+      setTemplateSubject(selectedTemplate.subject || selectedTemplate.name || '');
+      setBody(selectedTemplate.body || '');
+      setHasChanges(false);
+      focusFieldRef.current = null;
+    }
+  }, [selectedTemplate]);
+
+  const handleSelectTemplate = useCallback(
+    (tpl) => {
+      if (selectedTemplate?.id === tpl.id) return;
+      if (hasChanges) {
+        pendingTemplateRef.current = tpl;
+        triggerUnsavedChanges(true);
+      } else {
+        setSelectedTemplate(tpl);
+      }
+    },
+    [selectedTemplate, hasChanges, triggerUnsavedChanges]
   );
 
-  const charCount = body.length;
-  const smsCount = Math.ceil(charCount / MAX_SMS_CHARS) || 1;
-
-  const previewBody = () => {
-    const preview = {
-      '{{first_name}}': 'John',
-      '{{carrier_name}}': 'Carrier',
-      '{{portal_url}}': 'https://portal.acme.com',
-      '{{username}}': 'john.doe',
-      '{{temp_password}}': 'Abc@1234',
-      '{{otp_code}}': '847291',
-      '{{reset_link}}': 'https://portal.acme.com/reset',
-      '{{adjuster_name}}': 'Sarah Wilson',
-      '{{claim_number}}': 'CLM-2024-001234',
-      '{{policy_number}}': 'POL-005678',
-      '{{renewal_date}}': 'Jan 15, 2025',
-      '{{premium_amount}}': '$840.00',
-    };
-    let result = body;
-    Object.entries(preview).forEach(([k, v]) => {
-      result = result.replace(new RegExp(k.replace(/[{{}]/g, '\\$&'), 'g'), v);
+  const previewBody = useMemo(() => {
+    let result = body || '';
+    Object.entries(DEFAULT_SMS_PREVIEW_VALUES).forEach(([k, v]) => {
+      result = result.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), v);
     });
     return result;
+  }, [body]);
+
+  /** Test send without Authorization header */
+  const handleSendTestSms = async () => {
+    if (!selectedTemplate) return;
+    const rawPhone = (previewPhone || '').trim();
+    if (!rawPhone) {
+      showSnackbar('Please enter a recipient phone number in "Preview SMS To"', 'warning');
+      return;
+    }
+
+    const digitsWithPlus = rawPhone.replace(/[^\d+]/g, '');
+    const mobileNumber = digitsWithPlus.startsWith('+') ? digitsWithPlus : `+1${digitsWithPlus}`;
+
+    setIsSendingTest(true);
+    try {
+      const extractedVars = (body || '').match(/\{\{([a-zA-Z0-9_-]+)\}\}/g) || [];
+      const varKeys = Array.from(new Set(
+        extractedVars.map((v) => v.replace(/[{}]/g, '').trim())
+      ));
+
+      const variablesPayload = {};
+      varKeys.forEach((key) => {
+        variablesPayload[key] = DEFAULT_SMS_PREVIEW_VALUES[key] || 'test';
+      });
+
+      const payload = {
+        mobile_number: mobileNumber,
+        template_code: selectedTemplate.name,
+        variables: variablesPayload,
+      };
+
+      const res = await axios.post(
+        `${ELOG_API_GATEWAY_URL}/master/sms-templates/test-send`,
+        payload,
+        {
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (res?.data?.statusCode >= 400 || res?.data?.status === 'error') {
+        throw new Error(res?.data?.body?.message || res?.data?.message || 'Failed to send test SMS');
+      }
+
+      showSnackbar('Test SMS sent successfully');
+    } catch (err) {
+      console.error('[SmsTemplates] Send test SMS failed', err);
+      showSnackbar(
+        err?.response?.data?.message ??
+          err?.message ??
+          'Failed to send test SMS',
+        'error'
+      );
+    } finally {
+      setIsSendingTest(false);
+    }
   };
 
   return (
-    <Box sx={styles.mainContainerStyle}>
-      {/* Left Panel */}
-      <Box sx={styles.getLeftPanelStyle(isDark)}>
-        <Box sx={styles.leftPanelHeaderStyle}>
-          <Box sx={styles.headerTitleRowStyle}>
-            <Typography variant="subtitle2" fontWeight={700}>
-              SMS Templates
-              {!isFetching && (
-                <Typography component="span" variant="caption" color="text.disabled" sx={styles.headerTitleBadgeStyle}>
-                  ({filtered.length})
-                </Typography>
-              )}
-            </Typography>
-            <Box sx={styles.headerActionsStyle}>
-              <Tooltip title="Refresh list">
-                <IconButton size="small" onClick={() => fetchTemplates()} disabled={isFetching}>
-                  <LuRefreshCw size={13} style={{ animation: isFetching ? 'spin 1s linear infinite' : 'none' }} />
-                </IconButton>
-              </Tooltip>
-              <IconButton size="small"><LuFilter size={14} /></IconButton>
-            </Box>
-          </Box>
-          <TextField
-            size="small" fullWidth placeholder="Search templates..."
-            value={search} onChange={(e) => setSearch(e.target.value)}
-            InputProps={{
-              startAdornment: <InputAdornment position="start"><LuSearch size={14} /></InputAdornment>,
-              sx: styles.searchInputPropsStyle,
-            }}
-          />
-        </Box>
-        <Divider />
-        <Box sx={styles.listContainerStyle}>
-          {isFetching ? (
-            Array.from(new Array(5)).map((_, i) => <ListItemSkeleton key={i} />)
-          ) : filtered.length === 0 ? (
-            <Box sx={styles.emptyStateContainerStyle}>
-              <LuMessageSquare size={32} color={theme.palette.text.disabled} />
-              <Typography variant="caption" color="text.disabled" display="block" mt={1}>
-                No templates found
-              </Typography>
-            </Box>
-          ) : (
-            filtered.map((tpl) => (
-              <Box
-                key={tpl.id}
-                onClick={() => handleSelect(tpl)}
-                sx={styles.getListItemStyle(selected?.id === tpl.id, theme, alpha)}
-              >
-                <Box sx={styles.listItemContentStyle}>
-                  <Avatar sx={styles.getListItemAvatarStyle(selected?.id === tpl.id, theme, alpha)}>
-                    <LuMessageSquare size={14} />
-                  </Avatar>
-                  <Box sx={styles.listItemTextContainerStyle}>
-                    <Box sx={styles.listItemHeaderStyle}>
-                      <Typography variant="body2" fontWeight={600} noWrap sx={styles.getListItemTitleStyle(selected?.id === tpl.id)}>
-                        {tpl.name}
-                      </Typography>
-                      <Chip label={tpl.status} size="small" sx={styles.getStatusChipStyle(STATUS_COLORS[tpl.status])} />
-                    </Box>
-                    <Typography variant="caption" color="text.secondary" noWrap>{tpl.description}</Typography>
-                  </Box>
-                </Box>
-              </Box>
-            ))
-          )}
-        </Box>
-        <Divider />
-        <Box sx={styles.createButtonContainerStyle}>
-          <Button variant="outlined" fullWidth startIcon={<LuPlus size={15} />} size="small" onClick={handleCreateTemplate} sx={styles.createButtonStyle}>
-            Create New Template
-          </Button>
-        </Box>
-      </Box>
+    <>
+      <AppContainer>
+        {/* Left Panel: Sidebar */}
+        <SmsTemplatesSidebar
+          templates={templates}
+          isFetching={isFetching}
+          selectedTemplate={selectedTemplate}
+          onSelectTemplate={handleSelectTemplate}
+          onRefresh={() => fetchTemplates(true)}
+          onCreateClick={() => {
+            if (hasChanges) {
+              pendingTemplateRef.current = 'CREATE';
+              triggerUnsavedChanges(true);
+            } else {
+              setCreateDialogOpen(true);
+            }
+          }}
+        />
 
-      {/* Middle Panel: Editor */}
-      {!selected && !isFetching ? (
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1.5, px: 4, textAlign: 'center', borderRight: '1px solid', borderColor: 'divider' }}>
-          <Box sx={{ width: 64, height: 64, borderRadius: 3, bgcolor: isDark ? 'rgba(255,255,255,0.05)' : alpha(theme.palette.primary.main, 0.08), display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 0.5 }}>
-            <LuSmartphone size={32} color={theme.palette.primary.main} />
-          </Box>
-          <Typography variant="subtitle1" fontWeight={700} color="text.primary">
-            No template selected
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 300, lineHeight: 1.6 }}>
-            Select a template from the list on the left, or create a new one to start editing.
-          </Typography>
-          <Button variant="outlined" size="small" startIcon={<LuPlus size={14} />} onClick={handleCreateTemplate} sx={{ mt: 0.5, borderRadius: 1.5, fontWeight: 600 }}>
-            Create New Template
-          </Button>
-        </Box>
-      ) : (
-        <Box sx={styles.middlePanelStyle}>
-          <Box sx={styles.middlePanelHeaderStyle}>
-            <Typography variant="subtitle1" fontWeight={700}>Edit SMS Template</Typography>
-            <Typography variant="caption" color="text.secondary">Customize your SMS message content</Typography>
-          </Box>
-          <Box sx={styles.middlePanelContentStyle}>
-            <Typography variant="caption" fontWeight={600} color="text.secondary" display="block" mb={0.5}>
-              Template Name
-            </Typography>
-            <TextField size="small" fullWidth value={templateName} onChange={(e) => { setTemplateName(e.target.value); setHasChanges(true); }} sx={{ mb: 2 }} InputProps={{ sx: styles.editorInputPropsStyle }} />
+        {/* Middle Panel: Editor */}
+        <SmsTemplateEditor
+          selectedTemplate={selectedTemplate}
+          templateName={templateName}
+          setTemplateName={setTemplateName}
+          templateSubject={templateSubject}
+          setTemplateSubject={setTemplateSubject}
+          body={body}
+          setBody={setBody}
+          hasChanges={hasChanges}
+          setHasChanges={setHasChanges}
+          isSaving={isSaving}
+          handleSave={handleSave}
+          onCreateClick={() => {
+            if (hasChanges) {
+              pendingTemplateRef.current = 'CREATE';
+              triggerUnsavedChanges(true);
+            } else {
+              setCreateDialogOpen(true);
+            }
+          }}
+          bodyInputRef={bodyInputRef}
+          subjectInputRef={subjectInputRef}
+          focusFieldRef={focusFieldRef}
+        />
 
-            <Box sx={styles.charCountContainerStyle}>
-              <Typography variant="caption" fontWeight={600} color="text.secondary">SMS Body</Typography>
-              <Typography variant="caption" color={charCount > MAX_SMS_CHARS ? 'error.main' : 'text.secondary'}>
-                {charCount} chars · {smsCount} SMS
-              </Typography>
-            </Box>
-            <TextField
-              multiline minRows={5} fullWidth
-              value={body}
-              onChange={(e) => { setBody(e.target.value); setHasChanges(true); }}
-              placeholder="Write your SMS content here..."
-              InputProps={{ sx: styles.editorInputPropsStyle }}
-            />
+        {/* Drag resize handle */}
+        <DragHandle onMouseDown={handleResizeMouseDown}>
+          <DragHandleDotsContainer className="grip-dots">
+            <DragHandleDot />
+            <DragHandleDot />
+            <DragHandleDot />
+          </DragHandleDotsContainer>
+        </DragHandle>
 
-            <Typography variant="caption" fontWeight={600} color="text.secondary" display="block" mt={2} mb={1}>
-              Insert Variable
-            </Typography>
-            <Box sx={styles.variableContainerStyle}>
-              {SMS_VARIABLES.map((v) => (
-                <Chip
-                  key={v} label={v} size="small" clickable
-                  onClick={() => { setBody((p) => p + v); setHasChanges(true); }}
-                  sx={styles.getVariableChipStyle(isDark, alpha)}
-                />
-              ))}
-            </Box>
-          </Box>
-          <Box sx={styles.editorFooterStyle}>
-            <Button variant="outlined" size="small" startIcon={<LuSend size={14} />} sx={styles.editorFooterButtonStyle}>Send Test SMS</Button>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={isSaving ? <CircularProgress size={14} color="inherit" /> : <LuSave size={14} />}
-              disabled={!hasChanges || isSaving || !selected}
-              onClick={handleSave}
-              sx={styles.editorFooterButtonStyle}
-            >
-              {isSaving ? 'Saving...' : 'Save Template'}
-            </Button>
-          </Box>
-        </Box>
-      )}
-
-      {/* Right Panel: Phone Preview */}
-      <Box sx={styles.rightPanelStyle}>
-        <Box sx={styles.rightPanelHeaderStyle}>
-          <Typography variant="subtitle2" fontWeight={700}>SMS Preview</Typography>
-        </Box>
-        <Box sx={{ px: 2, pt: 2, pb: 1.5, borderBottom: '1px solid', borderColor: 'divider', bgcolor: isDark ? 'background.paper' : '#fafbfc' }}>
-          <CommonTextField
-            size="small" fullWidth label="Preview SMS To"
-            placeholder="e.g., +1234567890"
-            value={previewPhone} 
-            onChange={(e) => {
-              const val = e.target.value.replace(/[^0-9]/g, '');
-              setPreviewPhone(val.slice(0, 10));
-            }}
-            inputProps={{ maxLength: 10 }}
-            InputProps={{ sx: { fontSize: 14, borderRadius: 1.5 } }}
-          />
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, lineHeight: 1.2 }}>
-            This is how your SMS will appear to recipients.
-          </Typography>
-        </Box>
-        <Box sx={styles.getPhoneContainerStyle(isDark)}>
-          {/* Phone Frame */}
-          <Box sx={styles.phoneFrameStyle}>
-            {/* Status bar */}
-            <Box sx={styles.phoneStatusBarStyle}>
-              <Typography sx={styles.phoneStatusBarTextStyle}>9:41 AM</Typography>
-              <Typography sx={styles.phoneStatusBarTextStyle}>📶 🔋</Typography>
-            </Box>
-            {/* Message thread */}
-            <Box sx={styles.phoneMessageThreadStyle}>
-              <Typography sx={styles.phoneSenderTextStyle}>Acme Insurance</Typography>
-              <Box sx={styles.phoneMessageBubbleStyle}>
-                <Typography sx={styles.phoneMessageTextStyle}>
-                  {previewBody()}
-                </Typography>
-              </Box>
-              <Typography sx={styles.phoneDeliveredTextStyle}>Delivered</Typography>
-            </Box>
-          </Box>
-        </Box>
-      </Box>
-
-      {/* Spin animation for refresh icon */}
-      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+        {/* Right Panel: Preview */}
+        <SmsTemplatePreview
+          previewPhone={previewPhone}
+          setPreviewPhone={setPreviewPhone}
+          previewBody={previewBody}
+          isDarkPreview={isDarkPreview}
+          setIsDarkPreview={setIsDarkPreview}
+          previewDevice={previewDevice}
+          previewWidth={previewWidth}
+          onSendTestSms={handleSendTestSms}
+          isSendingTest={isSendingTest}
+          selectedTemplate={selectedTemplate}
+        />
+      </AppContainer>
 
       {UnsavedChangesDialog}
 
@@ -515,10 +479,10 @@ export default function SmsTemplates({ setLoading }) {
       <CreateTemplateDialog
         open={createDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
-        onCreate={executeCreateTemplate}
+        onCreate={handleCreateTemplate}
         isCreating={isCreating}
         type="sms"
       />
-    </Box>
+    </>
   );
 }

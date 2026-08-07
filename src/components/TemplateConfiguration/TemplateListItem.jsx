@@ -18,8 +18,8 @@ export const TEMPLATE_ICONS = {
 };
 
 export const STATUS_COLORS = {
-  Active:   { bg: '#dcfce7', text: '#15803d' },
-  Draft:    { bg: '#fef9c3', text: '#854d0e' },
+  Active: { bg: '#dcfce7', text: '#15803d' },
+  Draft: { bg: '#fef9c3', text: '#854d0e' },
   Inactive: { bg: '#fee2e2', text: '#991b1b' },
 };
 
