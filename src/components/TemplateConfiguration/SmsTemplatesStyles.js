@@ -28,8 +28,8 @@ export const getListItemStyle = (isSelected, theme, alpha) => ({
 });
 
 export const getListItemAvatarStyle = (isSelected, theme, alpha) => ({
-  width: 32, height: 32, 
-  bgcolor: isSelected ? 'primary.main' : alpha(theme.palette.grey[500], 0.12), 
+  width: 32, height: 32,
+  bgcolor: isSelected ? 'primary.main' : alpha(theme.palette.grey[500], 0.12),
   color: isSelected ? 'white' : 'text.secondary'
 });
 
@@ -42,9 +42,9 @@ export const getListItemTitleStyle = (isSelected) => ({
 });
 
 export const getStatusChipStyle = (statusColor) => ({
-  height: 18, fontSize: '10px', fontWeight: 600, 
-  bgcolor: statusColor?.bg, 
-  color: statusColor?.text, 
+  height: 18, fontSize: '10px', fontWeight: 600,
+  bgcolor: statusColor?.bg,
+  color: statusColor?.text,
   borderRadius: '4px', flexShrink: 0
 });
 
@@ -66,10 +66,10 @@ export const charCountContainerStyle = { display: 'flex', alignItems: 'center', 
 export const variableContainerStyle = { display: 'flex', flexWrap: 'wrap', gap: 0.5 };
 
 export const getVariableChipStyle = (isDark, alpha) => ({
-  height: 22, fontSize: '11px', fontFamily: 'monospace', 
-  bgcolor: isDark ? alpha('#3e60d5', 0.15) : '#eff6ff', 
-  color: isDark ? '#93c5fd' : '#1d4ed8', 
-  border: '1px solid', 
+  height: 22, fontSize: '11px', fontFamily: 'monospace',
+  bgcolor: isDark ? alpha('#3e60d5', 0.15) : '#eff6ff',
+  color: isDark ? '#93c5fd' : '#1d4ed8',
+  border: '1px solid',
   borderColor: isDark ? alpha('#3e60d5', 0.3) : '#bfdbfe'
 });
 
@@ -86,7 +86,7 @@ export const rightPanelStyle = { width: 320, flexShrink: 0, display: 'flex', fle
 export const rightPanelHeaderStyle = { px: 2, pt: 2, pb: 1.5, borderBottom: '1px solid', borderColor: 'divider' };
 
 export const getPhoneContainerStyle = (isDark) => ({
-  flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 3, 
+  flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 3,
   bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#f8f9fa'
 });
 
