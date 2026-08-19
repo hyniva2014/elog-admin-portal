@@ -1,13 +1,11 @@
-import { ListItemText } from "@mui/material";
 import {
   OperatorListItemButton,
   OperatorRadio,
   OperatorPrimaryText,
-  OperatorSecondaryText,
 } from "./AlertCenterScreenCard.styles.jsx";
 
 const OperatorItem = ({ op, selectedOperator, onSelect }) => {
-  const { id, name, role } = op;
+  const { id, name } = op;
   const isSelected = selectedOperator === id;
 
   const handleClick = () => onSelect(id);
@@ -19,10 +17,7 @@ const OperatorItem = ({ op, selectedOperator, onSelect }) => {
       selected={isSelected}
     >
       <OperatorRadio checked={isSelected} size="small" />
-      <ListItemText
-        primary={<OperatorPrimaryText>{name}</OperatorPrimaryText>}
-        secondary={<OperatorSecondaryText>{role}</OperatorSecondaryText>}
-      />
+      <OperatorPrimaryText>{name}</OperatorPrimaryText>
     </OperatorListItemButton>
   );
 };

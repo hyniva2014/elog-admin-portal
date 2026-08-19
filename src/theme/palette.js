@@ -96,6 +96,8 @@ const paletteTheme = (themeMode) => {
       inStockBlue: "#2563EB",
 
       retiredGrey: "#CAD5E2",
+
+      allocatedOrange: "#FF9800",
       // Alert Center Colors
       alertActiveBackground: "#f5f7ff",
       navyBlue: "#1e3a8a",
