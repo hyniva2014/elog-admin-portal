@@ -565,8 +565,10 @@ const AlertDetailsPanel = ({ selectedAlert }) => {
           disableSubmit={!selectedOperator}
           loading={assignLoading}
           maxWidth="xs"
+          contentSx={{ px: 3, pt: 2, pb: 1 }}
           content={
             <AssignOperatorContent
+              key={assignOpen ? "assign-open" : "assign-closed"}
               operators={operators}
               renderOperator={renderOperator}
             />

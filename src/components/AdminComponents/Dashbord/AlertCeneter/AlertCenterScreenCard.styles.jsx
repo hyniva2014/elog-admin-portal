@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Paper, Typography, ListItemButton, Radio, Breadcrumbs, Link, FormControl, Pagination } from "@mui/material";
+import { Box, Button, Grid, Paper, Typography, ListItemButton, Radio, Breadcrumbs, Link, FormControl, Pagination, OutlinedInput } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 import TelegramIcon from "@mui/icons-material/Telegram";
 
@@ -951,9 +951,57 @@ export const InfoSectionSpaced = styled(InfoSection)(() => ({
   marginTop: 24,
 }));
 
-export const ScrollableListBox = styled(Box)(() => ({
-  maxHeight: 300,
-  overflow: "auto",
+export const AssignOperatorContentWrapper = styled(Box)(() => ({
+  display: "flex",
+  flexDirection: "column",
+  width: "100%",
+}));
+
+export const AssignOperatorSearchField = styled(OutlinedInput)(({ theme }) => ({
+  width: "100%",
+  marginBottom: theme.spacing(2),
+  borderRadius: 8,
+  fontSize: 14,
+  backgroundColor: theme.palette.common.white,
+  "& .MuiOutlinedInput-notchedOutline": {
+    borderColor: theme.palette.grey[300],
+  },
+  "&:hover .MuiOutlinedInput-notchedOutline": {
+    borderColor: theme.palette.grey[400],
+  },
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: theme.palette.grey[400],
+    borderWidth: 1,
+  },
+  "& .MuiInputBase-input": {
+    padding: "10px 12px",
+    "&::placeholder": {
+      color: theme.palette.text.disabled,
+      opacity: 1,
+    },
+  },
+  "& .MuiInputAdornment-root": {
+    color: theme.palette.text.disabled,
+    marginLeft: theme.spacing(1),
+  },
+}));
+
+export const ScrollableListBox = styled(Box)(({ theme }) => ({
+  maxHeight: 280,
+  overflowY: "auto",
+  border: `1px solid ${theme.palette.grey[300]}`,
+  borderRadius: 8,
+  backgroundColor: theme.palette.common.white,
+  "&::-webkit-scrollbar": {
+    width: 6,
+  },
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: theme.palette.grey[500],
+    borderRadius: 3,
+  },
+  "&::-webkit-scrollbar-track": {
+    backgroundColor: theme.palette.grey[100],
+  },
 }));
 
 export const LocationItemSpaced = styled(LocationItem)(() => ({
@@ -961,13 +1009,27 @@ export const LocationItemSpaced = styled(LocationItem)(() => ({
 }));
 
 // MUI Component Wrappers to replace sx props
-export const OperatorListItemButton = styled(ListItemButton)(() => ({
-  borderRadius: 8,
-  marginBottom: 4,
+export const OperatorListItemButton = styled(ListItemButton)(({ theme }) => ({
+  padding: "12px 16px",
+  borderRadius: 0,
+  gap: theme.spacing(1),
+  "&:hover": {
+    backgroundColor: theme.palette.action.hover,
+  },
+  "&.Mui-selected": {
+    backgroundColor: "transparent",
+    "&:hover": {
+      backgroundColor: theme.palette.action.hover,
+    },
+  },
 }));
 
-export const OperatorRadio = styled(Radio)(() => ({
-  marginRight: 8,
+export const OperatorRadio = styled(Radio)(({ theme }) => ({
+  padding: 4,
+  color: theme.palette.grey[400],
+  "&.Mui-checked": {
+    color: theme.palette.custom?.navyBlue || "#284495",
+  },
 }));
 
 export const TelegramIconStyled = styled(TelegramIcon)(() => ({
@@ -975,13 +1037,10 @@ export const TelegramIconStyled = styled(TelegramIcon)(() => ({
   color: "white",
 }));
 
-export const OperatorPrimaryText = styled(Typography)(() => ({
-  fontWeight: 600,
+export const OperatorPrimaryText = styled(Typography)(({ theme }) => ({
+  fontWeight: 500,
   fontSize: 14,
-}));
-
-export const OperatorSecondaryText = styled(Typography)(() => ({
-  fontSize: 12,
+  color: theme.palette.text.primary,
 }));
 
 export const PanelHeader = styled(Box)(({ theme }) => ({

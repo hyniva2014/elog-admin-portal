@@ -35,6 +35,7 @@ const CommonDialogForm = ({
   headerActions,
   isEditing = false,
   disableSubmit = false,
+  contentSx,
 }) => {
   const theme = useTheme();
   const styles = dialogStyles(theme);
@@ -139,7 +140,7 @@ const CommonDialogForm = ({
         </Box>
       </DialogTitle>
 
-      <DialogContent>{dialogContent}</DialogContent>
+      <DialogContent sx={contentSx}>{dialogContent}</DialogContent>
 
       {dialogActions}
     </Dialog>

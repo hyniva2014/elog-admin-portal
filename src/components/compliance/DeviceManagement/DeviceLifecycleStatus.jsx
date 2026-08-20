@@ -48,6 +48,12 @@ const mapSegmentsWithTheme = (segments, theme) => {
         borderColor = theme.palette.info.light;
         labelColor = theme.palette.info.main;
         break;
+      case "allocated":
+        chartColor = theme.palette.custom.allocatedOrange;
+        bg = isDark ? "#FFE0B2" : "#FFF3E0";
+        borderColor = "#FFCC80";
+        labelColor = theme.palette.custom.allocatedOrange;
+        break;
       case "inMaintenance":
         chartColor = theme.palette.warning.main;
         bg = isDark ? theme.palette.warning.darker : theme.palette.warning.lighter;
@@ -164,6 +170,9 @@ const DeviceLifecycleStatus = ({
 
       case "inStock":
         return theme.palette.custom.inStockBlue;
+
+      case "allocated":
+        return theme.palette.custom.allocatedOrange;
 
       case "retired":
       default:
